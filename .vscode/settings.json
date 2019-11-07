@@ -1,7 +1,0 @@
-{
-  "editor.formatOnPaste": true,
-  "editor.formatOnSave": true,
-  "eslint.autoFixOnSave": true,
-  "tslint.autoFixOnSave": true,
-  "eslint.workingDirectories": ["./backend"]
-}
