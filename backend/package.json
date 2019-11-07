@@ -14,6 +14,18 @@
     "test": "jest --watch",
     "lint": "esw -w src test"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.js": [
+      "eslint src --ext .js",
+      "prettier --write",
+      "git add"
+    ]
+  },
   "keywords": [
     "express",
     "babel",
@@ -50,8 +62,11 @@
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-watch": "^5.0.1",
+    "husky": "^3.0.9",
     "jest": "^24.5.0",
+    "lint-staged": "^9.4.2",
     "nodemon": "^1.18.10",
+    "prettier": "^1.18.2",
     "supertest": "^4.0.2"
   },
   "babel": {
