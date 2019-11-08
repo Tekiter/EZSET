@@ -5,6 +5,10 @@
   "repository": "https://github.com/Tekiter/EZSET",
   "license": "MIT",
   "main": "dist/index.js",
+  "engines": {
+    "node": "~10.15.1",
+    "npm": ">=6.4.0"
+  },
   "scripts": {
     "prestart": "npm run -s build",
     "start": "node dist/index.js",
@@ -42,15 +46,12 @@
     "babel-jest": "^24.5.0",
     "babel-register": "^6.26.0",
     "dotenv": "^7.0.0",
-    "eslint": "^6.6.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.18.2",
+    "eslint": "^5.15.2",
+    "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-jest": "^22.4.1",
-    "eslint-plugin-promise": "^4.2.1",
     "eslint-watch": "^5.0.1",
     "jest": "^24.5.0",
     "nodemon": "^1.18.10",
-    "prettier-eslint-cli": "^5.0.0",
     "supertest": "^4.0.2"
   },
   "babel": {
@@ -73,7 +74,6 @@
     "parser": "babel-eslint",
     "plugins": [
       "import",
-      "promise",
       "jest"
     ],
     "parserOptions": {
@@ -85,12 +85,11 @@
       "jest": true
     },
     "extends": [
-      "airbnb-base"
+      "eslint:recommended"
     ],
     "rules": {
       "jest/no-focused-tests": 2,
-      "jest/no-identical-title": 2,
-      "no-console": "error"
+      "jest/no-identical-title": 2
     }
   },
   "jest": {
