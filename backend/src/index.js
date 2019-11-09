@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import app from './app'
 import database from './utils/database'
+import app from './app'
 
 const { PORT = 8080 } = process.env
 
