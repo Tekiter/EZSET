@@ -1,57 +1,23 @@
 <template>
-  <v-app v-if="!$route.meta.layout">
-    <v-navigation-drawer v-model="drawer" app clipped>
-      <v-list dense>
-        <v-list-item link>
-          <v-list-item-action>
-            <v-icon>mdi-view-dashboard</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Dashboard</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item link>
-          <v-list-item-action>
-            <v-icon>mdi-settings</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Settings</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
+  <general-layout v-if="!$route.meta.layout"></general-layout>
 
-    <v-app-bar app clipped-left>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-toolbar-title>EZSET</v-toolbar-title>
-    </v-app-bar>
+  <empty-layout v-else-if="$route.meta.layout == 'empty'"></empty-layout>
 
-    <v-content>
-      <router-view></router-view>
-    </v-content>
-
-    <v-footer app>&copy; EZSET</v-footer>
-  </v-app>
-
-  <v-app v-else-if="$route.meta.layout == 'empty'">
-    <v-content>
-      <router-view></router-view>
-    </v-content>
-  </v-app>
-
-  <v-app v-else>
-    <router-view></router-view>
-  </v-app>
+  <router-view v-else></router-view>
 </template>
 
 <script>
+import GeneralLayout from './components/layout/General.vue'
+import EmptyLayout from './components/layout/Empty.vue'
+
 export default {
   name: 'App',
-
+  components: {
+    GeneralLayout,
+    EmptyLayout,
+  },
   data() {
-    return {
-      drawer: true,
-    }
+    return {}
   },
 }
 </script>
