@@ -1,4 +1,6 @@
 /* eslint-disable no-console */
+const { validationResult } = require('express-validator')
+
 export function databaseError(res, error) {
     const errfunc = err => {
         console.log(err)
@@ -22,5 +24,18 @@ export function unexpectedError(res, error) {
         errfunc(error)
     } else {
         return errfunc
+    }
+}
+
+export function validateParams(req, res, next) {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        res.status(400).json({ errors: errors.array() })
+        return false
+    } else {
+        if (next) {
+            next()
+        }
+        return true
     }
 }
