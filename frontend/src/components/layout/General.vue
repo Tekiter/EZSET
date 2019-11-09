@@ -33,8 +33,7 @@
     <v-footer app>&copy; EZSET</v-footer>
   </v-app>
 </template>
-<style scoped>
-</style>
+<style scoped></style>
 <script>
 export default {
   data() {
