@@ -20,11 +20,11 @@ yarn
 ### frontend
 ```
 cd ./frontend
-yarn dev
+yarn serve
 ```
 
 ### backend
 ```
 cd ./backend
-yarn serve
+yarn dev
 ```
