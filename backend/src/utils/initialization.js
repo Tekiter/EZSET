@@ -28,7 +28,7 @@ const initialization = {
             console.log('Initialization detected.') // eslint-disable-line no-console
             await initialization.createSuperAdmin()
 
-            setConfig('groupName', 'EZSET')
+            config.setConfig('groupName', 'EZSET')
         }
     },
 }
