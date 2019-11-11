@@ -24,4 +24,5 @@ const database = {
     },
 }
 
-export default database
+module.exports.default = database
+module.exports = database

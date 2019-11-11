@@ -72,7 +72,5 @@ const auth = {
     },
 }
 
+module.exports.default = auth
 module.exports = auth
-
-// export default auth
-// export { auth }
