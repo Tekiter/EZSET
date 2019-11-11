@@ -18,7 +18,7 @@ const initialization = {
             password: 'admin_' + rndNum,
         })
         const result = await admin.save()
-        config.setConfig('superadmin', result.id)
+        config.setConfig('superAdmin', result.username)
 
         console.log(`Superadmin created (admin/admin_${rndNum})`) // eslint-disable-line no-console
     },
