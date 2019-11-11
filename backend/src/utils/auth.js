@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt-nodejs'
 import jwt from 'jsonwebtoken'
+import config from '../utils/config'
 
 const auth = {
     hashPassword(password) {
@@ -54,6 +55,22 @@ const auth = {
         }
         res.status(401).json({ message: '로그인이 필요합니다.' })
     },
+    async superAdminRequired(req, res, next) {
+        const f = () => {
+            if (req.user.username === config.getConfig('superAdmin')) {
+                next()
+            } else {
+                res.status(403).json({ message: '권한이 부족합니다.' })
+            }
+        }
+
+        if (req.user) {
+            f()
+        } else {
+            auth.loginRequired(req, res, f)
+        }
+    },
 }
 
-export default auth
+module.exports.default = auth
+module.exports = auth
