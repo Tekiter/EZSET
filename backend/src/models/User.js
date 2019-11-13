@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
             trim: true,
         },
     },
+    roles: [{ type: Number, ref: 'role' }],
 })
 
 userSchema
