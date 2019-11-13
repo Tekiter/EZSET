@@ -6,6 +6,7 @@ import { databaseError, unexpectedError, validateParams } from '../../utils/api'
 import User from '../../models/User'
 
 const router = Router()
+router.loginNotRequired = true
 
 router
     .route('/login')

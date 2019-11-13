@@ -2,6 +2,8 @@ import fs from 'fs'
 import path from 'path'
 import { Router } from 'express'
 
+import { loginRequired } from '../../utils/auth'
+
 const router = Router()
 const indexJs = path.basename(__filename)
 
@@ -12,11 +14,13 @@ fs.readdirSync(__dirname)
             file !== indexJs &&
             file.slice(-9) === '.route.js'
     )
-    .forEach(routeFile =>
-        router.use(
-            `/${routeFile.split('.')[0]}`,
-            require(`./${routeFile}`).default
-        )
-    )
+    .forEach(routeFile => {
+        const subrouter = require(`./${routeFile}`).default
+        if (subrouter.loginNotRequired) {
+            router.use(`/${routeFile.split('.')[0]}`, subrouter)
+        } else {
+            router.use(`/${routeFile.split('.')[0]}`, loginRequired, subrouter)
+        }
+    })
 
 export default router
