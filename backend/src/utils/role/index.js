@@ -38,26 +38,61 @@ const role = {
     async createRole(name, extend = 'user') {
         let newtag
         do {
-            newtag = await random(1, 0x1000)
+            newtag = await random(1, 0xffff)
         } while (ac.hasRole(newtag))
-        dbrole = new Role({
-            tag: newtag.toString(16),
+        newtag = newtag.toString(16)
+        ac.grant(newtag)
+        ac.extendRole(newtag, extend)
+
+        const dbrole = new Role({
+            tag: newtag,
             name: name,
             extend: extend,
         })
         await dbrole.save()
-        ac.grant(newtag).extend(extend)
     },
+    async getRoles() {
+        const roletags = ac.getRoles()
 
+        // const result = []
+
+        const result = await Promise.all(
+            roletags.map(async tag => {
+                let name = tag
+                if (!Object.keys(defaultRoles).includes(tag)) {
+                    const roledata = await Role.findOne()
+                        .where('tag')
+                        .equals(tag)
+                    name = roledata.name
+                }
+
+                return {
+                    tag,
+                    name,
+                }
+            })
+        )
+
+        return result
+    },
     async getPermission(req, res, next) {
-        const user = req.user
+        try {
+            const user = req.user
 
-        // const roles = convertRoleNames(user.roles)
+            // const roles = convertRoleNames(user.roles)
 
-        req.permission = ac.can(user.roles)
+            if (!user.roles) {
+                user.roles = ['user']
+            }
 
-        next()
+            req.permission = ac.can(user.roles)
+
+            next()
+        } catch (err) {
+            res.status(500).json({ message: 'unexpected error' })
+        }
     },
 }
 
 module.exports = role
+export default role

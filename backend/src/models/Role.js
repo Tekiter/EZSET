@@ -5,7 +5,7 @@ const roleSchema = new mongoose.Schema({
     tag: { type: String, trim: true, required: true, unique: true },
     name: { type: String, trim: true, required: true },
     // extend: { type: [String], default: ['user'] },
-    permissions: {},
+    permissions: { type: mongoose.Schema.Types.Mixed, default: {} },
 })
 
 roleSchema.plugin(autoIncrement.plugin, {

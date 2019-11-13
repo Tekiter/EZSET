@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
             trim: true,
         },
     },
-    roles: { type: [Number] },
+    roles: { type: [String] },
 })
 
 userSchema
