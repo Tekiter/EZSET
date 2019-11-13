@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 const { validationResult } = require('express-validator')
 
+export const asyncRoute = fn => (...args) => fn(...args).catch(args[2])
+
 export function databaseError(res, error) {
     const errfunc = err => {
         console.log(err)
