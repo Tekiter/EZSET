@@ -35,14 +35,14 @@ const role = {
         })
         // console.log(ac.getGrants())
     },
-    async createRole(name, extend = 'user') {
+    async createRole(name, extend = ['user']) {
         let newtag
         do {
             newtag = await random(1, 0xffff)
         } while (ac.hasRole(newtag))
         newtag = newtag.toString(16)
-        ac.grant(newtag)
-        ac.extendRole(newtag, extend)
+        ac.grant(newtag).extend(extend)
+        // ac.extendRole(newtag, extend)
 
         const dbrole = new Role({
             tag: newtag,
@@ -74,6 +74,9 @@ const role = {
         )
 
         return result
+    },
+    async getGrant(role) {
+        return ac.getGrants()[role]
     },
     async getPermission(req, res, next) {
         try {
