@@ -39,6 +39,7 @@
         "eslint"
     ],
     "dependencies": {
+        "accesscontrol": "^2.2.1",
         "babel-cli": "^6.26.0",
         "babel-plugin-transform-class-properties": "^6.24.1",
         "babel-plugin-transform-object-rest-spread": "^6.26.0",

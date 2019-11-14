@@ -9,11 +9,12 @@ const auth = {
     checkPassword(password, hash) {
         return bcrypt.compareSync(password, hash)
     },
-    createAccessToken({ username }) {
+    createAccessToken({ username, roles }) {
         return new Promise(function(resolve, reject) {
             jwt.sign(
                 {
                     username,
+                    roles,
                 },
                 process.env.JWT_SECRET,
                 { expiresIn: 86400 },

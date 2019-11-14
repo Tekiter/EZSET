@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
             trim: true,
         },
     },
+    roles: { type: [String] },
 })
 
 userSchema
