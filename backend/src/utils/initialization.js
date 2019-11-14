@@ -1,7 +1,6 @@
 import random from 'random-number-csprng'
 import config from '../utils/config'
 import User from '../models/User'
-import role from '../utils/role'
 
 const initialization = {
     async createSuperAdmin() {
@@ -31,8 +30,6 @@ const initialization = {
 
             config.setConfig('groupName', 'EZSET')
         }
-
-        await role.initialize()
     },
 }
 
