@@ -1,45 +1,14 @@
 export const adminRole = {
-    board: {
-        read: {
-            any: {
-                all: true,
-            },
-            own: {
-                all: true,
-            },
+    profile: {
+        all: ['read', 'update', 'delete'],
+        params: {
+            password: ['!read', 'update'],
         },
-        write: [],
-        create: [],
+    },
+    board: {
+        all: ['read', 'write'],
     },
 }
-
-// export const userRole = {
-//     profile: {
-//         read: {
-//             any: {
-//                 all: true,
-//             },
-//         },
-//         update: {
-//             own: {
-//                 all: true,
-//             },
-//         },
-//     },
-//     board: {
-//         read: {
-//             any: {
-//                 all: true,
-//             },
-//             own: {
-//                 all: true,
-//             },
-//         },
-//         write: {
-//             any: {},
-//         },
-//     },
-// }
 
 export const userRole = {
     profile: {
@@ -48,7 +17,10 @@ export const userRole = {
             own: ['read', 'update', 'delete'],
         },
         params: {
-            password: ['!read'],
+            password: {
+                any: ['!read'],
+                own: ['!read'],
+            },
         },
     },
     board: {
