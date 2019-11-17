@@ -1,11 +1,11 @@
 import { Router } from 'express'
-import { loginRequired } from '../../utils/auth'
-// import { getPermission } from '../../utils/role'
 
 const router = Router()
 
-router.get('/', [loginRequired], (req, res) => {
-    res.json({ message: req.permission })
+router.get('/', [], (req, res) => {
+    if (req.perm('board', '1234').can('write', 'own')) {
+        res.json({ message: req.permission })
+    }
 })
 
 export default router
