@@ -1,4 +1,5 @@
 import Permission from './Permission'
+import Query from './Query'
 
 class RoleSystem {
     constructor(...params) {
@@ -6,11 +7,25 @@ class RoleSystem {
     }
 
     setRole(roletag, roleobj) {
+        if (!roleobj) {
+            roleobj = {}
+        }
         if (roleobj instanceof Role) {
             this._roles[roletag] = roleobj
         } else {
             this._roles[roletag] = new Role(roleobj)
         }
+    }
+
+    role(roletag) {
+        if (!this._roles[roletag]) {
+            this.setRole(roletag, {})
+        }
+        return new Query({ role: this._roles[roletag], mode: 'grant' })
+    }
+
+    hasRole(roletag) {
+        return !!this._roles[roletag]
     }
 
     createPermChecker(roles) {

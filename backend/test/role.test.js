@@ -47,3 +47,26 @@ describe('role system test', () => {
         expect(perm('board').can('read')).toBeTruthy()
     })
 })
+
+describe('role modify test', () => {
+    test('add role', () => {
+        const roles = new RoleSystem()
+        roles.setRole('user', {
+            profile: {
+                all: {
+                    any: ['read'],
+                    own: ['read', 'write'],
+                },
+            },
+        })
+
+        const perm = roles.createPermChecker('user')
+
+        expect(perm('profile').can('read')).toBeTruthy()
+        expect(perm('profile').can('write')).toBeFalsy()
+        expect(perm('profile').canOwn('read')).toBeTruthy()
+        expect(perm('profile').canOwn('write')).toBeTruthy()
+    })
+
+    test('add multiple roles', () => {})
+})
