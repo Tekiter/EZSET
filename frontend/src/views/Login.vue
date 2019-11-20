@@ -30,6 +30,12 @@
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer />
+                            <v-btn
+                                type="submit"
+                                color="primary"
+                                :to="'/register'"
+                                >Sign up</v-btn
+                            >
                             <v-btn type="submit" color="primary">Login</v-btn>
                         </v-card-actions>
                     </v-form>

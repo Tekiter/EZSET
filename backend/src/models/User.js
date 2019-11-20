@@ -15,10 +15,8 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
     info: {
-        realname: {
-            type: String,
-            trim: true,
-        },
+        type: mongoose.Schema.Types.Mixed,
+        default: {},
     },
     roles: { type: [String] },
 })
