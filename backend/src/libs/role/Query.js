@@ -3,10 +3,19 @@ class Query {
         this.targetRole = role
         this._mode = mode
         this._resources = []
+        this._resource = undefined
+        this._params = []
+    }
+
+    clear() {
+        this._resources = []
+        this._resource = undefined
         this._params = []
     }
 
     resource(resource) {
+        this.clear()
+        this._resource = resource
         if (Array.isArray(resource)) {
             resource.forEach(res => {
                 this._resources.push(res)
@@ -22,80 +31,88 @@ class Query {
         return this
     }
 
-    canAny(action) {}
+    canAny(action) {
+        return this.can(action, 'any')
+    }
 
-    canOwn(action) {}
+    canOwn(action) {
+        return this.can(action, 'own')
+    }
 
-    can(action, type) {
-        if (this._params.length === 0) {
-            this._resources.forEach(reskey => {
-                if (!this.targetRole[reskey]) {
-                    this.targetRole[reskey] = []
-                }
-
-                if (Array.isArray(this.targetRole[reskey].all)) {
-                    if (type) {
-                        this.targetRole[reskey].all = convertToAnyOwn(
-                            this.targetRole[reskey].all
-                        )
-                        // if (!Array.isArray(this.targetRole[reskey].all[type])) {
-                        //     this.targetRole[reskey].all[type] = []
-                        // }
-                        // this.targetRole[reskey].all[type].push(action)
-                        this.targetRole[reskey].all[
-                            type
-                        ] = forcePushIfNotExists(
-                            this.targetRole[reskey].all[type],
-                            action
-                        )
-                    } else {
-                        this.targetRole[reskey].all.push(action)
-                    }
-                } else {
-                    if (type) {
-                        if (!Array.isArray(this.targetRole[reskey].all[type])) {
-                            this.targetRole[reskey].all[type] = []
-                        }
-                        this.targetRole[reskey].all[type].push(action)
-                    } else {
-                        if (
-                            !Array.isArray(this.targetRole[reskey].all['any'])
-                        ) {
-                            this.targetRole[reskey].all['any'] = []
-                        }
-                        this.targetRole[reskey].all['any'].push(action)
-
-                        if (
-                            !Array.isArray(this.targetRole[reskey].all['all'])
-                        ) {
-                            this.targetRole[reskey].all['all'] = []
-                        }
-                        this.targetRole[reskey].all['all'].push(action)
-                    }
-                }
-
-                // if (type) {
-                //     if (Array.isArray(this.targetRole[reskey])) {
-                //         this.targetRole[reskey] = convertToAnyOwn(
-                //             this.targetRole[reskey]
-                //         )
-                //     }
-
-                //     if (Array.isArray(this.targetRole[reskey][type])) {
-                //         this.targetRole[reskey][type].push(action)
-                //     } else {
-                //         this.targetRole[reskey][type] = [action]
-                //     }
-                // } else {
-                // }
-            })
+    can(actions, type) {
+        if (!Array.isArray(actions)) {
+            actions = [actions]
         }
+
+        const resKey = this._resource
+        if (!resKey) {
+            throw new Error('Need a resource to be granted.')
+        }
+
+        const targetRes = this.targetRole.resource(resKey)
+
+        actions.forEach(action => {
+            if (this._params.length === 0) {
+                if (!targetRes.all) {
+                    targetRes.all = []
+                }
+                targetRes.all = grantActionToPerms(targetRes.all, action, type)
+            } else {
+                if (!targetRes.params) {
+                    targetRes.params = {}
+                }
+                this._params.forEach(param => {
+                    if (!targetRes.params[param]) {
+                        targetRes.params[param] = []
+                    }
+
+                    targetRes.params[param] = grantActionToPerms(
+                        targetRes.params[param],
+                        action,
+                        type
+                    )
+                })
+            }
+        })
+
+        return this
     }
 
     canNot(action) {}
 }
 
-function forcePushIfNotExists(arr, item) {
+const typeAvailable = ['any', 'own']
+
+function grantActionToPerms(obj, action, type) {
+    if (Array.isArray(obj)) {
+        if (type) {
+            let newobj = convertToAnyOwn(obj)
+            newobj[type] = forcePushArray(newobj[type], action)
+            return newobj
+        } else {
+            obj.push(action)
+            return obj
+        }
+    } else {
+        if (type) {
+            obj[type] = forcePushArray(obj[type], action)
+            return obj
+        } else {
+            typeAvailable.forEach(ntype => {
+                obj[ntype] = forcePushArray(obj[ntype], action)
+            })
+            return obj
+        }
+    }
+}
+
+// function grantToAnyOwn(obj, action, type) {
+//     if (!Array.isArray(obj[type])) {
+//         obj[type] = forcePushArray(obj[type], action)
+//     }
+// }
+
+function forcePushArray(arr, item) {
     if (!Array.isArray(arr)) {
         return [item]
     }

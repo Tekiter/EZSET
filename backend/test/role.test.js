@@ -68,5 +68,33 @@ describe('role modify test', () => {
         expect(perm('profile').canOwn('write')).toBeTruthy()
     })
 
-    test('add multiple roles', () => {})
+    // test('add multiple roles', () => {})
+})
+
+describe('role grant test', () => {
+    test('grant can', () => {
+        const roles = new RoleSystem()
+
+        roles
+            .role('user')
+
+            .resource('board')
+            .canAny('read')
+
+            .resource('profile')
+            .can('read')
+            .canOwn(['update', 'delete'])
+        // .canOwn('update')
+
+        // console.log(roles.getRole('user').resource('profile'))
+
+        const perm = roles.createPermChecker('user')
+
+        expect(perm('profile').can('read')).toBeTruthy()
+        expect(perm('profile').canOwn('read')).toBeTruthy()
+        expect(perm('profile').can('update')).toBeFalsy()
+        expect(perm('profile').canOwn('update')).toBeTruthy()
+        expect(perm('profile').can('delete')).toBeFalsy()
+        expect(perm('profile').canOwn('delete')).toBeTruthy()
+    })
 })

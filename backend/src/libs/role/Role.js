@@ -17,6 +17,10 @@ class RoleSystem {
         }
     }
 
+    getRole(roletag) {
+        return this._roles[roletag]
+    }
+
     role(roletag) {
         if (!this._roles[roletag]) {
             this.setRole(roletag, {})
@@ -59,6 +63,9 @@ class Role {
     }
 
     resource(name) {
+        if (!this._role[name]) {
+            this._role[name] = {}
+        }
         return this._role[name]
     }
 
