@@ -13,7 +13,7 @@ class Query {
         this._params = []
     }
 
-    resource(resource) {
+    resource(resource, param) {
         this.clear()
         this._resource = resource
         if (Array.isArray(resource)) {
@@ -23,11 +23,20 @@ class Query {
         } else {
             this._resources.push(resource)
         }
+
+        if (param) {
+            return this.param(param)
+        }
+
         return this
     }
 
     param(param) {
-        this._params.push(param)
+        if (Array.isArray(param)) {
+            this._params.push(...param)
+        } else {
+            this._params.push(param)
+        }
         return this
     }
 
@@ -78,7 +87,20 @@ class Query {
         return this
     }
 
-    canNot(action) {}
+    cannot(action, type) {
+        if (!Array.isArray(action)) {
+            action = [action]
+        }
+        return this.can(action.map(i => `!${i}`), type)
+    }
+
+    cannotAny(action) {
+        return this.cannot(action, 'any')
+    }
+
+    cannotOwn(action) {
+        return this.cannot(action, 'own')
+    }
 }
 
 const typeAvailable = ['any', 'own']
@@ -90,7 +112,8 @@ function grantActionToPerms(obj, action, type) {
             newobj[type] = forcePushArray(newobj[type], action)
             return newobj
         } else {
-            obj.push(action)
+            // obj.push(action)
+            obj = forcePushArray(obj, action)
             return obj
         }
     } else {
@@ -112,13 +135,44 @@ function grantActionToPerms(obj, action, type) {
 //     }
 // }
 
+function parseNeg(item) {
+    let negcnt = 0
+    let c
+    for (c of item) {
+        if (c !== '!') {
+            break
+        }
+        negcnt++
+    }
+    return [negcnt, item.substr(negcnt)]
+}
+
 function forcePushArray(arr, item) {
     if (!Array.isArray(arr)) {
         return [item]
     }
 
-    if (arr.indexOf(item) < 0) {
-        arr.push(item)
+    const [negcnt, pitem] = parseNeg(item)
+    const isNeg = negcnt % 2 === 1
+
+    if (isNeg) {
+        const proidx = arr.indexOf(pitem)
+        if (proidx >= 0) {
+            arr.splice(proidx, 1)
+        }
+
+        if (arr.indexOf(`!${pitem}`) < 0) {
+            arr.push(`!${pitem}`)
+        }
+    } else {
+        const negidx = arr.indexOf(`!${item}`)
+        if (negidx >= 0) {
+            arr.splice(negidx, 1)
+        }
+
+        if (arr.indexOf(item) < 0) {
+            arr.push(item)
+        }
     }
 
     return arr

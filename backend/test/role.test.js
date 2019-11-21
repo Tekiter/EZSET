@@ -72,21 +72,18 @@ describe('role modify test', () => {
 })
 
 describe('role grant test', () => {
-    test('grant can', () => {
+    test('can', () => {
         const roles = new RoleSystem()
 
         roles
             .role('user')
 
-            .resource('board')
-            .canAny('read')
-
             .resource('profile')
             .can('read')
             .canOwn(['update', 'delete'])
-        // .canOwn('update')
 
-        // console.log(roles.getRole('user').resource('profile'))
+            .resource('profile', 'password')
+            .can('!read')
 
         const perm = roles.createPermChecker('user')
 
@@ -96,5 +93,28 @@ describe('role grant test', () => {
         expect(perm('profile').canOwn('update')).toBeTruthy()
         expect(perm('profile').can('delete')).toBeFalsy()
         expect(perm('profile').canOwn('delete')).toBeTruthy()
+        expect(perm('profile', 'password').can('read')).toBeFalsy()
+        expect(perm('profile', 'password').canOwn('read')).toBeFalsy()
+        expect(perm('profile', 'password').can('update')).toBeFalsy()
+        expect(perm('profile', 'password').canOwn('update')).toBeTruthy()
+    })
+
+    test('cannot', () => {
+        const roles = new RoleSystem()
+
+        roles
+            .role('user')
+            .resource('profile')
+            .can('read')
+            .resource('profile', 'password')
+            .cannot('read')
+            .canOwn('read')
+            .cannotAny('read')
+
+        const perm = roles.createPermChecker('user')
+
+        expect(perm('profile').can('read')).toBeTruthy()
+        expect(perm('profile', 'password').can('read')).toBeFalsy()
+        expect(perm('profile', 'password').canOwn('read')).toBeTruthy()
     })
 })
