@@ -2,7 +2,7 @@ import { userRole, adminRole } from '../src/utils/role/default'
 import { Role, RoleSystem } from '../src/libs/role'
 
 describe('Role class test', () => {
-    const role = new Role(userRole)
+    const role = new Role({ perm: userRole })
 
     test('can any', () => {
         const perm = role.createPermChecker()
@@ -29,8 +29,8 @@ describe('Role class test', () => {
 
 describe('role system test', () => {
     const roles = new RoleSystem()
-    roles.setRole('user', userRole)
-    roles.setRole('admin', adminRole)
+    roles.setRole({ tag: 'user', perm: userRole })
+    roles.setRole({ tag: 'admin', perm: adminRole })
 
     test('profile: user + admin', () => {
         const perm = roles.createPermChecker(['user', 'admin'])
@@ -51,11 +51,14 @@ describe('role system test', () => {
 describe('role modify test', () => {
     test('add role', () => {
         const roles = new RoleSystem()
-        roles.setRole('user', {
-            profile: {
-                all: {
-                    any: ['read'],
-                    own: ['read', 'write'],
+        roles.setRole({
+            tag: 'user',
+            perm: {
+                profile: {
+                    all: {
+                        any: ['read'],
+                        own: ['read', 'write'],
+                    },
                 },
             },
         })
@@ -83,7 +86,7 @@ describe('role grant test', () => {
             .canOwn(['update', 'delete'])
 
             .resource('profile', 'password')
-            .can('!read')
+            .cannot(['read', 'delete'])
 
         const perm = roles.createPermChecker('user')
 
@@ -97,6 +100,7 @@ describe('role grant test', () => {
         expect(perm('profile', 'password').canOwn('read')).toBeFalsy()
         expect(perm('profile', 'password').can('update')).toBeFalsy()
         expect(perm('profile', 'password').canOwn('update')).toBeTruthy()
+        expect(perm('profile', 'password').canOwn('delete')).toBeFalsy()
     })
 
     test('cannot', () => {

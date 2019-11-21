@@ -6,15 +6,16 @@ class RoleSystem {
         this._roles = {}
     }
 
-    setRole(roletag, roleobj) {
-        if (!roleobj) {
-            roleobj = {}
+    setRole({ tag, perm, name }) {
+        if (!perm) {
+            perm = {}
         }
-        if (roleobj instanceof Role) {
-            this._roles[roletag] = roleobj
-        } else {
-            this._roles[roletag] = new Role(roleobj)
-        }
+        // if (perm instanceof Role) {
+        //     this._roles[tag] = perm
+        // } else {
+        //     this._roles[tag] = new Role(perm)
+        // }
+        this._roles[tag] = new Role({ perm, name })
     }
 
     getRole(roletag) {
@@ -23,7 +24,7 @@ class RoleSystem {
 
     role(roletag) {
         if (!this._roles[roletag]) {
-            this.setRole(roletag, {})
+            this.setRole({ tag: roletag, perm: {} })
         }
         return new Query({ role: this._roles[roletag], mode: 'grant' })
     }
@@ -54,24 +55,25 @@ class RoleSystem {
 }
 
 class Role {
-    constructor(roleobj) {
-        if (roleobj) {
-            this._role = roleobj
+    constructor({ perm, name }) {
+        if (perm) {
+            this._perm = perm
         } else {
-            this._role = {}
+            this._perm = {}
         }
+        this.name = name
     }
 
     resource(name) {
-        if (!this._role[name]) {
-            this._role[name] = {}
+        if (!this._perm[name]) {
+            this._perm[name] = {}
         }
-        return this._role[name]
+        return this._perm[name]
     }
 
     createPermChecker() {
         return (resource, param) => {
-            return new Permission(this._role[resource], param)
+            return new Permission(this._perm[resource], param)
         }
     }
 }
