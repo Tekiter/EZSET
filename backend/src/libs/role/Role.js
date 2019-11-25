@@ -4,6 +4,7 @@ import Query from './Query'
 class RoleSystem {
     constructor(...params) {
         this._roles = {}
+        this._default = new Role({ tag: 'default', name: 'default' })
     }
 
     setRole({ tag, perm, name }) {
@@ -29,6 +30,18 @@ class RoleSystem {
         return new Query({ role: this._roles[roletag], mode: 'grant' })
     }
 
+    getDefault() {
+        return this._default
+    }
+
+    // setDefault(defaultRole) {
+    //     this._default = defaultRole
+    // }
+
+    default() {
+        return new Query({ role: this._default })
+    }
+
     hasRole(roletag) {
         return !!this._roles[roletag]
     }
@@ -38,8 +51,15 @@ class RoleSystem {
             roles = [roles]
         }
 
+        // roles = [this.getDefault(), ...roles]
+
         return (resource, param) => {
             let resources = []
+
+            if (this.getDefault().resource(resource)) {
+                resources.push(this.getDefault().resource(resource))
+            }
+
             roles.forEach(rname => {
                 if (
                     this._roles[rname] &&

@@ -116,9 +116,25 @@ describe('role grant test', () => {
             .cannotAny('read')
 
         const perm = roles.createPermChecker('user')
+        // console.log(perm('profile'))
 
         expect(perm('profile').can('read')).toBeTruthy()
         expect(perm('profile', 'password').can('read')).toBeFalsy()
         expect(perm('profile', 'password').canOwn('read')).toBeTruthy()
+    })
+})
+
+describe('default role test', () => {
+    test('default', () => {
+        const roles = new RoleSystem()
+
+        roles
+            .default()
+            .resource('profile')
+            .can('read')
+
+        const perm = roles.createPermChecker('user')
+
+        expect(perm('profile').can('read')).toBeTruthy()
     })
 })
