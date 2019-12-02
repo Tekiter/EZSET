@@ -1,5 +1,38 @@
-import { userRole, adminRole } from '../src/utils/role/default'
+// import { userRole, adminRole } from '../src/utils/role/default'
 import { Role, RoleSystem } from '../src/libs/role'
+
+export const adminRole = {
+    profile: {
+        all: ['read', 'update', 'delete'],
+        params: {
+            password: ['!read', 'update'],
+        },
+    },
+    board: {
+        all: ['read', 'write'],
+    },
+}
+
+export const userRole = {
+    profile: {
+        all: {
+            any: ['read'],
+            own: ['read', 'update', 'delete'],
+        },
+        params: {
+            password: {
+                any: ['!read'],
+                own: ['!read'],
+            },
+        },
+    },
+    board: {
+        all: ['read', 'write'],
+        params: {
+            '12': ['!write'],
+        },
+    },
+}
 
 describe('Role class test', () => {
     const role = new Role({ perm: userRole })
