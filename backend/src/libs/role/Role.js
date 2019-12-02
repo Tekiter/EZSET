@@ -16,7 +16,7 @@ class RoleSystem {
         // } else {
         //     this._roles[tag] = new Role(perm)
         // }
-        this._roles[tag] = new Role({ perm, name })
+        this._roles[tag] = new Role({ perm, name, tag })
     }
 
     getRole(roletag) {
@@ -44,6 +44,18 @@ class RoleSystem {
 
     hasRole(roletag) {
         return !!this._roles[roletag]
+    }
+
+    export(roletag) {
+        if (this._roles[roletag]) {
+            return {
+                tag: roletag,
+                // perm: copyPerm(this._roles[roletag]._perm),
+                perm: this._roles[roletag].getPerm(),
+            }
+        } else {
+            return undefined
+        }
     }
 
     createPermChecker(roles) {
@@ -75,13 +87,14 @@ class RoleSystem {
 }
 
 class Role {
-    constructor({ perm, name }) {
+    constructor({ perm, name, tag }) {
         if (perm) {
             this._perm = perm
         } else {
             this._perm = {}
         }
         this.name = name
+        this.tag = tag
     }
 
     resource(name) {
@@ -95,6 +108,53 @@ class Role {
         return (resource, param) => {
             return new Permission(this._perm[resource], param)
         }
+    }
+
+    getPerm() {
+        let result = {}
+
+        result = copyPerm(this._perm)
+
+        return result
+    }
+}
+
+function copyPerm(perm) {
+    let result = {}
+    Object.keys(perm).forEach(resname => {
+        let resource = {}
+
+        if (perm[resname].all) {
+            resource.all = copyGrant(perm[resname].all)
+        }
+        if (perm[resname].params) {
+            resource.params = {}
+            Object.keys(perm[resname].params).forEach(paramname => {
+                resource.params[paramname] = copyGrant(
+                    perm[resname].params[paramname]
+                )
+            })
+        }
+
+        result[resname] = resource
+    })
+    return result
+}
+
+function copyGrant(grant) {
+    if (Array.isArray(grant)) {
+        return [...grant]
+    } else {
+        const result = {}
+
+        if (grant.any) {
+            result.any = [...grant.any]
+        }
+        if (grant.own) {
+            result.own = [...grant.own]
+        }
+
+        return result
     }
 }
 

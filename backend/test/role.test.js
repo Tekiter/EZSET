@@ -138,3 +138,29 @@ describe('default role test', () => {
         expect(perm('profile').can('read')).toBeTruthy()
     })
 })
+
+describe('role export test', () => {
+    test('get perm', () => {
+        const roles = new RoleSystem()
+
+        roles
+            .role('user')
+            .resource('profile')
+            .can('read')
+            .resource('profile', 'password')
+            .cannot('read')
+            .canOwn('read')
+            .cannotAny('read')
+        roles
+            .role('admin')
+            .resource('profile')
+            .can(['read', 'edit'])
+
+        expect(JSON.stringify(roles.getRole('user')._perm)).toEqual(
+            JSON.stringify(roles.export('user').perm)
+        )
+        expect(JSON.stringify(roles.getRole('admin')._perm)).toEqual(
+            JSON.stringify(roles.export('admin').perm)
+        )
+    })
+})
