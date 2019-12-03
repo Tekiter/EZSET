@@ -7,6 +7,12 @@ class RoleSystem {
         this._default = new Role({ tag: 'default', name: 'default' })
     }
 
+    roleNames() {
+        return Object.keys(this._roles).map(roletag => {
+            return { tag: roletag, name: this._roles[roletag].name }
+        })
+    }
+
     setRole({ tag, perm, name }) {
         if (!perm) {
             perm = {}
@@ -51,6 +57,7 @@ class RoleSystem {
             return {
                 tag: roletag,
                 // perm: copyPerm(this._roles[roletag]._perm),
+                name: this._roles[roletag].name,
                 perm: this._roles[roletag].getPerm(),
             }
         } else {
@@ -89,11 +96,11 @@ class RoleSystem {
 class Role {
     constructor({ perm, name, tag }) {
         if (perm) {
-            this._perm = perm
+            this._perm = copyPerm(perm)
         } else {
             this._perm = {}
         }
-        this.name = name
+        this.name = name || 'unnamed role'
         this.tag = tag
     }
 

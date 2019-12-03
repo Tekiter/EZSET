@@ -3,6 +3,7 @@ import path from 'path'
 import { Router } from 'express'
 
 import { loginRequired } from '../../utils/auth'
+import { getRoleMiddleware } from '../../utils/role'
 
 const router = Router()
 const indexJs = path.basename(__filename)
@@ -19,7 +20,11 @@ fs.readdirSync(__dirname)
         if (subrouter.loginNotRequired) {
             router.use(`/${routeFile.split('.')[0]}`, subrouter)
         } else {
-            router.use(`/${routeFile.split('.')[0]}`, loginRequired, subrouter)
+            router.use(
+                `/${routeFile.split('.')[0]}`,
+                [loginRequired, getRoleMiddleware],
+                subrouter
+            )
         }
     })
 
