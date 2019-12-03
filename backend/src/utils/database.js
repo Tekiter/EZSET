@@ -1,7 +1,9 @@
 import mongoose from 'mongoose'
+import cachegoose from 'cachegoose'
 import autoIncrement from 'mongoose-auto-increment'
 
 autoIncrement.initialize(mongoose.connection)
+cachegoose(mongoose)
 
 const database = {
     initialize() {

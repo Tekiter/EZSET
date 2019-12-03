@@ -14,8 +14,16 @@ router.route('/').get(
 )
 
 router.route('/').post(
-    [body('name').isString(), validateParams],
+    [role.perm('role').can('create'), body('name').isString(), validateParams],
     asyncRoute(async (req, res) => {
+        // if (req.user.perm('role').can('create')) {
+        //     const newrole = await role.createRole({ name: req.body.name })
+        //     res.json(newrole)
+        // } else {
+        //     const err = new Error('권한이 없습니다.')
+        //     err.status = 403
+        //     throw err
+        // }
         const newrole = await role.createRole({ name: req.body.name })
         res.json(newrole)
     })

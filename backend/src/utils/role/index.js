@@ -1,6 +1,8 @@
 import RoleModel from '../../models/Role'
 import { RoleSystem } from '../../libs/role'
 import random from 'random-number-csprng'
+import { setDefaultRole } from './default'
+import User from '../../models/User'
 
 const roles = new RoleSystem()
 
@@ -8,9 +10,49 @@ const role = {
     roles,
     async getRoleMiddleware(req, res, next) {
         if (req.user) {
+            const user = await User.findOne()
+                .where('username')
+                .equals(req.user.username)
+                .select('roles')
+                .cache(0, 'USER-ROLE-' + req.user.username)
+            req.user.perm = roles.createPermChecker(user.perms)
             next()
         } else {
             next()
+        }
+    },
+    perm(resource, params) {
+        const middleware = (verb, action, type) => {
+            return (req, res, next) => {
+                if (req.user.perm(resource, params)[verb](action, type)) {
+                    next()
+                } else {
+                    const err = new Error('권한이 없습니다.')
+                    err.status = 403
+                    throw err
+                }
+            }
+        }
+
+        return {
+            can(action, type) {
+                return middleware('can', action, type)
+            },
+            canOwn(action, type) {
+                return middleware('canOwn', action, type)
+            },
+            canAny(action, type) {
+                return middleware('canAny', action, type)
+            },
+            cannot(action, type) {
+                return middleware('cannot', action, type)
+            },
+            cannotAny(action, type) {
+                return middleware('cannotAny', action, type)
+            },
+            cannotOwn(action, type) {
+                return middleware('cannotOwn', action, type)
+            },
         }
     },
     async getRoleNames() {
@@ -43,6 +85,7 @@ const role = {
                 perm: role.perm,
             })
         })
+        setDefaultRole(roles)
     },
 }
 
