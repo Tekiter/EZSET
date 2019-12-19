@@ -1,5 +1,5 @@
 // import { userRole, adminRole } from '../src/utils/role/default'
-import { Role, RoleSystem } from '../src/libs/role'
+import { Role, RoleSystem } from '../../src/libs/role'
 
 export const adminRole = {
     profile: {
