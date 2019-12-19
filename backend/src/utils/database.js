@@ -6,10 +6,10 @@ autoIncrement.initialize(mongoose.connection)
 cachegoose(mongoose)
 
 const database = {
-    initialize() {
+    initialize(DATABASE_URI) {
         return new Promise(function(resolve, reject) {
             mongoose.connect(
-                process.env.DATABASE_URI,
+                DATABASE_URI,
                 {
                     useNewUrlParser: true,
                     useUnifiedTopology: true,
