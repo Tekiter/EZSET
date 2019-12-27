@@ -2,89 +2,89 @@
     <v-app>
         <v-app-bar app clipped-left>
             <!-- <v-app-bar-nav-icon @click.stop="drawer = !drawer" /> -->
-            <v-toolbar-title>EZSET 회원가입</v-toolbar-title>
+            <v-btn text to="/">
+                <v-toolbar-title>EZSET</v-toolbar-title>
+            </v-btn>회원가입
         </v-app-bar>
         <v-content>
-            <v-card :loading="isloading">
-                <v-stepper v-model="curpage" vertical>
-                    <v-stepper-step
-                        :complete="curpage > 1"
-                        :rules="[() => !errorRequiredStep]"
-                        step="1"
-                    >
-                        필수정보입력
-                    </v-stepper-step>
+            <v-container>
+                <v-row justify="center">
+                    <v-col cols="6" xs="12" md="6" xl="4">
+                        <v-card :loading="isloading">
+                            <v-stepper v-model="curpage" vertical>
+                                <v-list-item-title
+                                    class="headline mt-3 font-weight-bold text-center"
+                                >CREATE YOUR ACCOUNT</v-list-item-title>
+                                <v-stepper-step
+                                    :complete="curpage > 1"
+                                    :rules="[() => !errorRequiredStep]"
+                                    step="1"
+                                >필수정보입력</v-stepper-step>
 
-                    <v-stepper-content step="1">
-                        <v-text-field
-                            v-model="form.realname"
-                            label="name"
-                            @input="removeError('realname')"
-                            :error-messages="errors.realname"
-                            required
-                        ></v-text-field>
-                        <v-text-field
-                            v-model="form.username"
-                            label="ID"
-                            @input="removeError('username')"
-                            :error-messages="errors.username"
-                            required
-                        ></v-text-field>
-                        <v-text-field
-                            v-model="form.password"
-                            label="password"
-                            @input="removeError('password')"
-                            :error-messages="errors.password"
-                            type="password"
-                            required
-                        ></v-text-field>
-                        <v-text-field
-                            v-model="form.confirmpassword"
-                            label="confirm password"
-                            @input="removeError('confirmpassword')"
-                            :error-messages="errors.confirmpassword"
-                            type="password"
-                            required
-                        ></v-text-field>
-                    </v-stepper-content>
+                                <v-stepper-content step="1">
+                                    <v-text-field
+                                        v-model="form.realname"
+                                        label="name"
+                                        @input="removeError('realname')"
+                                        :error-messages="errors.realname"
+                                        required
+                                    ></v-text-field>
+                                    <v-text-field
+                                        v-model="form.username"
+                                        label="ID"
+                                        @input="removeError('username')"
+                                        :error-messages="errors.username"
+                                        required
+                                    ></v-text-field>
+                                    <v-text-field
+                                        v-model="form.password"
+                                        label="password"
+                                        @input="removeError('password')"
+                                        :error-messages="errors.password"
+                                        type="password"
+                                        required
+                                    ></v-text-field>
+                                    <v-text-field
+                                        v-model="form.confirmpassword"
+                                        label="confirm password"
+                                        @input="removeError('confirmpassword')"
+                                        :error-messages="errors.confirmpassword"
+                                        type="password"
+                                        required
+                                    ></v-text-field>
+                                </v-stepper-content>
 
-                    <v-stepper-step :complete="curpage > 2" step="2"
-                        >추가정보입력</v-stepper-step
-                    >
+                                <v-stepper-step :complete="curpage > 2" step="2">추가정보입력</v-stepper-step>
 
-                    <v-stepper-content step="2">
-                        <v-text-field
-                            v-model="form.email"
-                            label="E-mail"
-                            required
-                        ></v-text-field>
-                    </v-stepper-content>
+                                <v-stepper-content step="2">
+                                    <v-text-field v-model="form.email" label="E-mail" required></v-text-field>
+                                </v-stepper-content>
 
-                    <v-row>
-                        <v-col class="d-flex flex-row justify-center">
-                            <v-btn
-                                class="mr-3"
-                                color="primary"
-                                @click="curpage -= 1"
-                                v-if="curpage != 1"
-                                >이전</v-btn
-                            >
-                            <v-btn
-                                color="primary"
-                                @click="curpage += 1"
-                                v-if="curpage != maxpage"
-                                >다음</v-btn
-                            >
-                            <v-btn
-                                color="primary"
-                                @click="finish"
-                                v-if="curpage == maxpage"
-                                >완료</v-btn
-                            >
-                        </v-col>
-                    </v-row>
-                </v-stepper>
-            </v-card>
+                                <v-row>
+                                    <v-col class="d-flex flex-row justify-center">
+                                        <v-btn
+                                            class="mr-3"
+                                            color="primary"
+                                            @click="curpage -= 1"
+                                            v-if="curpage != 1"
+                                        >이전</v-btn>
+                                        <v-btn
+                                            color="primary"
+                                            @click="curpage += 1"
+                                            v-if="curpage != maxpage"
+                                        >다음</v-btn>
+                                        <v-btn
+                                            color="primary"
+                                            @click="finish"
+                                            v-if="curpage == maxpage"
+                                        >완료</v-btn>
+                                    </v-col>
+                                </v-row>
+                            </v-stepper>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-container>
         </v-content>
     </v-app>
 </template>
@@ -137,10 +137,11 @@ export default {
             this.isloading = true
             try {
                 const res = await axios.post('auth/register', {
-                    username: this.form.id,
+                    username: this.form.username,
                     password: this.form.password,
                     realname: this.form.realname,
                 })
+                this.$router.push({ path: '/' })
                 console.log(res) // eslint-disable-line no-console
             } catch (error) {
                 console.log(error.response) // eslint-disable-line no-console
