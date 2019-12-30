@@ -72,4 +72,24 @@ router.route('/register').post(
     })
 )
 
+router.route('/register/check/username').post(
+    [body('username').isString(), validateParams],
+    asyncRoute(async (req, res) => {
+        try {
+            const exits = await User.count()
+                .where('username')
+                .equals(req.body.username)
+            if (exits) {
+                res.status(409).json({
+                    message: '이미 사용중인 아이디입니다.',
+                })
+                return
+            }
+            res.status(200).end()
+        } catch (error) {
+            unexpectedError(res, error)
+        }
+    })
+)
+
 export default router
