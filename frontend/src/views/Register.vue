@@ -33,7 +33,9 @@
                                         v-model="form.username"
                                         label="ID"
                                         @input="removeError('username')"
+                                        @change="checkUsername()"
                                         :error-messages="errors.username"
+                                        :success-messages="success.username"
                                         required
                                     ></v-text-field>
                                     <v-text-field
@@ -108,6 +110,9 @@ export default {
                 confirmpassword: '',
                 email: '',
             },
+            success: {
+                username: '',
+            },
             curpage: 1,
             isloading: false,
         }
@@ -144,6 +149,7 @@ export default {
                 this.$router.push({ path: '/' })
                 console.log(res) // eslint-disable-line no-console
             } catch (error) {
+                // if (error.response.status == 409)
                 console.log(error.response) // eslint-disable-line no-console
             } finally {
                 this.isloading = false
@@ -182,6 +188,18 @@ export default {
         },
         removeError(field) {
             this.errors[field] = ''
+        },
+        async checkUsername() {
+            try {
+                const res = await axios.post('auth/register/check/username', {
+                    username: this.form.username,
+                })
+                this.success.username = '사용할 수 있는 아이디입니다.'
+                console.log(res)
+            } catch (error) {
+                this.errors.username = '중복된 아이디입니다.'
+                console.log(error)
+            }
         },
     },
 }
