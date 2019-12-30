@@ -43,18 +43,18 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 //connection event handler
 io.on('connection', function(socket) {
-    console.log('Connect from Client: ' + socket.id)
+    //console.log('Connect from Client: ' + socket.id)
     socket.on('attendance', function(data) {
-        console.log('message from Client: ' + data.flag + " " + data.socket_id)
+        //console.log('message from Client: ' + data.flag + " " + data.output_attendance_code)
         var rtnMessage = {
             flag: data.flag,
-            num: Math.floor(Math.random() * (999 - 100) + 100)
+            output_attendance_code: data.output_attendance_code
         };
         socket.broadcast.emit('attendance', rtnMessage);
     });
 })
 server.listen(3001, function() {
-    console.log('socket io server listening on port 3001')
+    console.log('[socket io] server listening on port 3001')
 })
 
 export default app
