@@ -32,6 +32,27 @@
 // import axios from 'axios'
 export default {
     name: 'attendence',
-    data() {},
+    created() {
+        this.$socket.on('attendence', data => {
+            this.textarea += data.socket_id + ' : ' + data.message + '\n'
+        })
+    },
+    data() {
+        return {
+            textarea: '',
+            message: '',
+            socket_id: '',
+        }
+    },
+    methods: {
+        sendMessage() {
+            this.$socket.emit('attendence', {
+                message: this.message,
+                socket_id: this.$socket.id,
+            })
+            this.textarea += this.$socket.id + ' : ' + this.message + '\n'
+            this.message = ''
+        },
+    },
 }
 </script>
