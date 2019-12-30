@@ -1,6 +1,6 @@
 <template>
     <v-form>
-        <v-card class="mx-auto" max-width="400">
+        <v-card class="mx-auto" max-width="400" v-if="flag">
             <v-card-title>
                 <v-text-field label="출석번호"></v-text-field>
             </v-card-title>
@@ -12,19 +12,21 @@
             </v-card-actions>
         </v-card>
 
-        <v-card class="mx-auto" max-width="400">
+        <v-card class="mx-auto" max-width="400" v-if="flag">
             <v-card-title>
-                <v-text-field label="출석번호"></v-text-field>
+                {{ attnum }}
             </v-card-title>
-
             <v-card-actions>
-                <v-btn color="purple" text>
-                    시작
-                </v-btn>
                 <v-btn color="purple" text>
                     종료
                 </v-btn>
             </v-card-actions>
+        </v-card>
+
+        <v-card class="mx-auto">
+            <v-btn color="purple" text v-if="!flag">
+                시작
+            </v-btn>
         </v-card>
     </v-form>
 </template>
@@ -42,6 +44,10 @@ export default {
             textarea: '',
             message: '',
             socket_id: '',
+            admin: '',
+            user: '',
+            attnum: '399',
+            flag: '0',
         }
     },
     methods: {
