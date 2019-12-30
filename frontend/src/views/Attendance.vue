@@ -41,6 +41,10 @@ export default {
             this.flag = data.flag
             this.output_attendance_code = data.output_attendance_code
         })
+        this.$socket.on('create', data => {
+            this.flag = data.flag
+            this.output_attendance_code = data.output_attendance_code
+        })
     },
     data() {
         return {
@@ -58,7 +62,7 @@ export default {
             this.output_attendance_code = Math.floor(
                 Math.random() * (999 - 100) + 100
             )
-            console.log('output_attendance_cod:' + this.output_attendance_code)
+            console.log('output_attendance_code:' + this.output_attendance_code)
             this.$socket.emit('attendance', {
                 flag: true,
                 output_attendance_code: this.output_attendance_code,

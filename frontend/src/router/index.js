@@ -8,7 +8,7 @@ const routes = [{
         path: '/',
         name: 'home',
         component: () =>
-            import ('../views/Home.vue'),
+            import ('../views/Home.vue')
     },
     {
         path: '/login',
@@ -17,7 +17,7 @@ const routes = [{
             import ('../views/Login.vue'),
         meta: {
             layout: 'empty',
-            noLoginRequired: true
+            noLoginRequired: true,
         },
     },
     {
@@ -27,7 +27,7 @@ const routes = [{
             import ('../views/Register.vue'),
         meta: {
             layout: 'null',
-            noLoginRequired: true
+            noLoginRequired: true,
         },
     },
     {

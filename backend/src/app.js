@@ -42,15 +42,27 @@ app.use((err, req, res, next) => {
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 //connection event handler
+var curFlag = false
+var curOutput_attendance_code = ''
 io.on('connection', function(socket) {
-    //console.log('Connect from Client: ' + socket.id)
+    var curState = {
+        flag: this.curFlag,
+        output_attendance_code: this.curOutput_attendance_code,
+    }
+    socket.emit('create', curState);
+    console.log('[socket.io]Start Page: ' + socket.id + " " + curFlag + " " + curOutput_attendance_code)
     socket.on('attendance', function(data) {
-        //console.log('message from Client: ' + data.flag + " " + data.output_attendance_code)
+        console.log('message from Client: ' + data.flag + " " + data.output_attendance_code)
+
+        curFlag = data.flag
+        curOutput_attendance_code = data.output_attendance_code
+        console.log('message from Client: ' + curFlag + " " + curOutput_attendance_code)
         var rtnMessage = {
             flag: data.flag,
             output_attendance_code: data.output_attendance_code
         };
         socket.broadcast.emit('attendance', rtnMessage);
+        console.log("[socket.io]" + curFlag);
     });
 })
 server.listen(3001, function() {
