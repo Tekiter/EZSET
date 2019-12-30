@@ -1,7 +1,7 @@
 import RoleModel from '../../models/Role'
 import { RoleSystem } from '../../libs/role'
 import random from 'random-number-csprng'
-import { setDefaultRole } from './default'
+import { setDefaultRole, setAdminRole } from './default'
 import User from '../../models/User'
 
 const roles = new RoleSystem()
@@ -86,6 +86,7 @@ const role = {
             })
         })
         setDefaultRole(roles)
+        setAdminRole(roles)
     },
 }
 

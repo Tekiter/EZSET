@@ -17,6 +17,7 @@ const initialization = {
         const admin = new User({
             username: 'admin',
             password: 'admin_' + rndNum,
+            roles: ['admin'],
         })
         const result = await admin.save()
         config.setConfig('superAdmin', result.username)
