@@ -41,11 +41,8 @@ export default {
             this.flag = data.flag
             this.output_attendance_code = data.output_attendance_code
         })
-        this.$socket.on('create', data => {
-            this.flag = data.flag
-            this.output_attendance_code = data.output_attendance_code
-        })
     },
+
     data() {
         return {
             socket_id: '',

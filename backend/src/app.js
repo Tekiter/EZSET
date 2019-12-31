@@ -42,28 +42,30 @@ app.use((err, req, res, next) => {
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 //connection event handler
-var curFlag = false
-var curOutput_attendance_code = ''
+var curState = {
+    flag: false,
+    output_attendance_code: ''
+}
 io.on('connection', function(socket) {
-    var curState = {
-        flag: this.curFlag,
-        output_attendance_code: this.curOutput_attendance_code,
-    }
-    socket.emit('create', curState);
-    console.log('[socket.io]Start Page: ' + socket.id + " " + curFlag + " " + curOutput_attendance_code)
+    socket.emit('connection', curState);
+    //console.log('[socket.io]Start Page: ' + socket.id + " " + curState.flag + " " + curState.output_attendance_code)
     socket.on('attendance', function(data) {
-        console.log('message from Client: ' + data.flag + " " + data.output_attendance_code)
-
-        curFlag = data.flag
-        curOutput_attendance_code = data.output_attendance_code
-        console.log('message from Client: ' + curFlag + " " + curOutput_attendance_code)
+        //console.log('message from Client: ' + data.flag + " " + data.output_attendance_code)
+        curState.flag = data.flag
+        curState.output_attendance_code = data.output_attendance_code
+            //console.log('message from Client: ' + curState.flag + " " + curState.Output_attendance_code)
         var rtnMessage = {
             flag: data.flag,
             output_attendance_code: data.output_attendance_code
         };
         socket.broadcast.emit('attendance', rtnMessage);
-        console.log("[socket.io]" + curFlag);
+        //console.log("[socket.io]" + curState.flag);
     });
+    setInterval(function() {
+        if (curState.flag == true) {
+            socket.emit('attendance', curState);
+        }
+    }, 2000)
 })
 server.listen(3001, function() {
     console.log('[socket io] server listening on port 3001')
