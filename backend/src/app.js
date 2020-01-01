@@ -41,32 +41,44 @@ app.use((err, req, res, next) => {
 //socket io to Attendance
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
-//connection event handler
+
+//Attendance State
 var curState = {
     flag: false,
     output_attendance_code: ''
 }
+
+//connect event
 io.on('connection', function(socket) {
-    socket.emit('connection', curState);
-    //console.log('[socket.io]Start Page: ' + socket.id + " " + curState.flag + " " + curState.output_attendance_code)
-    socket.on('attendance', function(data) {
-        //console.log('message from Client: ' + data.flag + " " + data.output_attendance_code)
-        curState.flag = data.flag
-        curState.output_attendance_code = data.output_attendance_code
-            //console.log('message from Client: ' + curState.flag + " " + curState.Output_attendance_code)
-        var rtnMessage = {
-            flag: data.flag,
-            output_attendance_code: data.output_attendance_code
-        };
-        socket.broadcast.emit('attendance', rtnMessage);
-        //console.log("[socket.io]" + curState.flag);
-    });
-    setInterval(function() {
-        if (curState.flag == true) {
-            socket.emit('attendance', curState);
-        }
-    }, 2000)
-})
+        socket.on('join', function(data) {
+            socket.join(data.roomName)
+            console.log('[socket.io] ' + socket.id + 'user join conneted room : ' + data.roomName);
+        });
+        //disconnect event
+        socket.on('disconnect', () => {
+            console.log('[socket.io] ' + socket.id + 'user disconnected');
+        });
+        //attendance event lisner
+        socket.on('attendance', function(data) {
+            curState.flag = data.flag
+            curState.output_attendance_code = data.output_attendance_code
+            if (curState.flag == true) console.log('[socket.io] Attendance start : ' + curState.output_attendance_code);
+            if (curState.flag == false) console.log('[socket.io] Attendance end');
+            var rtnMessage = {
+                flag: data.flag,
+                output_attendance_code: data.output_attendance_code
+            };
+            //broadcast changed state
+            socket.broadcast.to('attendance').emit('attendance', rtnMessage);
+        });
+        //connect after attendance start
+        setInterval(function() {
+            if (curState.flag == true) {
+                socket.to('attendance').emit('attendance', curState);
+            }
+        }, 1000)
+    })
+    //start socket.io server
 server.listen(3001, function() {
     console.log('[socket io] server listening on port 3001')
 })

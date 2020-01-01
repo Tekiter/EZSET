@@ -6,9 +6,7 @@
             </v-card-title>
 
             <v-card-actions>
-                <v-btn color="purple" text>
-                    출석하기
-                </v-btn>
+                <v-btn color="purple" text>출석하기</v-btn>
             </v-card-actions>
         </v-card>
 
@@ -17,17 +15,13 @@
                 <v-text-field v-model="output_attendance_code"></v-text-field>
             </v-card-title>
             <v-card-actions>
-                <v-btn color="purple" text v-if="flag" @click="endAttendance">
-                    종료
-                </v-btn>
+                <v-btn color="purple" text v-if="flag" @click="endAttendance">종료</v-btn>
             </v-card-actions>
         </v-card>
 
         <v-card class="mx-auto" max-width="400" text v-if="!flag">
             <v-card-actions>
-                <v-btn color="purple" text @click="startAttendance">
-                    시작
-                </v-btn>
+                <v-btn color="purple" text @click="startAttendance">시작</v-btn>
             </v-card-actions>
         </v-card>
     </v-form>
@@ -37,6 +31,9 @@
 export default {
     name: 'attendance',
     created() {
+        this.$socket.emit('join', {
+            roomName: 'attendance',
+        })
         this.$socket.on('attendance', data => {
             this.flag = data.flag
             this.output_attendance_code = data.output_attendance_code
@@ -59,7 +56,6 @@ export default {
             this.output_attendance_code = Math.floor(
                 Math.random() * (999 - 100) + 100
             )
-            console.log('output_attendance_code:' + this.output_attendance_code)
             this.$socket.emit('attendance', {
                 flag: true,
                 output_attendance_code: this.output_attendance_code,
