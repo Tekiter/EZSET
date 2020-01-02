@@ -43,14 +43,16 @@ router.route('/').post(
         //     err.status = 403
         //     throw err
         // }
-        const newrole = await role.createRole({ name: req.body.name })
+        const newrole = await role.createRole({
+            name: req.body.name,
+        })
         res.json(newrole)
     })
 )
 
 // 역할 정보 조회
 router.route('/:role_tag').get(
-    [param('role_tag').isString(), validateParams],
+    [, validateParams],
     asyncRoute(async (req, res) => {
         if (role.roles.hasRole(req.params.role_tag)) {
             const roleobj = role.roles.export(req.params.role_tag)

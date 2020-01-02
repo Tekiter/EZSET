@@ -16,7 +16,7 @@ store.dispatch('auth/restore')
 
 // socket.io
 import io from 'socket.io-client'
-const socket = io('http://localhost:3001')
+const socket = io('http://localhost:5050')
 Vue.prototype.$socket = socket
 
 new Vue({
