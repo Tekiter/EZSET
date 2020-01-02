@@ -52,7 +52,7 @@ router.route('/').post(
 
 // 역할 정보 조회
 router.route('/:role_tag').get(
-    [, validateParams],
+    [param('role_tag').isString(), validateParams],
     asyncRoute(async (req, res) => {
         if (role.roles.hasRole(req.params.role_tag)) {
             const roleobj = role.roles.export(req.params.role_tag)

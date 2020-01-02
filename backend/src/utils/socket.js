@@ -31,17 +31,10 @@ export async function initSocket(app, SOCKET_PORT) {
         socket.on('attendance', function(data) {
             curState.flag = data.flag
             curState.output_attendance_code = data.output_attendance_code
-            if (curState.flag == true)
-                if (curState.flag == false)
-                    // console.log(
-                    //     '[socket.io] Attendance start : ' +
-                    //     curState.output_attendance_code
-                    // )
-                    // console.log('[socket.io] Attendance end')
-                    var rtnMessage = {
-                        flag: data.flag,
-                        output_attendance_code: data.output_attendance_code,
-                    }
+            var rtnMessage = {
+                flag: data.flag,
+                output_attendance_code: data.output_attendance_code,
+            }
             //broadcast changed state
             socket.broadcast.to('attendance').emit('attendance', rtnMessage)
         })
@@ -54,6 +47,6 @@ export async function initSocket(app, SOCKET_PORT) {
     })
     //start socket.io server
     server.listen(SOCKET_PORT, function() {
-        //console.log(`[socket io] server listening on port ${SOCKET_PORT}`)
+        console.log(`[socket io] server listening on port ${SOCKET_PORT}`) // eslint-disable-line no-console
     })
 }
