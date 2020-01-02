@@ -1,6 +1,7 @@
 import random from 'random-number-csprng'
 import config from '../utils/config'
 import User from '../models/User'
+import role from '../utils/role'
 
 const initialization = {
     async createSuperAdmin() {
@@ -16,6 +17,7 @@ const initialization = {
         const admin = new User({
             username: 'admin',
             password: 'admin_' + rndNum,
+            roles: ['admin'],
         })
         const result = await admin.save()
         config.setConfig('superAdmin', result.username)
@@ -30,6 +32,8 @@ const initialization = {
 
             config.setConfig('groupName', 'EZSET')
         }
+
+        await role.loadRoles()
     },
 }
 
