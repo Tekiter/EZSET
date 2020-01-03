@@ -9,7 +9,7 @@
         <v-content>
             <v-container>
                 <v-row justify="center">
-                    <v-col cols="6" xs="12" md="6" xl="4">
+                    <v-col xs="12" sm="10" md="8" lg="6" xl="4">
                         <v-card :loading="isloading">
                             <v-stepper v-model="curpage" vertical>
                                 <v-list-item-title
@@ -42,6 +42,7 @@
                                         v-model="form.password"
                                         label="password"
                                         @input="removeError('password')"
+                                        @change="checkPassword()"
                                         :error-messages="errors.password"
                                         type="password"
                                         required
@@ -50,6 +51,7 @@
                                         v-model="form.confirmpassword"
                                         label="confirm password"
                                         @input="removeError('confirmpassword')"
+                                        @change="checkConfirmPassword()"
                                         :error-messages="errors.confirmpassword"
                                         type="password"
                                         required
@@ -78,6 +80,7 @@
                                         <v-btn
                                             color="primary"
                                             @click="finish"
+                                            :disabled="errorRequiredStep"
                                             v-if="curpage == maxpage"
                                         >완료</v-btn>
                                     </v-col>
@@ -173,11 +176,6 @@ export default {
                 this.errors.confirmpassword = '비밀번호를 입력해주세요'
                 result = false
             }
-            if (this.form.password !== this.form.confirmpassword) {
-                this.errors.confirmpassword =
-                    '비밀번호 확인이 일치하지 않습니다.'
-                result = false
-            }
             return result
         },
         clearErrors() {
@@ -190,15 +188,40 @@ export default {
             this.errors[field] = ''
         },
         async checkUsername() {
+            let idreg = /^[a-z0-9]{6,12}$/
+            if (!idreg.test(this.form.username)) {
+                this.errors.username =
+                    '아이디는 6~12자의 영문 소문자, 숫자만 사용 가능합니다.'
+                return
+            }
+
             try {
-                const res = await axios.post('auth/register/check/username', {
-                    username: this.form.username,
-                })
+                const res = await axios.post(
+                    'auth/register/doublecheck/username',
+                    {
+                        username: this.form.username,
+                    }
+                )
                 this.success.username = '사용할 수 있는 아이디입니다.'
                 console.log(res)
             } catch (error) {
                 this.errors.username = '중복된 아이디입니다.'
                 console.log(error)
+            }
+        },
+        async checkPassword() {
+            let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,16}$/
+            if (!pwreg.test(this.form.password)) {
+                this.errors.password =
+                    '비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요'
+                return
+            }
+        },
+        async checkConfirmPassword() {
+            if (this.form.password != this.form.confirmpassword) {
+                this.errors.confirmpassword =
+                    '비밀번호 확인이 일치하지 않습니다.'
+                return
             }
         },
     },
