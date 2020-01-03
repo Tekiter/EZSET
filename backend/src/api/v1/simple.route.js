@@ -89,6 +89,16 @@ router.delete('/posts/:post_id', function(req, res) {
 router.put('/posts/:post_id', function(req, res) {
     Post.findById(req.params.post_id).then(post => {
         if (post) {
+            if (req.body.content) {
+                post.content = req.body.content
+            }
+            post.save()
+                .then(() => {
+                    res.status(200).json({ message: '수정 완료', target: post })
+                })
+                .catch(() => res.json({ error }))
+        } else {
+            res.status(404).json({ message: 'no post id' + req.params.post_id })
         }
     })
 })
@@ -128,6 +138,48 @@ router.get('/boards/:board_id', function(req, res) {
                 .catch(() => res.json({ error: error }))
         })
         .catch(() => res.json({ error: error }))
+})
+
+//post comment
+router.post('/posts/:post_id/comment', function(req, res) {
+    Post.findOne()
+        .where('_id')
+        .equals(req.params.post_id)
+        .then(post => {
+            if (!post) {
+                res.status(404).json({
+                    message: 'no post id' + req.params.post_id,
+                })
+                return
+            }
+            post.addComment(req.body.content, req.body.user)
+                .then(() => {
+                    res.status(201).json({ message: '댓글 작성 완료' })
+                })
+                .catch(() => res.json({ message: 'function error' }))
+        })
+    //.catch(e => console.log(e))
+})
+
+//delete comment
+router.delete('/posts/:post_id/comment/:comment_id', function(req, res) {
+    Post.findOne()
+        .where('_id')
+        .equals(req.params.post_id)
+        .then(post => {
+            if (!post) {
+                res.status(404).json({
+                    message: 'no post id ' + req.params.comment_id,
+                })
+                return
+            }
+            post.removeComment(req.params.comment_id)
+                .then(() => {
+                    res.status(200).json({ message: '삭제 성공' })
+                })
+                .catch(() => res.json({ message: 'remove function error' }))
+        })
+        .catch(() => res.json({ message: 'find error' }))
 })
 
 export default router
