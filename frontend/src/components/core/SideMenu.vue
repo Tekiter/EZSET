@@ -34,6 +34,12 @@ export default {
                     title: '설정',
                     to: '/settings',
                 },
+                {
+                    type: 'simple',
+                    icon: 'mdi-clipboard-multiple-outline',
+                    title: '게시판',
+                    to: '/board',
+                },
             ],
         }
     },
