@@ -34,6 +34,12 @@ export default {
                     title: '설정',
                     to: '/settings',
                 },
+                {
+                    type: 'simple',
+                    icon: 'mdi-checkbox-marked-circle-outline',
+                    title: '출석체크',
+                    to: '/attendance',
+                },
             ],
         }
     },
