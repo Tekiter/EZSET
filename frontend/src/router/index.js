@@ -4,23 +4,32 @@ import store from '../store'
 
 Vue.use(VueRouter)
 
-const routes = [
-    {
+const routes = [{
         path: '/',
         name: 'home',
-        component: () => import('../views/Home.vue'),
+        component: () =>
+            import ('../views/Home.vue'),
     },
     {
         path: '/login',
         name: 'login',
-        component: () => import('../views/Login.vue'),
+        component: () =>
+            import ('../views/Login.vue'),
         meta: { layout: 'empty', noLoginRequired: true },
     },
     {
         path: '/register',
         name: 'register',
-        component: () => import('../views/Register.vue'),
+        component: () =>
+            import ('../views/Register.vue'),
         meta: { layout: 'null', noLoginRequired: true },
+    },
+    {
+        path: '/board',
+        name: 'board',
+        component: () =>
+            import ('../views/Board.vue'),
+        meta: { noLoginRequired: true },
     },
 ]
 
