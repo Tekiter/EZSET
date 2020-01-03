@@ -1,36 +1,7 @@
 <template>
     <v-app>
         <v-navigation-drawer v-model="drawer" app clipped>
-            <v-list dense>
-                <!-- <v-list-item link>
-                    <v-list-item-action>
-                        <v-icon>mdi-view-dashboard</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>Dashboard</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                <v-list-item link>
-                    <v-list-item-action>
-                        <v-icon>mdi-settings</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>Settings</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>-->
-                <v-list-item
-                    v-for="(menu, index) in navigationMenu"
-                    :key="index"
-                    :to="menu.to"
-                >
-                    <v-list-item-action>
-                        <v-icon>{{ menu.icon }}</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>{{ menu.title }}</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-            </v-list>
+            <side-menu></side-menu>
         </v-navigation-drawer>
 
         <v-app-bar app clipped-left>
@@ -41,9 +12,9 @@
 
             <v-menu offset-y :nudge-width="200">
                 <template v-slot:activator="{ on }">
-                    <v-btn text large v-on="on" class="text-none">
-                        {{ user.username }}
-                    </v-btn>
+                    <v-btn text large v-on="on" class="text-none">{{
+                        user.username
+                    }}</v-btn>
                 </template>
                 <v-card>
                     <v-list>
@@ -52,9 +23,9 @@
                                 <v-icon>fas fa-user</v-icon>
                             </v-list-item-avatar>
                             <v-list-item-content>
-                                <v-list-item-title>
-                                    {{ user.username }}
-                                </v-list-item-title>
+                                <v-list-item-title>{{
+                                    user.username
+                                }}</v-list-item-title>
                                 <v-list-item-subtitle></v-list-item-subtitle>
                             </v-list-item-content>
                             <v-list-item-action>
@@ -80,15 +51,15 @@
 <style scoped></style>
 <script>
 import { mapState } from 'vuex'
+import SideMenu from '../core/SideMenu.vue'
 
 export default {
+    components: {
+        SideMenu,
+    },
     data() {
         return {
             drawer: true,
-            navigationMenu: [
-                { icon: 'mdi-view-dashboard', title: 'Dashboard', to: '/' },
-                { icon: 'mdi-settings', title: 'Settings', to: '/settings' },
-            ],
         }
     },
     computed: {
