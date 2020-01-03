@@ -11,11 +11,11 @@
         </v-card>
 
         <v-card class="mx-auto" max-width="400" v-if="flag">
-            <v-card-title>
-                <v-text-field v-model="output_attendance_code"></v-text-field>
-            </v-card-title>
+            <v-card-title> {{ output_attendance_code }} </v-card-title>
             <v-card-actions>
-                <v-btn color="purple" text v-if="flag" @click="endAttendance">종료</v-btn>
+                <v-btn color="purple" text v-if="flag" @click="endAttendance"
+                    >종료</v-btn
+                >
             </v-card-actions>
         </v-card>
 
