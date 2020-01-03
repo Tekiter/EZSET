@@ -2,9 +2,8 @@
     <v-app>
         <v-app-bar app clipped-left>
             <!-- <v-app-bar-nav-icon @click.stop="drawer = !drawer" /> -->
-            <v-btn text to="/">
-                <v-toolbar-title>EZSET</v-toolbar-title>
-            </v-btn>회원가입
+            <v-btn text to="/"> <v-toolbar-title>EZSET</v-toolbar-title> </v-btn
+            >회원가입
         </v-app-bar>
         <v-content>
             <v-container>
@@ -14,12 +13,14 @@
                             <v-stepper v-model="curpage" vertical>
                                 <v-list-item-title
                                     class="headline mt-3 font-weight-bold text-center"
-                                >CREATE YOUR ACCOUNT</v-list-item-title>
+                                    >CREATE YOUR ACCOUNT</v-list-item-title
+                                >
                                 <v-stepper-step
                                     :complete="curpage > 1"
                                     :rules="[() => !errorRequiredStep]"
                                     step="1"
-                                >필수정보입력</v-stepper-step>
+                                    >필수정보입력</v-stepper-step
+                                >
 
                                 <v-stepper-content step="1">
                                     <v-text-field
@@ -56,30 +57,41 @@
                                     ></v-text-field>
                                 </v-stepper-content>
 
-                                <v-stepper-step :complete="curpage > 2" step="2">추가정보입력</v-stepper-step>
+                                <v-stepper-step :complete="curpage > 2" step="2"
+                                    >추가정보입력</v-stepper-step
+                                >
 
                                 <v-stepper-content step="2">
-                                    <v-text-field v-model="form.email" label="E-mail" required></v-text-field>
+                                    <v-text-field
+                                        v-model="form.email"
+                                        label="E-mail"
+                                        required
+                                    ></v-text-field>
                                 </v-stepper-content>
 
                                 <v-row>
-                                    <v-col class="d-flex flex-row justify-center">
+                                    <v-col
+                                        class="d-flex flex-row justify-center"
+                                    >
                                         <v-btn
                                             class="mr-3"
                                             color="primary"
                                             @click="curpage -= 1"
                                             v-if="curpage != 1"
-                                        >이전</v-btn>
+                                            >이전</v-btn
+                                        >
                                         <v-btn
                                             color="primary"
                                             @click="curpage += 1"
                                             v-if="curpage != maxpage"
-                                        >다음</v-btn>
+                                            >다음</v-btn
+                                        >
                                         <v-btn
                                             color="primary"
                                             @click="finish"
                                             v-if="curpage == maxpage"
-                                        >완료</v-btn>
+                                            >완료</v-btn
+                                        >
                                     </v-col>
                                 </v-row>
                             </v-stepper>
