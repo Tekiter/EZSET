@@ -1,11 +1,20 @@
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
-var attendanceUserSchema = new Schema({
-    attendance_date: {
+const statusSchema = new mongoose.Schema({
+    date: {
         type: Date,
-        default: Date.now,
     },
+    state: {
+        type: String,
+    },
+})
+
+var attendanceUserSchema = new Schema({
+    name: {
+        type: String,
+    },
+    status: [statusSchema],
 })
 
 module.exports = mongoose.model('attendanceUser', attendanceUserSchema)

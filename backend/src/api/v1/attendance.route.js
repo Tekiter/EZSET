@@ -1,10 +1,16 @@
 import { Router } from 'express'
-
+//import AttendanceDay from '../../models/attendanceDay'
+import AttendanceUser from '../../models/attendanceUser'
 const router = Router()
 
-router.get('/', (req, res) => {
+router.get('/test', (req, res) => {
+    var attendanceUser = new AttendanceUser()
+    attendanceUser.name = 'admin'
+    attendanceUser.attendance_day = Date.now()
+    attendanceUser.status = '정상출석'
+    attendanceUser.save()
     res.json({
-        message: 'att',
+        message: 'ddiba',
     })
 })
 

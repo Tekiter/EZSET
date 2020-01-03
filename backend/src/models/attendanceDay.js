@@ -1,11 +1,20 @@
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
-var attendanceDaySchema = new Schema({
-    attendance_date: {
+const statusSchema = new mongoose.Schema({
+    name: {
         type: Date,
-        default: Date.now,
     },
+    state: {
+        type: String,
+    },
+})
+
+var attendanceDaySchema = new Schema({
+    day: {
+        type: Date,
+    },
+    status: [statusSchema],
 })
 
 module.exports = mongoose.model('attendanceDay', attendanceDaySchema)
