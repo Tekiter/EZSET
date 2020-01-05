@@ -1,17 +1,35 @@
 import { Router } from 'express'
-//import AttendanceDay from '../../models/attendanceDay'
-import AttendanceUser from '../../models/attendanceUser'
+
+// const AttendanceDay = require('../../models/AttendanceDay')
+// const AttendanceUser = require('../../models/AttendanceUser')
+import { asyncRoute } from '../../utils/api'
+//var moment = require('moment')
 const router = Router()
 
-router.get('/test', (req, res) => {
-    var attendanceUser = new AttendanceUser()
-    attendanceUser.name = 'admin'
-    attendanceUser.attendance_day = Date.now()
-    attendanceUser.status = '정상출석'
-    attendanceUser.save()
-    res.json({
-        message: 'ddiba',
+router.post(
+    '/add',
+    asyncRoute(async function(req, res) {
+        //var cur = moment().format('YYYYMMDD')
+        try {
+            // const pp = await AttendanceDay.findOne({
+            //     day: cur,
+            // })
+            // if (pp) {
+            //     pp.addStatus('root', req.body.state)
+            // } else {
+            //     pp.day = cur
+            //     pp.save
+            // }
+
+            //pp.addStatus('root', req.body.state)
+            res.json({
+                message: 'status update',
+            })
+        } catch (err) {
+            //console.log(err)
+            res.status(501).json(err)
+        }
     })
-})
+)
 
 export default router
