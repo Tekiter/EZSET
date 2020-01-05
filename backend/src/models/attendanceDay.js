@@ -9,6 +9,7 @@ const statusSchema = new mongoose.Schema({
         type: String,
     },
 })
+const Status = mongoose.model('status', statusSchema)
 
 var attendanceDaySchema = new Schema({
     day: {
@@ -18,7 +19,12 @@ var attendanceDaySchema = new Schema({
 })
 
 attendanceDaySchema.methods.addStatus = function(name, state) {
-    // this.status.push(new statusSchema({ name, state }))
+    this.status.push(
+        new Status({
+            name,
+            state,
+        })
+    )
     return this.save()
 }
 module.exports = mongoose.model('attendanceDay', attendanceDaySchema)

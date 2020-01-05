@@ -1,7 +1,7 @@
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
-const statusSchema = new mongoose.Schema({
+const datestatusSchema = new mongoose.Schema({
     date: {
         type: String,
     },
@@ -9,16 +9,22 @@ const statusSchema = new mongoose.Schema({
         type: String,
     },
 })
+const DateStatus = mongoose.model('dateStatus', datestatusSchema)
 
 var attendanceUserSchema = new Schema({
     name: {
         type: String,
     },
-    status: [statusSchema],
+    status: [datestatusSchema],
 })
 
-attendanceUserSchema.methods.addStatusSchema = function(date, state) {
-    this.status.push(new statusSchema({ date, state }))
+attendanceUserSchema.methods.addStatus = function(date, state) {
+    this.status.push(
+        new DateStatus({
+            date,
+            state,
+        })
+    )
     return this.save()
 }
 

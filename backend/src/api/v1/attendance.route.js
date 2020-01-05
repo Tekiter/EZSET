@@ -1,30 +1,66 @@
-import { Router } from 'express'
-
-// const AttendanceDay = require('../../models/AttendanceDay')
-// const AttendanceUser = require('../../models/AttendanceUser')
+import Router from 'express'
 import { asyncRoute } from '../../utils/api'
-//var moment = require('moment')
+const AttendanceDay = require('../../models/AttendanceDay')
+const AttendanceUser = require('../../models/AttendanceUser')
 const router = Router()
+var moment = require('moment')
 
+//date,state,name
 router.post(
-    '/add',
+    '/attendanceDay',
     asyncRoute(async function(req, res) {
-        //var cur = moment().format('YYYYMMDD')
+        var Date = moment().format('YYYYMMDD')
         try {
-            // const pp = await AttendanceDay.findOne({
-            //     day: cur,
-            // })
-            // if (pp) {
-            //     pp.addStatus('root', req.body.state)
-            // } else {
-            //     pp.day = cur
-            //     pp.save
-            // }
+            var pp = await AttendanceDay.findOne()
+                .where('day')
+                .equals(Date)
+            if (!pp) {
+                var attendanceDay = new AttendanceDay()
+                attendanceDay.day = Date
+                attendanceDay.addStatus(req.body.name, req.body.state)
+                res.json({
+                    message: 'status create',
+                    result: 1,
+                })
+            } else {
+                pp.addStatus(req.body.name, req.body.state)
+                res.json({
+                    message: 'status update',
+                    result: 1,
+                })
+            }
+        } catch (err) {
+            //console.log(err)
+            res.status(501).json(err)
+        }
+    })
+)
 
-            //pp.addStatus('root', req.body.state)
-            res.json({
-                message: 'status update',
-            })
+//name,state
+router.post(
+    '/attendanceUser',
+    asyncRoute(async function(req, res) {
+        var Date = moment().format('YYYYMMDD')
+        var Name = req.body.name
+        try {
+            var pp = await AttendanceUser.findOne()
+                .where('name')
+                .equals(Name)
+            if (!pp) {
+                var attendanceUser = new AttendanceUser()
+                attendanceUser.name = Name
+                attendanceUser.addStatus(Date, req.body.state)
+                res.json({
+                    message: 'status create',
+                    result: 1,
+                })
+            } else {
+                pp.addStatus(Date, req.body.state)
+                res.json({
+                    message: 'status update',
+                    result: 1,
+                })
+            }
         } catch (err) {
             //console.log(err)
             res.status(501).json(err)
