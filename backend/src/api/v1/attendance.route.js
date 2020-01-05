@@ -30,7 +30,7 @@ router.post(
                 })
             }
         } catch (err) {
-            //console.log(err)
+            console.log(err) // eslint-disable-line no-console
             res.status(501).json(err)
         }
     })
@@ -62,7 +62,35 @@ router.post(
                 })
             }
         } catch (err) {
-            //console.log(err)
+            console.log(err) // eslint-disable-line no-console
+            res.status(501).json(err)
+        }
+    })
+)
+
+router.get(
+    '/attendanceCheck',
+    asyncRoute(async function(req, res) {
+        var Date = moment().format('YYYYMMDD')
+        var Name = req.body.name
+        try {
+            const cursor = await AttendanceDay.find({
+                day: Date,
+                'status.name': Name,
+            })
+            if (cursor != '') {
+                res.json({
+                    message: 'already attendance',
+                    result: 1,
+                })
+            } else {
+                res.json({
+                    message: 'need attendance',
+                    result: 0,
+                })
+            }
+        } catch (err) {
+            console.log(err) // eslint-disable-line no-console
             res.status(501).json(err)
         }
     })
