@@ -1,63 +1,52 @@
 import Router from 'express'
 import { asyncRoute } from '../../utils/api'
+import random from 'random-number-csprng'
 const AttendanceDay = require('../../models/AttendanceDay')
 const AttendanceUser = require('../../models/AttendanceUser')
 const router = Router()
 var moment = require('moment')
+var ranNum = random(100, 999)
 
-//date,state,name
+//state,name
 router.post(
-    '/attendanceDay',
+    '/attendanceWrite',
     asyncRoute(async function(req, res) {
+        if (ranNum != req.body.code) {
+            res.json({
+                message: 'wrongCode!',
+                result: 0,
+            })
+        }
         var Date = moment().format('YYYYMMDD')
         try {
-            var pp = await AttendanceDay.findOne()
+            var cursor_Day = await AttendanceDay.findOne()
                 .where('day')
                 .equals(Date)
-            if (!pp) {
+            if (!cursor_Day) {
                 var attendanceDay = new AttendanceDay()
                 attendanceDay.day = Date
                 attendanceDay.addStatus(req.body.name, req.body.state)
-                res.json({
-                    message: 'status create',
-                    result: 1,
-                })
             } else {
-                pp.addStatus(req.body.name, req.body.state)
-                res.json({
-                    message: 'status update',
-                    result: 1,
-                })
+                cursor_Day.addStatus(req.body.name, req.body.state)
             }
         } catch (err) {
             console.log(err) // eslint-disable-line no-console
             res.status(501).json(err)
         }
-    })
-)
-
-//name,state
-router.post(
-    '/attendanceUser',
-    asyncRoute(async function(req, res) {
-        var Date = moment().format('YYYYMMDD')
-        var Name = req.body.name
         try {
-            var pp = await AttendanceUser.findOne()
+            var cursor_User = await AttendanceUser.findOne()
                 .where('name')
-                .equals(Name)
-            if (!pp) {
+                .equals(req.body.name)
+            if (!cursor_User) {
                 var attendanceUser = new AttendanceUser()
-                attendanceUser.name = Name
+                attendanceUser.name = req.body.name
                 attendanceUser.addStatus(Date, req.body.state)
                 res.json({
-                    message: 'status create',
                     result: 1,
                 })
             } else {
-                pp.addStatus(Date, req.body.state)
+                cursor_User.addStatus(Date, req.body.state)
                 res.json({
-                    message: 'status update',
                     result: 1,
                 })
             }
@@ -80,12 +69,10 @@ router.get(
             })
             if (cursor != '') {
                 res.json({
-                    message: 'already attendance',
                     result: 1,
                 })
             } else {
                 res.json({
-                    message: 'need attendance',
                     result: 0,
                 })
             }
@@ -96,4 +83,16 @@ router.get(
     })
 )
 
+router.get(
+    '/startAttendance',
+    asyncRoute(async function(req, res) {
+        try {
+            ranNum = await random(100, 999)
+            res.json({ code: ranNum })
+        } catch (err) {
+            console.log(err) // eslint-disable-line no-console
+            res.status(501).json
+        }
+    })
+)
 export default router
