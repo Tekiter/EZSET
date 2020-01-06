@@ -37,11 +37,11 @@
             </v-card>
         </v-form>
 
-        <v-snackbar v-model="snackbar_c" multi-line="multiLine" color="success"
+        <v-snackbar v-model="snackbar_c" color="success"
             >출석되었습니다.
             <v-btn dark text @click="close"> Close</v-btn>
         </v-snackbar>
-        <v-snackbar v-model="snackbar_e" multi-line="multiLine" color="error"
+        <v-snackbar v-model="snackbar_e" color="error"
             >번호가 일치하지 않습니다.
             <v-btn dark text @click="closeSnack"> Close</v-btn>
         </v-snackbar>
