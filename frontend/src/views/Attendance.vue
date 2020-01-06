@@ -94,7 +94,6 @@ export default {
             try {
                 const res = await axios.post('attendance/attendanceWrite', {
                     code: this.input_attendance_code,
-                    name: 'wldbs2043',
                     state: 'attendance',
                 })
                 if (res.data.result) this.snackbar_c = true
