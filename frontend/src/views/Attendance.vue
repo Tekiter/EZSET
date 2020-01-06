@@ -96,15 +96,19 @@ export default {
         attendanceCheck() {
             if (this.input_attendance_code == this.output_attendance_code) {
                 axios
-                    .post('', {
-                        //name: ,
+                    .post('http://localhost:5000/attendance/attendanceDay', {
+                        name: '최현석',
                         state: 'attendance',
                     })
                     .then(res => {
                         axios
-                            .post('', {
-                                state: 'attendance',
-                            })
+                            .post(
+                                'http://localhost:5000/attendance/attendanceUser',
+                                {
+                                    name: '최현석',
+                                    state: 'attendance',
+                                }
+                            )
                             .then(res => {
                                 this.snackbar_c = true
                             })
