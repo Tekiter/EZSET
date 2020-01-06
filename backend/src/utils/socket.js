@@ -9,19 +9,12 @@ export async function initSocket(app, SOCKET_PORT) {
     //Attendance State
     var curState = {
         flag: false,
-        output_attendance_code: '',
     }
 
     //connect event
     io.on('connection', function(socket) {
         socket.on('join', function(data) {
             socket.join(data.roomName)
-            // console.log(
-            //     '[socket.io] ' +
-            //     socket.id +
-            //     'user join conneted room : ' +
-            //     data.roomName
-            // )
         })
         //disconnect event
         socket.on('disconnect', () => {
@@ -30,10 +23,8 @@ export async function initSocket(app, SOCKET_PORT) {
         //attendance event lisner
         socket.on('attendance', function(data) {
             curState.flag = data.flag
-            curState.output_attendance_code = data.output_attendance_code
             var rtnMessage = {
                 flag: data.flag,
-                output_attendance_code: data.output_attendance_code,
             }
             //broadcast changed state
             socket.broadcast.to('attendance').emit('attendance', rtnMessage)
