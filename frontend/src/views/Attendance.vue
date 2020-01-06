@@ -72,19 +72,17 @@ export default {
         }
     },
     methods: {
-        checkAttendanceCode() {
-            //입력받은 코드와 전달받은 코드 일치 확인
-        },
-        startAttendance() {
-            this.output_attendance_code = Math.floor(
-                Math.random() * (999 - 100) + 100
-            )
+        async startAttendance() {
+            try {
+                const res_code = await axios.get('attendance/startAttendance')
+                this.output_attendance_code = res_code.code
+            } catch (err) {
+                console.log(err)
+            }
             this.$socket.emit('attendance', {
                 flag: true,
-                output_attendance_code: this.output_attendance_code,
             })
             this.flag = true
-            this.output_attendance_code = this.output_attendance_code
         },
         endAttendance() {
             this.$socket.emit('attendance', {
@@ -93,33 +91,18 @@ export default {
             this.flag = false
             this.input_attendance_code = ''
         },
-        attendanceCheck() {
-            if (this.input_attendance_code == this.output_attendance_code) {
-                axios
-                    .post('http://localhost:5000/attendance/attendanceDay', {
-                        name: '최현석',
-                        state: 'attendance',
-                    })
-                    .then(res => {
-                        axios
-                            .post(
-                                'http://localhost:5000/attendance/attendanceUser',
-                                {
-                                    name: '최현석',
-                                    state: 'attendance',
-                                }
-                            )
-                            .then(res => {
-                                this.snackbar_c = true
-                            })
-                            .catch(err => {
-                                console.log(err)
-                            })
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
-            } else this.snackbar_e = true
+        async attendanceCheck() {
+            try {
+                const res = await axios.post('attendance/attendanceWrite', {
+                    code: this.input_attendance_code,
+                    name: '최현석',
+                    state: 'attendance',
+                })
+                if (res.result) this.snackbar_c = true
+                else this.snackbar_e = true
+            } catch (err) {
+                console.log(err)
+            }
         },
         close() {
             this.input_attendance_code = ''
@@ -132,7 +115,9 @@ export default {
         /*
         created() {
             try {
-                const res = await axios.get(``)
+                const res = await axios.get('attendance/attendanceCheck')
+                if(res.result)
+                else
             }
             catch (err) {
                 console.log(err)
