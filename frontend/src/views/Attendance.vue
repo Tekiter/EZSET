@@ -57,7 +57,6 @@ export default {
         })
         this.$socket.on('attendance', data => {
             this.flag = data.flag
-            this.output_attendance_code = data.output_attendance_code
         })
     },
 
@@ -75,7 +74,7 @@ export default {
         async startAttendance() {
             try {
                 const res_code = await axios.get('attendance/startAttendance')
-                this.output_attendance_code = res_code.code
+                this.output_attendance_code = res_code.data.code
             } catch (err) {
                 console.log(err)
             }
@@ -95,10 +94,10 @@ export default {
             try {
                 const res = await axios.post('attendance/attendanceWrite', {
                     code: this.input_attendance_code,
-                    name: '최현석',
+                    name: '씨발',
                     state: 'attendance',
                 })
-                if (res.result) this.snackbar_c = true
+                if (res.data.result) this.snackbar_c = true
                 else this.snackbar_e = true
             } catch (err) {
                 console.log(err)
@@ -116,7 +115,7 @@ export default {
         created() {
             try {
                 const res = await axios.get('attendance/attendanceCheck')
-                if(res.result)
+                if(res.data.result)
                 else
             }
             catch (err) {
