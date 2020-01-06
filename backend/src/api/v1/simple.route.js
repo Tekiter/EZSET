@@ -10,6 +10,10 @@ router.post('/boards', [body('title').isString(), validateParams], function(
     req,
     res
 ) {
+    if (!req.user.perm('board').can('create')) {
+        res.status(403).end()
+        return
+    }
     let board = new Board()
     board.title = req.body.title
 
@@ -28,6 +32,10 @@ router.delete(
     '/boards/:board_id',
     [param('board_id').isNumeric(), validateParams],
     function(req, res) {
+        if (!req.user.perm('board', req.params.board_id).can('delete')) {
+            res.status(403).end()
+            return
+        }
         Board.remove({ _id: req.params.board_id }, function(err, output) {
             if (err) {
                 const errr = new Error('database error')
@@ -55,13 +63,14 @@ router.get('/boards', function(req, res) {
 router.post(
     '/boards/:board_id',
     [
-        param('board_id').isNumeric,
+        param('board_id').isNumeric(),
         body('title').isString(),
         body('content').isString(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
-        if (!req.perm('board', req.params.board_id).can('create')) {
+        if (!req.user.perm('board', req.params.board_id).can('create')) {
+            res.status(403).end()
             return
         }
         const boardId = parseInt(req.params.board_id)

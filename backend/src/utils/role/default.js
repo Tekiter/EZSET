@@ -6,7 +6,10 @@ export function setDefaultRole(roles) {
         .canOwn('read')
 
         .resource('role')
-        .canOwn('read')
+        .can('read')
+
+        .resource('board')
+        .can('read')
 }
 
 export function setAdminRole(roles) {
@@ -18,4 +21,7 @@ export function setAdminRole(roles) {
 
         .resource('role')
         .canOwn(['read', 'create', 'delete'])
+
+        .resource('board')
+        .can(['read', 'create', 'delete'])
 }
