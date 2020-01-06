@@ -1,7 +1,11 @@
 <template>
     <v-container>
         <v-form>
-            <v-card class="mx-auto" max-width="400" v-if="flag">
+            <v-card
+                class="mx-auto"
+                max-width="400"
+                v-if="flag && attendanceCard"
+            >
                 <v-card-title>
                     <v-text-field
                         v-model="input_attendance_code"
@@ -15,7 +19,7 @@
                 </v-card-actions>
             </v-card>
 
-            <v-card class="mx-auto" max-width="400" v-if="flag">
+            <v-card class="mx-auto" max-width="400" v-if="flag && endCard">
                 <v-card-title> {{ output_attendance_code }} </v-card-title>
                 <v-card-actions>
                     <v-btn
@@ -28,7 +32,12 @@
                 </v-card-actions>
             </v-card>
 
-            <v-card class="mx-auto" max-width="400" text v-if="!flag">
+            <v-card
+                class="mx-auto"
+                max-width="400"
+                text
+                v-if="!flag && startCard"
+            >
                 <v-card-actions>
                     <v-btn color="purple" text @click="startAttendance"
                         >시작</v-btn
@@ -51,13 +60,25 @@
 import axios from 'axios'
 export default {
     name: 'attendance',
-    created() {
+    async created() {
         this.$socket.emit('join', {
             roomName: 'attendance',
         })
         this.$socket.on('attendance', data => {
             this.flag = data.flag
         })
+        try {
+            const res = await axios.get('attendance/attendanceCheck')
+            console.log(res.data)
+            if (res.data.result == '1') {
+                if (this.flag) {
+                    this.endCard = false
+                    this.attendanceCard = false
+                }
+            }
+        } catch (err) {
+            console.log(err)
+        }
     },
 
     data() {
@@ -68,9 +89,15 @@ export default {
             flag: false,
             snackbar_c: false,
             snackbar_e: false,
+            attendanceCard: true,
+            startCard: true,
+            endCard: true,
         }
     },
     methods: {
+        test() {
+            console.log('haha')
+        },
         async startAttendance() {
             try {
                 const res_code = await axios.get('attendance/startAttendance')
@@ -94,7 +121,7 @@ export default {
             try {
                 const res = await axios.post('attendance/attendanceWrite', {
                     code: this.input_attendance_code,
-                    name: '씨발',
+                    name: 'wldbs2043',
                     state: 'attendance',
                 })
                 if (res.data.result) this.snackbar_c = true
@@ -111,18 +138,6 @@ export default {
             this.snackbar_e = false
             this.input_attendance_code = ''
         },
-        /*
-        created() {
-            try {
-                const res = await axios.get('attendance/attendanceCheck')
-                if(res.data.result)
-                else
-            }
-            catch (err) {
-                console.log(err)
-            }
-        },
-        */
     },
 }
 </script>
