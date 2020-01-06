@@ -125,6 +125,16 @@ export default {
             this.snackbar_e = false
             this.input_attendance_code = ''
         },
+        /*
+        created() {
+            try {
+                const res = await axios.get(``)
+            }
+            catch (err) {
+                console.log(err)
+            }
+        },
+        */
     },
 }
 </script>
