@@ -65,9 +65,9 @@ router.get(
                 'status.name': Name,
             })
             if (cursor != '') {
-                res.json({ result: 1 })
+                res.json(1)
             } else {
-                res.json({ result: 0 })
+                res.json(0)
             }
         } catch (err) {
             console.log(err) // eslint-disable-line no-console

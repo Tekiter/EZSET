@@ -1,46 +1,25 @@
 <template>
     <v-container>
         <v-form>
-            <v-card
-                class="mx-auto"
-                max-width="400"
-                v-if="flag && attendanceCard"
-            >
+            <v-card class="mx-auto" max-width="400" v-if="flag==true && code==0">
                 <v-card-title>
-                    <v-text-field
-                        v-model="input_attendance_code"
-                    ></v-text-field>
+                    <v-text-field v-model="input_attendance_code"></v-text-field>
                 </v-card-title>
 
                 <v-card-actions>
-                    <v-btn color="purple" text @click="attendanceCheck"
-                        >출석하기</v-btn
-                    >
+                    <v-btn color="purple" text @click="attendanceCheck">출석하기</v-btn>
                 </v-card-actions>
             </v-card>
-            <v-card class="mx-auto" max-width="400" v-if="flag && endCard">
-                <v-card-title> {{ output_attendance_code }} </v-card-title>
+            <v-card class="mx-auto" max-width="400" v-if="flag">
+                <v-card-title>{{ output_attendance_code }}</v-card-title>
                 <v-card-actions>
-                    <v-btn
-                        color="purple"
-                        text
-                        v-if="flag"
-                        @click="endAttendance"
-                        >종료</v-btn
-                    >
+                    <v-btn color="purple" text v-if="flag" @click="endAttendance">종료</v-btn>
                 </v-card-actions>
             </v-card>
 
-            <v-card
-                class="mx-auto"
-                max-width="400"
-                text
-                v-if="!flag && startCard"
-            >
+            <v-card class="mx-auto" max-width="400" text v-if="!flag">
                 <v-card-actions>
-                    <v-btn color="purple" text @click="startAttendance"
-                        >시작</v-btn
-                    >
+                    <v-btn color="purple" text @click="startAttendance">시작</v-btn>
                 </v-card-actions>
             </v-card>
         </v-form>
@@ -68,13 +47,12 @@ export default {
         })
         try {
             const res = await axios.get('attendance/attendanceCheck')
-            console.log(res.data)
-            if (res.data.result == '1') {
-                if (this.flag) {
-                    this.endCard = false
-                    this.attendanceCard = false
-                }
-            }
+            this.code = parseInt(res.data)
+            // console.log(res.data)
+            // if (this.code == 1 && this.flag == true) {
+            //     this.endCard = false
+            //     this.attendanceCard = false
+            // }
         } catch (err) {
             console.log(err)
         }
@@ -89,14 +67,10 @@ export default {
             snackbar_c: false,
             snackbar_e: false,
             attendanceCard: true,
-            startCard: true,
-            endCard: true,
+            code: 0,
         }
     },
     methods: {
-        test() {
-            console.log('haha')
-        },
         async startAttendance() {
             try {
                 const res_code = await axios.get('attendance/startAttendance')
