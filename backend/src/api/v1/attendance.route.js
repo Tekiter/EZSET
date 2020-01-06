@@ -41,14 +41,10 @@ router.post(
                 var attendanceUser = new AttendanceUser()
                 attendanceUser.name = req.body.name
                 attendanceUser.addStatus(Date, req.body.state)
-                res.json({
-                    result: 1,
-                })
+                res.json({ result: 1 })
             } else {
                 cursor_User.addStatus(Date, req.body.state)
-                res.json({
-                    result: 1,
-                })
+                res.json({ result: 1 })
             }
         } catch (err) {
             console.log(err) // eslint-disable-line no-console
@@ -61,20 +57,16 @@ router.get(
     '/attendanceCheck',
     asyncRoute(async function(req, res) {
         var Date = moment().format('YYYYMMDD')
-        var Name = req.body.name
+        var Name = req.user.username
         try {
             const cursor = await AttendanceDay.find({
                 day: Date,
                 'status.name': Name,
             })
             if (cursor != '') {
-                res.json({
-                    result: 1,
-                })
+                res.json({ result: 1 })
             } else {
-                res.json({
-                    result: 0,
-                })
+                res.json({ result: 0 })
             }
         } catch (err) {
             console.log(err) // eslint-disable-line no-console
