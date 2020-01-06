@@ -59,6 +59,10 @@ export default {
 
                 user = JSON.parse(user)
 
+                axios.defaults.headers.common[
+                    'Authorization'
+                ] = `Bearer ${accessToken}`
+
                 context.commit('SET_ACCESS_TOKEN', accessToken)
                 context.commit('SET_USER', user)
             } catch {
