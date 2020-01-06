@@ -45,6 +45,24 @@ router.route('/register').post(
     ],
     asyncRoute(async (req, res) => {
         try {
+            let idreg = /^[a-z0-9]{6,12}$/
+            if (!idreg.test(req.body.username)) {
+                res.status(400).json({
+                    message:
+                        '아이디는 6~12자의 영문 소문자, 숫자만 사용 가능합니다.',
+                })
+                return
+            }
+
+            let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,16}$/
+            if (!pwreg.test(req.body.password)) {
+                res.status(400).json({
+                    message:
+                        '비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요',
+                })
+                return
+            }
+
             const exists = await User.count()
                 .where('username')
                 .equals(req.body.username)
@@ -72,7 +90,7 @@ router.route('/register').post(
     })
 )
 
-router.route('/register/check/username').post(
+router.route('/register/doublecheck/username').post(
     [body('username').isString(), validateParams],
     asyncRoute(async (req, res) => {
         try {
