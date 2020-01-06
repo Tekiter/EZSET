@@ -18,6 +18,7 @@ router.post(
             })
         }
         var Date = moment().format('YYYYMMDD')
+        var Name = req.user.username
         try {
             var cursor_Day = await AttendanceDay.findOne()
                 .where('day')
@@ -25,9 +26,9 @@ router.post(
             if (!cursor_Day) {
                 var attendanceDay = new AttendanceDay()
                 attendanceDay.day = Date
-                attendanceDay.addStatus(req.body.name, req.body.state)
+                attendanceDay.addStatus(Name, req.body.state)
             } else {
-                cursor_Day.addStatus(req.body.name, req.body.state)
+                cursor_Day.addStatus(Name, req.body.state)
             }
         } catch (err) {
             console.log(err) // eslint-disable-line no-console
@@ -36,10 +37,10 @@ router.post(
         try {
             var cursor_User = await AttendanceUser.findOne()
                 .where('name')
-                .equals(req.body.name)
+                .equals(Name)
             if (!cursor_User) {
                 var attendanceUser = new AttendanceUser()
-                attendanceUser.name = req.body.name
+                attendanceUser.name = Name
                 attendanceUser.addStatus(Date, req.body.state)
                 res.json({ result: 1 })
             } else {
