@@ -5,12 +5,13 @@ import Post from '../../models/Post'
 import { validateParams, asyncRoute } from '../../utils/api'
 const router = Router()
 
-//post board
+//게시판 생성
 router.post('/boards', [body('title').isString(), validateParams], function(
     req,
     res
 ) {
     if (!req.user.perm('board').can('create')) {
+        //권한설정
         res.status(403).end()
         return
     }
@@ -27,7 +28,7 @@ router.post('/boards', [body('title').isString(), validateParams], function(
     })
 })
 
-//delete board
+//게시판 삭제
 router.delete(
     '/boards/:board_id',
     [param('board_id').isNumeric(), validateParams],
@@ -47,7 +48,7 @@ router.delete(
     }
 )
 
-//get all board
+//게시판 목록 보기
 router.get('/boards', function(req, res) {
     Board.find(function(err, board) {
         if (err) {
@@ -59,7 +60,7 @@ router.get('/boards', function(req, res) {
     })
 })
 
-//post post
+//게시글 작성
 router.post(
     '/boards/:board_id',
     [
@@ -98,7 +99,7 @@ router.post(
     })
 )
 
-//delete post
+//게시글 삭제
 router.delete(
     '/posts/:post_id',
     [param('post_id').isNumeric(), validateParams],
@@ -127,7 +128,7 @@ router.delete(
     })
 )
 
-//edit post
+//게시글 수정
 router.put(
     '/posts/:post_id',
     [param('post_id').isNumeric(), body('content').isString(), validateParams],
@@ -158,7 +159,7 @@ router.put(
     })
 )
 
-//get one post
+//게시글 보기
 router.get(
     '/posts/:post_id',
     [param('post_id').isNumeric(), validateParams],
@@ -176,7 +177,7 @@ router.get(
     }
 )
 
-//get all post (get one board)
+//게시글 목록 보기
 router.get(
     '/boards/:board_id',
     [param('board_id').isNumeric(), validateParams],
@@ -205,7 +206,7 @@ router.get(
     })
 )
 
-//post comment
+//댓글 작성
 router.post(
     '/posts/:post_id/comment',
     [param('post_id').isNumeric(), body('comment').isString(), validateParams],
@@ -222,7 +223,7 @@ router.post(
                 return
             }
 
-            await post.addComment(req.body.content, req.body.user)
+            await post.addComment(req.body.content, req.user.username)
             res.status(201).json({ message: '댓글 작성 완료' })
         } catch (error) {
             const errr = new Error('database error')
@@ -232,7 +233,7 @@ router.post(
     })
 )
 
-//delete comment
+//댓글 삭제
 router.delete(
     '/posts/:post_id/comment/:comment_id',
     [
