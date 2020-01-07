@@ -3,6 +3,7 @@ import autoIncrement from 'mongoose-auto-increment'
 const Schema = mongoose.Schema
 
 let commentSchema = new Schema({
+    //댓글 구조
     content: { type: String, required: [true, 'comment content required'] },
     writer: { type: String, required: [true, 'comment writer required'] },
 })
@@ -34,18 +35,28 @@ let postSchema = new Schema({
         type: Date,
         default: Date.now,
     },
-    cnt: {
-        view: { type: Number, default: 0 },
-        like: { type: Number, default: 0 },
-    },
+    view: { type: Number, default: 0 },
+    like: [{ liker: { type: String } }],
     comments: [commentSchema],
 })
 
+//좋아요 카운트
+postSchema.virtual('likes_count').get(function() {
+    return this.likes ? this.likes.length : 0
+})
+
+//댓글 갯수 카운트
+postSchema.virtual('comments_count').get(function() {
+    return this.comments ? this.comments.length : 0
+})
+
+//댓글 작성
 postSchema.methods.addComment = function(content, writer) {
     this.comments.push(new Comment({ content, writer }))
     return this.save()
 }
 
+//댓글 삭제
 postSchema.methods.removeComment = function(comment_id) {
     let comment = this.comments.id(comment_id)
     comment.remove()
