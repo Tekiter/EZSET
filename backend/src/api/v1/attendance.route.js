@@ -124,4 +124,19 @@ router.post(
     })
 )
 
+router.get(
+    '/attendanceState/:day',
+    asyncRoute(async function(req, res) {
+        var Day = req.params.day
+        try {
+            const cur = await AttendanceDay.find({
+                day: Day,
+            })
+            res.json(cur)
+        } catch (err) {
+            console.log(err) // eslint-disable-line no-console
+            res.status(501).json
+        }
+    })
+)
 export default router
