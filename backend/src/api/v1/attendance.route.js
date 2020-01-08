@@ -2,14 +2,13 @@ import Router from 'express'
 import { asyncRoute } from '../../utils/api'
 import random from 'random-number-csprng'
 import User from '../../models/User'
-
-const AttendanceDay = require('../../models/AttendanceDay')
-const AttendanceUser = require('../../models/AttendanceUser')
+import AttendanceDay from '../../models/attendanceDay'
+import AttendanceUser from '../../models/attendanceUser'
 const router = Router()
 var moment = require('moment')
 var ranNum = random(100, 999)
 
-//state,name
+//사용자가 출석코드를 입력했을 경우 서버에서 생성한 코드와 사용자 입력코드가 일치한다면 db에 출석상태로 업데이트
 router.post(
     '/attendanceWrite',
     asyncRoute(async function(req, res) {
@@ -22,38 +21,35 @@ router.post(
         var Date = moment().format('YYYYMMDD')
         var Name = req.user.username
         try {
-            var cursor_Day = await AttendanceDay.findOne()
-                .where('day')
-                .equals(Date)
-            if (!cursor_Day) {
-                var attendanceDay = new AttendanceDay()
-                attendanceDay.day = Date
-                attendanceDay.addStatus(Name, req.body.state)
-            } else {
-                cursor_Day.addStatus(Name, req.body.state)
-            }
+            AttendanceDay.findOneAndUpdate(
+                {
+                    day: Date,
+                    'status.name': Name,
+                },
+                { 'status.$.state': 'attendance' },
+                function(err, doc) {}
+            )
         } catch (err) {
             res.status(501).json(err)
         }
         try {
-            var cursor_User = await AttendanceUser.findOne()
-                .where('name')
-                .equals(Name)
-            if (!cursor_User) {
-                var attendanceUser = new AttendanceUser()
-                attendanceUser.name = Name
-                attendanceUser.addStatus(Date, req.body.state)
-                res.json({ result: 1 })
-            } else {
-                cursor_User.addStatus(Date, req.body.state)
-                res.json({ result: 1 })
-            }
+            AttendanceUser.findOneAndUpdate(
+                {
+                    name: Name,
+                    'status.date': Date,
+                },
+                { 'status.$.state': 'attendance' },
+                function(err, doc) {}
+            )
+            res.json({ result: 1 })
         } catch (err) {
             res.status(501).json(err)
         }
     })
 )
 
+//출석 후 다시 출석하기 페이지에 접근시 이미 출석했음을 체크하는 API
+//출석을 했다면 1을 하지않았다면 0을 반환
 router.get(
     '/attendanceCheck',
     asyncRoute(async function(req, res) {
@@ -62,7 +58,7 @@ router.get(
         try {
             const cursor = await AttendanceDay.find({
                 day: Date,
-                'status.name': Name,
+                status: { $elemMatch: { name: Name, state: 'attendance' } },
             })
             if (cursor != '') {
                 res.json(1)
@@ -75,8 +71,8 @@ router.get(
     })
 )
 
-//관리자가 시작버튼을 눌렀을경우
-//관리자는 출석상태 다른 모든 유저는 결석상태로 업데이트됨
+//관리자가 시작버튼을 눌렀을경우 관리자는 출석상태 다른 모든 유저는 결석상태로 업데이트됨
+//attendanceDays, attendanceUsers Collection에 시작버튼을 누른 관리자를 제외한 모두를 '결석'상태로 초기화한 Document가 생성됨
 router.get(
     '/startAttendance',
     asyncRoute(async function(req, res) {
@@ -115,7 +111,7 @@ router.get(
                 cursor_User.addStatus(Date, state)
             }
         }
-        //Generate Code
+        //Generate Attendance Code and return
         try {
             ranNum = await random(100, 999)
             res.json({ code: ranNum })
