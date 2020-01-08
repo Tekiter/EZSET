@@ -139,4 +139,21 @@ router.get(
         }
     })
 )
+
+router.put(
+    '/attendanceStateUpdate/:day',
+    asyncRoute(async function(req, res) {
+        var Day = req.params.day
+        try {
+            const cur = await AttendanceDay.findOne({
+                day: Day,
+                Name: req.body.name,
+            })
+            cur.state = req.body.state
+        } catch (err) {
+            //console.log(err)
+            res.status(501).json
+        }
+    })
+)
 export default router
