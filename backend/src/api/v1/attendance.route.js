@@ -33,7 +33,6 @@ router.post(
                 cursor_Day.addStatus(Name, req.body.state)
             }
         } catch (err) {
-            console.log(err) // eslint-disable-line no-console
             res.status(501).json(err)
         }
         try {
@@ -50,7 +49,6 @@ router.post(
                 res.json({ result: 1 })
             }
         } catch (err) {
-            console.log(err) // eslint-disable-line no-console
             res.status(501).json(err)
         }
     })
@@ -72,46 +70,49 @@ router.get(
                 res.json(0)
             }
         } catch (err) {
-            console.log(err) // eslint-disable-line no-console
             res.status(501).json(err)
         }
     })
 )
 
-router.post(
+//관리자가 시작버튼을 눌렀을경우
+//관리자는 출석상태 다른 모든 유저는 결석상태로 업데이트됨
+router.get(
     '/startAttendance',
     asyncRoute(async function(req, res) {
         var Date = moment().format('YYYYMMDD')
         //get Userlist in User collection
-        const userList = await User.find()
-            .where('day')
-            .equals(req.body.date)
-            .select('username')
+        const userList = await User.find().select('username')
         //create db - AttendanceDay
         var attendanceDay = new AttendanceDay()
         attendanceDay.day = Date
         for (var k in userList) {
-            //create db - AttendanceDay
             var cursor_Day = await AttendanceDay.findOne()
                 .where('day')
                 .equals(Date)
+
+            var state = 'absence'
+            if (req.user.username == userList[k].username) state = 'attendance'
             if (!cursor_Day) {
                 var attendanceDay = new AttendanceDay()
                 attendanceDay.day = Date
-                attendanceDay.addStatus(userList[k].username, 'absence')
+                attendanceDay.addStatus(userList[k].username, state)
             } else {
-                cursor_Day.addStatus(userList[k].username, 'absence')
+                cursor_Day.addStatus(userList[k].username, state)
             }
             //create db - AttendanceUser
             var cursor_User = await AttendanceUser.findOne()
                 .where('name')
                 .equals(userList[k].username)
+
+            state = 'absence'
+            if (req.user.username == userList[k].username) state = 'attendance'
             if (!cursor_User) {
                 var attendanceUser = new AttendanceUser()
                 attendanceUser.name = userList[k].username
-                attendanceUser.addStatus(Date, 'absence')
+                attendanceUser.addStatus(Date, state)
             } else {
-                cursor_User.addStatus(Date, 'absence')
+                cursor_User.addStatus(Date, state)
             }
         }
         //Generate Code
@@ -134,7 +135,6 @@ router.get(
             })
             res.json(cur)
         } catch (err) {
-            //console.log(err) // eslint-disable-line no-console
             res.status(501).json
         }
     })
