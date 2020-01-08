@@ -14,8 +14,8 @@ const role = {
                 .where('username')
                 .equals(req.user.username)
                 .select('roles')
-                .cache(0, 'USER-ROLE-' + req.user.username)
-            req.user.perm = roles.createPermChecker(user.perms)
+                .cache(60, 'USER-ROLE-' + req.user.username)
+            req.user.perm = roles.createPermChecker(user.roles)
             next()
         } else {
             next()
