@@ -1,25 +1,41 @@
 <template>
     <v-container>
         <v-form>
-            <v-card class="mx-auto" max-width="400" v-if="flag==true && code==0">
+            <v-card
+                class="mx-auto"
+                max-width="400"
+                v-if="flag == true && code == 0"
+            >
                 <v-card-title>
-                    <v-text-field v-model="input_attendance_code"></v-text-field>
+                    <v-text-field
+                        v-model="input_attendance_code"
+                    ></v-text-field>
                 </v-card-title>
 
                 <v-card-actions>
-                    <v-btn color="purple" text @click="attendanceCheck">출석하기</v-btn>
+                    <v-btn color="purple" text @click="attendanceCheck"
+                        >출석하기</v-btn
+                    >
                 </v-card-actions>
             </v-card>
             <v-card class="mx-auto" max-width="400" v-if="flag">
                 <v-card-title>{{ output_attendance_code }}</v-card-title>
                 <v-card-actions>
-                    <v-btn color="purple" text v-if="flag" @click="endAttendance">종료</v-btn>
+                    <v-btn
+                        color="purple"
+                        text
+                        v-if="flag"
+                        @click="endAttendance"
+                        >종료</v-btn
+                    >
                 </v-card-actions>
             </v-card>
 
             <v-card class="mx-auto" max-width="400" text v-if="!flag">
                 <v-card-actions>
-                    <v-btn color="purple" text @click="startAttendance">시작</v-btn>
+                    <v-btn color="purple" text @click="startAttendance"
+                        >시작</v-btn
+                    >
                 </v-card-actions>
             </v-card>
         </v-form>
@@ -92,7 +108,7 @@ export default {
         },
         async attendanceCheck() {
             try {
-                const res = await axios.post('attendance/attendanceWrite', {
+                const res = await axios.put('attendance/attendanceWrite', {
                     code: this.input_attendance_code,
                     state: 'attendance',
                 })
