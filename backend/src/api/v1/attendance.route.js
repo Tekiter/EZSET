@@ -99,7 +99,7 @@ router.get(
             })
             res.json(cur)
         } catch (err) {
-            console.log(err) // eslint-disable-line no-console
+            //console.log(err) // eslint-disable-line no-console
             res.status(501).json
         }
     })
