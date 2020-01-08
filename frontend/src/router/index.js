@@ -22,6 +22,11 @@ const routes = [
         component: () => import('../views/Register.vue'),
         meta: { layout: 'null', noLoginRequired: true },
     },
+    {
+        path: '/mypage',
+        name: 'mypage',
+        component: () => import('../views/Mypage.vue'),
+    },
 ]
 
 const router = new VueRouter({

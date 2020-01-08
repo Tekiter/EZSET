@@ -41,6 +41,7 @@ router.route('/register').post(
         body('username').isString(),
         body('password').isString(),
         body('realname').isString(),
+        body('email').isEmail(),
         validateParams,
     ],
     asyncRoute(async (req, res) => {
@@ -79,6 +80,7 @@ router.route('/register').post(
                 password: req.body.password,
                 info: {
                     realname: req.body.realname,
+                    email: req.body.email,
                 },
             })
             await user.save()

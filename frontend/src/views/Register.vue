@@ -148,6 +148,7 @@ export default {
                     username: this.form.username,
                     password: this.form.password,
                     realname: this.form.realname,
+                    email: this.form.email,
                 })
                 this.$router.push({ path: '/' })
                 console.log(res) // eslint-disable-line no-console
