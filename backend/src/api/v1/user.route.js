@@ -7,6 +7,7 @@ import {
 } from '../../utils/api'
 import { param, body } from 'express-validator'
 import User from '../../models/User'
+import { clearCache } from 'cachegoose'
 
 const router = Router()
 
@@ -61,6 +62,7 @@ router.post(
             user.roles.push(req.body.roletag)
             await user.save()
         }
+        clearCache('USER-ROLE-' + req.user.username)
         res.status(200).json({})
     })
 )
@@ -88,6 +90,7 @@ router.delete(
             user.roles.splice(idx, 1)
             await user.save()
         }
+        clearCache('USER-ROLE-' + req.user.username)
         res.status(200).json({})
     })
 )

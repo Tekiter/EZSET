@@ -17,5 +17,5 @@ export function setAdminRole(roles) {
         .can(['read', 'update'])
 
         .resource('role')
-        .canOwn(['read', 'create', 'delete'])
+        .can(['read', 'create', 'delete'])
 }
