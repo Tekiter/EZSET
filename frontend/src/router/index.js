@@ -25,7 +25,7 @@ const routes = [
     {
         path: '/board',
         name: 'board',
-        component: () => import('../views/Board.vue'),
+        component: () => import('../views/BoardList.vue'),
         meta: { noLoginRequired: true },
     },
 ]
