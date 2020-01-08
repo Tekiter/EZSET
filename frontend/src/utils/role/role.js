@@ -1,9 +1,23 @@
-import { RoleSystem } from './libs/Role'
+import Permission from './libs/Permission'
+import store from '../../store'
 
-const roles = new RoleSystem()
+export function checkPerm(resource, param) {
+    const perms = store.state.role.perms
+    const res = []
 
-export function createChecker(roleList) {
-    return roles.createPermChecker(roleList)
+    perms.forEach(perm => {
+        if (perm[resource]) {
+            res.push(perm[resource])
+        }
+    })
+
+    return new Permission(res, param)
 }
 
-export function checkPerm() {}
+// export function addPermComponent() {
+//     Vue.component('perm', {
+//         props: ['resource', 'param'],
+//         data() {},
+//         template: `<slot v-if=""></slot>`,
+//     })
+// }

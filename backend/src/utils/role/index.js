@@ -88,6 +88,13 @@ const role = {
         setDefaultRole(roles)
         setAdminRole(roles)
     },
+    async getUserRoles(username) {
+        const user = await User.findOne()
+            .where('username')
+            .equals(username)
+            .select('roles')
+        return user.roles
+    },
 }
 
 module.exports = role
