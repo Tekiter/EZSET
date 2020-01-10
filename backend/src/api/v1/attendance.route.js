@@ -79,10 +79,33 @@ router.get(
         var Date = moment().format('YYYYMMDD')
         //get Userlist in User collection
         const userList = await User.find().select('username')
+        // const id = await AttendanceDay.find({
+        //         day: Date,
+        //     }).select('_id')
+        //console.log(id)
         //create db - AttendanceDay
         var attendanceDay = new AttendanceDay()
         attendanceDay.day = Date
+
         for (var k in userList) {
+            //     var q = { _id: id, 'status.name': userList[k].username },
+            //         update1 = {
+            //             $addToSet: {
+            //                 status: {
+            //                     name: userList[k].username,
+            //                     state: 'absence',
+            //                 },
+            //             },
+            //         },
+            //         options = { upsert: true }
+
+            //     AttendanceDay.findOneAndUpdate(q, update1, options, function(
+            //         err,
+            //         res
+            //     ) {
+            //         console.log(err)
+            //     })
+
             var cursor_Day = await AttendanceDay.findOne()
                 .where('day')
                 .equals(Date)
