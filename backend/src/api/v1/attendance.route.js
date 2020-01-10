@@ -4,6 +4,7 @@ import random from 'random-number-csprng'
 import User from '../../models/User'
 import AttendanceDay from '../../models/attendanceDay'
 import AttendanceUser from '../../models/attendanceUser'
+import { perm } from '../../utils/role'
 const router = Router()
 var moment = require('moment')
 var ranNum = random(100, 999)
@@ -52,6 +53,7 @@ router.post(
 //출석을 했다면 1을 하지않았다면 0을 반환
 router.get(
     '/attendanceCheck',
+    [perm('attendance').can('att')],
     asyncRoute(async function(req, res) {
         var Date = moment().format('YYYYMMDD')
         var Name = req.user.username

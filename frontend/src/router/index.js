@@ -8,7 +8,7 @@ const routes = [{
         path: '/',
         name: 'home',
         component: () =>
-            import ('../views/Home.vue')
+            import ('../views/Home.vue'),
     },
     {
         path: '/login',
@@ -36,6 +36,12 @@ const routes = [{
         component: () =>
             import ('../views/Attendance.vue'),
     },
+    {
+        path: '/attendanceManageDay',
+        name: 'attendanceManage',
+        component: () =>
+            import ('../views/AttendanceManageDay.vue'),
+    },
 ]
 
 const router = new VueRouter({
@@ -51,7 +57,7 @@ router.beforeEach(function(to, from, next) {
             next({
                 path: '/login',
                 query: {
-                    redirect: to.fullPath
+                    redirect: to.fullPath,
                 },
             })
         } else {
