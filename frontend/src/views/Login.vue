@@ -30,12 +30,7 @@
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer />
-                            <v-btn
-                                type="submit"
-                                color="primary"
-                                :to="'/register'"
-                                >Sign up</v-btn
-                            >
+                            <v-btn type="submit" color="primary" :to="'/register'">Sign up</v-btn>
                             <v-btn type="submit" color="primary">Login</v-btn>
                         </v-card-actions>
                     </v-form>
@@ -72,6 +67,7 @@ export default {
                     username: this.user.username,
                     password: this.user.password,
                 })
+                await this.$store.dispatch('role/fetchPermission')
 
                 let to
                 if (this.$route.query.redirect) {
