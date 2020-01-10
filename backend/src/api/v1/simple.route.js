@@ -205,7 +205,17 @@ router.get(
                 .equals(boardId)
             res.status(200).json({
                 board: board,
-                posts: posts,
+                posts: posts.map(post => {
+                    return {
+                        title: post.title,
+                        content: post.content,
+                        author: post.author,
+                        created_date: post.created_date,
+                        view: post.view,
+                        like: post.likes_count,
+                        comment: post.comment,
+                    }
+                }),
             })
         } catch (error) {
             const errr = new Error('database error')
