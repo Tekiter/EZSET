@@ -2,7 +2,7 @@
     <v-list dense>
         <template v-for="(menu, index) in mainMenus">
             <v-list-item
-                v-if="menu.type == 'simple'"
+                v-if="menu.type == 'simple' && menu.perm != false"
                 :key="index"
                 :to="menu.to"
             >
@@ -33,6 +33,7 @@ export default {
                     icon: 'mdi-settings',
                     title: '설정',
                     to: '/settings',
+                    perm: this.$perm('role').can('read'),
                 },
                 {
                     type: 'simple',

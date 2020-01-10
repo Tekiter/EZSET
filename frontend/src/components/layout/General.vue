@@ -12,9 +12,11 @@
 
             <v-menu offset-y :nudge-width="200">
                 <template v-slot:activator="{ on }">
-                    <v-btn text large v-on="on" class="text-none">{{
+                    <v-btn text large v-on="on" class="text-none">
+                        {{
                         user.username
-                    }}</v-btn>
+                        }}
+                    </v-btn>
                 </template>
                 <v-card>
                     <v-list>
@@ -23,9 +25,11 @@
                                 <v-icon>fas fa-user</v-icon>
                             </v-list-item-avatar>
                             <v-list-item-content>
-                                <v-list-item-title>{{
+                                <v-list-item-title>
+                                    {{
                                     user.username
-                                }}</v-list-item-title>
+                                    }}
+                                </v-list-item-title>
                                 <v-list-item-subtitle></v-list-item-subtitle>
                             </v-list-item-content>
                             <v-list-item-action>
@@ -68,6 +72,7 @@ export default {
     methods: {
         async logout() {
             await this.$store.dispatch('auth/logout')
+            await this.$store.dispatch('role/destroyPermission')
             this.$router.push({ path: '/login' })
         },
     },
