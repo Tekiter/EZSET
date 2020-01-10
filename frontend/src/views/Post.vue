@@ -17,13 +17,23 @@
 </template>
 <script>
 import axios from 'axios'
+import moment from 'moment'
 
 export default {
     mounted() {
         axios
             .get('/simple/boards/' + this.$route.params.board_id)
             .then(res => {
-                this.posts = res.data.posts
+                this.posts = res.data.posts.map(post => {
+                    post.created_date = moment(post.created_date).format(
+                        'YY/MM/DD'
+                    )
+                    return post
+                })
+                this.posts = res.data.posts.map(post => {
+                    post.number = post._id + 1
+                    return post
+                })
                 this.board = res.data.board
                 console.log(res.data.posts)
             })
@@ -31,6 +41,7 @@ export default {
                 console.error(e.message)
             })
     },
+
     data() {
         return {
             board: '',
@@ -54,6 +65,15 @@ export default {
                 { text: '조회', value: 'view' },
             ],
         }
+    },
+    methods: {
+        read(evt) {
+            console.log(evt._id)
+            console.log(evt.title)
+            this.$router.push({
+                path: '/post/' + evt._id + '/' + evt.title,
+            })
+        },
     },
 }
 </script>
