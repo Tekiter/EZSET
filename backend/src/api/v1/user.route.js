@@ -11,15 +11,19 @@ import { clearCache } from 'cachegoose'
 
 const router = Router()
 
-router.get('/', [], (req, res) => {
-    if (req.perm('board', '1234').can('write', 'own')) {
-        res.json({ message: req.permission })
-    }
-})
+// router.get('/', [], (req, res) => {
+//     if (req.perm('board', '1234').can('write', 'own')) {
+//         res.json({ message: req.permission })
+//     }
+// })
 
 router.get(
     '/:username/role',
-    [param('username').isString(), validateParams],
+    [
+        role.perm('role', 'user').can('read'),
+        param('username').isString(),
+        validateParams,
+    ],
     asyncRoute(async (req, res) => {
         const user = await User.findOne()
             .where('username')
@@ -42,6 +46,7 @@ router.get(
 router.post(
     '/:username/role',
     [
+        role.perm('role', 'user').can('update'),
         // param('username').isString(),
         param('username').custom(checkUsername),
         body('roletag').custom(checkRoleTag),
@@ -70,6 +75,7 @@ router.post(
 router.delete(
     '/:username/role/:roletag',
     [
+        role.perm('role', 'user').can('delete'),
         param('username').custom(checkUsername),
         param('roletag').custom(checkRoleTag),
         validateParams,
