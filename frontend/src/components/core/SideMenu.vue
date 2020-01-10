@@ -35,6 +35,12 @@ export default {
                     to: '/settings',
                     perm: this.$perm('role').can('read'),
                 },
+                {
+                    type: 'simple',
+                    icon: 'mdi-checkbox-marked-circle-outline',
+                    title: '출석체크',
+                    to: '/attendance',
+                },
             ],
         }
     },

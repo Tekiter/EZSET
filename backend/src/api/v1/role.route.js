@@ -19,7 +19,6 @@ import { Router } from 'express'
 import { validateParams, asyncRoute } from '../../utils/api'
 import { body, param } from 'express-validator'
 import role from '../../utils/role'
-import User from '../../models/User'
 
 const router = Router()
 
@@ -59,7 +58,9 @@ router.route('/').post(
         //     err.status = 403
         //     throw err
         // }
-        const newrole = await role.createRole({ name: req.body.name })
+        const newrole = await role.createRole({
+            name: req.body.name,
+        })
         res.json(newrole)
     })
 )
