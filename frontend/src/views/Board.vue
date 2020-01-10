@@ -1,7 +1,7 @@
 <template>
     <v-data-table
         :headers="headers"
-        :items="boards"
+        :items="posts"
         :items-per-page="10"
         class="elevation-1"
     >
@@ -9,7 +9,7 @@
             <v-divider class="mx-4" inset vertical></v-divider>
 
             <v-toolbar-title class="d-flex justify-center"
-                >-{board.title}-</v-toolbar-title
+                >-{{ board.title }}-</v-toolbar-title
             >
             <v-divider class="mx-2" inset vertical></v-divider>
         </template>
@@ -20,9 +20,11 @@ import axios from 'axios'
 export default {
     mounted() {
         axios
-            .get(`http://localhost:5000/api/v1/simple/boards/${this.board._id}`)
-            .then(r => {
-                console.log(r), (this.board = r.board), (this.posts = r.posts)
+            .get('/simple/boards/' + 1)
+            .then(res => {
+                this.posts = res.data.posts
+                this.board = res.data.board
+                console.log(res.data.posts)
             })
             .catch(e => {
                 console.error(e.message)
@@ -31,7 +33,7 @@ export default {
     data() {
         return {
             board: '',
-            posts: '',
+            posts: [],
             headers: [
                 {
                     text: '번호',
@@ -41,14 +43,14 @@ export default {
                 },
                 {
                     text: '제목',
-                    value: 'posts.title',
+                    value: 'title',
                     sortable: false,
                     width: '50%',
                 },
-                { text: '작성자', value: 'posts.author', sortable: false },
-                { text: '작성일', value: 'posts.created_date' },
-                { text: '추천', value: 'posts.like' },
-                { text: '조회', value: 'posts.view' },
+                { text: '작성자', value: 'author', sortable: false },
+                { text: '작성일', value: 'created_date' },
+                { text: '추천', value: 'like' },
+                { text: '조회', value: 'view' },
             ],
         }
     },
