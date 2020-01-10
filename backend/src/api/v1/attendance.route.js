@@ -177,4 +177,17 @@ router.put(
         }
     })
 )
+
+router.get(
+    '/attendanceUserList',
+    asyncRoute(async function(req, res) {
+        try {
+            const userList = await User.find().select('username')
+            res.json(userList)
+        } catch (err) {
+            //console.log(err)
+            res.status(501).json
+        }
+    })
+)
 export default router

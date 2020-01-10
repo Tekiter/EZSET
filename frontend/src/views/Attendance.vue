@@ -1,25 +1,50 @@
 <template>
     <v-container>
         <v-form>
-            <v-card class="mx-auto" max-width="400" v-if="flag == true && code == 0">
+            <v-card
+                class="mx-auto"
+                max-width="400"
+                v-if="flag == true && code == 0"
+            >
                 <v-card-title>
-                    <v-text-field v-model="input_attendance_code"></v-text-field>
+                    <v-text-field
+                        v-model="input_attendance_code"
+                    ></v-text-field>
                 </v-card-title>
 
                 <v-card-actions>
-                    <v-btn color="purple" text @click="attendanceCheck">출석하기</v-btn>
+                    <v-btn color="purple" text @click="attendanceCheck"
+                        >출석하기</v-btn
+                    >
                 </v-card-actions>
             </v-card>
-            <v-card class="mx-auto" max-width="400" v-if="flag">
+            <v-card
+                class="mx-auto"
+                max-width="400"
+                v-if="flag && this.$perm('attendance').can('start')"
+            >
                 <v-card-title>{{ output_attendance_code }}</v-card-title>
                 <v-card-actions>
-                    <v-btn color="purple" text v-if="flag" @click="endAttendance">종료</v-btn>
+                    <v-btn
+                        color="purple"
+                        text
+                        v-if="flag"
+                        @click="endAttendance"
+                        >종료</v-btn
+                    >
                 </v-card-actions>
             </v-card>
 
-            <v-card class="mx-auto" max-width="400" text v-if="!flag">
+            <v-card
+                class="mx-auto"
+                max-width="400"
+                text
+                v-if="!flag && this.$perm('attendance').can('start')"
+            >
                 <v-card-actions>
-                    <v-btn color="purple" text @click="startAttendance">시작</v-btn>
+                    <v-btn color="purple" text @click="startAttendance"
+                        >시작</v-btn
+                    >
                 </v-card-actions>
             </v-card>
         </v-form>
