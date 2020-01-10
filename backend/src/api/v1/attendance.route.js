@@ -81,59 +81,44 @@ router.get(
         var Date = moment().format('YYYYMMDD')
         //get Userlist in User collection
         const userList = await User.find().select('username')
-        // const id = await AttendanceDay.find({
-        //         day: Date,
-        //     }).select('_id')
-        //console.log(id)
         //create db - AttendanceDay
         var attendanceDay = new AttendanceDay()
         attendanceDay.day = Date
 
-        for (var k in userList) {
-            //     var q = { _id: id, 'status.name': userList[k].username },
-            //         update1 = {
-            //             $addToSet: {
-            //                 status: {
-            //                     name: userList[k].username,
-            //                     state: 'absence',
-            //                 },
-            //             },
-            //         },
-            //         options = { upsert: true }
+        const cnt = await AttendanceDay.find()
+            .where('day')
+            .equals(Date)
+            .count()
 
-            //     AttendanceDay.findOneAndUpdate(q, update1, options, function(
-            //         err,
-            //         res
-            //     ) {
-            //         console.log(err)
-            //     })
-
-            var cursor_Day = await AttendanceDay.findOne()
-                .where('day')
-                .equals(Date)
-
-            var state = 'absence'
-            if (req.user.username == userList[k].username) state = 'attendance'
-            if (!cursor_Day) {
-                var attendanceDay = new AttendanceDay()
-                attendanceDay.day = Date
-                attendanceDay.addStatus(userList[k].username, state)
-            } else {
-                cursor_Day.addStatus(userList[k].username, state)
-            }
-            //create db - AttendanceUser
-            var cursor_User = await AttendanceUser.findOne()
-                .where('name')
-                .equals(userList[k].username)
-
-            state = 'absence'
-            if (req.user.username == userList[k].username) state = 'attendance'
-            if (!cursor_User) {
-                var attendanceUser = new AttendanceUser()
-                attendanceUser.name = userList[k].username
-                attendanceUser.addStatus(Date, state)
-            } else {
-                cursor_User.addStatus(Date, state)
+        if (cnt == 0) {
+            for (var k in userList) {
+                var cursor_Day = await AttendanceDay.findOne()
+                    .where('day')
+                    .equals(Date)
+                var state = 'absence'
+                if (req.user.username == userList[k].username)
+                    state = 'attendance'
+                if (!cursor_Day) {
+                    var attendanceDay = new AttendanceDay()
+                    attendanceDay.day = Date
+                    attendanceDay.addStatus(userList[k].username, state)
+                } else {
+                    cursor_Day.addStatus(userList[k].username, state)
+                }
+                //create db - AttendanceUser
+                var cursor_User = await AttendanceUser.findOne()
+                    .where('name')
+                    .equals(userList[k].username)
+                state = 'absence'
+                if (req.user.username == userList[k].username)
+                    state = 'attendance'
+                if (!cursor_User) {
+                    var attendanceUser = new AttendanceUser()
+                    attendanceUser.name = userList[k].username
+                    attendanceUser.addStatus(Date, state)
+                } else {
+                    cursor_User.addStatus(Date, state)
+                }
             }
         }
         //Generate Attendance Code and return
