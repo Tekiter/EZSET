@@ -168,7 +168,16 @@ router.get(
             .where('_id')
             .equals(req.params.post_id)
             .then(post => {
-                if (post) res.status(200).json(post)
+                if (post)
+                    res.status(200).json({
+                        title: post.title,
+                        content: post.content,
+                        author: post.author,
+                        created_date: post.created_date,
+                        view: post.view,
+                        like: post.likes_count,
+                        comment: post.comment,
+                    })
                 else
                     res.status(404).json({
                         message: 'no post id ' + req.params.post_id,
