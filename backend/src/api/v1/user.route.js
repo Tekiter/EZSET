@@ -8,6 +8,7 @@ import {
 import { param, body } from 'express-validator'
 import User from '../../models/User'
 import { clearCache } from 'cachegoose'
+import role from '../../utils/role'
 
 const router = Router()
 
