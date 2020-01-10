@@ -170,6 +170,7 @@ router.get(
             .then(post => {
                 if (post)
                     res.status(200).json({
+                        _id: parseInt(post.id),
                         title: post.title,
                         content: post.content,
                         author: post.author,
@@ -207,6 +208,7 @@ router.get(
                 board: board,
                 posts: posts.map(post => {
                     return {
+                        _id: parseInt(post.id),
                         title: post.title,
                         content: post.content,
                         author: post.author,
