@@ -59,7 +59,7 @@ class Permission {
                     }
                 }
             }
-            return result
+            return !!result
         })
 
         return results.indexOf(true) >= 0

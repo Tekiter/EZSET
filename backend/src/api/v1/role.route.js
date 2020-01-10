@@ -19,10 +19,26 @@ import { Router } from 'express'
 import { validateParams, asyncRoute } from '../../utils/api'
 import { body, param } from 'express-validator'
 import role from '../../utils/role'
+import User from '../../models/User'
 
 const router = Router()
 
-// 역할 목록 조회
+router.route('/me').get(
+    [role.perm('role').canOwn('read'), validateParams],
+    asyncRoute(async (req, res) => {
+        const userRoles = await role.getUserRoles(req.user.username)
+        const userPerms = userRoles.map(i => {
+            return role.roles.export(i).perm
+        })
+
+        res.json({
+            roles: userRoles,
+            perms: [role.roles.getDefault().getPerm(), ...userPerms],
+        })
+    })
+)
+
+// 모든 역할 목록 조회
 router.route('/').get(
     [role.perm('role').can('read'), validateParams],
     asyncRoute(async (req, res) => {
@@ -66,6 +82,7 @@ router.route('/:role_tag').get(
 // 역할 권한 변경
 router.route('/:role_tag').patch(
     [
+        role.perm('role').can('update'),
         param('role_tag').isString(),
         // body('mode').custom(value => ['grant', 'deny'].includes(value)),
         param('grant').isArray(),
@@ -78,7 +95,7 @@ router.route('/:role_tag').patch(
 
 // 역할 제거
 router.route('/:role_tag').delete(
-    [validateParams],
+    [role.perm('role').can('delete'), validateParams],
     asyncRoute(async (req, res) => {
         // NOT IMPLEMENTED
     })
