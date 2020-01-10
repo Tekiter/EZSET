@@ -82,6 +82,7 @@ router.route('/:role_tag').get(
 // 역할 권한 변경
 router.route('/:role_tag').patch(
     [
+        role.perm('role').can('update'),
         param('role_tag').isString(),
         // body('mode').custom(value => ['grant', 'deny'].includes(value)),
         param('grant').isArray(),
@@ -94,7 +95,7 @@ router.route('/:role_tag').patch(
 
 // 역할 제거
 router.route('/:role_tag').delete(
-    [validateParams],
+    [role.perm('role').can('delete'), validateParams],
     asyncRoute(async (req, res) => {
         // NOT IMPLEMENTED
     })
