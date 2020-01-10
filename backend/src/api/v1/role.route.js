@@ -19,7 +19,6 @@ import { Router } from 'express'
 import { validateParams, asyncRoute } from '../../utils/api'
 import { body, param } from 'express-validator'
 import role from '../../utils/role'
-import User from '../../models/User'
 
 const router = Router()
 
