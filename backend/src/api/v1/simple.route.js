@@ -204,6 +204,7 @@ router.get(
             let posts = await Post.find()
                 .where('board')
                 .equals(boardId)
+                .sort('-_id')
             res.status(200).json({
                 board: board,
                 posts: posts.map(post => {
