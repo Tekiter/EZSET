@@ -25,12 +25,12 @@ const routes = [
     {
         path: '/board',
         name: 'board',
-        component: () => import('../views/BoardList.vue'),
+        component: () => import('../views/Board.vue'),
     },
     {
         path: '/board/:board_id/:board_title',
         name: 'post',
-        component: () => import('../views/Board.vue'),
+        component: () => import('../views/Post.vue'),
     },
 ]
 

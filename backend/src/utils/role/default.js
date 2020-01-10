@@ -6,7 +6,7 @@ export function setDefaultRole(roles) {
         .canOwn('read')
 
         .resource('role')
-        .can('read')
+        .canOwn('read')
 
         .resource('board')
         .can('read')

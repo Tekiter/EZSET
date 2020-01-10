@@ -8,8 +8,15 @@
     </div>
     <v-app v-else>
         <v-content>
-            <div class="d-flex justify-center align-center" style="height: 100%">
-                <v-progress-circular indeterminate color="blue" size="50"></v-progress-circular>
+            <div
+                class="d-flex justify-center align-center"
+                style="height: 100%"
+            >
+                <v-progress-circular
+                    indeterminate
+                    color="blue"
+                    size="50"
+                ></v-progress-circular>
             </div>
         </v-content>
     </v-app>
