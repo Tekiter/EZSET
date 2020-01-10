@@ -34,7 +34,12 @@ export default {
         this.isLoading = true
 
         if (this.$store.getters['auth/isLoggedIn']) {
-            await this.$store.dispatch('role/fetchPermission')
+            try {
+                await this.$store.dispatch('role/fetchPermission')
+            } catch (error) {
+                this.$store.dispatch('auth/logout')
+                this.$router.push('/login')
+            }
         }
         // 권한 목록 가져오기
 
