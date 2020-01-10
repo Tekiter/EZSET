@@ -28,7 +28,7 @@ const routes = [
         component: () => import('../views/BoardList.vue'),
     },
     {
-        path: '/post',
+        path: '/board/:board_id/:board_title',
         name: 'post',
         component: () => import('../views/Board.vue'),
     },

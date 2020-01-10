@@ -1,16 +1,9 @@
 <template>
-    <v-data-table
-        :headers="headers"
-        :items="posts"
-        :items-per-page="10"
-        class="elevation-1"
-    >
+    <v-data-table :headers="headers" :items="posts" :items-per-page="10" class="elevation-1">
         <template v-slot:top>
             <v-divider class="mx-4" inset vertical></v-divider>
 
-            <v-toolbar-title class="d-flex justify-center"
-                >-{{ board.title }}-</v-toolbar-title
-            >
+            <v-toolbar-title class="d-flex justify-center">-{{ board.title }}-</v-toolbar-title>
             <v-divider class="mx-2" inset vertical></v-divider>
         </template>
     </v-data-table>
@@ -20,7 +13,7 @@ import axios from 'axios'
 export default {
     mounted() {
         axios
-            .get('/simple/boards/' + 1)
+            .get('/simple/boards/' + this.$route.params.board_id)
             .then(res => {
                 this.posts = res.data.posts
                 this.board = res.data.board
