@@ -4,6 +4,7 @@
         :items="posts"
         :items-per-page="10"
         class="elevation-1"
+        @click:row="read"
     >
         <template v-slot:top>
             <v-divider class="mx-4" inset vertical></v-divider>
@@ -35,7 +36,7 @@ export default {
                     return post
                 })
                 this.board = res.data.board
-                console.log(res.data.posts)
+                //console.log(res.data.posts)
             })
             .catch(e => {
                 console.error(e.message)
