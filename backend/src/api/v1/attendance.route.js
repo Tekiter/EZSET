@@ -138,7 +138,7 @@ router.get(
         try {
             const cur = await AttendanceDay.find({
                 day: Day,
-            })
+            }).select({ _id: 0, __v: 0, day: 0 })
             res.json(cur)
         } catch (err) {
             res.status(501).json

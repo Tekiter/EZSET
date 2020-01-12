@@ -37,7 +37,7 @@ const routes = [{
             import ('../views/Attendance.vue'),
     },
     {
-        path: '/attendanceManageDay',
+        path: '/attendanceManageDay/:day',
         name: 'attendanceManage',
         component: () =>
             import ('../views/AttendanceManageDay.vue'),
