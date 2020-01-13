@@ -31,7 +31,7 @@ export default {
                         {
                             title: '유저 관리',
                             to: '/manage/users',
-                            perm: this.$perm('role').can('read'),
+                            perm: this.$perm('manageUsers').can('access'),
                         },
                     ],
                 },
