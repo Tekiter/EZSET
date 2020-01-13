@@ -77,6 +77,11 @@ router.post(
         const boardId = parseInt(req.params.board_id)
 
         try {
+            let board = await Board.findOne({ _id: boardId })
+            if (!board) {
+                res.status(404).json({ message: 'no board id ' + boardId })
+                return
+            }
             const post = new Post({
                 board: boardId,
                 title: req.body.title,
@@ -173,7 +178,7 @@ router.get(
                         created_date: post.created_date,
                         view: post.view,
                         like: post.likes_count,
-                        comment: post.comment,
+                        comment: post.comments,
                     })
                 else
                     res.status(404).json({
@@ -212,7 +217,7 @@ router.get(
                         created_date: post.created_date,
                         view: post.view,
                         like: post.likes_count,
-                        comment: post.comment,
+                        comment: post.comments,
                     }
                 }),
             })
