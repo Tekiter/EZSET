@@ -4,23 +4,43 @@ import store from '../store'
 
 Vue.use(VueRouter)
 
-const routes = [
-    {
+const routes = [{
         path: '/',
         name: 'home',
-        component: () => import('../views/Home.vue'),
+        component: () =>
+            import ('../views/Home.vue'),
     },
     {
         path: '/login',
         name: 'login',
-        component: () => import('../views/Login.vue'),
-        meta: { layout: 'empty', noLoginRequired: true },
+        component: () =>
+            import ('../views/Login.vue'),
+        meta: {
+            layout: 'empty',
+            noLoginRequired: true,
+        },
     },
     {
         path: '/register',
         name: 'register',
-        component: () => import('../views/Register.vue'),
-        meta: { layout: 'null', noLoginRequired: true },
+        component: () =>
+            import ('../views/Register.vue'),
+        meta: {
+            layout: 'null',
+            noLoginRequired: true,
+        },
+    },
+    {
+        path: '/attendance',
+        name: 'attendance',
+        component: () =>
+            import ('../views/Attendance.vue'),
+    },
+    {
+        path: '/attendanceManageDay',
+        name: 'attendanceManage',
+        component: () =>
+            import ('../views/AttendanceManageDay.vue'),
     },
     {
         path: '/board',
@@ -51,7 +71,9 @@ router.beforeEach(function(to, from, next) {
         if (!store.getters['auth/isLoggedIn']) {
             next({
                 path: '/login',
-                query: { redirect: to.fullPath },
+                query: {
+                    redirect: to.fullPath,
+                },
             })
         } else {
             next()
