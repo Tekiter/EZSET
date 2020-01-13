@@ -20,6 +20,11 @@ axios.defaults.baseURL = '/api/v1'
 // 저장되어있는 로그인 세션 복원
 store.dispatch('auth/restore')
 
+// socket.io
+import io from 'socket.io-client'
+const socket = io('http://localhost:5050')
+Vue.prototype.$socket = socket
+
 new Vue({
     router,
     store,

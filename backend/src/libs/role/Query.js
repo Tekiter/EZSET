@@ -91,7 +91,10 @@ class Query {
         if (!Array.isArray(action)) {
             action = [action]
         }
-        return this.can(action.map(i => `!${i}`), type)
+        return this.can(
+            action.map(i => `!${i}`),
+            type
+        )
     }
 
     cannotAny(action) {

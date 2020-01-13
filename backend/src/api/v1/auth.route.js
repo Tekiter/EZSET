@@ -28,7 +28,9 @@ router.route('/login').post(
                     accessToken,
                 })
             } else {
-                res.status(403).json({ message: '로그인 실패' })
+                res.status(403).json({
+                    message: '로그인 실패',
+                })
             }
         } catch (error) {
             databaseError(res, error)
@@ -83,7 +85,9 @@ router.route('/register').post(
             })
             await user.save()
 
-            res.status(201).json({ message: 'success' })
+            res.status(201).json({
+                message: 'success',
+            })
         } catch (error) {
             unexpectedError(res, error)
         }

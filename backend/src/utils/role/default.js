@@ -10,6 +10,9 @@ export function setDefaultRole(roles) {
 
         .resource('board')
         .can('read')
+
+        .resource('attendance')
+        .can('att')
 }
 
 export function setAdminRole(roles) {
@@ -24,4 +27,7 @@ export function setAdminRole(roles) {
 
         .resource('board')
         .can(['read', 'create', 'delete'])
+
+        .resource('attendance')
+        .can(['start', 'att'])
 }
