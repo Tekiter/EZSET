@@ -15,10 +15,6 @@ commentSchema.plugin(autoIncrement.plugin, {
 let Comment = mongoose.model('comment', commentSchema)
 
 let postSchema = new Schema({
-    number: {
-        type: Number,
-        default: 0,
-    },
     board: {
         type: Number,
         ref: 'board',

@@ -15,9 +15,15 @@
                                 </div>
                             </div>
                         </v-card-subtitle>
+                        <v-card-text>{{ post.content }}</v-card-text>
                     </v-card>
                     <v-card outlined>
-                        <v-card-text>{{ post.content }}</v-card-text>
+                        <v-col
+                            v-for="comment in post.comment"
+                            :key="comment._id"
+                        >
+                            <v-card outlined>{{ comment.content }}</v-card>
+                        </v-col>
                     </v-card>
                 </v-col>
             </v-row>
@@ -37,13 +43,14 @@ export default {
                 content: '',
                 author: '',
                 created_date: '',
+                comment: '',
             },
         }
     },
     mounted() {
         axios.get('/simple/posts/' + this.$route.params.post_id).then(res => {
             this.post = res.data
-            //console.log(res.data.created_date)
+            console.log(res.data)
             this.post.created_date = moment(res.data.created_date).format(
                 'YY/MM/DD HH:MM'
             )

@@ -232,17 +232,13 @@ router.get(
 //댓글 작성
 router.post(
     '/posts/:post_id/comment',
-    [param('post_id').isNumeric(), body('comment').isString(), validateParams],
+    [param('post_id').isNumeric(), body('content').isString(), validateParams],
     asyncRoute(async function(req, res) {
         try {
-            let post = await findOne()
-                .where('_id')
-                .equals(req.params.post_id)
-
+            let postId = parseInt(req.params.post_id)
+            let post = await Post.findOne({ _id: postId })
             if (!post) {
-                res.status(404).json({
-                    message: 'no post id' + req.params.post_id,
-                })
+                res.status(404).json({ message: 'no post id ' + postId })
                 return
             }
 
