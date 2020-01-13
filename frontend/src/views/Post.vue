@@ -19,8 +19,18 @@
                 <v-divider class="mx-2" inset vertical></v-divider>
             </template>
         </v-data-table>
-        <div class="text-center pt-2">
-            <v-pagination v-model="page" :length="pageCount"></v-pagination>
+        <div class="row">
+            <div class="col"></div>
+            <div class="col">
+                <v-pagination v-model="page" :length="pageCount"></v-pagination>
+            </div>
+            <div class="col">
+                <div class="d-flex flex-row-reverse">
+                    <v-btn class="ma-2" tile outlined color="success">
+                        <v-icon left>mdi-pencil</v-icon> 글쓰기
+                    </v-btn>
+                </div>
+            </div>
         </div>
     </div>
 </template>
