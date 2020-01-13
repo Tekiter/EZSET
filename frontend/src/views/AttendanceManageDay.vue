@@ -2,16 +2,41 @@
     <v-card>
         <v-simple-table>
             <template v-slot:default>
-                <thead>
+                <!-- <thead>
                     <tr>
-                        <th class="text-left">Name</th>
-                        <th class="text-left">Calories</th>
+                        <th class="text-left">이름</th>
+                        <th></th>
+                        <th class="text-left">출석현황</th>
+                    </tr>
+                    <tr>
+                        <th>이름</th>
+                        <th><div style="min-width: 300px"></div></th>
+                        <th>출석</th>
+                        <th>지각</th>
+                        <th>결석</th>
+                        <th>인정결석</th>
+                    </tr>
+                </thead> -->
+                <thead>
+                    <tr class="d-flex">
+                        <th class="flex-grow-1">이름</th>
+                        <th class="flex-grow-0">출석</th>
+                        <th class="flex-grow-0">지각</th>
+                        <th class="flex-grow-0">결석</th>
+                        <th class="flex-grow-0">인정결석</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in desserts" :key="item.name">
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.calories }}</td>
+                    <tr
+                        v-for="item in desserts"
+                        :key="item.name"
+                        class="d-flex"
+                    >
+                        <td class="flex-grow-1">{{ item.calories }}</td>
+                        <td class="flex-grow-0">출석</td>
+                        <td class="flex-grow-0">지각</td>
+                        <td class="flex-grow-0">결석</td>
+                        <td class="flex-grow-0">ㅇㅈ</td>
                     </tr>
                 </tbody>
             </template>
@@ -19,52 +44,10 @@
     </v-card>
 </template>
 <script>
+//import axios from 'axios'
 export default {
     data() {
-        return {
-            desserts: [
-                {
-                    name: 'Frozen Yogurt',
-                    calories: 159,
-                },
-                {
-                    name: 'Ice cream sandwich',
-                    calories: 237,
-                },
-                {
-                    name: 'Eclair',
-                    calories: 262,
-                },
-                {
-                    name: 'Cupcake',
-                    calories: 305,
-                },
-                {
-                    name: 'Gingerbread',
-                    calories: 356,
-                },
-                {
-                    name: 'Jelly bean',
-                    calories: 375,
-                },
-                {
-                    name: 'Lollipop',
-                    calories: 392,
-                },
-                {
-                    name: 'Honeycomb',
-                    calories: 408,
-                },
-                {
-                    name: 'Donut',
-                    calories: 452,
-                },
-                {
-                    name: 'KitKat',
-                    calories: 518,
-                },
-            ],
-        }
+        return {}
     },
 }
 </script>

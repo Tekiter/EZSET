@@ -73,11 +73,6 @@ export default {
         try {
             const res = await axios.get('attendance/attendanceCheck')
             this.code = parseInt(res.data)
-            // console.log(res.data)
-            // if (this.code == 1 && this.flag == true) {
-            //     this.endCard = false
-            //     this.attendanceCard = false
-            // }
         } catch (err) {
             console.log(err)
         }
