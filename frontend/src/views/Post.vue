@@ -1,19 +1,27 @@
 <template>
-    <v-data-table
-        :headers="headers"
-        :items="posts"
-        :items-per-page="10"
-        class="elevation-1"
-    >
-        <template v-slot:top>
-            <v-divider class="mx-4" inset vertical></v-divider>
+    <div>
+        <v-data-table
+            :headers="headers"
+            :items="posts"
+            :page.sync="page"
+            :items-per-page="10"
+            hide-default-footer
+            class="elevation-1"
+            @page-count="pageCount = $event"
+        >
+            <template v-slot:top>
+                <v-divider class="mx-4" inset vertical></v-divider>
 
-            <v-toolbar-title class="d-flex justify-center"
-                >-{{ board.title }}-</v-toolbar-title
-            >
-            <v-divider class="mx-2" inset vertical></v-divider>
-        </template>
-    </v-data-table>
+                <v-toolbar-title class="d-flex justify-center"
+                    >-{{ board.title }}-</v-toolbar-title
+                >
+                <v-divider class="mx-2" inset vertical></v-divider>
+            </template>
+        </v-data-table>
+        <div class="text-center pt-2">
+            <v-pagination v-model="page" :length="pageCount"></v-pagination>
+        </div>
+    </div>
 </template>
 <script>
 import axios from 'axios'
@@ -44,6 +52,9 @@ export default {
 
     data() {
         return {
+            page: 1,
+            pageCount: 0,
+            itemsPerPage: 10,
             board: '',
             posts: [],
             headers: [
