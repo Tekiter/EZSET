@@ -23,6 +23,11 @@ import io from 'socket.io-client'
 const socket = io('http://localhost:5050')
 Vue.prototype.$socket = socket
 
+import moment from 'moment'
+import VueMomentJS from 'vue-momentjs'
+
+Vue.use(VueMomentJS, moment)
+
 new Vue({
     router,
     store,

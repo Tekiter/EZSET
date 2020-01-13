@@ -2,50 +2,101 @@
     <v-card>
         <v-simple-table>
             <template v-slot:default>
-                <!-- <thead>
-                    <tr>
-                        <th class="text-left">이름</th>
-                        <th></th>
-                        <th class="text-left">출석현황</th>
-                    </tr>
-                    <tr>
-                        <th>이름</th>
-                        <th><div style="min-width: 300px"></div></th>
-                        <th>출석</th>
-                        <th>지각</th>
-                        <th>결석</th>
-                        <th>인정결석</th>
-                    </tr>
-                </thead> -->
-                <thead>
-                    <tr class="d-flex">
-                        <th class="flex-grow-1">이름</th>
-                        <th class="flex-grow-0">출석</th>
-                        <th class="flex-grow-0">지각</th>
-                        <th class="flex-grow-0">결석</th>
-                        <th class="flex-grow-0">인정결석</th>
-                    </tr>
-                </thead>
                 <tbody>
-                    <tr
-                        v-for="item in desserts"
-                        :key="item.name"
-                        class="d-flex"
-                    >
-                        <td class="flex-grow-1">{{ item.calories }}</td>
+                    <tr class="pa-2 d-flex">
+                        <td class="flex-grow-1">이름</td>
                         <td class="flex-grow-0">출석</td>
                         <td class="flex-grow-0">지각</td>
                         <td class="flex-grow-0">결석</td>
-                        <td class="flex-grow-0">ㅇㅈ</td>
-                        <!-- <th class="text-left">Name</th>
-                        <th class="text-left">state</th>
+                        <td class="flex-grow-0">공결</td>
                     </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="item in statusData.status" :key="item.name">
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.state }}</td>
-                    </tr> -->
+                    <tr
+                        v-for="item in statusData.status"
+                        :key="item.name"
+                        class="d-flex"
+                    >
+                        <td class="flex-grow-1">{{ item.name }}</td>
+                        <td
+                            v-if="item.state == 'attendance'"
+                            class="flex-grow-0"
+                        >
+                            <v-btn text icon color="green" dark>
+                                <v-icon>
+                                    mdi-checkbox-blank-circle-outline
+                                </v-icon>
+                            </v-btn>
+                        </td>
+                        <td
+                            v-if="item.state != 'attendance'"
+                            class="flex-grow-0"
+                        >
+                            <v-btn
+                                text
+                                icon
+                                color="gray"
+                                @click="updateStateToAttendance(item)"
+                            >
+                                <v-icon>
+                                    mdi-checkbox-blank-circle-outline
+                                </v-icon>
+                            </v-btn>
+                        </td>
+
+                        <td v-if="item.state == 'late'" class="flex-grow-0">
+                            <v-btn text icon color="orange" dark>
+                                <v-icon> mdi-triangle-outline </v-icon>
+                            </v-btn>
+                        </td>
+                        <td v-if="item.state != 'late'" class="flex-grow-0">
+                            <v-btn
+                                text
+                                icon
+                                color="gray"
+                                @click="updateStateToLate(item)"
+                            >
+                                <v-icon> mdi-triangle-outline </v-icon>
+                            </v-btn>
+                        </td>
+                        <td v-if="item.state == 'absence'" class="flex-grow-0">
+                            <v-btn text icon color="red" dark>
+                                <v-icon> mdi-close </v-icon>
+                            </v-btn>
+                        </td>
+                        <td v-if="item.state != 'absence'" class="flex-grow-0">
+                            <v-btn
+                                text
+                                icon
+                                color="gray"
+                                @click="updateStateToAbsence(item)"
+                            >
+                                <v-icon> mdi-close </v-icon>
+                            </v-btn>
+                        </td>
+                        <td
+                            v-if="item.state == 'official_absence'"
+                            class="flex-grow-0"
+                        >
+                            <v-btn text icon color="red" dark>
+                                <v-icon>
+                                    mdi-close-circle-outline
+                                </v-icon>
+                            </v-btn>
+                        </td>
+                        <td
+                            v-if="item.state != 'official_absence'"
+                            class="flex-grow-0"
+                        >
+                            <v-btn
+                                text
+                                icon
+                                color="gray lighten-2"
+                                @click="updateStateToOfficialAbsence(item)"
+                            >
+                                <v-icon>
+                                    mdi-close-circle-outline
+                                </v-icon>
+                            </v-btn>
+                        </td>
                     </tr>
                 </tbody>
             </template>
@@ -74,6 +125,64 @@ export default {
     computed: {
         date() {
             return this.$route.params.day
+        },
+    },
+    methods: {
+        async updateStateToAttendance(item) {
+            try {
+                await axios.post(
+                    `attendance/attendancestateupdate/${this.$route.params.day}`,
+                    {
+                        state: 'attendance',
+                        name: item.name,
+                    }
+                )
+                item.state = 'attendance'
+            } catch (err) {
+                console.log(err)
+            }
+        },
+        async updateStateToLate(item) {
+            try {
+                await axios.post(
+                    `attendance/attendancestateupdate/${this.date}`,
+                    {
+                        state: 'late',
+                        name: item.name,
+                    }
+                )
+                item.state = 'late'
+            } catch (err) {
+                console.log(err)
+            }
+        },
+        async updateStateToAbsence(item) {
+            try {
+                await axios.post(
+                    `attendance/attendancestateupdate/${this.date}`,
+                    {
+                        state: 'absence',
+                        name: item.name,
+                    }
+                )
+                item.state = 'absence'
+            } catch (err) {
+                console.log(err)
+            }
+        },
+        async updateStateToOfficialAbsence(item) {
+            try {
+                await axios.post(
+                    `attendance/attendancestateupdate/${this.date}`,
+                    {
+                        state: 'official_absence',
+                        name: item.name,
+                    }
+                )
+                item.state = 'official_absence'
+            } catch (err) {
+                console.log(err)
+            }
         },
     },
 }
