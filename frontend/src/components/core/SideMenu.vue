@@ -41,6 +41,12 @@ export default {
                     title: '출석체크',
                     to: '/attendance',
                 },
+                {
+                    type: 'simple',
+                    icon: 'mdi-checkbox-marked-circle-outline',
+                    title: '일별출석현황',
+                    to: '/AttendanceManageDay',
+                },
             ],
         }
     },
