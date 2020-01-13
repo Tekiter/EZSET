@@ -26,7 +26,7 @@
             </div>
             <div class="col">
                 <div class="d-flex flex-row-reverse">
-                    <v-btn class="ma-2" tile outlined color="success">
+                    <v-btn class="ma-2" tile outlined color="blue darken-3">
                         <v-icon left>mdi-pencil</v-icon> 글쓰기
                     </v-btn>
                 </div>
