@@ -1,10 +1,11 @@
 import Router from 'express'
-import { asyncRoute } from '../../utils/api'
+import { asyncRoute, validateParams } from '../../utils/api'
 import random from 'random-number-csprng'
 import User from '../../models/User'
 import AttendanceDay from '../../models/attendanceDay'
 import AttendanceUser from '../../models/attendanceUser'
 import { perm } from '../../utils/role'
+import { param, body } from 'express-validator'
 const router = Router()
 var moment = require('moment')
 var ranNum = random(100, 999)
@@ -133,6 +134,7 @@ router.get(
 
 router.get(
     '/attendanceState/:day',
+    [param('day').isString(), validateParams],
     asyncRoute(async function(req, res) {
         var Day = req.params.day
         try {
@@ -146,16 +148,35 @@ router.get(
     })
 )
 
-router.put(
-    '/attendanceStateUpdate/:day',
+router.post(
+    '/attendancestateupdate/:day',
+    [
+        param('day').isString(),
+        body('state').isString(),
+        body('name').isString(),
+        validateParams,
+    ],
     asyncRoute(async function(req, res) {
         var Day = req.params.day
         try {
-            const cur = await AttendanceDay.findOne({
-                day: Day,
-                Name: req.body.name,
-            })
-            cur.state = req.body.state
+            const cur = await AttendanceDay.findOneAndUpdate(
+                {
+                    day: Day,
+                    'status.name': req.body.name,
+                },
+                { 'status.$.state': req.body.state },
+                function(err, doc) {}
+            )
+            res.json(cur)
+            const cur_user = await AttendanceUser.findOneAndUpdate(
+                {
+                    name: req.body.name,
+                    'status.date': Day,
+                },
+                { 'status.$.state': req.body.state },
+                function(err, doc) {}
+            )
+            res.json(cur_user)
         } catch (err) {
             //console.log(err)
             res.status(501).json
