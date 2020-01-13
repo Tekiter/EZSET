@@ -77,10 +77,6 @@ router.post(
         const boardId = parseInt(req.params.board_id)
 
         try {
-            let board = await Board.findOne()
-                .where('_id')
-                .equals(boardId)
-
             const post = new Post({
                 board: boardId,
                 title: req.body.title,
