@@ -4,8 +4,9 @@ import {
     checkRoleTag,
     checkUsername,
     validateParams,
+    isPositive,
 } from '../../utils/api'
-import { param, body } from 'express-validator'
+import { param, body, query } from 'express-validator'
 import User from '../../models/User'
 import { clearCache } from 'cachegoose'
 import role from '../../utils/role'
@@ -17,6 +18,50 @@ const router = Router()
 //         res.json({ message: req.permission })
 //     }
 // })
+
+router.route('/').get(
+    [
+        role.perm('manageUsers').can('access'),
+        query('page')
+            .custom(isPositive)
+            .optional(),
+        query('pagesize')
+            .custom(isPositive)
+            .optional(),
+        validateParams,
+    ],
+    asyncRoute(async (req, res) => {
+        let query
+
+        const total = await User.count()
+
+        if (req.query.page) {
+            // 페이지 쿼리 존재할때
+            const page = parseInt(req.query.page)
+            const pagesize = parseInt(req.query.pagesize || 30)
+
+            query = User.find()
+                .limit(pagesize)
+                .skip((page - 1) * pagesize)
+        } else {
+            // 페이지 쿼리 없을 때
+            query = User.find()
+        }
+
+        const users = await query.sort('username').select('username info roles')
+
+        res.json({
+            total,
+            users: users.map(user => {
+                return {
+                    username: user.username,
+                    realname: user.info.realname || '',
+                    roles: user.roles,
+                }
+            }),
+        })
+    })
+)
 
 router.get(
     '/:username/role',

@@ -70,3 +70,15 @@ export async function checkRoleTag(value) {
         throw new Error('존재하지 않는 Role Tag 입니다.')
     }
 }
+
+/**
+ * RoleTag 가 존재하는지 검사하는 함수
+ * @example param('username').custom(checkRoleTag)
+ */
+export function isPositive(value) {
+    const intval = parseInt(value)
+    if (intval) {
+        return intval >= 0
+    }
+    return false
+}
