@@ -13,6 +13,7 @@ export function setDefaultRole(roles) {
 }
 
 export function setAdminRole(roles) {
+    roles.setRole({ tag: 'admin', name: 'admin' })
     roles
         .role('admin')
 
