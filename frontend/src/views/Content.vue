@@ -36,7 +36,6 @@
                                     icon
                                     small
                                     v-if="del_comment(comment.writer)"
-                                    @click=""
                                 >
                                     <v-icon>mdi-trash-can-outline</v-icon>
                                 </v-btn>
