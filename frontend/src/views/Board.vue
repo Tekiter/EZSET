@@ -28,7 +28,7 @@ export default {
             console.log(evt._id)
             console.log(evt.title)
             this.$router.push({
-                path: '/board/' + evt._id + '/' + evt.title,
+                path: '/board/' + evt._id,
             })
         },
     },

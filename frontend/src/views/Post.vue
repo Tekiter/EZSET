@@ -93,7 +93,7 @@ export default {
             console.log(evt._id)
             console.log(evt.title)
             this.$router.push({
-                path: '/post/' + evt._id + '/' + evt.title,
+                path: '/post/' + evt._id,
             })
         },
     },

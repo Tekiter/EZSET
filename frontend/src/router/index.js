@@ -4,17 +4,16 @@ import store from '../store'
 
 Vue.use(VueRouter)
 
-const routes = [{
+const routes = [
+    {
         path: '/',
         name: 'home',
-        component: () =>
-            import ('../views/Home.vue'),
+        component: () => import('../views/Home.vue'),
     },
     {
         path: '/login',
         name: 'login',
-        component: () =>
-            import ('../views/Login.vue'),
+        component: () => import('../views/Login.vue'),
         meta: {
             layout: 'empty',
             noLoginRequired: true,
@@ -23,8 +22,7 @@ const routes = [{
     {
         path: '/register',
         name: 'register',
-        component: () =>
-            import ('../views/Register.vue'),
+        component: () => import('../views/Register.vue'),
         meta: {
             layout: 'null',
             noLoginRequired: true,
@@ -33,14 +31,12 @@ const routes = [{
     {
         path: '/attendance',
         name: 'attendance',
-        component: () =>
-            import ('../views/Attendance.vue'),
+        component: () => import('../views/Attendance.vue'),
     },
     {
         path: '/attendanceManageDay',
         name: 'attendanceManage',
-        component: () =>
-            import ('../views/AttendanceManageDay.vue'),
+        component: () => import('../views/AttendanceManageDay.vue'),
     },
     {
         path: '/board',
@@ -48,12 +44,12 @@ const routes = [{
         component: () => import('../views/Board.vue'),
     },
     {
-        path: '/board/:board_id/:board_title',
+        path: '/board/:board_id',
         name: 'post',
         component: () => import('../views/Post.vue'),
     },
     {
-        path: '/post/:post_id/:post_title',
+        path: '/post/:post_id',
         name: 'content',
         component: () => import('../views/Content.vue'),
     },
