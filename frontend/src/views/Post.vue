@@ -45,7 +45,7 @@ export default {
             .then(res => {
                 this.posts = res.data.posts.map(post => {
                     post.created_date = moment(post.created_date).format(
-                        'YY/MM/DD'
+                        'YYYY/MM/DD HH:MM'
                     )
                     return post
                 })
