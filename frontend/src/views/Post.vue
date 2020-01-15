@@ -14,9 +14,12 @@
                 <v-divider class="mx-4" inset vertical></v-divider>
 
                 <v-toolbar-title class="d-flex justify-center"
-                    >-{{ board.title }}-</v-toolbar-title
+                    ><h1>
+                        <strong class="blue--text text--darken-2">{{
+                            board.title
+                        }}</strong>
+                    </h1></v-toolbar-title
                 >
-                <v-divider class="mx-2" inset vertical></v-divider>
             </template>
         </v-data-table>
         <div class="row">

@@ -4,7 +4,7 @@
 
         <v-toolbar-title class="d-flex justify-center"
             ><h1>
-                <strong class="blue--text text--darken-2">게시글 작성</strong>
+                <strong class="blue--text text--darken-2">게시글 수정</strong>
             </h1></v-toolbar-title
         >
         <v-divider class="mx-4" inset vertical></v-divider>
@@ -45,9 +45,9 @@
                         tile
                         outlined
                         color="blue darken-3"
-                        @click="submitClick"
+                        @click="updateClick"
                     >
-                        <v-icon left>mdi-pencil</v-icon> SUBMIT
+                        <v-icon left>mdi-pencil</v-icon> UPDATE
                     </v-btn>
                 </div>
             </div>
@@ -66,30 +66,32 @@ export default {
             like: '',
             view: '',
             comment: '',
+            post_id: '',
         }
     },
     methods: {
         clearClick() {
             this.$router.push({
-                path: `/board/${this.$route.params.board_id}`,
+                path: `/post/${this.$route.params.post_id}`,
             })
         },
-        submitClick() {
+        updateClick() {
             console.log(this.$toute)
-            axios.post('/simple/boards/' + this.$route.params.board_id, {
+            axios.put('/simple/boards/' + this.$route.params.board_id, {
                 title: this.title,
                 content: this.content,
-                author: this.author,
-                created_date: this.created_date,
-                like: 0,
-                view: 0,
-                comment: '',
-                _id: this._id,
             }),
                 this.$router.push({
-                    path: `/board/${this.$route.params.board_id}`,
+                    path: `/post/${this.$route.params.post_id}`,
                 })
         },
+    },
+    mounted() {
+        axios.get('/simple/posts/' + this.$route.params.post_id).then(res => {
+            console.log(res.data)
+            this.title = res.data.title
+            this.content = res.data.content
+        })
     },
 }
 </script>

@@ -56,7 +56,12 @@ const routes = [
     {
         path: '/write/:board_id',
         name: 'write',
-        component: () => import('../views/Writepost.vue'),
+        component: () => import('../views/WritePost.vue'),
+    },
+    {
+        path: '/update/:post_id',
+        name: 'update',
+        component: () => import('../views/UpdatePost.vue'),
     },
 ]
 
