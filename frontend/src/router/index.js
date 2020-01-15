@@ -42,6 +42,12 @@ const routes = [{
         component: () =>
             import ('../views/AttendanceManageDay.vue'),
     },
+    {
+        path: '/attendanceManageMonth',
+        name: 'attendanceManageMonth',
+        component: () =>
+            import ('../views/AttendanceManagMonth.vue'),
+    },
 ]
 
 const router = new VueRouter({

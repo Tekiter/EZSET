@@ -51,6 +51,11 @@ export default {
                             to: '/AttendanceManageDay',
                             perm: this.$perm('attendance').can('update'),
                         },
+                        {
+                            title: '월별출석현황',
+                            to: '/AttendanceManageMonth',
+                            // perm: this.$perm('attendance').can('update'),
+                        },
                     ],
                 },
             ],
