@@ -142,6 +142,7 @@ router.put(
                 if (req.body.content) {
                     post.title = req.body.title
                     post.content = req.body.content
+                    post.created_date = Date.now
                 }
                 await post.save()
 
