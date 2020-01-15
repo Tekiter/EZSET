@@ -5,9 +5,11 @@ import {
     checkUsername,
     validateParams,
     isPositive,
+    checkRoleTagArray,
 } from '../../utils/api'
 import { param, body, query } from 'express-validator'
 import User from '../../models/User'
+import { getConfig } from '../../utils/config'
 import { clearCache } from 'cachegoose'
 import role from '../../utils/role'
 
@@ -86,6 +88,43 @@ router.get(
         res.json({
             roles: user.roles,
         })
+    })
+)
+
+router.put(
+    '/:username/role',
+    [
+        // role.perm('role', 'user').can('update'),
+        param('username').custom(checkUsername),
+        body('roletags').custom(checkRoleTagArray),
+        validateParams,
+    ],
+    asyncRoute(async (req, res) => {
+        const user = await User.findOne()
+            .where('username')
+            .equals(req.params.username)
+
+        if (!user) {
+            const err = new Error('해당 유저가 없습니다.')
+            err.status = 404
+            throw err
+        }
+
+        if (req.body.roletags.indexOf('admin') < 0) {
+            if ((await getConfig('superAdmin')) == req.params.username) {
+                const err = new Error(
+                    '서버 관리자의 어드민 역할은 변경할 수 없습니다.'
+                )
+                err.status = 403
+                throw err
+            }
+        }
+
+        user.roles = req.body.roletags
+        await user.save()
+        clearCache('USER-ROLE-' + req.user.username)
+
+        res.end()
     })
 )
 
