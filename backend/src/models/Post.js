@@ -6,6 +6,10 @@ let commentSchema = new Schema({
     //댓글 구조
     content: { type: String, required: [true, 'comment content required'] },
     writer: { type: String, required: [true, 'comment writer required'] },
+    created_date: {
+        type: Date,
+        default: Date.now,
+    },
 })
 
 commentSchema.plugin(autoIncrement.plugin, {

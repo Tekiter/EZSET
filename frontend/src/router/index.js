@@ -44,12 +44,12 @@ const routes = [
         component: () => import('../views/Board.vue'),
     },
     {
-        path: '/board/:board_id/:board_title',
+        path: '/board/:board_id',
         name: 'post',
         component: () => import('../views/Post.vue'),
     },
     {
-        path: '/post/:post_id/:post_title',
+        path: '/post/:post_id',
         name: 'content',
         component: () => import('../views/Content.vue'),
     },
