@@ -90,11 +90,11 @@
             </template>
         </v-data-iterator>
 
-        <!-- 유저 정보 수정 Dialog -->
+        <!-- 유저 Action Dialog -->
         <v-dialog v-model="editDialog.show" persistent max-width="500px">
             <v-card>
                 <v-card-title>
-                    <span class="headline">유저 정보 수정</span>
+                    <span class="headline">유저 관리</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
@@ -104,18 +104,6 @@
                                     label="아이디"
                                     disabled
                                     :value="editDialog.user.username"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12">
-                                <v-text-field
-                                    label="이메일"
-                                    v-model="editDialog.user.email"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12">
-                                <v-text-field
-                                    label="이름"
-                                    v-model="editDialog.user.realname"
                                 ></v-text-field>
                             </v-col>
                         </v-row>
@@ -140,8 +128,12 @@
         <v-dialog v-model="roleDialog.show" persistent max-width="300px">
             <v-card :loading="roleDialog.isLoading">
                 <v-card-title>
-                    <span class="headline">유저 역할 변경</span>
+                    <span class="headline">역할 변경</span>
+                    <v-card-subtitle>{{
+                        roleDialog.user.username
+                    }}</v-card-subtitle>
                 </v-card-title>
+
                 <v-card-text>
                     <v-text-field
                         v-model="roleDialog.search"
@@ -151,7 +143,8 @@
                         flat
                         hide-details
                         dense
-                        label="검색하기"
+                        label="검색"
+                        prepend-inner-icon="mdi-magnify"
                     ></v-text-field>
 
                     <v-list>
@@ -162,6 +155,9 @@
                             <v-list-item
                                 v-for="role in rawRoles"
                                 :key="role.tag"
+                                v-show="
+                                    searchMatches(role.name, roleDialog.search)
+                                "
                             >
                                 <template v-slot:default="{ active, toggle }">
                                     <v-list-item-action>
@@ -204,7 +200,7 @@ export default {
     data() {
         return {
             users: [],
-            rawRoles: [],
+            rawRoles: [], // 배열로 된 role 목록
             fetchingCount: 0,
             totalCount: 0,
             toolbar: {
@@ -220,6 +216,7 @@ export default {
                 search: '',
                 selections: [],
                 isLoading: false,
+                errorMessage: '',
             },
         }
     },
@@ -228,6 +225,7 @@ export default {
             return this.fetchingCount > 0
         },
         roles() {
+            // Object 형태로 가공된 role 목록
             const newrole = {}
             this.rawRoles.forEach(role => {
                 newrole[role.tag] = role
@@ -256,6 +254,9 @@ export default {
             } finally {
                 this.fetchingCount -= 1
             }
+        },
+        searchMatches(haystack, niddle) {
+            return haystack.includes(niddle)
         },
         showEditDialog(user) {
             this.editDialog.user = user
