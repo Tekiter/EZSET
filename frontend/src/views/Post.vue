@@ -26,7 +26,18 @@
             </div>
             <div class="col">
                 <div class="d-flex flex-row-reverse">
-                    <v-btn class="ma-2" tile outlined color="blue darken-3">
+                    <v-btn
+                        class="ma-2"
+                        tile
+                        outlined
+                        color="blue darken-3"
+                        :to="
+                            '/write/' +
+                                curid +
+                                '/' +
+                                this.$route.params.board_title
+                        "
+                    >
                         <v-icon left>mdi-pencil</v-icon> 글쓰기
                     </v-btn>
                 </div>
@@ -60,7 +71,11 @@ export default {
                 console.error(e.message)
             })
     },
-
+    computed: {
+        curid() {
+            return this.$route.params.board_id
+        },
+    },
     data() {
         return {
             page: 1,
