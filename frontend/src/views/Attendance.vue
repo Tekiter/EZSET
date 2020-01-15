@@ -117,8 +117,12 @@ export default {
                     code: this.input_attendance_code,
                     state: 'attendance',
                 })
-                if (res.data.result) this.snackbar_c = true
-                else this.snackbar_e = true
+                if (res.data.result) {
+                    this.snackbar_c = true
+                    setTimeout(() => {
+                        this.$router.push('/')
+                    }, 2000)
+                } else this.snackbar_e = true
             } catch (err) {
                 console.log(err)
             }
