@@ -106,7 +106,7 @@ router.delete(
     '/posts/:post_id',
     [param('post_id').isNumeric(), validateParams],
     asyncRoute(async function(req, res) {
-        if (!req.perm('board', req.params.board_id).canOwn('delete')) {
+        if (!req.user.perm('board', req.params.board_id).canOwn('delete')) {
         }
 
         try {
