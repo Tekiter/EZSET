@@ -63,6 +63,8 @@ const routes = [
         path: '/update/:post_id',
         name: 'update',
         component: () => import('../views/UpdatePost.vue'),
+    },
+    {
         path: '/manage/users',
         name: 'manageUsers',
         component: () => import('../views/Manage/UserManage.vue'),
