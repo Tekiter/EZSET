@@ -94,31 +94,22 @@
         <v-dialog v-model="editDialog.show" persistent max-width="500px">
             <v-card>
                 <v-card-title>
-                    <span class="headline">유저 관리</span>
+                    <span class="headline">유저 관리</span
+                    ><v-card-subtitle>{{
+                        editDialog.user.username
+                    }}</v-card-subtitle>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
                         <v-row no-gutters>
-                            <v-col cols="12">
-                                <v-text-field
-                                    label="아이디"
-                                    disabled
-                                    :value="editDialog.user.username"
-                                ></v-text-field>
-                            </v-col>
+                            <v-col cols="12"> </v-col>
                         </v-row>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn
-                        @click.native="editDialog.show = false"
-                        text
-                        color="primary"
-                        >변경</v-btn
-                    >
                     <v-btn @click.native="editDialog.show = false" text
-                        >취소</v-btn
+                        >닫기</v-btn
                     >
                 </v-card-actions>
             </v-card>
