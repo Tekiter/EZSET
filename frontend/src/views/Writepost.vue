@@ -1,5 +1,6 @@
 <template>
     <v-container fluid>
+        <v-divider class="mx-4" inset vertical></v-divider>
         <v-toolbar-title class="d-flex justify-center"
             >-게시판이름-</v-toolbar-title
         >
@@ -54,7 +55,7 @@ export default {
     methods: {
         clearClick() {
             this.$router.push({
-                path: `/board/${this.$route.params.board_id}/${this.$route.params.board_title}`,
+                path: `/board/${this.$route.params.board_id}`,
             })
         },
     },

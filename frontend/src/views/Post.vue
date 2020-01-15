@@ -31,12 +31,7 @@
                         tile
                         outlined
                         color="blue darken-3"
-                        :to="
-                            '/write/' +
-                                curid +
-                                '/' +
-                                this.$route.params.board_title
-                        "
+                        :to="'/write/' + curid"
                     >
                         <v-icon left>mdi-pencil</v-icon> 글쓰기
                     </v-btn>
