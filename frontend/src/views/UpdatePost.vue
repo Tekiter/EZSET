@@ -26,10 +26,10 @@
                 single-line
             ></v-textarea>
         </v-form>
-        <div class="row">
-            <div class="col"></div>
-            <div class="col"></div>
-            <div class="col">
+        <v-row>
+            <v-col></v-col>
+            <v-col></v-col>
+            <v-col>
                 <div class="d-flex flex-row-reverse">
                     <v-btn
                         class="ma-2"
@@ -50,8 +50,8 @@
                         <v-icon left>mdi-pencil</v-icon> UPDATE
                     </v-btn>
                 </div>
-            </div>
-        </div>
+            </v-col>
+        </v-row>
     </v-container>
 </template>
 <script>
