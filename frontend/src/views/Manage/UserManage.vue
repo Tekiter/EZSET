@@ -288,6 +288,11 @@ export default {
         },
     },
     async created() {
+        if (!this.$perm('manageRoles').can('access')) {
+            this.$router.push({ name: 'error403' })
+            return
+        }
+
         this.fetchingCount += 1
         await this.fetchRoles()
         await this.fetchUsers()
