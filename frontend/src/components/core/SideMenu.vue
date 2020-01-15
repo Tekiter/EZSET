@@ -33,6 +33,11 @@ export default {
                             to: '/manage/users',
                             perm: this.$perm('manageUsers').can('access'),
                         },
+                        {
+                            title: '역할 관리',
+                            to: '/manage/roles',
+                            perm: this.$perm('manageRoles').can('access'),
+                        },
                     ],
                 },
                 {
