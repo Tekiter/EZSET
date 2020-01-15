@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import store from '../store'
+// import store from '../store'
+import { loginGuard } from './guard'
 
 Vue.use(VueRouter)
 
@@ -62,6 +63,14 @@ const routes = [
         path: '/update/:post_id',
         name: 'update',
         component: () => import('../views/UpdatePost.vue'),
+        path: '/manage/users',
+        name: 'manageUsers',
+        component: () => import('../views/Manage/UserManage.vue'),
+    },
+    {
+        path: '*',
+        name: 'error404',
+        component: () => import('../views/Error/404.vue'),
     },
 ]
 
@@ -72,21 +81,6 @@ const router = new VueRouter({
 })
 
 // 비로그인시 로그인 화면으로
-router.beforeEach(function(to, from, next) {
-    if (!to.matched.some(record => record.meta.noLoginRequired)) {
-        if (!store.getters['auth/isLoggedIn']) {
-            next({
-                path: '/login',
-                query: {
-                    redirect: to.fullPath,
-                },
-            })
-        } else {
-            next()
-        }
-    } else {
-        next()
-    }
-})
+router.beforeEach(loginGuard)
 
 export default router

@@ -16,6 +16,7 @@ export function setDefaultRole(roles) {
 }
 
 export function setAdminRole(roles) {
+    roles.setRole({ tag: 'admin', name: 'admin' })
     roles
         .role('admin')
 
@@ -27,6 +28,9 @@ export function setAdminRole(roles) {
 
         .resource('board')
         .can(['read', 'create', 'delete'])
+
+        .resource('manageUsers')
+        .can('access')
 
         .resource('attendance')
         .can(['start', 'att'])
