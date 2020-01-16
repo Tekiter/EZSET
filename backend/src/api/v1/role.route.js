@@ -16,9 +16,10 @@ Role과 거기에 대한 권한을 관리하는 API
 */
 
 import { Router } from 'express'
-import { validateParams, asyncRoute } from '../../utils/api'
+import { validateParams, asyncRoute, checkRoleTag } from '../../utils/api'
 import { body, param } from 'express-validator'
 import role from '../../utils/role'
+import User from '../../models/User'
 
 const router = Router()
 
@@ -77,6 +78,21 @@ router.route('/:role_tag').get(
             err.status = 404
             throw err
         }
+    })
+)
+
+// 역할 유저 조회
+router.route('/:role_tag/users').get(
+    [param('role_tag').custom(checkRoleTag), validateParams],
+    asyncRoute(async (req, res) => {
+        const users = await User.find({ roles: req.params.role_tag }).select(
+            'username'
+        )
+        res.json({
+            users: users.map(user => {
+                return { username: user.username }
+            }),
+        })
     })
 )
 
