@@ -54,6 +54,23 @@
                 </v-card>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col></v-col>
+            <v-col></v-col>
+            <v-col>
+                <div class="d-flex flex-row-reverse">
+                    <v-btn
+                        class="ma-2"
+                        tile
+                        outlined
+                        color="blue darken-3"
+                        @click="go_modify()"
+                    >
+                        <v-icon left>mdi-autorenew</v-icon> 수정하기
+                    </v-btn>
+                </div>
+            </v-col>
+        </v-row>
         <v-dialog v-model="deleteDialog.show" max-width="290">
             <v-card>
                 <v-card-title class="headline"
@@ -146,7 +163,11 @@ export default {
     mounted() {
         this.fetch_data()
     },
+
     methods: {
+        go_modify() {
+            this.$router.push(`/update/${this.$route.params.post_id}`)
+        },
         fetch_data() {
             axios
                 .get('/simple/posts/' + this.$route.params.post_id)
