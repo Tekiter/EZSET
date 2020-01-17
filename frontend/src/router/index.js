@@ -4,17 +4,16 @@ import store from '../store'
 
 Vue.use(VueRouter)
 
-const routes = [{
+const routes = [
+    {
         path: '/',
         name: 'home',
-        component: () =>
-            import ('../views/Home.vue'),
+        component: () => import('../views/Home.vue'),
     },
     {
         path: '/login',
         name: 'login',
-        component: () =>
-            import ('../views/Login.vue'),
+        component: () => import('../views/Login.vue'),
         meta: {
             layout: 'empty',
             noLoginRequired: true,
@@ -23,8 +22,7 @@ const routes = [{
     {
         path: '/register',
         name: 'register',
-        component: () =>
-            import ('../views/Register.vue'),
+        component: () => import('../views/Register.vue'),
         meta: {
             layout: 'null',
             noLoginRequired: true,
@@ -33,20 +31,22 @@ const routes = [{
     {
         path: '/attendance',
         name: 'attendance',
-        component: () =>
-            import ('../views/Attendance.vue'),
+        component: () => import('../views/Attendance.vue'),
+    },
+    {
+        path: '/attendancestatus',
+        name: 'attendancestatus',
+        component: () => import('../views/Attendancestatus.vue'),
     },
     {
         path: '/attendanceManageDay/:day',
         name: 'attendanceManage',
-        component: () =>
-            import ('../views/AttendanceManageDay.vue'),
+        component: () => import('../views/AttendanceManageDay.vue'),
     },
     {
         path: '/attendanceManageMonth',
         name: 'attendanceManageMonth',
-        component: () =>
-            import ('../views/AttendanceManagMonth.vue'),
+        component: () => import('../views/AttendanceManagMonth.vue'),
     },
 ]
 

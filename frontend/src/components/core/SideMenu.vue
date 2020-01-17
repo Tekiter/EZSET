@@ -47,6 +47,11 @@ export default {
                             perm: this.$perm('attendance').can('att'),
                         },
                         {
+                            title: '출석현황',
+                            to: '/attendancestatus',
+                            perm: this.$perm('attendance').can('att'),
+                        },
+                        {
                             title: '일별출석현황',
                             to: '/AttendanceManageDay',
                             perm: this.$perm('attendance').can('update'),
