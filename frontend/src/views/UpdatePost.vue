@@ -3,9 +3,9 @@
         <v-divider class="mx-4" inset vertical></v-divider>
 
         <v-toolbar-title class="d-flex justify-center"
-            ><h1>
+            ><h3>
                 <strong class="blue--text text--darken-2">게시글 수정</strong>
-            </h1></v-toolbar-title
+            </h3></v-toolbar-title
         >
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-form>
