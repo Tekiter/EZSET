@@ -63,9 +63,6 @@ export default {
             content: '',
             author: '',
             created_date: '',
-            like: '',
-            view: '',
-            comment: '',
             post_id: '',
         }
     },
@@ -76,13 +73,18 @@ export default {
             })
         },
         updateClick() {
-            console.log(this.$toute)
-            axios.put('/simple/boards/' + this.$route.params.board_id, {
-                title: this.title,
-                content: this.content,
-            }),
-                this.$router.push({
-                    path: `/post/${this.$route.params.post_id}`,
+            axios
+                .put('/simple/posts/' + this.$route.params.post_id, {
+                    title: this.title,
+                    content: this.content,
+                    created_date: Date.now(),
+                })
+                .then(res => {
+                    console.log(res)
+                    this.$router.push(`/post/${this.$route.params.post_id}`)
+                })
+                .catch(err => {
+                    console.log(err)
                 })
         },
     },

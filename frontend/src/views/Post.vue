@@ -95,7 +95,7 @@ export default {
                     width: '50%',
                 },
                 { text: '작성자', value: 'author', sortable: false },
-                { text: '작성일', value: 'created_date' },
+                { text: '작성일', value: 'created_date', width: '20%' },
                 { text: '추천', value: 'like' },
                 { text: '조회', value: 'view' },
             ],

@@ -76,18 +76,24 @@ export default {
         },
         submitClick() {
             console.log(this.$toute)
-            axios.post('/simple/boards/' + this.$route.params.board_id, {
-                title: this.title,
-                content: this.content,
-                author: this.author,
-                created_date: this.created_date,
-                like: 0,
-                view: 0,
-                comment: '',
-                _id: this._id,
-            }),
-                this.$router.push({
-                    path: `/board/${this.$route.params.board_id}`,
+            axios
+                .post('/simple/boards/' + this.$route.params.board_id, {
+                    title: this.title,
+                    content: this.content,
+                    author: this.author,
+                    created_date: this.created_date,
+                    like: 0,
+                    view: 0,
+                    comment: '',
+                    _id: this._id,
+                })
+                .then(res => {
+                    this.$router.push({
+                        path: `/board/${this.$route.params.board_id}`,
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
                 })
         },
     },
