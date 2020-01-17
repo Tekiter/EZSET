@@ -87,7 +87,7 @@ router.post(
                 title: req.body.title,
                 content: req.body.content,
                 author: req.user.username,
-                created_date: Date.now,
+                created_date: Date.now(),
             })
 
             let newpost = await post.save()
@@ -142,7 +142,7 @@ router.put(
                 if (req.body.content) {
                     post.title = req.body.title
                     post.content = req.body.content
-                    post.created_date = Date.now
+                    post.created_date = req.body.created_date
                 }
                 await post.save()
 
