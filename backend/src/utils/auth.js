@@ -28,6 +28,7 @@ const auth = {
             )
         })
     },
+    //accessToken이 유효한지 확인
     checkToken(token) {
         return new Promise(function(resolve, reject) {
             jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
@@ -37,6 +38,26 @@ const auth = {
                     reject(err)
                 }
             })
+        })
+    },
+    //민감한 개인정보를 수정,관리하기 위한 토큰
+    createEditToken(username) {
+        return new Promise(function(resolve, reject) {
+            jwt.sign(
+                {
+                    username,
+                    is_edit_token: true,
+                },
+                process.env.JWT_SECRET,
+                { expiresIn: 300 },
+                function(err, encoded) {
+                    if (!err) {
+                        resolve(encoded)
+                    } else {
+                        reject(err)
+                    }
+                }
+            )
         })
     },
     async loginRequired(req, res, next) {
