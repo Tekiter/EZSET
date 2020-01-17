@@ -1,255 +1,158 @@
 <template>
-    <v-row class="fill-height">
-        <v-col>
-            <v-sheet height="64">
-                <v-toolbar flat color="white">
-                    <v-btn
-                        outlined
-                        class="mr-4"
-                        color="grey darken-2"
-                        @click="setToday"
-                    >
-                        Today
-                    </v-btn>
-                    <v-btn fab text small color="grey darken-2" @click="prev">
-                        <v-icon small>mdi-chevron-left</v-icon>
-                    </v-btn>
-                    <v-btn fab text small color="grey darken-2" @click="next">
-                        <v-icon small>mdi-chevron-right</v-icon>
-                    </v-btn>
-                    <v-toolbar-title>{{ title }}</v-toolbar-title>
-                    <v-spacer></v-spacer>
-                    <v-menu bottom right>
-                        <template v-slot:activator="{ on }">
-                            <v-btn outlined color="grey darken-2" v-on="on">
-                                <span>{{ typeToLabel[type] }}</span>
-                                <v-icon right>mdi-menu-down</v-icon>
-                            </v-btn>
+    <div>
+        <v-data-table
+            :headers="headers"
+            :items="dataItems"
+            item-key="day"
+            class="elevation-1"
+            :search="search"
+            :custom-filter="filterOnlyCapsText"
+        >
+            <template v-slot:item="{ item, headers }">
+                <tr>
+                    <td v-for="(header, idx) in headers" :key="idx">
+                        <template v-if="header.value == 'day'">
+                            {{ item[header.value] }}
                         </template>
-                        <v-list>
-                            <v-list-item @click="type = 'day'">
-                                <v-list-item-title>Day</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item @click="type = 'week'">
-                                <v-list-item-title>Week</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item @click="type = 'month'">
-                                <v-list-item-title>Month</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item @click="type = '4day'">
-                                <v-list-item-title>4 days</v-list-item-title>
-                            </v-list-item>
-                        </v-list>
-                    </v-menu>
-                </v-toolbar>
-            </v-sheet>
-            <v-sheet height="600">
-                <v-calendar
-                    ref="calendar"
-                    v-model="focus"
-                    color="primary"
-                    :events="events"
-                    :event-color="getEventColor"
-                    :now="today"
-                    :type="type"
-                    @click:event="showEvent"
-                    @click:more="viewDay"
-                    @click:date="viewDay"
-                    @change="updateRange"
-                ></v-calendar>
-                <v-menu
-                    v-model="selectedOpen"
-                    :close-on-content-click="false"
-                    :activator="selectedElement"
-                    offset-x
-                >
-                    <v-card color="grey lighten-4" min-width="350px" flat>
-                        <v-toolbar :color="selectedEvent.color" dark>
-                            <v-btn icon>
-                                <v-icon>mdi-pencil</v-icon>
-                            </v-btn>
-                            <v-toolbar-title
-                                v-html="selectedEvent.name"
-                            ></v-toolbar-title>
-                            <v-spacer></v-spacer>
-                            <v-btn icon>
-                                <v-icon>mdi-heart</v-icon>
-                            </v-btn>
-                            <v-btn icon>
-                                <v-icon>mdi-dots-vertical</v-icon>
-                            </v-btn>
-                        </v-toolbar>
-                        <v-card-text>
-                            <span v-html="selectedEvent.details"></span>
-                        </v-card-text>
-                        <v-card-actions>
-                            <v-btn
-                                text
-                                color="secondary"
-                                @click="selectedOpen = false"
+                        <template v-else>
+                            <v-icon v-if="item[header.value] == 'attendance'"
+                                >mdi-checkbox-blank-circle-outline</v-icon
                             >
-                                Cancel
-                            </v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-menu>
-            </v-sheet>
-        </v-col>
-    </v-row>
+                            <v-icon v-else-if="item[header.value] == 'late'"
+                                >mdi-triangle-outline</v-icon
+                            >
+                            <v-icon v-else-if="item[header.value] == 'absence'"
+                                >mdi-close</v-icon
+                            >
+                            <v-icon
+                                v-else-if="
+                                    item[header.value] == 'official_absence'
+                                "
+                                >mdi-close-circle-outline</v-icon
+                            >
+                        </template>
+                    </td>
+                </tr>
+            </template>
+            <!-- <template v-slot:top>
+                <v-text-field
+                    v-model="search"
+                    label="Search (UPPER CASE ONLY)"
+                    class="mx-4"
+                ></v-text-field>
+            </template> -->
+            <!-- <template v-slot:body.append>
+                <tr>
+                    <td></td>
+                     <td>
+                        <v-text-field
+                            v-model="attendanceDayData"
+                            type="number"
+                            label="Less than"
+                        ></v-text-field>
+                    </td>
+                    <td colspan="4"></td>
+                </tr>
+            </template> -->
+        </v-data-table>
+    </div>
 </template>
 <script>
+import axios from 'axios'
 export default {
-    data: () => ({
-        focus: '',
-        type: 'month',
-        typeToLabel: {
-            month: 'Month',
-            week: 'Week',
-            day: 'Day',
-            '4day': '4 Days',
-        },
-        start: null,
-        end: null,
-        selectedEvent: {},
-        selectedElement: null,
-        selectedOpen: false,
-        events: [],
-        colors: [
-            'blue',
-            'indigo',
-            'deep-purple',
-            'cyan',
-            'green',
-            'orange',
-            'grey darken-1',
-        ],
-        names: [
-            'Meeting',
-            'Holiday',
-            'PTO',
-            'Travel',
-            'Event',
-            'Birthday',
-            'Conference',
-            'Party',
-        ],
-    }),
+    async created() {
+        try {
+            const res = await axios.get('attendance/attendanceUserList')
+            this.userList = res.data
+        } catch (err) {
+            console.log(err)
+        }
+        try {
+            const res = await axios.get('attendance/attendanceDayList')
+            this.attendanceDayData = res.data
+        } catch (err) {
+            console.log(err)
+        }
+    },
+    data() {
+        return {
+            search: '',
+            calories: '',
+            desserts: [
+                {
+                    name: 'Frozen Yogurt',
+                    calories: 159,
+                    fat: 6.0,
+                    carbs: 24,
+                    protein: 4.0,
+                    iron: '1%',
+                },
+            ],
+            attendanceDayData: [],
+            userList: [],
+        }
+    },
     computed: {
-        title() {
-            const { start, end } = this
-            if (!start || !end) {
-                return ''
-            }
+        headers() {
+            // return [
+            //     {
+            //         text: 'Dessert (100g serving)',
+            //         align: 'left',
+            //         sortable: false,
+            //         value: 'day',
+            //     },
+            // {
+            //     text: 'Calories',
+            //     value: 'calories',
+            //     filter: value => {
+            //         if (!this.calories) return true
 
-            const startMonth = this.monthFormatter(start)
-            const endMonth = this.monthFormatter(end)
-            const suffixMonth = startMonth === endMonth ? '' : endMonth
-
-            const startYear = start.year
-            const endYear = end.year
-            const suffixYear = startYear === endYear ? '' : endYear
-
-            const startDay = start.day + this.nth(start.day)
-            const endDay = end.day + this.nth(end.day)
-
-            switch (this.type) {
-                case 'month':
-                    return `${startMonth} ${startYear}`
-                case 'week':
-                case '4day':
-                    return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
-                case 'day':
-                    return `${startMonth} ${startDay} ${startYear}`
-            }
-            return ''
+            //         return value < parseInt(this.calories)
+            //     },
+            // },
+            // { text: 'Fat (g)', value: 'fat' },
+            // { text: 'Carbs (g)', value: 'carbs' },
+            // { text: 'Protein (g)', value: 'protein' },
+            // { text: 'Iron (%)', value: 'iron' },
+            //     { text: '아이디', value: 'username' },
+            // ]
+            // {
+            //         text: 'Dessert (100g serving)',
+            //         align: 'left',
+            //         sortable: false,
+            //         value: 'day',
+            //     },
+            const cols = this.userList.map(user => {
+                return { text: user.username, value: user.username }
+            })
+            return [{ text: '날짜', value: 'day' }, ...cols]
+            // return [{ text: '날짜', value: 'day' }].concat(cols)
         },
-        monthFormatter() {
-            return this.$refs.calendar.getFormatter({
-                timeZone: 'UTC',
-                month: 'long',
+        dataItems() {
+            return this.attendanceDayData.map(item => {
+                const output = {
+                    day: item.day,
+                }
+
+                item.status.forEach(st => {
+                    output[st.name] = st.state
+                })
+
+                return output
             })
         },
     },
-    mounted() {
-        this.$refs.calendar.checkChange()
-    },
     methods: {
-        viewDay({ date }) {
-            this.focus = date
-            this.type = 'day'
-        },
-        getEventColor(event) {
-            return event.color
-        },
-        setToday() {
-            this.focus = this.today
-        },
-        prev() {
-            this.$refs.calendar.prev()
-        },
-        next() {
-            this.$refs.calendar.next()
-        },
-        showEvent({ nativeEvent, event }) {
-            const open = () => {
-                this.selectedEvent = event
-                this.selectedElement = nativeEvent.target
-                setTimeout(() => (this.selectedOpen = true), 10)
-            }
-
-            if (this.selectedOpen) {
-                this.selectedOpen = false
-                setTimeout(open, 10)
-            } else {
-                open()
-            }
-
-            nativeEvent.stopPropagation()
-        },
-        updateRange({ start, end }) {
-            const events = []
-
-            const min = new Date(`${start.date}T00:00:00`)
-            const max = new Date(`${end.date}T23:59:59`)
-            const days = (max.getTime() - min.getTime()) / 86400000
-            const eventCount = this.rnd(days, days + 20)
-
-            for (let i = 0; i < eventCount; i++) {
-                const allDay = this.rnd(0, 3) === 0
-                const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-                const first = new Date(
-                    firstTimestamp - (firstTimestamp % 900000)
-                )
-                const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-                const second = new Date(first.getTime() + secondTimestamp)
-
-                events.push({
-                    name: this.names[this.rnd(0, this.names.length - 1)],
-                    start: this.formatDate(first, !allDay),
-                    end: this.formatDate(second, !allDay),
-                    color: this.colors[this.rnd(0, this.colors.length - 1)],
-                })
-            }
-
-            this.start = start
-            this.end = end
-            this.events = events
-        },
-        nth(d) {
-            return d > 3 && d < 21
-                ? 'th'
-                : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][
-                      d % 10
-                  ]
-        },
-        rnd(a, b) {
-            return Math.floor((b - a + 1) * Math.random()) + a
-        },
-        formatDate(a, withTime) {
-            return withTime
-                ? `${a.getFullYear()}-${a.getMonth() +
-                      1}-${a.getDate()} ${a.getHours()}:${a.getMinutes()}`
-                : `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()}`
+        filterOnlyCapsText(value, search, item) {
+            return (
+                value != null &&
+                search != null &&
+                typeof value === 'string' &&
+                value
+                    .toString()
+                    .toLocaleUpperCase()
+                    .indexOf(search) !== -1
+            )
         },
     },
 }

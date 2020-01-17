@@ -196,4 +196,16 @@ router.get(
         }
     })
 )
+
+router.get(
+    '/attendanceDayList',
+    asyncRoute(async function(req, res) {
+        try {
+            const attendnaceDayList = await AttendanceDay.find()
+            res.json(attendnaceDayList)
+        } catch (err) {
+            res.status(501).json
+        }
+    })
+)
 export default router
