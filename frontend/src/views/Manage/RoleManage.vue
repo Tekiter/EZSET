@@ -19,6 +19,8 @@
                     </v-tab>
                 </v-tabs>
             </v-col>
+
+            <!-- 역할 column  -->
             <v-col
                 cols="12"
                 md="3"
@@ -26,8 +28,9 @@
                 class="fill-screen"
             >
                 <v-card tile minHeight="95%">
+                    <v-card-title>역할</v-card-title>
                     <v-list>
-                        <v-subheader>역할</v-subheader>
+                        <!-- <v-subheader>역할</v-subheader> -->
                         <template v-if="isLoading">
                             <v-skeleton-loader
                                 v-for="i in 7"
@@ -51,9 +54,52 @@
                                 </v-list-item-content>
                             </v-list-item>
                         </v-list-item-group>
+                        <v-menu
+                            v-model="roleAddDialog.show"
+                            :close-on-content-click="false"
+                        >
+                            <template v-slot:activator="{ on }">
+                                <v-list-item link v-on="on">
+                                    <v-list-item-icon>
+                                        <v-icon>mdi-plus</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-title class="grey--text">
+                                        새 역할 추가
+                                    </v-list-item-title>
+                                </v-list-item>
+                            </template>
+                            <v-card :loading="roleAddDialog.isLoading">
+                                <v-card-title class="pb-0">
+                                    <v-text-field
+                                        label="역할 이름"
+                                        v-model="roleAddDialog.name"
+                                        solo
+                                        outlined
+                                        flat
+                                        hide-details
+                                        dense
+                                        class="ma-auto"
+                                        :error-messages="roleAddDialog.message"
+                                    >
+                                    </v-text-field>
+                                </v-card-title>
+
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+                                    <v-btn
+                                        text
+                                        color="primary"
+                                        @click="applyRoleAddDialog"
+                                        >역할 추가</v-btn
+                                    >
+                                </v-card-actions>
+                            </v-card>
+                        </v-menu>
                     </v-list>
                 </v-card>
             </v-col>
+
+            <!-- 권한 설정 column -->
             <v-col
                 cols="12"
                 md="5"
@@ -72,6 +118,8 @@
                     </v-card-text>
                 </v-card>
             </v-col>
+
+            <!-- 소속 유저 column -->
             <v-col
                 cols="12"
                 md="4"
@@ -303,6 +351,7 @@ export default {
             fetchingCount: 0,
             users: [],
             curTab: 0,
+
             curRole: {
                 tag: '',
                 name: '',
@@ -326,6 +375,12 @@ export default {
                 show: false,
                 isLoading: false,
                 users: [],
+            },
+            roleAddDialog: {
+                show: false,
+                name: '',
+                isLoading: false,
+                message: '',
             },
         }
     },
@@ -435,6 +490,24 @@ export default {
             this.curUsers.selections = []
 
             await this.fetchRoleUsers()
+        },
+        async applyRoleAddDialog() {
+            try {
+                if (!this.roleAddDialog.name) {
+                    throw new Error()
+                }
+                this.roleAddDialog.isLoading = true
+                await axios.post('role', {
+                    name: this.roleAddDialog.name,
+                })
+                this.roleAddDialog.show = false
+                this.roleAddDialog.name = ''
+                this.roleAddDialog.isLoading = false
+                await this.fetchRoles()
+            } catch (error) {
+                this.roleAddDialog.isLoading = false
+                // this.roleAddDialog.message = '역할 추가에 실패했습니다.'
+            }
         },
     },
     async created() {
