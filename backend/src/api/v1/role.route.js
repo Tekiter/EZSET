@@ -86,11 +86,11 @@ router.route('/:role_tag/users').get(
     [param('role_tag').custom(checkRoleTag), validateParams],
     asyncRoute(async (req, res) => {
         const users = await User.find({ roles: req.params.role_tag }).select(
-            'username'
+            'username info'
         )
         res.json({
             users: users.map(user => {
-                return { username: user.username }
+                return { username: user.username, realname: user.info.realname }
             }),
         })
     })
