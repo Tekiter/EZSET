@@ -4,8 +4,27 @@
         <!-- <v-navigation-drawer permanent>
             
         </v-navigation-drawer> -->
-        <v-row class="fill-height">
-            <v-col cols="3">
+
+        <v-row :no-gutters="isMobileMode" class="fill-height">
+            <v-col v-show="isMobileMode" cols="12">
+                <v-tabs v-model="curTab" class="mt-3">
+                    <v-tab>
+                        역할
+                    </v-tab>
+                    <v-tab>
+                        권한 설정
+                    </v-tab>
+                    <v-tab>
+                        소속 유저
+                    </v-tab>
+                </v-tabs>
+            </v-col>
+            <v-col
+                cols="12"
+                md="3"
+                v-show="!isMobileMode || curTab == 0"
+                class="fill-screen"
+            >
                 <v-card tile minHeight="95%">
                     <v-list>
                         <v-subheader>역할</v-subheader>
@@ -20,7 +39,10 @@
                             <v-list-item
                                 v-for="role in roles"
                                 :key="role.tag"
-                                @click="switchRole(role)"
+                                @click="
+                                    switchRole(role)
+                                    curTab = 1
+                                "
                             >
                                 <v-list-item-content
                                     ><v-list-item-title>{{
@@ -32,7 +54,12 @@
                     </v-list>
                 </v-card>
             </v-col>
-            <v-col>
+            <v-col
+                cols="12"
+                md="5"
+                v-show="!isMobileMode || curTab == 1"
+                class="fill-screen"
+            >
                 <v-card tile minHeight="95%">
                     <v-card-text>
                         <v-text-field
@@ -45,7 +72,12 @@
                     </v-card-text>
                 </v-card>
             </v-col>
-            <v-col>
+            <v-col
+                cols="12"
+                md="4"
+                v-show="!isMobileMode || curTab == 2"
+                class="fill-height"
+            >
                 <v-card :loading="curUsers.isLoading" tile minHeight="95%">
                     <v-toolbar flat>
                         <v-toolbar-title>
@@ -143,7 +175,7 @@
         <!-- 유저 추가 Dialog -->
         <v-dialog
             v-model="userAddDialog.show"
-            :fullscreen="$vuetify.breakpoint.smAndDown"
+            :fullscreen="isMobileMode"
             max-width="800px"
             height="500px"
         >
@@ -257,8 +289,8 @@
     </div>
 </template>
 <style scoped>
-.fullheight {
-    height: 100vh;
+.fill-screen {
+    min-height: 95%;
 }
 </style>
 <script>
@@ -270,6 +302,7 @@ export default {
             roles: [],
             fetchingCount: 0,
             users: [],
+            curTab: 0,
             curRole: {
                 tag: '',
                 name: '',
@@ -308,6 +341,9 @@ export default {
             return this.users.filter(user => {
                 return !userSet.has(user.username)
             })
+        },
+        isMobileMode() {
+            return this.$vuetify.breakpoint.smAndDown
         },
     },
     methods: {
