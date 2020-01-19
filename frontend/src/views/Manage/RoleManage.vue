@@ -106,17 +106,7 @@
                 v-show="!isMobileMode || curTab == 1"
                 class="fill-screen"
             >
-                <v-card tile minHeight="95%">
-                    <v-card-text>
-                        <v-text-field
-                            v-model="curRole.name"
-                            label="이름"
-                            placeholder="역할 이름"
-                            outlined
-                        ></v-text-field>
-                        <v-divider></v-divider>
-                    </v-card-text>
-                </v-card>
+                <role-perm-edit :roletag="curRole.tag"></role-perm-edit>
             </v-col>
 
             <!-- 소속 유저 column -->
@@ -343,8 +333,12 @@
 </style>
 <script>
 import axios from 'axios'
+import RolePermEdit from '../../components/manage/RolePermEdit.vue'
 
 export default {
+    components: {
+        RolePermEdit,
+    },
     data() {
         return {
             roles: [],
@@ -430,6 +424,7 @@ export default {
         async switchRole(role) {
             this.curRole.tag = role.tag
             this.curRole.name = role.name
+            this.curUsers.selections = []
             await this.fetchRoleUsers()
         },
         searchMatches(haystack, niddle) {
