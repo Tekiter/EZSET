@@ -1,63 +1,117 @@
 <template>
-    <div>
-        <v-data-table
-            :headers="headers"
-            :items="dataItems"
-            item-key="day"
-            class="elevation-1"
-            :search="search"
-            :custom-filter="filterOnlyCapsText"
-        >
-            <template v-slot:item="{ item, headers }">
-                <tr>
-                    <td v-for="(header, idx) in headers" :key="idx">
-                        <template v-if="header.value == 'day'">
-                            {{ item[header.value] }}
-                        </template>
-                        <template v-else>
-                            <v-icon v-if="item[header.value] == 'attendance'"
-                                >mdi-checkbox-blank-circle-outline</v-icon
-                            >
-                            <v-icon v-else-if="item[header.value] == 'late'"
-                                >mdi-triangle-outline</v-icon
-                            >
-                            <v-icon v-else-if="item[header.value] == 'absence'"
-                                >mdi-close</v-icon
-                            >
-                            <v-icon
-                                v-else-if="
-                                    item[header.value] == 'official_absence'
-                                "
-                                >mdi-close-circle-outline</v-icon
-                            >
-                        </template>
-                    </td>
-                </tr>
-            </template>
-            <!-- <template v-slot:top>
-                <v-text-field
-                    v-model="search"
-                    label="Search (UPPER CASE ONLY)"
-                    class="mx-4"
-                ></v-text-field>
-            </template> -->
-            <!-- <template v-slot:body.append>
-                <tr>
-                    <td></td>
-                     <td>
-                        <v-text-field
-                            v-model="attendanceDayData"
-                            type="number"
-                            label="Less than"
-                        ></v-text-field>
-                    </td>
-                    <td colspan="4"></td>
-                </tr>
-            </template> -->
-        </v-data-table>
-    </div>
+    <v-card>
+        <v-card-title class=".font.-reaular">
+            Monthly attendance management
+        </v-card-title>
+        <div>
+            <v-container>
+                <v-row>
+                    <v-col cols="8" lg="4">
+                        <v-menu
+                            v-model="menu1"
+                            :close-on-content-click="false"
+                            max-width="290"
+                        >
+                            <template v-slot:activator="{ on }">
+                                <v-text-field
+                                    :value="computedDateStart"
+                                    clearable
+                                    label="Start date"
+                                    readonly
+                                    v-on="on"
+                                    @click:clear="date = null"
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker
+                                v-model="Sdate"
+                                @change="menu1 = false"
+                                locale="ko"
+                            ></v-date-picker>
+                        </v-menu>
+                    </v-col>
+                    <v-col>
+                        부터
+                    </v-col>
+                    <v-col cols="8" lg="4">
+                        <v-menu
+                            v-model="menu2"
+                            :close-on-content-click="false"
+                            max-width="290"
+                        >
+                            <template v-slot:activator="{ on }">
+                                <v-text-field
+                                    :value="computedDateEnd"
+                                    clearable
+                                    label="End date"
+                                    readonly
+                                    v-on="on"
+                                    @click:clear="date = null"
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker
+                                v-model="Edate"
+                                @change="menu2 = false"
+                                locale="ko"
+                            ></v-date-picker>
+                        </v-menu>
+                    </v-col>
+                    <v-col>
+                        까지
+                    </v-col>
+                </v-row>
+            </v-container>
+            <v-data-table
+                :headers="headers"
+                :items="dataItems"
+                item-key="day"
+                class="elevation-1"
+                :search="search"
+                :custom-filter="filterOnlyCapsText"
+            >
+                <template v-slot:item="{ item, headers }">
+                    <tr>
+                        <td v-for="(header, idx) in headers" :key="idx">
+                            <template v-if="header.value == 'day'">
+                                {{ item[header.value] }}
+                            </template>
+                            <template v-else>
+                                <v-icon
+                                    v-if="item[header.value] == 'attendance'"
+                                    >mdi-checkbox-blank-circle-outline</v-icon
+                                >
+                                <v-icon v-else-if="item[header.value] == 'late'"
+                                    >mdi-triangle-outline</v-icon
+                                >
+                                <v-icon
+                                    v-else-if="item[header.value] == 'absence'"
+                                    >mdi-close</v-icon
+                                >
+                                <v-icon
+                                    v-else-if="
+                                        item[header.value] == 'official_absence'
+                                    "
+                                    >mdi-close-circle-outline</v-icon
+                                >
+                            </template>
+                        </td>
+                    </tr>
+                </template>
+                <template v-slot:body.append>
+                    <tr>
+                        <td>Total</td>
+                        <td v-for="(item, idx) in total" :key="idx">
+                            {{ item.v1 }}/{{ item.v2 }}/{{ item.v3 }}/{{
+                                item.v4
+                            }}
+                        </td>
+                    </tr>
+                </template>
+            </v-data-table>
+        </div>
+    </v-card>
 </template>
 <script>
+import moment from 'moment'
 import axios from 'axios'
 export default {
     async created() {
@@ -78,68 +132,97 @@ export default {
         return {
             search: '',
             calories: '',
-            desserts: [
-                {
-                    name: 'Frozen Yogurt',
-                    calories: 159,
-                    fat: 6.0,
-                    carbs: 24,
-                    protein: 4.0,
-                    iron: '1%',
-                },
-            ],
             attendanceDayData: [],
             userList: [],
+            //date-picker
+            Sdate: new Date().toISOString().substr(0, 10),
+            Edate: new Date().toISOString().substr(0, 10),
+            menu1: false,
+            menu2: false,
         }
     },
     computed: {
         headers() {
-            // return [
-            //     {
-            //         text: 'Dessert (100g serving)',
-            //         align: 'left',
-            //         sortable: false,
-            //         value: 'day',
-            //     },
-            // {
-            //     text: 'Calories',
-            //     value: 'calories',
-            //     filter: value => {
-            //         if (!this.calories) return true
-
-            //         return value < parseInt(this.calories)
-            //     },
-            // },
-            // { text: 'Fat (g)', value: 'fat' },
-            // { text: 'Carbs (g)', value: 'carbs' },
-            // { text: 'Protein (g)', value: 'protein' },
-            // { text: 'Iron (%)', value: 'iron' },
-            //     { text: '아이디', value: 'username' },
-            // ]
-            // {
-            //         text: 'Dessert (100g serving)',
-            //         align: 'left',
-            //         sortable: false,
-            //         value: 'day',
-            //     },
             const cols = this.userList.map(user => {
                 return { text: user.username, value: user.username }
             })
-            return [{ text: '날짜', value: 'day' }, ...cols]
+            return [
+                {
+                    text: '날짜',
+                    value: 'day',
+                    filter: value => {
+                        if (!this.NSdate) return true
+                        else if (
+                            parseInt(value) <= parseInt(this.NEdate) &&
+                            parseInt(value) >= parseInt(this.NSdate)
+                        )
+                            return true
+                        else return false
+                    },
+                },
+                ...cols,
+            ]
             // return [{ text: '날짜', value: 'day' }].concat(cols)
+        },
+        total() {
+            // const res = 
+            // this.userList.forEach(user => {
+            //     res[user.username] = {
+            //         name: user.username,
+            //         v1: 0,
+            //         v2: 0,
+            //         v3: 0,
+            //         v4: 0,
+            //     }
+            // })
+            return this.attendanceDayData
+                .filter(val => {
+                    return (
+                        parseInt(val.day) >= parseInt(this.NSdate) &&
+                        parseInt(val.day) <= parseInt(this.NEdate)
+                    )
+                })
+                .map(item => {
+                    console.log(item)
+                    const res = { v1: 0, v2: 0, v3: 0, v4: 0 }
+                    item.status.forEach(st => {
+                        if (st.state == 'attendance') res.v1 += 1
+                        else if (st.state == 'late') res.v2 += 1
+                        else if (st.state == 'absence') res.v3 += 1
+                        else if (st.state == 'official_absence') res.v4 += 1
+                    })
+                    return res
+                })
+            // return res
         },
         dataItems() {
             return this.attendanceDayData.map(item => {
                 const output = {
                     day: item.day,
                 }
-
                 item.status.forEach(st => {
                     output[st.name] = st.state
                 })
-
                 return output
             })
+        },
+        computedDateStart() {
+            return this.Sdate
+                ? moment(this.Sdate).format('YYYY 년 MM 월 DD 일')
+                : ''
+        },
+        computedDateEnd() {
+            return this.Edate
+                ? moment(this.Edate).format('YYYY 년 MM 월 DD 일')
+                : ''
+        },
+        NSdate() {
+            var tmp = this.Sdate.split('-')
+            return tmp[0].concat(tmp[1], tmp[2])
+        },
+        NEdate() {
+            var tmp = this.Edate.split('-')
+            return tmp[0].concat(tmp[1], tmp[2])
         },
     },
     methods: {
