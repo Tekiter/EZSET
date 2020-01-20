@@ -34,9 +34,15 @@ export default {
                             perm: this.$perm('manageUsers').can('access'),
                         },
                         {
+                            title: '역할 관리',
+                            to: '/manage/roles',
+                            perm: this.$perm('manageRoles').can('access'),
+                        },
+                        {
                             title: '게시판 관리',
                             to: '/manage/boards',
                             perm: this.$perm('manageBoards').can('access'),
+
                         },
                     ],
                 },

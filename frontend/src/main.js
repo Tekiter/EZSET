@@ -17,6 +17,19 @@ Vue.prototype.$perm = checkPerm
 // api 호출의 기본 경로
 axios.defaults.baseURL = '/api/v1'
 
+axios.interceptors.response.use(
+    function(response) {
+        return response
+    },
+    function(error) {
+        if (error.response.status === 401) {
+            window.location.reload()
+        } else {
+            return Promise.reject(error)
+        }
+    }
+)
+
 // 저장되어있는 로그인 세션 복원
 store.dispatch('auth/restore')
 

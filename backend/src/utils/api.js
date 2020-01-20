@@ -71,6 +71,10 @@ export async function checkRoleTag(value) {
     }
 }
 
+/**
+ * RoleTag 들의 배열이 올바른지 검사하는 함수
+ * @example param('username').custom(checkRoleTag)
+ */
 export async function checkRoleTagArray(value) {
     if (!Array.isArray(value)) {
         throw new Error('올바르지 않은 Role 배열입니다.')
