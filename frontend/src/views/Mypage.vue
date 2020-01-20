@@ -188,6 +188,7 @@
                                         battom
                                         right
                                         color="blue darken-3"
+                                        @click="editFinish"
                                     >
                                         FINISH
                                     </v-btn>
@@ -264,28 +265,28 @@ export default {
                 console.log(error.response)
             }
         },
-        // async EditFinish() {
-        //     this.clearErrors()
-        //     if (!this.checkValid()) {
-        //         return
-        //     }
-        //     this.isloading = true
-        //     try {
-        //         const res = await axios.post('auth/register', {
-        //             username: this.form.username,
-        //             password: this.form.password,
-        //             realname: this.form.realname,
-        //             email: this.form.email,
-        //         })
-        //         this.$router.push({ path: '/' })
-        //         console.log(res) // eslint-disable-line no-console
-        //     } catch (error) {
-        //         // if (error.response.status == 409)
-        //         console.log(error.response) // eslint-disable-line no-console
-        //     } finally {
-        //         this.isloading = false
-        //     }
-        // },
+        async editFinish() {
+            this.clearErrors()
+            if (!this.checkValid()) {
+                return
+            }
+            this.isloading = true
+            try {
+                const res = await axios.post('auth/register', {
+                    username: this.form.username,
+                    password: this.form.password,
+                    realname: this.form.realname,
+                    email: this.form.email,
+                })
+                this.$router.push({ path: '/' })
+                console.log(res) // eslint-disable-line no-console
+            } catch (error) {
+                // if (error.response.status == 409)
+                console.log(error.response) // eslint-disable-line no-console
+            } finally {
+                this.isloading = false
+            }
+        },
     },
     async created() {
         this.isloading = true
