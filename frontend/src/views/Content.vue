@@ -15,16 +15,6 @@
                         </div>
                     </v-card-subtitle>
                     <v-card-text>{{ post.content }}</v-card-text>
-                    <v-col>
-                        <v-card
-                            class="d-flex flex-row-reverse"
-                            flat
-                            v-if="del_auth(post.author)"
-                            @click="deletePostDialog.show = true"
-                        >
-                            <v-btn icon><v-icon>mdi-trash-can</v-icon></v-btn>
-                        </v-card>
-                    </v-col>
                 </v-card>
                 <v-card outlined>
                     <v-col v-for="comment in post.comment" :key="comment._id">
@@ -64,9 +54,28 @@
                         tile
                         outlined
                         color="blue darken-3"
+                        v-if="del_auth(post.author)"
+                        @click="deletePostDialog.show = true"
+                    >
+                        <v-icon>mdi-trash-can</v-icon> 삭제하기
+                    </v-btn>
+                    <v-btn
+                        class="ma-2"
+                        tile
+                        outlined
+                        color="blue darken-3"
                         @click="go_modify()"
                     >
                         <v-icon left>mdi-autorenew</v-icon> 수정하기
+                    </v-btn>
+                    <v-btn
+                        class="ma-2"
+                        tile
+                        outlined
+                        color="blue darken-3"
+                        @click="writeCommentDialog.show = true"
+                    >
+                        <v-icon>mdi-comment-outline</v-icon> 댓글작성
                     </v-btn>
                 </div>
             </v-col>
@@ -131,6 +140,44 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="writeCommentDialog.show" max-width="450">
+            <v-card>
+                <v-card-title class="headline">댓글 작성</v-card-title>
+                <v-form>
+                    <v-textarea
+                        v-model="content"
+                        label="Content"
+                        counter
+                        maxlength="2000"
+                        full-width
+                        single-line
+                    ></v-textarea>
+                </v-form>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="
+                            comment.content = content
+                            writeComment()
+                            writeCommentDialog.show = false
+                        "
+                    >
+                        Submit
+                    </v-btn>
+
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="writeCommentDialog.show = false"
+                    >
+                        Cancel
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 
@@ -157,7 +204,14 @@ export default {
                 show: false,
                 title: '',
             },
+            writeCommentDialog: {
+                show: false,
+                title: '',
+            },
             temp_id: '',
+            comment: {
+                content: '',
+            },
         }
     },
     mounted() {
@@ -203,6 +257,15 @@ export default {
         },
         fetch_id(id) {
             this.temp_id = id
+        },
+        writeComment() {
+            axios.post(
+                '/simple/posts/' + this.$route.params.post_id + '/comment',
+                {
+                    content: this.comment.content,
+                }
+            )
+            this.fetch_data()
         },
     },
 }
