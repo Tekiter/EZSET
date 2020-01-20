@@ -1,5 +1,13 @@
 <template>
     <v-container>
+        <div>
+            <v-text-field
+                v-if="loading"
+                color="blue darken-2"
+                loading
+                disabled
+            ></v-text-field>
+        </div>
         <v-row>
             <v-col>
                 <v-card outlined>
@@ -189,6 +197,7 @@ import moment from 'moment'
 export default {
     data() {
         return {
+            loading: true,
             post: {
                 _id: '',
                 title: '',
@@ -236,6 +245,7 @@ export default {
                             comment.created_date
                         ).format('YYYY/MM/DD HH:MM')
                     })
+                    this.loading = false
                 })
         },
         del_auth(writer) {

@@ -1,5 +1,13 @@
 <template>
     <v-container fluid>
+        <div>
+            <v-text-field
+                v-if="loading"
+                color="blue darken-2"
+                loading
+                disabled
+            ></v-text-field>
+        </div>
         <v-divider class="mx-4" inset vertical></v-divider>
 
         <v-toolbar-title class="d-flex justify-center"
@@ -64,6 +72,7 @@ export default {
             author: '',
             created_date: '',
             post_id: '',
+            loading: true,
         }
     },
     methods: {
@@ -93,6 +102,7 @@ export default {
             console.log(res.data)
             this.title = res.data.title
             this.content = res.data.content
+            this.loading = false
         })
     },
 }

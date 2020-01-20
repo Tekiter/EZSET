@@ -1,5 +1,13 @@
 <template>
     <div>
+        <div>
+            <v-text-field
+                v-if="loading"
+                color="blue darken-2"
+                loading
+                disabled
+            ></v-text-field>
+        </div>
         <v-data-table
             :headers="headers"
             :items="posts"
@@ -64,6 +72,7 @@ export default {
                 })
                 this.board = res.data.board
                 //console.log(res.data.posts)
+                this.loading = false
             })
             .catch(e => {
                 console.error(e.message)
@@ -76,6 +85,7 @@ export default {
     },
     data() {
         return {
+            loading: true,
             page: 1,
             pageCount: 0,
             itemsPerPage: 10,
