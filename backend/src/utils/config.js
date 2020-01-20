@@ -7,9 +7,11 @@ const config = {
         if (cache.key) {
             return cache.key
         }
-        return await Config.findOne()
-            .where('key')
-            .equals(key)
+        return (
+            await Config.findOne()
+                .where('key')
+                .equals(key)
+        ).value
     },
     async setConfig(key, value) {
         const newconfig = new Config({ key, value })

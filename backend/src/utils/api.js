@@ -70,3 +70,25 @@ export async function checkRoleTag(value) {
         throw new Error('존재하지 않는 Role Tag 입니다.')
     }
 }
+
+export async function checkRoleTagArray(value) {
+    if (!Array.isArray(value)) {
+        throw new Error('올바르지 않은 Role 배열입니다.')
+    }
+    for (let roletag of value) {
+        await checkRoleTag(roletag)
+    }
+    return true
+}
+
+/**
+ * RoleTag 가 존재하는지 검사하는 함수
+ * @example param('username').custom(checkRoleTag)
+ */
+export function isPositive(value) {
+    const intval = parseInt(value)
+    if (intval) {
+        return intval >= 0
+    }
+    return false
+}

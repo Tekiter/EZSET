@@ -13,9 +13,7 @@
             <v-menu offset-y :nudge-width="200">
                 <template v-slot:activator="{ on }">
                     <v-btn text large v-on="on" class="text-none">
-                        {{
-                        user.username
-                        }}
+                        {{ user.username }}
                     </v-btn>
                 </template>
                 <v-card>
@@ -26,9 +24,7 @@
                             </v-list-item-avatar>
                             <v-list-item-content>
                                 <v-list-item-title>
-                                    {{
-                                    user.username
-                                    }}
+                                    {{ user.username }}
                                 </v-list-item-title>
                                 <v-list-item-subtitle></v-list-item-subtitle>
                             </v-list-item-content>

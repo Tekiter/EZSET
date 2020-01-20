@@ -31,7 +31,12 @@ export default {
                         {
                             title: '유저 관리',
                             to: '/manage/users',
-                            perm: this.$perm('role').can('read'),
+                            perm: this.$perm('manageUsers').can('access'),
+                        },
+                        {
+                            title: '게시판 관리',
+                            to: '/manage/boards',
+                            perm: this.$perm('manageBoards').can('access'),
                         },
                     ],
                 },
@@ -40,6 +45,12 @@ export default {
                     icon: 'mdi-checkbox-marked-circle-outline',
                     title: '출석체크',
                     to: '/attendance',
+                },
+                {
+                    type: 'simple',
+                    icon: 'mdi-clipboard-multiple-outline',
+                    title: '게시판',
+                    to: '/board',
                 },
             ],
         }
