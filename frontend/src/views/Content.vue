@@ -255,8 +255,10 @@ export default {
                 return false
             }
         },
-        del_comment(id) {
-            axios.delete('/simple/posts/' + this.post._id + '/comment/' + id)
+        async del_comment(id) {
+            await axios.delete(
+                '/simple/posts/' + this.post._id + '/comment/' + id
+            )
             this.fetch_data()
         },
         delPost() {
@@ -268,8 +270,8 @@ export default {
         fetch_id(id) {
             this.temp_id = id
         },
-        writeComment() {
-            axios.post(
+        async writeComment() {
+            await axios.post(
                 '/simple/posts/' + this.$route.params.post_id + '/comment',
                 {
                     content: this.content,
