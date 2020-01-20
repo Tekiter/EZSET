@@ -10,6 +10,8 @@ import { checkPerm } from './utils/role/role'
 
 Vue.config.productionTip = false
 
+Vue.use(require('vue-moment'))
+
 Vue.prototype.$perm = checkPerm
 
 // api 호출의 기본 경로
