@@ -160,8 +160,9 @@
                         color="green darken-1"
                         text
                         @click="
-                            comment.content = content
+                            content = content
                             writeComment()
+                            content = ''
                             writeCommentDialog.show = false
                         "
                     >
@@ -209,9 +210,8 @@ export default {
                 title: '',
             },
             temp_id: '',
-            comment: {
-                content: '',
-            },
+
+            content: '',
         }
     },
     mounted() {
@@ -262,7 +262,7 @@ export default {
             axios.post(
                 '/simple/posts/' + this.$route.params.post_id + '/comment',
                 {
-                    content: this.comment.content,
+                    content: this.content,
                 }
             )
             this.fetch_data()
