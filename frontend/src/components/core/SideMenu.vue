@@ -33,6 +33,11 @@ export default {
                             to: '/manage/users',
                             perm: this.$perm('manageUsers').can('access'),
                         },
+                        {
+                            title: '게시판 관리',
+                            to: '/manage/boards',
+                            perm: this.$perm('manageBoards').can('access'),
+                        },
                     ],
                 },
                 {

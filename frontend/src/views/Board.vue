@@ -11,8 +11,11 @@
         <v-data-table
             :headers="header"
             :items="boards"
-            :items-per-page="5"
+            :page.sync="page"
+            :items-per-page="10"
+            hide-default-footer
             class="elevation-1"
+            @page-count="pageCount = $event"
             @click:row="read"
         ></v-data-table>
     </div>
@@ -24,6 +27,9 @@ export default {
     data() {
         return {
             loading: true,
+            page: 1,
+            pageCount: 0,
+            itemsPerPage: 10,
             header: [
                 {
                     text: '게시판 이름',
