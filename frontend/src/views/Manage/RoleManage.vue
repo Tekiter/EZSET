@@ -221,10 +221,23 @@
             height="500px"
         >
             <v-card :loading="userAddDialog.isLoading">
-                <v-card-title
+                <v-card-title v-if="!isMobileMode"
                     >유저 추가
                     <v-card-subtitle>{{ curRole.name }}</v-card-subtitle>
                 </v-card-title>
+                <v-toolbar v-else flat>
+                    <v-btn icon @click="closeUserAddDialog()">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                    <v-toolbar-title>유저 추가</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        outlined
+                        @click.native="applyUserAddDialog()"
+                        color="primary"
+                        >추가</v-btn
+                    >
+                </v-toolbar>
                 <v-card-text>
                     <v-container>
                         <v-text-field
@@ -271,7 +284,7 @@
                     </v-container>
                 </v-card-text>
                 <v-spacer></v-spacer>
-                <v-card-actions>
+                <v-card-actions v-if="!isMobileMode">
                     <v-spacer></v-spacer>
                     <v-fade-transition>
                         <small
@@ -428,6 +441,7 @@ export default {
             this.curRole.tag = role.tag
             this.curRole.name = role.name
             this.curUsers.selections = []
+            this.userAddDialog.selections = []
             await this.fetchRoleUsers()
         },
         searchMatches(haystack, niddle) {
