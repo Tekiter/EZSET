@@ -112,8 +112,22 @@ router.route('/:role_tag').patch(
 
 // 역할 제거
 router.route('/:role_tag').delete(
-    [role.perm('role').can('delete'), validateParams],
+    [
+        role.perm('role').can('delete'),
+        param('role_tag').custom(checkRoleTag),
+        validateParams,
+    ],
     asyncRoute(async (req, res) => {
+        if (req.params.role_tag == 'admin') {
+            const err = new Error('admin 역할은 삭제할 수 없습니다.')
+            err.status = 400
+            throw err
+        }
+
+        await role.removeRole(req.params.role_tag)
+
+        res.end()
+
         // NOT IMPLEMENTED
     })
 )

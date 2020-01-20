@@ -76,6 +76,33 @@ const role = {
 
         return newrole
     },
+    async removeRole(roletag) {
+        // db에 저장된 role 정보 가져오기
+        const dbrole = await RoleModel.findOne()
+            .where('tag')
+            .equals(roletag)
+
+        // 해당 role을 가진 모든 유저 가져오기
+        const users = await User.find({ roles: roletag }).select(
+            'username roles'
+        )
+
+        // 해당 role을 유저에서 제거
+        for (let user of users) {
+            const idx = user.roles.indexOf(roletag)
+            if (idx < 0) {
+                throw new Error('Remove role error')
+            }
+            user.roles.splice(idx, 1)
+            await user.save()
+        }
+
+        // db에서 role 제거
+        await dbrole.remove()
+
+        // 메모리의 role 제거
+        roles.removeRole(roletag)
+    },
     async loadRoles() {
         const roleobjs = await RoleModel.find()
         roleobjs.forEach(role => {

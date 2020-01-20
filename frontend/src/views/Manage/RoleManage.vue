@@ -106,7 +106,10 @@
                 v-show="!isMobileMode || curTab == 1"
                 class="fill-screen"
             >
-                <role-perm-edit :roletag="curRole.tag"></role-perm-edit>
+                <role-perm-edit
+                    :roletag="curRole.tag"
+                    @removed="roleRemoved()"
+                ></role-perm-edit>
             </v-col>
 
             <!-- 소속 유저 column -->
@@ -503,6 +506,11 @@ export default {
                 this.roleAddDialog.isLoading = false
                 // this.roleAddDialog.message = '역할 추가에 실패했습니다.'
             }
+        },
+        async roleRemoved() {
+            await this.fetchRoles()
+            this.switchRole(this.roles[0])
+            this.curTab = 0
         },
     },
     async created() {
