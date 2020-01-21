@@ -42,7 +42,6 @@ export default {
                             title: '게시판 관리',
                             to: '/manage/boards',
                             perm: this.$perm('manageBoards').can('access'),
-
                         },
                     ],
                 },
