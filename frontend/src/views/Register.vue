@@ -156,7 +156,7 @@ export default {
             }
             this.isloading = true
             try {
-                const res = await axios.post('auth/register', {
+                await axios.post('auth/register', {
                     username: this.form.username,
                     password: this.form.password,
                     realname: this.form.realname,
@@ -208,12 +208,9 @@ export default {
             }
 
             try {
-                const res = await axios.post(
-                    'auth/register/doublecheck/username',
-                    {
-                        username: this.form.username,
-                    }
-                )
+                await axios.post('auth/register/doublecheck/username', {
+                    username: this.form.username,
+                })
                 this.success.username = '사용할 수 있는 아이디입니다.'
                 // console.log(res)
             } catch (error) {
