@@ -22,7 +22,10 @@
                             </div>
                         </div>
                     </v-card-subtitle>
-                    <v-card-text>{{ post.content }}</v-card-text>
+                    <v-card-text>
+                        <!-- {{ post.content }} -->
+                        <viewer :value="post.content" />
+                    </v-card-text>
                 </v-card>
                 <v-card outlined>
                     <v-col v-for="comment in post.comment" :key="comment._id">
@@ -193,8 +196,12 @@
 <script>
 import axios from 'axios'
 import moment from 'moment'
+import { Viewer } from '@toast-ui/vue-editor'
 
 export default {
+    components: {
+        Viewer,
+    },
     data() {
         return {
             loading: true,
