@@ -1,44 +1,43 @@
 <template>
-    <div class="pa-10">
-        <v-card outlined :loading="isLoading">
-            <v-toolbar flat>
-                <v-toolbar-title>
-                    게시판
-                </v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-btn
-                    outlined
-                    tile
-                    color="primary"
-                    @click="showCreateBoardDialog()"
-                >
-                    <v-icon left>mdi-pencil</v-icon> 게시판 생성
-                </v-btn>
-            </v-toolbar>
-            <!-- <v-card-title class="pb-5">게시판 이름</v-card-title> -->
-            <v-col v-for="board in boards" :key="board._id">
-                <v-card class="row pl-5" flat>
-                    <v-card class="col" flat>{{ board.title }}</v-card>
-                    <v-btn icon small @click="showDeleteBoardDialog(board)">
-                        <v-icon>mdi-trash-can-outline</v-icon>
+    <v-row class="ma-3 fill-height">
+        <v-col cols="5">
+            <v-card outlined :loading="isLoading">
+                <v-toolbar flat>
+                    <v-toolbar-title>
+                        게시판
+                    </v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        outlined
+                        tile
+                        color="primary"
+                        @click="showCreateBoardDialog()"
+                    >
+                        <v-icon left>mdi-pencil</v-icon> 게시판 생성
                     </v-btn>
-                </v-card>
-            </v-col>
-        </v-card>
+                </v-toolbar>
+                <v-list>
+                    <v-list-item v-for="board in boards" :key="board._id">
+                        <v-list-item-title>{{ board.title }}</v-list-item-title>
+                        <v-list-item-action>
+                            <v-btn icon @click="showDeleteBoardDialog(board)">
+                                <v-icon>mdi-trash-can-outline</v-icon>
+                            </v-btn>
+                        </v-list-item-action>
+                    </v-list-item>
+                </v-list>
+            </v-card>
+        </v-col>
+        <v-col cols="7">
+            <v-card outlined>
+                <v-card-title>게시판 설정</v-card-title>
+                <v-list> </v-list>
+            </v-card>
+        </v-col>
 
         <v-dialog v-model="createBoardDialog.show" max-width="300">
             <v-card :loading="createBoardDialog.isLoading">
                 <v-card-title>게시판 생성</v-card-title>
-                <!-- <v-form>
-                    <v-textarea
-                        v-model="title"
-                        label="Title"
-                        counter
-                        maxlength="100"
-                        full-width
-                        single-line
-                    ></v-textarea>
-                </v-form> -->
                 <v-card-text>
                     <v-text-field
                         v-model="createBoardDialog.title"
@@ -95,7 +94,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </div>
+    </v-row>
 </template>
 
 <script>
