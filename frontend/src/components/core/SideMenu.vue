@@ -14,8 +14,11 @@ import SideMenuItem from './SideMenuItem.vue'
 export default {
     components: { SideMenuItem },
     data() {
-        return {
-            mainMenus: [
+        return {}
+    },
+    computed: {
+        mainMenus() {
+            return [
                 {
                     type: 'simple',
                     icon: 'mdi-view-dashboard',
@@ -57,8 +60,8 @@ export default {
                     title: '게시판',
                     to: '/board',
                 },
-            ],
-        }
+            ]
+        },
     },
 }
 </script>
