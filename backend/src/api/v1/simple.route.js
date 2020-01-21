@@ -3,62 +3,63 @@ import { body, param } from 'express-validator'
 import Board from '../../models/Board'
 import Post from '../../models/Post'
 import { validateParams, asyncRoute } from '../../utils/api'
+import { perm } from '../../utils/role'
 const router = Router()
 
 //게시판 생성
-router.post('/boards', [body('title').isString(), validateParams], function(
-    req,
-    res
-) {
-    if (!req.user.perm('board').can('create')) {
-        //권한설정
-        res.status(403).end()
-        return
-    }
-    let board = new Board()
-    board.title = req.body.title
+router.post(
+    '/boards',
+    [perm('board').can('create'), body('title').isString(), validateParams],
+    asyncRoute(async (req, res) => {
+        let board = new Board()
+        board.title = req.body.title
 
-    board.save(function(err) {
-        if (err) {
-            const errr = new Error('database error')
-            errr.status = 500
-            throw errr
-        }
-        res.status(201).json({ board })
+        await board.save()
+        res.status(201).end()
     })
-})
+)
 
 //게시판 삭제
 router.delete(
     '/boards/:board_id',
     [param('board_id').isNumeric(), validateParams],
-    function(req, res) {
+    asyncRoute(async (req, res) => {
         if (!req.user.perm('board', req.params.board_id).can('delete')) {
             res.status(403).end()
             return
         }
-        Board.remove({ _id: req.params.board_id }, function(err, output) {
-            if (err) {
-                const errr = new Error('database error')
-                errr.status = 500
-                throw errr
-            }
-            res.status(204).end()
-        })
-    }
+
+        const board = await Board.findOne()
+            .where('_id')
+            .equals(req.params.board_id)
+
+        if (!board) {
+            const err = new Error('존재하지 않는 게시판입니다.')
+            err.status = 404
+            throw err
+        }
+
+        await board.remove()
+        // await Board.remove({ _id: req.params.board_id })
+        res.end()
+    })
 )
 
 //게시판 목록 보기
-router.get('/boards', function(req, res) {
-    Board.find(function(err, board) {
-        if (err) {
-            const errr = new Error('database error')
-            errr.status = 500
-            throw errr
-        }
-        res.json(board)
+router.get(
+    '/boards',
+    asyncRoute(async (req, res) => {
+        const boards = await Board.find()
+        res.json(
+            boards.map(board => {
+                return {
+                    _id: board._id,
+                    title: board.title,
+                }
+            })
+        )
     })
-})
+)
 
 //게시글 작성
 router.post(
