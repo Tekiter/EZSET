@@ -59,6 +59,7 @@ export default {
                     icon: 'mdi-clipboard-multiple-outline',
                     title: '게시판',
                     to: '/board',
+                    children: this.$store.getters['board/boardList'],
                 },
             ]
         },
