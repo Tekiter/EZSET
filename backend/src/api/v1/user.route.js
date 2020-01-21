@@ -176,6 +176,16 @@ router.delete(
             throw err
         }
 
+        if (req.params.roletag == 'admin') {
+            if ((await getConfig('superAdmin')) == req.params.username) {
+                const err = new Error(
+                    '서버 관리자의 어드민 역할은 변경할 수 없습니다.'
+                )
+                err.status = 403
+                throw err
+            }
+        }
+
         const idx = user.roles.indexOf(req.params.roletag)
         if (idx != -1) {
             user.roles.splice(idx, 1)

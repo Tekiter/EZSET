@@ -45,7 +45,7 @@
             <router-view></router-view>
         </v-content>
 
-        <v-footer app>&copy; EZSET</v-footer>
+        <!-- <v-footer app>&copy; EZSET</v-footer> -->
     </v-app>
 </template>
 <style scoped></style>

@@ -70,9 +70,19 @@ const routes = [
         component: () => import('../views/Manage/UserManage.vue'),
     },
     {
+        path: '/manage/roles',
+        name: 'manageRoles',
+        component: () => import('../views/Manage/RoleManage.vue'),
+    },
+    {
         path: '/manage/boards',
         name: 'manageBoards',
         component: () => import('../views/Manage/BoardManage.vue'),
+    },
+    {
+        path: '/403',
+        name: 'error403',
+        component: () => import('../views/Error/403.vue'),
     },
     {
         path: '*',

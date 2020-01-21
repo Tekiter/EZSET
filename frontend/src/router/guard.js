@@ -28,6 +28,12 @@ export function loginGuard(to, from, next) {
     }
 }
 
-export function permGuard(to, from, next) {
-    next()
+export function permGuard(checker) {
+    return (to, from, next) => {
+        if (checker()) {
+            next()
+        } else {
+            next({ name: 'error403' })
+        }
+    }
 }
