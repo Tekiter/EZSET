@@ -23,7 +23,8 @@ axios.interceptors.response.use(
     },
     function(error) {
         if (error.response.status === 401) {
-            window.location.reload()
+            this.$store.dispatch('auth/logout')
+            router.push('/login')
         } else {
             return Promise.reject(error)
         }
