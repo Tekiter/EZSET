@@ -42,27 +42,27 @@ const routes = [
     {
         path: '/board',
         name: 'board',
-        component: () => import('../views/Board.vue'),
+        component: () => import('../views/Board/Board.vue'),
     },
     {
         path: '/board/:board_id',
         name: 'post',
-        component: () => import('../views/Post.vue'),
+        component: () => import('../views/Board/Post.vue'),
     },
     {
         path: '/post/:post_id',
         name: 'content',
-        component: () => import('../views/Content.vue'),
+        component: () => import('../views/Board/Content.vue'),
     },
     {
         path: '/write/:board_id',
         name: 'write',
-        component: () => import('../views/WritePost.vue'),
+        component: () => import('../views/Board/WritePost.vue'),
     },
     {
         path: '/update/:post_id',
         name: 'update',
-        component: () => import('../views/UpdatePost.vue'),
+        component: () => import('../views/Board/UpdatePost.vue'),
     },
     {
         path: '/manage/users',

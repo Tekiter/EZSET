@@ -50,6 +50,8 @@ export default {
         }
         // 권한 목록 가져오기
 
+        await this.$store.dispatch('board/fetchBoards')
+
         this.isLoading = false
     },
 }
