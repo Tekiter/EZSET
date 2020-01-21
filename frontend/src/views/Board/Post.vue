@@ -56,28 +56,6 @@ import axios from 'axios'
 import moment from 'moment'
 
 export default {
-    mounted() {
-        axios
-            .get('/simple/boards/' + this.$route.params.board_id)
-            .then(res => {
-                this.posts = res.data.posts.map(post => {
-                    post.created_date = moment(post.created_date).format(
-                        'YYYY/MM/DD HH:MM'
-                    )
-                    return post
-                })
-                this.posts = res.data.posts.map(post => {
-                    post.number = post._id + 1
-                    return post
-                })
-                this.board = res.data.board
-                //console.log(res.data.posts)
-                this.loading = false
-            })
-            .catch(e => {
-                console.error(e.message)
-            })
-    },
     computed: {
         curid() {
             return this.$route.params.board_id
@@ -118,6 +96,36 @@ export default {
             this.$router.push({
                 path: '/post/' + evt._id,
             })
+        },
+        async fetchPostList() {
+            try {
+                const res = await axios.get(
+                    '/simple/boards/' + this.$route.params.board_id
+                )
+                this.posts = res.data.posts.map(post => {
+                    post.created_date = moment(post.created_date).format(
+                        'YYYY/MM/DD HH:MM'
+                    )
+                    return post
+                })
+                this.posts = res.data.posts.map(post => {
+                    post.number = post._id + 1
+                    return post
+                })
+                this.board = res.data.board
+                //console.log(res.data.posts)
+                this.loading = false
+            } catch (error) {
+                //
+            }
+        },
+    },
+    async created() {
+        await this.fetchPostList()
+    },
+    watch: {
+        async $route(to, from) {
+            await this.fetchPostList()
         },
     },
 }
