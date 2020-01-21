@@ -60,6 +60,13 @@ postSchema.methods.addComment = function(content, writer) {
     return this.save()
 }
 
+//댓글 수정
+postSchema.methods.updateComment = function(comment_id, content) {
+    this.comment = this.comments.id(comment_id)
+    this.comment.content = content
+    return this.save()
+}
+
 //댓글 삭제
 postSchema.methods.removeComment = function(comment_id) {
     let comment = this.comments.id(comment_id)

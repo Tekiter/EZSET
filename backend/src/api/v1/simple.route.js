@@ -255,6 +255,32 @@ router.post(
     })
 )
 
+//댓글 수정
+router.put(
+    '/posts/:post_id/comment/:comment_id',
+    [param('post_id').isNumeric(), body('content').isString(), validateParams],
+    asyncRoute(async function(req, res) {
+        try {
+            let post = await Post.findOne()
+                .where('_id')
+                .equals(req.params.post_id)
+
+            if (!post) {
+                res.status(404).json({
+                    message: 'no post id ' + req.params.comment_id,
+                })
+                return
+            }
+            await post.updateComment(req.params.comment_id, req.body.content)
+            res.status(201).json({ message: '댓글 수정 완료' })
+        } catch (error) {
+            const errr = new Error('database error')
+            errr.status = 500
+            throw errr
+        }
+    })
+)
+
 //댓글 삭제
 router.delete(
     '/posts/:post_id/comment/:comment_id',
