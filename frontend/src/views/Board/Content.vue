@@ -28,33 +28,71 @@
                     </v-card-text>
                 </v-card>
                 <v-card outlined>
-                    <v-col v-for="comment in post.comment" :key="comment._id">
-                        <v-card class="row pl-5" flat>
-                            <p class="bold">{{ comment.writer }}</p>
-                            <p class="caption">
-                                {{ comment.created_date }}
-                            </p>
-                        </v-card>
-                        <v-card class="row pl-5" flat>
-                            <v-card class="col" flat>{{
-                                comment.content
-                            }}</v-card>
-                            <v-btn icon small v-if="del_auth(comment.writer)">
-                                <v-icon>mdi-file-edit-outline</v-icon>
-                            </v-btn>
-                            <v-btn
-                                icon
-                                small
-                                v-if="del_auth(comment.writer)"
-                                @click="
-                                    deleteDialog.show = true
-                                    fetch_id(comment._id)
-                                "
-                            >
-                                <v-icon>mdi-trash-can-outline</v-icon>
-                            </v-btn>
-                        </v-card>
-                    </v-col>
+                    <v-list three-lines>
+                        <v-list-item
+                            v-for="comment in post.comment"
+                            :key="comment._id"
+                        >
+                            <template v-if="flag == true">
+                                <v-list-item-content>
+                                    <v-list-item-title
+                                        >{{ comment.writer
+                                        }}<span class="ml-3">{{
+                                            comment.created_date
+                                        }}</span></v-list-item-title
+                                    >{{ comment.content }}</v-list-item-content
+                                >
+                                <v-btn
+                                    icon
+                                    small
+                                    v-if="del_auth(comment.writer)"
+                                    @click="flag = true"
+                                >
+                                    <v-icon>mdi-file-edit-outline</v-icon>
+                                </v-btn>
+                                <v-btn
+                                    icon
+                                    small
+                                    v-if="del_auth(comment.writer)"
+                                    @click="
+                                        deleteDialog.show = true
+                                        fetchComment(comment.content)
+                                    "
+                                >
+                                    <v-icon>mdi-trash-can-outline</v-icon>
+                                </v-btn>
+                            </template>
+                            <template v-else>
+                                <v-list-item-content>
+                                    <v-list-item-title
+                                        >{{ comment.writer
+                                        }}<span class="ml-3">{{
+                                            comment.created_date
+                                        }}</span></v-list-item-title
+                                    ><v-text-field
+                                        v-model="editContent"
+                                    ></v-text-field>
+                                </v-list-item-content>
+                                <v-btn
+                                    icon
+                                    small
+                                    @click="writeCommentDialog.show = true"
+                                >
+                                    <v-icon>mdi-check-bold</v-icon>
+                                </v-btn>
+                                <v-btn
+                                    icon
+                                    small
+                                    @click="
+                                        deleteDialog.show = true
+                                        fetch_id(comment._id)
+                                    "
+                                >
+                                    <v-icon>mdi-close-outline</v-icon>
+                                </v-btn>
+                            </template>
+                        </v-list-item>
+                    </v-list>
                 </v-card>
             </v-col>
         </v-row>
@@ -187,6 +225,36 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="updateCommentDialog.show" max-width="290">
+            <v-card>
+                <v-card-title class="headline"
+                    >댓글을 수정하시겠습니까?</v-card-title
+                >
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="
+                            updateComment(temp_id)
+                            updateCommentDialog.show = false
+                        "
+                    >
+                        예
+                    </v-btn>
+
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="updateCommentDialog.show = false"
+                    >
+                        아니요
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 
@@ -222,8 +290,15 @@ export default {
                 show: false,
                 title: '',
             },
+            updateCommentDialog: {
+                show: false,
+                title: '',
+            },
             temp_id: '',
             commentContent: '',
+            flag: false,
+            editContent: '',
+            fetchCommentContent: '',
         }
     },
     mounted() {
@@ -284,6 +359,10 @@ export default {
             this.fetch_data()
             this.commentContent = ''
             this.writeCommentDialog.show = false
+        },
+        updateComment() {},
+        fetchComment(content) {
+            this.fetchCommentContent = content
         },
     },
 }
