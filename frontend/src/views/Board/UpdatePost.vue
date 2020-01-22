@@ -1,6 +1,38 @@
 <template>
-    <v-container fluid>
-        <div>
+    <v-container>
+        <v-card outlined>
+            <v-card-title>
+                게시글 수정
+            </v-card-title>
+            <!-- <v-card-subtitle> 게시판: {{ curBoardName }} </v-card-subtitle> -->
+            <v-card-text>
+                <v-text-field
+                    v-model="title"
+                    label="제목"
+                    hide-details
+                    class="mb-4"
+                ></v-text-field>
+                <editor
+                    ref="editor"
+                    mode="wysiwyg"
+                    :options="editor.options"
+                    :value="content"
+                />
+                <div class="d-flex mt-3">
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        class="ma-2"
+                        tile
+                        outlined
+                        color="blue darken-3"
+                        @click="updateClick"
+                    >
+                        <v-icon left>mdi-pencil</v-icon> 수정
+                    </v-btn>
+                </div>
+            </v-card-text>
+        </v-card>
+        <!-- <div>
             <v-text-field
                 v-if="loading"
                 color="blue darken-2"
@@ -25,14 +57,6 @@
                 hide-details
             ></v-text-field>
             <v-divider></v-divider>
-            <!-- <v-textarea
-                v-model="content"
-                label="Content"
-                counter
-                maxlength="2000"
-                full-width
-                single-line
-            ></v-textarea> -->
             <editor
                 ref="editor"
                 mode="wysiwyg"
@@ -65,7 +89,7 @@
                     </v-btn>
                 </div>
             </v-col>
-        </v-row>
+        </v-row> -->
     </v-container>
 </template>
 <script>
@@ -84,6 +108,7 @@ export default {
             created_date: '',
             post_id: '',
             loading: true,
+            curBoardName: '',
             editor: {
                 options: {
                     language: 'ko',
@@ -92,6 +117,10 @@ export default {
         }
     },
     methods: {
+        async getBoards() {
+            const res = await axios.get('simple/boards')
+            return res.data
+        },
         async fetchPost() {
             const res = await axios.get(
                 '/simple/posts/' + this.$route.params.post_id
@@ -108,7 +137,7 @@ export default {
         async updateClick() {
             const content = this.getMarkdown()
 
-            await axios.put('/simple/posts/' + this.$route.params.post_id, {
+            await axios.patch('/simple/posts/' + this.$route.params.post_id, {
                 title: this.title,
                 content: content,
                 created_date: Date.now(),
