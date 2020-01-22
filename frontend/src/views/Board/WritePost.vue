@@ -1,46 +1,20 @@
 <template>
-    <v-container fluid>
-        <v-divider class="mx-4" inset vertical></v-divider>
-
-        <v-toolbar-title class="d-flex justify-center"
-            ><h3>
-                <strong class="blue--text text--darken-2">게시글 작성</strong>
-            </h3></v-toolbar-title
-        >
-        <v-divider class="mx-4" inset vertical></v-divider>
-        <v-form>
-            <v-text-field
-                v-model="title"
-                label="Title"
-                single-line
-                full-width
-                hide-details
-            ></v-text-field>
-            <v-divider></v-divider>
-            <!-- <v-textarea
-                v-model="content"
-                label="Content"
-                counter
-                maxlength="2000"
-                full-width
-                single-line
-            ></v-textarea> -->
-            <editor ref="editor" mode="wysiwyg" :options="editor.options" />
-        </v-form>
-        <div class="row">
-            <div class="col"></div>
-            <div class="col"></div>
-            <div class="col">
-                <div class="d-flex flex-row-reverse">
-                    <v-btn
-                        class="ma-2"
-                        tile
-                        outlined
-                        color="blue darken-3"
-                        @click="clearClick"
-                    >
-                        <v-icon left>mdi-keyboard-backspace</v-icon> CLEAR
-                    </v-btn>
+    <v-container>
+        <v-card outlined>
+            <v-card-title>
+                게시글 작성
+            </v-card-title>
+            <v-card-subtitle> 게시판: {{ curBoardName }} </v-card-subtitle>
+            <v-card-text>
+                <v-text-field
+                    v-model="title"
+                    label="제목"
+                    hide-details
+                    class="mb-4"
+                ></v-text-field>
+                <editor ref="editor" mode="wysiwyg" :options="editor.options" />
+                <div class="d-flex mt-3">
+                    <v-spacer></v-spacer>
                     <v-btn
                         class="ma-2"
                         tile
@@ -48,11 +22,38 @@
                         color="blue darken-3"
                         @click="submitClick"
                     >
-                        <v-icon left>mdi-pencil</v-icon> SUBMIT
+                        <v-icon left>mdi-pencil</v-icon> 작성
                     </v-btn>
                 </div>
-            </div>
-        </div>
+                <!-- <div class="row">
+                    <div class="col"></div>
+                    <div class="col"></div>
+                    <div class="col">
+                        <div class="d-flex flex-row-reverse">
+                            <v-btn
+                                class="ma-2"
+                                tile
+                                outlined
+                                color="blue darken-3"
+                                @click="clearClick"
+                            >
+                                <v-icon left>mdi-keyboard-backspace</v-icon>
+                                CLEAR
+                            </v-btn>
+                            <v-btn
+                                class="ma-2"
+                                tile
+                                outlined
+                                color="blue darken-3"
+                                @click="submitClick"
+                            >
+                                <v-icon left>mdi-pencil</v-icon> SUBMIT
+                            </v-btn>
+                        </div>
+                    </div>
+                </div> -->
+            </v-card-text>
+        </v-card>
     </v-container>
 </template>
 <script>
@@ -72,6 +73,7 @@ export default {
             like: '',
             view: '',
             comment: '',
+            curBoardName: '',
             editor: {
                 options: {
                     language: 'ko',
@@ -80,6 +82,10 @@ export default {
         }
     },
     methods: {
+        async getBoards() {
+            const res = await axios.get('simple/boards')
+            return res.data
+        },
         clearClick() {
             this.$router.push({
                 path: `/board/${this.$route.params.board_id}`,
@@ -112,6 +118,18 @@ export default {
         getMarkdown() {
             return this.$refs.editor.invoke('getMarkdown')
         },
+    },
+    async created() {
+        const boards = await this.getBoards()
+
+        const id = this.$route.params.board_id
+
+        for (let board of boards) {
+            if (board._id == id) {
+                this.curBoardName = board.title
+                break
+            }
+        }
     },
 }
 </script>
