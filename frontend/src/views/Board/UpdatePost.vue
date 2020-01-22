@@ -25,14 +25,20 @@
                 hide-details
             ></v-text-field>
             <v-divider></v-divider>
-            <v-textarea
+            <!-- <v-textarea
                 v-model="content"
                 label="Content"
                 counter
                 maxlength="2000"
                 full-width
                 single-line
-            ></v-textarea>
+            ></v-textarea> -->
+            <editor
+                ref="editor"
+                mode="wysiwyg"
+                :options="editor.options"
+                :value="content"
+            />
         </v-form>
         <v-row>
             <v-col></v-col>
@@ -64,7 +70,12 @@
 </template>
 <script>
 import axios from 'axios'
+import { Editor } from '@toast-ui/vue-editor'
+
 export default {
+    components: {
+        Editor,
+    },
     data() {
         return {
             title: '',
@@ -73,37 +84,48 @@ export default {
             created_date: '',
             post_id: '',
             loading: true,
+            editor: {
+                options: {
+                    language: 'ko',
+                },
+            },
         }
     },
     methods: {
+        async fetchPost() {
+            const res = await axios.get(
+                '/simple/posts/' + this.$route.params.post_id
+            )
+            this.title = res.data.title
+            this.content = res.data.content
+            this.loading = false
+        },
         clearClick() {
             this.$router.push({
                 path: `/post/${this.$route.params.post_id}`,
             })
         },
-        updateClick() {
-            axios
-                .put('/simple/posts/' + this.$route.params.post_id, {
-                    title: this.title,
-                    content: this.content,
-                    created_date: Date.now(),
-                })
-                .then(res => {
-                    console.log(res)
-                    this.$router.push(`/post/${this.$route.params.post_id}`)
-                })
-                .catch(err => {
-                    console.log(err)
-                })
+        async updateClick() {
+            const content = this.getMarkdown()
+
+            await axios.put('/simple/posts/' + this.$route.params.post_id, {
+                title: this.title,
+                content: content,
+                created_date: Date.now(),
+            })
+            this.$router.push(`/post/${this.$route.params.post_id}`)
+        },
+        getMarkdown() {
+            return this.$refs.editor.invoke('getMarkdown')
         },
     },
-    mounted() {
-        axios.get('/simple/posts/' + this.$route.params.post_id).then(res => {
-            console.log(res.data)
-            this.title = res.data.title
-            this.content = res.data.content
-            this.loading = false
-        })
+    async created() {
+        await this.fetchPost()
+    },
+    watch: {
+        async $route(to, from) {
+            await this.fetchPost()
+        },
     },
 }
 </script>
