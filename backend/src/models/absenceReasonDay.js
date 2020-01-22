@@ -15,7 +15,7 @@ const absence_DaySchema = new mongoose.Schema({
 const absenceDay = mongoose.model('absenceday', absence_DaySchema)
 
 var absenceDaySchema = new Schema({
-    Date: {
+    date: {
         type: String,
     },
     reasons: [absence_DaySchema],

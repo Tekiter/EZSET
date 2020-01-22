@@ -81,6 +81,7 @@
     </v-container>
 </template>
 <script>
+import axios from 'axios'
 export default {
     data() {
         return {
@@ -93,8 +94,18 @@ export default {
         }
     },
     methods: {
-        reservation() {
-            this.absenceResDialog.show = false
+        async reservation() {
+            try {
+                await axios.post('absencecheck/absenceBook', {
+                    Reason: this.absence_reason,
+                    dayList: this.dates,
+                })
+                this.dates = [this.$moment(new Date()).format('YYYY-MM-DD')]
+                this.absence_reason = ''
+                this.absenceResDialog.show = false
+            } catch (err) {
+                console.log(err)
+            }
         },
     },
 }

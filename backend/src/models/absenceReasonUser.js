@@ -2,9 +2,11 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
 const absence_UserSchema = new mongoose.Schema({
-    days: {
-        type: String,
-    },
+    days: [
+        {
+            type: String,
+        },
+    ],
     reason: {
         type: String,
     },
