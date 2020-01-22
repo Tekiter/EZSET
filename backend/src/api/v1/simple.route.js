@@ -136,7 +136,7 @@ router.delete(
 )
 
 //게시글 수정
-router.put(
+router.patch(
     '/posts/:post_id',
     [param('post_id').isNumeric(), body('content').isString(), validateParams],
     asyncRoute(async function(req, res) {
@@ -269,7 +269,7 @@ router.post(
 )
 
 //댓글 수정
-router.put(
+router.patch(
     '/posts/:post_id/comment/:comment_id',
     [param('post_id').isNumeric(), body('content').isString(), validateParams],
     asyncRoute(async function(req, res) {
