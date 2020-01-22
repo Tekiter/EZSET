@@ -13,6 +13,7 @@ var ranNum = random(100, 999)
 //사용자가 출석코드를 입력했을 경우 서버에서 생성한 코드와 사용자 입력코드가 일치한다면 db에 출석상태로 업데이트
 router.post(
     '/attendanceWrite',
+    [perm('attendance').can('att')],
     asyncRoute(async function(req, res) {
         if (ranNum != req.body.code) {
             res.json({
@@ -78,6 +79,7 @@ router.get(
 //attendanceDays, attendanceUsers Collection에 시작버튼을 누른 관리자를 제외한 모두를 '결석'상태로 초기화한 Document가 생성됨
 router.get(
     '/startAttendance',
+    [perm('attendance').can('start')],
     asyncRoute(async function(req, res) {
         var Date = moment().format('YYYYMMDD')
         //get Userlist in User collection
@@ -127,7 +129,7 @@ router.get(
             ranNum = await random(100, 999)
             res.json({ code: ranNum })
         } catch (err) {
-            res.status(501).json
+            res.status(501).json()
         }
     })
 )
@@ -143,7 +145,7 @@ router.get(
             }).select({ _id: 0, __v: 0, day: 0 })
             res.json(cur)
         } catch (err) {
-            res.status(501).json
+            cres.status(501).json()
         }
     })
 )
@@ -151,6 +153,7 @@ router.get(
 router.post(
     '/attendancestateupdate/:day',
     [
+        perm('attendance').can('read'),
         param('day').isString(),
         body('state').isString(),
         body('name').isString(),
@@ -179,44 +182,47 @@ router.post(
             res.json(cur_user)
         } catch (err) {
             //console.log(err)
-            res.status(501).json
+            res.status(501).json()
         }
     })
 )
 
 router.get(
     '/attendanceUserList',
+    [perm('attendance').can('read')],
     asyncRoute(async function(req, res) {
         try {
             const userList = await User.find().select('username')
             res.json(userList)
         } catch (err) {
             //console.log(err)
-            res.status(501).json
+            res.status(501).json()
         }
     })
 )
 
 router.get(
     '/attendanceDayList',
+    [perm('attendance').can('read')],
     asyncRoute(async function(req, res) {
         try {
             const attendnaceDayList = await AttendanceDay.find()
             res.json(attendnaceDayList)
         } catch (err) {
-            res.status(501).json
+            res.status(501).json()
         }
     })
 )
 
 router.get(
     '/attendanceUserListData',
+    [perm('attendance').can('read')],
     asyncRoute(async function(req, res) {
         try {
             const attendnaceUser = await AttendanceUser.find()
             res.json(attendnaceUser)
         } catch (err) {
-            res.status(501).json
+            res.status(501).json()
         }
     })
 )

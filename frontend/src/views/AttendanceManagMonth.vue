@@ -72,7 +72,19 @@
                     <tr>
                         <td v-for="(header, idx) in headers" :key="idx">
                             <template v-if="header.value == 'day'">
-                                {{ item[header.value] }}
+                                <div class="my-2">
+                                    <v-btn
+                                        @click="
+                                            $router.push(
+                                                `/AttendanceManageDay/${
+                                                    item[header.value]
+                                                }`
+                                            )
+                                        "
+                                        text
+                                        >{{ item[header.value] }}</v-btn
+                                    >
+                                </div>
                             </template>
                             <template v-else>
                                 <v-icon
