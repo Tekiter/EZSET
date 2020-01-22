@@ -137,6 +137,7 @@
                                 >
                                 <v-list-item-content class="align-end">
                                     <v-text-field
+                                        v-model="form.realname"
                                         label="Name"
                                         :placeholder="userinfo.realname"
                                         outlined
@@ -159,9 +160,80 @@
                                     >비밀번호 :</v-list-item-content
                                 >
                                 <v-list-item-content class="align-end">
-                                    <v-btn text color="blue darken-3">
+                                    <v-btn
+                                        text
+                                        color="blue darken-3"
+                                        @click="changePassword()"
+                                    >
                                         change password
                                     </v-btn>
+                                    <v-dialog v-model="dialog2" max-width="400">
+                                        <v-card>
+                                            <v-toolbar dark color="primary">
+                                                <v-btn
+                                                    icon
+                                                    dark
+                                                    @click="dialog2 = false"
+                                                >
+                                                    <v-icon>mdi-close</v-icon>
+                                                </v-btn>
+                                                <v-toolbar-title
+                                                    >비밀번호
+                                                    변경</v-toolbar-title
+                                                >
+                                            </v-toolbar>
+                                            <v-text-field
+                                                v-model="form.password"
+                                                @change="checkPassword()"
+                                                :error-messages="
+                                                    errors.password
+                                                "
+                                                outlined
+                                                :append-icon="
+                                                    showpw
+                                                        ? 'mdi-eye'
+                                                        : 'mdi-eye-off'
+                                                "
+                                                :type="
+                                                    showpw ? 'text' : 'password'
+                                                "
+                                                label="새비밀번호"
+                                                hint="비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요"
+                                                @click:append="showpw = !showpw"
+                                                class="px-3 pt-3"
+                                            ></v-text-field>
+                                            <v-text-field
+                                                v-model="form.confirmpassword"
+                                                @change="checkConfirmPassword()"
+                                                :error-messages="
+                                                    errors.confirmpassword
+                                                "
+                                                outlined
+                                                :append-icon="
+                                                    showpw
+                                                        ? 'mdi-eye'
+                                                        : 'mdi-eye-off'
+                                                "
+                                                :type="
+                                                    showpw ? 'text' : 'password'
+                                                "
+                                                label="새비밀번호 확인"
+                                                @click:append="showpw = !showpw"
+                                                class="px-3 pt-3"
+                                            ></v-text-field>
+                                            <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-btn
+                                                    color="blue darken-4"
+                                                    type="submit"
+                                                    text
+                                                    large
+                                                    @click="dialog2 = false"
+                                                    >확인</v-btn
+                                                >
+                                            </v-card-actions>
+                                        </v-card>
+                                    </v-dialog>
                                 </v-list-item-content>
                             </v-list-item>
                             <v-list-item>
@@ -171,6 +243,7 @@
                                 >
                                 <v-list-item-content class="align-end">
                                     <v-text-field
+                                        v-model="form.email"
                                         label="E-mail"
                                         :placeholder="userinfo.email"
                                         outlined
@@ -213,17 +286,22 @@ export default {
                 realname: '',
                 email: '',
             },
-            // form: {
-            //     username: userinfo.username,
-            //     password: '',
-            //     confirmpassword: '',
-            //     realname: userinfo.realname,
-            //     email: userinfo.email,
-            // },
+            form: {
+                password: '',
+                confirmpassword: '',
+                realname: '',
+                email: '',
+            },
+            errors: {
+                password: '',
+                confirmpassword: '',
+                email: '',
+            },
             isloading: false, //로딩하는 코드 추가 필요
             isEditMode: false, //수정 가능 모드
             isTokenValid: false,
             dialog: false,
+            dialog2: false,
             showpw: false,
             password: '',
         }
@@ -266,20 +344,31 @@ export default {
             }
         },
         async editFinish() {
-            this.clearErrors()
-            if (!this.checkValid()) {
-                return
-            }
-            this.isloading = true
+            // this.isloading = true 로딩 시스템 필요
             try {
-                const res = await axios.post('auth/register', {
-                    username: this.form.username,
+                const res = await axios.post('/mypage/edit', {
+                    username: this.userinfo.username,
                     password: this.form.password,
                     realname: this.form.realname,
                     email: this.form.email,
+                    edittoken: this.$store.state.auth.editToken,
                 })
-                this.$router.push({ path: '/' })
-                console.log(res) // eslint-disable-line no-console
+                await this.patchUser()
+                console.log(res)
+            } catch (error) {
+                console.log(error.response)
+            } finally {
+                this.isEditMode = false
+                // this.isloading = false 로딩 시스템 필요
+            }
+        },
+        async patchUser() {
+            this.isloading = true
+            try {
+                const res = await axios.get('mypage')
+                this.userinfo.username = res.data.username
+                this.userinfo.realname = res.data.realname
+                this.userinfo.email = res.data.email
             } catch (error) {
                 // if (error.response.status == 409)
                 console.log(error.response) // eslint-disable-line no-console
@@ -287,19 +376,34 @@ export default {
                 this.isloading = false
             }
         },
+        async changePassword() {
+            this.errors.password = ''
+            this.errors.confirmpassword = ''
+            this.form.password = ''
+            this.form.confirmpassword = ''
+            this.dialog2 = true
+        },
+        async checkPassword() {
+            let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,16}$/
+            if (!pwreg.test(this.form.password)) {
+                this.errors.password =
+                    '비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요'
+                return
+            }
+        },
+        async checkConfirmPassword() {
+            if (this.form.password != this.form.confirmpassword) {
+                this.errors.confirmpassword =
+                    '비밀번호 확인이 일치하지 않습니다.'
+                return
+            }
+        },
     },
     async created() {
-        this.isloading = true
         try {
-            const res = await axios.get('mypage')
-            this.userinfo.username = res.data.username
-            this.userinfo.realname = res.data.realname
-            this.userinfo.email = res.data.email
+            await this.patchUser()
         } catch (error) {
-            // if (error.response.status == 409)
-            console.log(error.response) // eslint-disable-line no-console
-        } finally {
-            this.isloading = false
+            console.log(error.response)
         }
     },
 }
