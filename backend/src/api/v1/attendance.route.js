@@ -208,4 +208,16 @@ router.get(
         }
     })
 )
+
+router.get(
+    '/attendanceUserListData',
+    asyncRoute(async function(req, res) {
+        try {
+            const attendnaceUser = await AttendanceUser.find()
+            res.json(attendnaceUser)
+        } catch (err) {
+            res.status(501).json
+        }
+    })
+)
 export default router

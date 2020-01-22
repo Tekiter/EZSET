@@ -1,5 +1,5 @@
 <template>
-    <v-card>
+    <v-card v-if="this.$perm('attendance').can('read')">
         <v-card-title class=".font.-reaular">
             Monthly attendance management
         </v-card-title>
@@ -76,17 +76,22 @@
                             </template>
                             <template v-else>
                                 <v-icon
+                                    color="green"
                                     v-if="item[header.value] == 'attendance'"
                                     >mdi-checkbox-blank-circle-outline</v-icon
                                 >
-                                <v-icon v-else-if="item[header.value] == 'late'"
+                                <v-icon
+                                    color="orange"
+                                    v-else-if="item[header.value] == 'late'"
                                     >mdi-triangle-outline</v-icon
                                 >
                                 <v-icon
+                                    color="red"
                                     v-else-if="item[header.value] == 'absence'"
                                     >mdi-close</v-icon
                                 >
                                 <v-icon
+                                    color="red"
                                     v-else-if="
                                         item[header.value] == 'official_absence'
                                     "
@@ -98,7 +103,7 @@
                 </template>
                 <template v-slot:body.append>
                     <tr>
-                        <td>Total</td>
+                        <td>Total(출석/지각/결석/공결)</td>
                         <td v-for="(item, idx) in total" :key="idx">
                             {{ item.v1 }}/{{ item.v2 }}/{{ item.v3 }}/{{
                                 item.v4
@@ -127,12 +132,19 @@ export default {
         } catch (err) {
             console.log(err)
         }
+        try {
+            const res = await axios.get('attendance/attendanceUserListData')
+            this.attendanceUserData = res.data
+        } catch (err) {
+            console.log(err)
+        }
     },
     data() {
         return {
             search: '',
             calories: '',
             attendanceDayData: [],
+            attendanceUserData: [],
             userList: [],
             //date-picker
             Sdate: new Date().toISOString().substr(0, 10),
@@ -165,35 +177,30 @@ export default {
             // return [{ text: '날짜', value: 'day' }].concat(cols)
         },
         total() {
-            // const res = 
-            // this.userList.forEach(user => {
-            //     res[user.username] = {
-            //         name: user.username,
-            //         v1: 0,
-            //         v2: 0,
-            //         v3: 0,
-            //         v4: 0,
-            //     }
-            // })
-            return this.attendanceDayData
-                .filter(val => {
-                    return (
-                        parseInt(val.day) >= parseInt(this.NSdate) &&
-                        parseInt(val.day) <= parseInt(this.NEdate)
-                    )
-                })
-                .map(item => {
-                    console.log(item)
-                    const res = { v1: 0, v2: 0, v3: 0, v4: 0 }
-                    item.status.forEach(st => {
-                        if (st.state == 'attendance') res.v1 += 1
-                        else if (st.state == 'late') res.v2 += 1
-                        else if (st.state == 'absence') res.v3 += 1
-                        else if (st.state == 'official_absence') res.v4 += 1
+            const cols = this.userList.map(user => {
+                return { name: user.username, v1: 0, v2: 0, v3: 0, v4: 0 }
+            })
+            cols.forEach(user => {
+                this.attendanceDayData
+                    .filter(val => {
+                        return (
+                            parseInt(val.day) >= parseInt(this.NSdate) &&
+                            parseInt(val.day) <= parseInt(this.NEdate)
+                        )
                     })
-                    return res
-                })
-            // return res
+                    .map(item => {
+                        item.status.forEach(st => {
+                            if (st.name == user.name) {
+                                if (st.state == 'attendance') user.v1 += 1
+                                else if (st.state == 'late') user.v2 += 1
+                                else if (st.state == 'absence') user.v3 += 1
+                                else if (st.state == 'official_absence')
+                                    user.v4 += 1
+                            }
+                        })
+                    })
+            })
+            return cols
         },
         dataItems() {
             return this.attendanceDayData.map(item => {
