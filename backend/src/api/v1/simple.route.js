@@ -108,12 +108,16 @@ router.delete(
     [param('post_id').isNumeric(), validateParams],
     asyncRoute(async function(req, res) {
         if (!req.user.perm('board', req.params.board_id).canOwn('delete')) {
+            res.status(403).end()
+            return
         }
 
         try {
             let post = await Post.findById(req.params.post_id)
             if (post) {
                 if (post.owner != req.user.username) {
+                    res.status(403).end()
+                    return
                 }
 
                 await post.delete()
@@ -132,14 +136,22 @@ router.delete(
 )
 
 //게시글 수정
-router.put(
+router.patch(
     '/posts/:post_id',
     [param('post_id').isNumeric(), body('content').isString(), validateParams],
     asyncRoute(async function(req, res) {
+        if (!req.user.perm('board', req.params.board_id).canOwn('update')) {
+            res.status(403).end()
+            return
+        }
         let post = await Post.findById(req.params.post_id)
 
         try {
             if (post) {
+                if (req.user.username != post.author) {
+                    res.status(403).end()
+                    return
+                }
                 if (req.body.content) {
                     post.title = req.body.title
                     post.content = req.body.content
@@ -257,7 +269,7 @@ router.post(
 )
 
 //댓글 수정
-router.put(
+router.patch(
     '/posts/:post_id/comment/:comment_id',
     [param('post_id').isNumeric(), body('content').isString(), validateParams],
     asyncRoute(async function(req, res) {

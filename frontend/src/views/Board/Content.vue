@@ -39,6 +39,9 @@
                             <v-card class="col" flat>{{
                                 comment.content
                             }}</v-card>
+                            <v-btn icon small v-if="del_auth(comment.writer)">
+                                <v-icon>mdi-file-edit-outline</v-icon>
+                            </v-btn>
                             <v-btn
                                 icon
                                 small
@@ -156,7 +159,7 @@
                 <v-card-title class="headline">댓글 작성</v-card-title>
                 <v-form>
                     <v-textarea
-                        v-model="content"
+                        v-model="commentContent"
                         label="Content"
                         counter
                         maxlength="2000"
@@ -167,23 +170,17 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
 
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="
-                            content = content
-                            writeComment()
-                            content = ''
-                            writeCommentDialog.show = false
-                        "
-                    >
+                    <v-btn color="green darken-1" text @click="createComment()">
                         Submit
                     </v-btn>
 
                     <v-btn
                         color="green darken-1"
                         text
-                        @click="writeCommentDialog.show = false"
+                        @click="
+                            writeCommentDialog.show = false
+                            commentContent = ''
+                        "
                     >
                         Cancel
                     </v-btn>
@@ -226,8 +223,7 @@ export default {
                 title: '',
             },
             temp_id: '',
-
-            content: '',
+            commentContent: '',
         }
     },
     mounted() {
@@ -277,14 +273,17 @@ export default {
         fetch_id(id) {
             this.temp_id = id
         },
-        async writeComment() {
+
+        async createComment() {
             await axios.post(
                 '/simple/posts/' + this.$route.params.post_id + '/comment',
                 {
-                    content: this.content,
+                    content: this.commentContent,
                 }
             )
             this.fetch_data()
+            this.commentContent = ''
+            this.writeCommentDialog.show = false
         },
     },
 }
