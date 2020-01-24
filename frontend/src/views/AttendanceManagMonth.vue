@@ -1,9 +1,20 @@
 <template>
-    <v-card v-if="this.$perm('attendance').can('read')">
-        <v-card-title class=".font.-reaular">
+    <v-card>
+        <v-card-title
+            v-if="this.$perm('attendance').can('read')"
+            class="font-weight-thin display-3"
+        >
             Monthly attendance management
+            <blockquote class="blockquote">
+                설정하신 기간동안의 출석, 지각, 결석, 공결 현황을 조회합니다.
+                날짜를 클릭할 경우, 그 날의 일별 출결 현황을 조회 및 수정 하실
+                수 있습니다.
+            </blockquote>
         </v-card-title>
-        <div>
+        <div
+            v-if="this.$perm('attendance').can('read')"
+            class="font-weight-medium subtitle-2"
+        >
             <v-container>
                 <v-row>
                     <v-col cols="8" lg="4">
@@ -64,7 +75,7 @@
                 :headers="headers"
                 :items="dataItems"
                 item-key="day"
-                class="elevation-1"
+                class="elevation-1 font-weight-medium headline"
                 :search="search"
                 :custom-filter="filterOnlyCapsText"
             >
@@ -124,6 +135,11 @@
                     </tr>
                 </template>
             </v-data-table>
+        </div>
+        <div>
+            <v-alert type="error" v-if="!$perm('attendance').can('read')">
+                권한이 없습니다.
+            </v-alert>
         </div>
     </v-card>
 </template>
