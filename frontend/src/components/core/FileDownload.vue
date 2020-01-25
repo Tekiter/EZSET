@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex">
+    <div class="d-flex" v-if="files.length > 0">
         <v-spacer></v-spacer>
         <v-subheader>파일 첨부</v-subheader>
         <v-btn
@@ -25,6 +25,9 @@ export default {
     props: {
         files: {
             type: Array,
+            default() {
+                return []
+            },
         },
     },
     methods: {
