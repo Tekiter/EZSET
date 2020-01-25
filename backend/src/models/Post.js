@@ -42,6 +42,7 @@ let postSchema = new Schema({
     view: { type: Number, default: 0 },
     like: [{ liker: { type: String } }],
     comments: [commentSchema],
+    files: [{ type: String }],
 })
 
 //좋아요 카운트

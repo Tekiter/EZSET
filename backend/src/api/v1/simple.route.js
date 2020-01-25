@@ -4,6 +4,11 @@ import Board from '../../models/Board'
 import Post from '../../models/Post'
 import { validateParams, asyncRoute } from '../../utils/api'
 import { perm } from '../../utils/role'
+import {
+    checkAttachableFileArray,
+    applyFileLink,
+    getFileInfoArray,
+} from '../../utils/file'
 const router = Router()
 
 //게시판 생성
@@ -68,6 +73,9 @@ router.post(
         param('board_id').isNumeric(),
         body('title').isString(),
         body('content').isString(),
+        body('files')
+            .custom(checkAttachableFileArray)
+            .optional(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
@@ -93,11 +101,15 @@ router.post(
 
             let newpost = await post.save()
 
+            // DB 파일 객체에 역참조 등록
+            await applyFileLink(req.body.files, 'board', newpost.id)
+            newpost.files = req.body.files
+
+            await newpost.save()
+
             res.status(201).json(newpost)
         } catch (err) {
-            const errr = new Error('database error')
-            errr.status = 500
-            throw errr
+            throw err
         }
     })
 )
@@ -180,28 +192,28 @@ router.patch(
 router.get(
     '/posts/:post_id',
     [param('post_id').isNumeric(), validateParams],
-    function(req, res) {
-        Post.findOne()
+    asyncRoute(async function(req, res) {
+        const post = await Post.findOne()
             .where('_id')
             .equals(req.params.post_id)
-            .then(post => {
-                if (post)
-                    res.status(200).json({
-                        _id: parseInt(post.id),
-                        title: post.title,
-                        content: post.content,
-                        author: post.author,
-                        created_date: post.created_date,
-                        view: post.view,
-                        like: post.likes_count,
-                        comment: post.comments,
-                    })
-                else
-                    res.status(404).json({
-                        message: 'no post id ' + req.params.post_id,
-                    })
+        if (post) {
+            res.status(200).json({
+                _id: parseInt(post.id),
+                title: post.title,
+                content: post.content,
+                author: post.author,
+                created_date: post.created_date,
+                view: post.view,
+                like: post.likes_count,
+                comment: post.comments,
+                files: await getFileInfoArray(post.files),
             })
-    }
+        } else {
+            res.status(404).json({
+                message: 'no post id ' + req.params.post_id,
+            })
+        }
+    })
 )
 
 //게시글 목록 보기

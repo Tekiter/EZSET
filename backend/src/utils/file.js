@@ -86,6 +86,7 @@ export async function getFileInfo(file_id) {
     }
 
     return {
+        id: file_id,
         filename: file.filename,
         size: file.size,
         uploader: file.uploader,
@@ -93,11 +94,101 @@ export async function getFileInfo(file_id) {
     }
 }
 
+export async function getFileInfoArray(files) {
+    const output = []
+    for (let file of files) {
+        output.push(await getFileInfo(file))
+    }
+    return output
+}
+
+/**
+ * 파일의 ID를 기준으로 실제 파일 경로를 가져온다.
+ * @param {ObjectID} file_id
+ */
 export function getFilePath(file_id) {
     return path.join(uploadDir, file_id)
 }
 
+/**
+ * 파일 다운로드 횟수를 1 증가시킨다.
+ * @param {ObjectID} file_id
+ */
 export async function increaseFileHit(file_id) {
     const file = await File.findById(file_id).cache()
     await file.increaseHit()
+}
+
+export function setUploadExpireTimeout(file) {
+    setTimeout(() => {}, 600000)
+}
+
+/**
+ * 첨부가 가능한, 즉 역참조가 없는 파일인지 체크
+ * @param {*} fileId 파일의 ID
+ */
+export async function checkAttachableFile(fileId) {
+    let file
+    try {
+        file = await File.findById(fileId + '')
+    } catch (error) {
+        throw new Error('올바르지 않은 파일 ID 입니다.')
+    }
+
+    if (file.link.target) {
+        throw new Error('이미 첨부된 파일입니다.')
+    }
+
+    return true
+}
+
+/**
+ * 첨부가 가능한 파일 ID의 배열인지 체크
+ * @param {*} files 파일 ID들이 들어있는 배열
+ */
+export async function checkAttachableFileArray(files) {
+    if (!Array.isArray(files)) {
+        throw new Error('올바르지 않은 파일 ID 배열입니다.')
+    }
+
+    for (let fileId of files) {
+        await checkAttachableFile(fileId)
+    }
+    return true
+}
+
+/**
+ * 파일 오브젝트에 역참조를 등록한다.
+ * @param {*} files
+ * @param {*} target
+ * @param {*} ref
+ */
+export async function applyFileLink(files, target, ref) {
+    if (!Array.isArray(files)) {
+        files = [files]
+    }
+    for (let fileId of files) {
+        const file = await File.findById(fileId)
+        file.link = {
+            target,
+            ref,
+        }
+
+        file.markModified('link')
+
+        await file.save()
+    }
+}
+
+/**
+ * 해당 파일을 삭제한다.
+ * @param {*} fileId
+ */
+export async function deleteFile(fileId) {
+    const file = await File.findById(fileId)
+    try {
+        await fs.promises.unlink(path.join(uploadDir, file.id))
+    } catch (error) {
+        //
+    }
 }

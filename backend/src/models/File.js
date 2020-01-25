@@ -34,6 +34,15 @@ const fileSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+
+    link: {
+        target: {
+            type: String,
+        },
+        ref: {
+            type: String,
+        },
+    },
 })
 
 fileSchema.methods.increaseHit = function() {

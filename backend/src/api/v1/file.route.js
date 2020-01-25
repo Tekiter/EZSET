@@ -10,6 +10,7 @@ import {
     getFileInfo,
     getFilePath,
     increaseFileHit,
+    setUploadExpireTimeout,
 } from '../../utils/file'
 import { asyncRoute, validateParams } from '../../utils/api'
 import { param } from 'express-validator'
@@ -37,6 +38,7 @@ router.post(
     '/upload',
     upload.single('file'),
     asyncRoute(async (req, res) => {
+        setUploadExpireTimeout(req.file)
         res.json({
             id: req.file.filename,
             size: req.file.size,
