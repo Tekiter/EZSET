@@ -69,6 +69,7 @@ export default {
         })
         this.$socket.on('attendance', data => {
             this.flag = data.flag
+            console.log(data.flag)
         })
         try {
             const res = await axios.get('attendance/attendanceCheck')
@@ -100,6 +101,9 @@ export default {
                 console.log(err)
             }
             this.$socket.emit('attendance', {
+                flag: true,
+            })
+            this.$socket.emit('start', {
                 flag: true,
             })
             this.flag = true

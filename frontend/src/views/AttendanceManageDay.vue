@@ -112,6 +112,11 @@
             </template>
         </v-simple-table>
         <div>
+            <v-alert type="warning" v-if="statusData == undefind">
+                출석정보가 없습니다.
+            </v-alert>
+        </div>
+        <div>
             <v-alert type="error" v-if="!$perm('attendance').can('read')">
                 권한이 없습니다.
             </v-alert>
