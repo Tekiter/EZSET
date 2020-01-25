@@ -50,4 +50,13 @@ fileSchema.methods.increaseHit = function() {
     return this.save()
 }
 
+fileSchema.methods.hasLink = function() {
+    if (this.link) {
+        if (this.link.target) {
+            return true
+        }
+    }
+    return false
+}
+
 export default mongoose.model('File', fileSchema)

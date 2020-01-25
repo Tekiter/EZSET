@@ -38,7 +38,9 @@ router.post(
     '/upload',
     upload.single('file'),
     asyncRoute(async (req, res) => {
-        setUploadExpireTimeout(req.file)
+        // 업로드 이후 5분동안 첨부가 없으면, 파일을 자동 삭제한다.
+        setUploadExpireTimeout(req.file.filename, 300000)
+
         res.json({
             id: req.file.filename,
             size: req.file.size,

@@ -119,8 +119,13 @@ export async function increaseFileHit(file_id) {
     await file.increaseHit()
 }
 
-export function setUploadExpireTimeout(file) {
-    setTimeout(() => {}, 600000)
+export function setUploadExpireTimeout(fileId, timeout) {
+    setTimeout(async () => {
+        const file = await File.findById(fileId)
+        if (!file.hasLink()) {
+            await deleteFile(fileId)
+        }
+    }, timeout)
 }
 
 /**
@@ -135,7 +140,7 @@ export async function checkAttachableFile(fileId) {
         throw new Error('올바르지 않은 파일 ID 입니다.')
     }
 
-    if (file.link.target) {
+    if (file.hasLink()) {
         throw new Error('이미 첨부된 파일입니다.')
     }
 
@@ -191,4 +196,5 @@ export async function deleteFile(fileId) {
     } catch (error) {
         //
     }
+    await file.remove()
 }
