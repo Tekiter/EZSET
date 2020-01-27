@@ -48,6 +48,12 @@ const routes = [{
         component: () =>
             import ('../views/AttendanceManagMonth.vue'),
     },
+    {
+        path: '/attendanceManageMonthUser',
+        name: 'attendanceManageMonthUser',
+        component: () =>
+            import ('../views/AttendanceManagMonthUser.vue'),
+    },
 ]
 
 const router = new VueRouter({

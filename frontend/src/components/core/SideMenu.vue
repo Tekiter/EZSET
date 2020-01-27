@@ -52,9 +52,14 @@ export default {
                             perm: this.$perm('attendance').can('update'),
                         },
                         {
-                            title: '월별출석현황',
+                            title: '월별출석현황(관리자)',
                             to: '/AttendanceManageMonth',
                             perm: this.$perm('attendance').can('read'),
+                        },
+                        {
+                            title: '월별출석현황(사용자)',
+                            to: '/AttendanceManageMonthUser',
+                            perm: this.$perm('attendance').canOwn('read'),
                         },
                     ],
                 },

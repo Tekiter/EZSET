@@ -214,12 +214,31 @@ router.get(
     })
 )
 
+//attendanceUser Collection에서 모든 정보를 가져옴
+// 월별출결관리(관리자)페이지에서 사용
 router.get(
     '/attendanceUserListData',
     [perm('attendance').can('read')],
     asyncRoute(async function(req, res) {
         try {
             const attendnaceUser = await AttendanceUser.find()
+            res.json(attendnaceUser)
+        } catch (err) {
+            res.status(501).json()
+        }
+    })
+)
+
+//attendanceUser Collection에서 현재 접속중인 사용자의 정보를 가져옴
+// 월별출결관리(사용자)페이지에서 사용
+router.get(
+    '/attendanceUserData',
+    [perm('attendance').canOwn('read')],
+    asyncRoute(async function(req, res) {
+        try {
+            const attendnaceUser = await AttendanceUser.find()
+                .where('name')
+                .equals(req.user.username)
             res.json(attendnaceUser)
         } catch (err) {
             res.status(501).json()
