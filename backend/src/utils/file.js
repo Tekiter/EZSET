@@ -190,11 +190,14 @@ export async function applyFileLink(files, target, ref) {
  * @param {*} fileId
  */
 export async function deleteFile(fileId) {
-    const file = await File.findById(fileId)
     try {
-        await fs.promises.unlink(path.join(uploadDir, file.id))
-    } catch (error) {
-        //
-    }
-    await file.remove()
+        const file = await File.findById(fileId)
+        try {
+            await fs.promises.unlink(path.join(uploadDir, file.id))
+        } catch (error) {
+            //
+        }
+
+        await file.remove()
+    } catch (error) {}
 }

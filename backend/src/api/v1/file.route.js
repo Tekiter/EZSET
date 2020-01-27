@@ -11,6 +11,7 @@ import {
     getFilePath,
     increaseFileHit,
     setUploadExpireTimeout,
+    deleteFile,
 } from '../../utils/file'
 import { asyncRoute, validateParams } from '../../utils/api'
 import { param } from 'express-validator'
@@ -26,6 +27,7 @@ router.get(
         if (fileinfo) {
             res.json(fileinfo)
         } else {
+            // await deleteFile(req.params.file_id)
             const err = new Error('존재하지 않는 파일입니다.')
             err.status = 404
             throw err
@@ -59,7 +61,7 @@ router.get(
             res.download(fullpath, fileinfo.filename, async err => {
                 if (err) {
                     res.status(404).json({
-                        message: '파일을 다운로드 할 수 없습니다.',
+                        message: '삭제된 파일입니다.',
                     })
                 } else {
                     await increaseFileHit(req.params.file_id)
