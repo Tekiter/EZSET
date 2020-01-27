@@ -10,6 +10,7 @@ import {
     getFileInfoArray,
     removeFileLink,
     deleteUnlinkedFile,
+    checkIsFileOwner,
 } from '../../utils/file'
 const router = Router()
 
@@ -93,6 +94,12 @@ router.post(
                 res.status(404).json({ message: 'no board id ' + boardId })
                 return
             }
+            if (!checkIsFileOwner(req.body.files)) {
+                const err = new Error('올바르지 않은 첨부파일입니다.')
+                err.status = 400
+                throw err
+            }
+
             const post = new Post({
                 board: boardId,
                 title: req.body.title,
@@ -174,8 +181,11 @@ router.patch(
                 return
             }
 
-            // for (let fileId of req.body.files) {
-            // }
+            if (!checkIsFileOwner(req.body.files)) {
+                const err = new Error('올바르지 않은 첨부파일입니다.')
+                err.status = 400
+                throw err
+            }
 
             if (req.body.content) {
                 post.title = req.body.title
@@ -188,7 +198,7 @@ router.patch(
             await removeFileLink(prevFiles)
 
             // 새로운 파일들의 역참조 등록
-            await applyFileLink(req.body.files, 'board', newpost.id)
+            await applyFileLink(req.body.files, 'boardPost', newpost.id)
             newpost.files = req.body.files
 
             await newpost.save()

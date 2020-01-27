@@ -245,3 +245,16 @@ export async function deleteFile(fileId) {
         await file.remove()
     } catch (error) {}
 }
+
+export async function checkIsFileOwner(files, username) {
+    if (!Array.isArray(files)) {
+        files = [files]
+    }
+    for (let fileId in files) {
+        const file = await File.findById(fileId)
+        if (file.uploader !== username) {
+            return false
+        }
+    }
+    return true
+}
