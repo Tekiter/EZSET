@@ -4,7 +4,9 @@
         outlined
         :loading="loading"
         @drop.prevent="addFileByDragDrop"
-        @dragover.prevent
+        @dragover.prevent=""
+        @dragenter.prevent="showDroppable"
+        @dragleave.prevent="hideDroppable"
     >
         <v-card-subtitle>
             <v-icon>mdi-paperclip</v-icon>
@@ -27,6 +29,23 @@
                 >or Drag and Drop...</span
             >
         </v-card-text>
+        <!-- <p v-if="dragOver">
+            gogo
+        </p> -->
+
+        <v-fade-transition>
+            <v-row
+                class="overlay"
+                v-show="dragOver"
+                align="center"
+                justify="center"
+            >
+                <v-col cols="3">
+                    <v-icon class="display-3">mdi-plus</v-icon>
+                </v-col>
+            </v-row>
+        </v-fade-transition>
+
         <input
             type="file"
             class="d-none"
@@ -36,7 +55,23 @@
         />
     </v-card>
 </template>
+<style scoped>
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.1);
+}
 
+/* v-card * {
+    pointer-events: none;
+} */
+</style>
 <script>
 export default {
     props: {
@@ -56,7 +91,13 @@ export default {
         return {
             selectedFiles: [],
             fileinput: [],
+            dragCount: 0,
         }
+    },
+    computed: {
+        dragOver() {
+            return this.dragCount != 0
+        },
     },
     methods: {
         showFileUploadDialog() {
@@ -73,6 +114,7 @@ export default {
                     this.addFile(file)
                 })
             }
+            this.hideDroppable()
         },
         addFile(file) {
             this.selectedFiles.push({
@@ -84,6 +126,12 @@ export default {
         },
         removeFile(idx) {
             this.selectedFiles.splice(idx, 1)
+        },
+        showDroppable() {
+            this.dragCount += 1
+        },
+        hideDroppable() {
+            this.dragCount -= 1
         },
     },
     watch: {

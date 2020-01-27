@@ -9,6 +9,7 @@
             depressed
             outlined
             color="green"
+            class="mr-2"
         >
             {{ file.filename }}
             <v-icon class="ml-1">mdi-file-outline</v-icon>
