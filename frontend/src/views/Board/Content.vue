@@ -264,7 +264,7 @@
 import axios from 'axios'
 import moment from 'moment'
 import { Viewer } from '@toast-ui/vue-editor'
-import FileDownload from '../../components/core/FileDownload.vue'
+import FileDownload from '../../components/file/FileDownload.vue'
 
 export default {
     components: {

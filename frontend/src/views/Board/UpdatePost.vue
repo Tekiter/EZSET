@@ -18,6 +18,10 @@
                     :options="editor.options"
                     :value="content"
                 />
+                <file-upload
+                    v-model="uploadFile.selected"
+                    :uploaded="uploadFile.uploaded"
+                ></file-upload>
                 <div class="d-flex mt-3">
                     <v-spacer></v-spacer>
                     <v-btn
@@ -32,73 +36,17 @@
                 </div>
             </v-card-text>
         </v-card>
-        <!-- <div>
-            <v-text-field
-                v-if="loading"
-                color="blue darken-2"
-                loading
-                disabled
-            ></v-text-field>
-        </div>
-        <v-divider class="mx-4" inset vertical></v-divider>
-
-        <v-toolbar-title class="d-flex justify-center"
-            ><h3>
-                <strong class="blue--text text--darken-2">게시글 수정</strong>
-            </h3></v-toolbar-title
-        >
-        <v-divider class="mx-4" inset vertical></v-divider>
-        <v-form>
-            <v-text-field
-                v-model="title"
-                label="Title"
-                single-line
-                full-width
-                hide-details
-            ></v-text-field>
-            <v-divider></v-divider>
-            <editor
-                ref="editor"
-                mode="wysiwyg"
-                :options="editor.options"
-                :value="content"
-            />
-        </v-form>
-        <v-row>
-            <v-col></v-col>
-            <v-col></v-col>
-            <v-col>
-                <div class="d-flex flex-row-reverse">
-                    <v-btn
-                        class="ma-2"
-                        tile
-                        outlined
-                        color="blue darken-3"
-                        @click="clearClick"
-                    >
-                        <v-icon left>mdi-keyboard-backspace</v-icon> CLEAR
-                    </v-btn>
-                    <v-btn
-                        class="ma-2"
-                        tile
-                        outlined
-                        color="blue darken-3"
-                        @click="updateClick"
-                    >
-                        <v-icon left>mdi-pencil</v-icon> UPDATE
-                    </v-btn>
-                </div>
-            </v-col>
-        </v-row> -->
     </v-container>
 </template>
 <script>
 import axios from 'axios'
 import { Editor } from '@toast-ui/vue-editor'
+import fileUpload from '../../components/file/FileUpload.vue'
 
 export default {
     components: {
         Editor,
+        fileUpload,
     },
     data() {
         return {
@@ -114,6 +62,11 @@ export default {
                     language: 'ko',
                 },
             },
+            uploadFile: {
+                selected: [],
+                uploaded: [],
+                isLoading: false,
+            },
         }
     },
     methods: {
@@ -127,6 +80,14 @@ export default {
             )
             this.title = res.data.title
             this.content = res.data.content
+
+            this.uploadFile.uploaded = res.data.files.map(file => {
+                return {
+                    filename: file.filename,
+                    id: file.id,
+                }
+            })
+
             this.loading = false
         },
         clearClick() {
@@ -137,15 +98,39 @@ export default {
         async updateClick() {
             const content = this.getMarkdown()
 
+            const fileIds = this.uploadFiles()
+
             await axios.patch('/simple/posts/' + this.$route.params.post_id, {
                 title: this.title,
                 content: content,
-                created_date: Date.now(),
+                files: fileIds,
             })
             this.$router.push(`/post/${this.$route.params.post_id}`)
         },
         getMarkdown() {
             return this.$refs.editor.invoke('getMarkdown')
+        },
+        async uploadFiles() {
+            const fileIds = []
+
+            if (this.uploadFile.selected.length > 0) {
+                this.uploadFile.isLoading = true
+                for (let file of this.uploadFile.selected) {
+                    if (file.uploaded) {
+                        fileIds.push(file.id)
+                        continue
+                    }
+                    let form = new FormData()
+                    form.append('file', file.file)
+
+                    const res = await axios.post('file/upload', form, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    })
+                    fileIds.push(res.data.id)
+                }
+                this.uploadFile.isLoading = false
+            }
+            return fileIds
         },
     },
     async created() {

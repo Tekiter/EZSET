@@ -1,7 +1,7 @@
 <template>
     <div class="d-flex" v-if="files.length > 0">
         <v-spacer></v-spacer>
-        <v-subheader>파일 첨부</v-subheader>
+        <v-subheader>첨부</v-subheader>
         <v-btn
             v-for="file in files"
             :key="file.id"
@@ -17,7 +17,6 @@
 </template>
 
 <script>
-// import fileDownload from 'js-file-download'
 import download from 'downloadjs'
 import axios from 'axios'
 

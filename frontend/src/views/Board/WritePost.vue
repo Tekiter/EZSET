@@ -13,7 +13,7 @@
                     class="mb-4"
                 ></v-text-field>
                 <editor ref="editor" mode="wysiwyg" :options="editor.options" />
-                <file-upload v-model="uploadFile.files"></file-upload>
+                <file-upload v-model="uploadFile.selected"></file-upload>
                 <div class="d-flex mt-3">
                     <v-spacer></v-spacer>
                     <v-btn
@@ -33,7 +33,7 @@
 <script>
 import axios from 'axios'
 import { Editor } from '@toast-ui/vue-editor'
-import FileUpload from '../../components/core/FileUpload'
+import FileUpload from '../../components/file/FileUpload'
 
 export default {
     components: {
@@ -57,7 +57,7 @@ export default {
             },
 
             uploadFile: {
-                files: [],
+                selected: [],
                 isLoading: false,
             },
         }
@@ -76,21 +76,8 @@ export default {
             try {
                 const content = this.getMarkdown()
 
-                const fileIds = []
-
-                if (this.uploadFile.files.length > 0) {
-                    this.uploadFile.isLoading = true
-                    for (let file of this.uploadFile.files) {
-                        let form = new FormData()
-                        form.append('file', file)
-
-                        const res = await axios.post('file/upload', form, {
-                            headers: { 'Content-Type': 'multipart/form-data' },
-                        })
-                        fileIds.push(res.data.id)
-                    }
-                    this.uploadFile.isLoading = false
-                }
+                // 첨부파일 업로드
+                const fileIds = await this.uploadFiles()
 
                 await axios.post(
                     '/simple/boards/' + this.$route.params.board_id,
@@ -109,6 +96,27 @@ export default {
         },
         getMarkdown() {
             return this.$refs.editor.invoke('getMarkdown')
+        },
+        async uploadFiles() {
+            const fileIds = []
+
+            if (this.uploadFile.selected.length > 0) {
+                this.uploadFile.isLoading = true
+                for (let file of this.uploadFile.selected) {
+                    if (file.uploaded) {
+                        continue
+                    }
+                    let form = new FormData()
+                    form.append('file', file.file)
+
+                    const res = await axios.post('file/upload', form, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    })
+                    fileIds.push(res.data.id)
+                }
+                this.uploadFile.isLoading = false
+            }
+            return fileIds
         },
     },
     async created() {
