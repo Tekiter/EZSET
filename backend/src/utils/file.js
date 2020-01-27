@@ -140,9 +140,9 @@ export async function checkAttachableFile(fileId) {
         throw new Error('올바르지 않은 파일 ID 입니다.')
     }
 
-    if (file.hasLink()) {
-        throw new Error('이미 첨부된 파일입니다.')
-    }
+    // if (file.hasLink()) {
+    //     throw new Error('이미 첨부된 파일입니다.')
+    // }
 
     return true
 }
@@ -183,6 +183,50 @@ export async function applyFileLink(files, target, ref) {
 
         await file.save()
     }
+}
+
+/**
+ * 파일 오브젝트에 역참조를 제거한다.
+ * @param {*} files
+ */
+export async function removeFileLink(files) {
+    if (!Array.isArray(files)) {
+        files = [files]
+    }
+    for (let fileId of files) {
+        const file = await File.findById(fileId)
+        file.link = {}
+
+        file.markModified('link')
+
+        await file.save()
+    }
+}
+
+/**
+ * 역참조가 없는 파일을 삭제한다.
+ * @param {*} files
+ */
+export async function deleteUnlinkedFile(files) {
+    if (!Array.isArray(files)) {
+        files = [files]
+    }
+    for (let fileId of files) {
+        const file = await File.findById(fileId)
+
+        if (!file.hasLink()) {
+            await deleteFile(fileId)
+        }
+    }
+}
+
+export async function cleanupUnlinkedFiles() {
+    const allFiles = await File.find()
+    await deleteUnlinkedFile(
+        allFiles.map(file => {
+            return file.id
+        })
+    )
 }
 
 /**

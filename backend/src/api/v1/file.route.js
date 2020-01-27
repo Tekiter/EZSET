@@ -12,9 +12,12 @@ import {
     increaseFileHit,
     setUploadExpireTimeout,
     deleteFile,
+    deleteUnlinkedFile,
+    cleanupUnlinkedFiles,
 } from '../../utils/file'
 import { asyncRoute, validateParams } from '../../utils/api'
 import { param } from 'express-validator'
+import { perm } from '../../utils/role'
 
 const router = Router()
 
@@ -70,6 +73,15 @@ router.get(
         } else {
             res.status(404).json({ message: '존재하지 않는 파일입니다.' })
         }
+    })
+)
+
+router.post(
+    '/manage/cleanup',
+    [perm('manageServer').can('access'), validateParams],
+    asyncRoute(async (req, res) => {
+        await cleanupUnlinkedFiles()
+        res.status(200).end()
     })
 )
 export default router

@@ -95,6 +95,7 @@ export default {
                     id: file.id,
                 }
             })
+            this.$emit('input', this.selectedFiles)
         },
     },
 }

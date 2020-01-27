@@ -8,6 +8,8 @@ import {
     checkAttachableFileArray,
     applyFileLink,
     getFileInfoArray,
+    removeFileLink,
+    deleteUnlinkedFile,
 } from '../../utils/file'
 const router = Router()
 
@@ -132,6 +134,9 @@ router.delete(
                     return
                 }
 
+                await removeFileLink(post.files)
+                await deleteUnlinkedFile(post.files)
+
                 await post.delete()
                 res.status(200).json({ message: 'post deleted', target: post })
             } else {
@@ -150,7 +155,12 @@ router.delete(
 //게시글 수정
 router.patch(
     '/posts/:post_id',
-    [param('post_id').isNumeric(), body('content').isString(), validateParams],
+    [
+        param('post_id').isNumeric(),
+        body('title').isString(),
+        body('content').isString(),
+        validateParams,
+    ],
     asyncRoute(async function(req, res) {
         if (!req.user.perm('board', req.params.board_id).canOwn('update')) {
             res.status(403).end()
@@ -158,32 +168,42 @@ router.patch(
         }
         let post = await Post.findById(req.params.post_id)
 
-        try {
-            if (post) {
-                if (req.user.username != post.author) {
-                    res.status(403).end()
-                    return
-                }
-                if (req.body.content) {
-                    post.title = req.body.title
-                    post.content = req.body.content
-                    post.created_date = req.body.created_date
-                }
-                await post.save()
-
-                res.status(200).json({
-                    message: '수정 완료',
-                    target: post,
-                })
-            } else {
-                res.status(404).json({
-                    message: 'no post id' + req.params.post_id,
-                })
+        if (post) {
+            if (req.user.username != post.author) {
+                res.status(403).end()
+                return
             }
-        } catch (error) {
-            const errr = new Error('database error')
-            errr.status = 500
-            throw errr
+
+            // for (let fileId of req.body.files) {
+            // }
+
+            if (req.body.content) {
+                post.title = req.body.title
+                post.content = req.body.content
+            }
+            const newpost = await post.save()
+            const prevFiles = newpost.files
+
+            // 기존 파일들의 역참조 삭제
+            await removeFileLink(prevFiles)
+
+            // 새로운 파일들의 역참조 등록
+            await applyFileLink(req.body.files, 'board', newpost.id)
+            newpost.files = req.body.files
+
+            await newpost.save()
+
+            // 기존에는 첨부되었지만, 수정시 제거된 파일들의 처리
+            await deleteUnlinkedFile(prevFiles)
+
+            res.status(200).json({
+                message: '수정 완료',
+                target: post,
+            })
+        } else {
+            res.status(404).json({
+                message: 'no post id' + req.params.post_id,
+            })
         }
     })
 )

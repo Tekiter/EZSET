@@ -98,7 +98,7 @@ export default {
         async updateClick() {
             const content = this.getMarkdown()
 
-            const fileIds = this.uploadFiles()
+            const fileIds = await this.uploadFiles()
 
             await axios.patch('/simple/posts/' + this.$route.params.post_id, {
                 title: this.title,
