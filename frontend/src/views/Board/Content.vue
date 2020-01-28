@@ -138,7 +138,7 @@
                 </div>
             </v-col>
         </v-row>
-        <v-dialog v-model="deleteDialog.show" max-width="290">
+        <v-dialog v-model="deleteDialog.show" max-width="330">
             <v-card>
                 <v-card-title class="headline"
                     >댓글을 삭제하시겠습니까?</v-card-title
@@ -168,7 +168,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="deletePostDialog.show" max-width="290">
+        <v-dialog v-model="deletePostDialog.show" max-width="330">
             <v-card>
                 <v-card-title class="headline"
                     >글을 삭제하시겠습니까?</v-card-title
@@ -231,7 +231,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="updateCommentDialog.show" max-width="290">
+        <v-dialog v-model="updateCommentDialog.show" max-width="330">
             <v-card>
                 <v-card-title class="headline"
                     >댓글을 수정하시겠습니까?</v-card-title
