@@ -199,6 +199,7 @@ export default {
         try {
             const res = await axios.get('attendance/attendanceUserData')
             this.attendanceUserdata = res.data[0].status
+            this.updateRange(this.start, this.end)
         } catch (err) {
             console.log(err)
         }
@@ -278,30 +279,7 @@ export default {
         //기간이 변경될 시에 이벤트를 다시 가져오는 함수
         updateRange({ start, end }) {
             const events = []
-            //Min, MAX 현재 달력의 최소 일과 최대 일 시간의 범위
-            const min = new Date(`${start.date}T00:00:00`)
-            const max = new Date(`${end.date}T23:59:59`)
-            console.log('min:' + min + 'max:' + max)
-            // const days = (max.getTime() - min.getTime()) / 86400000
-            // const eventCount = this.rnd(days, days + 20)
-            // // allDay가 1일경우 종일일정으로 표시
-            // for (let i = 0; i < eventCount; i++) {
-            //     // const allDay = this.rnd(0, 3) === 0
-            //     const allDay = 1
-            //     const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-            //     const first = new Date(
-            //         firstTimestamp - (firstTimestamp % 900000)
-            //     )
-            //     const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-            //     const second = new Date(first.getTime() + secondTimestamp)
-            //     // 이벤트 배열에 푸시
-            //     events.push({
-            //         name: this.names[this.rnd(0, this.names.length - 1)],
-            //         start: this.formatDate(first, !allDay),
-            //         end: this.formatDate(second, !allDay),
-            //         color: this.colors[this.rnd(0, this.colors.length - 1)],
-            //     })
-            // }
+            console.log(this.date)
             this.attendanceUserdata.map(item => {
                 //출석
                 if (item.state == 'attendance') {
