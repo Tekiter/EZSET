@@ -11,6 +11,8 @@ import {
     removeFileLink,
     deleteUnlinkedFile,
     checkIsFileOwner,
+    checkUnlinkedFile,
+    getFileLinks,
 } from '../../utils/file'
 const router = Router()
 
@@ -94,7 +96,10 @@ router.post(
                 res.status(404).json({ message: 'no board id ' + boardId })
                 return
             }
-            if (!checkIsFileOwner(req.body.files)) {
+            if (
+                !checkIsFileOwner(req.body.files) ||
+                !checkUnlinkedFile(req.body.files)
+            ) {
                 const err = new Error('올바르지 않은 첨부파일입니다.')
                 err.status = 400
                 throw err
@@ -181,10 +186,20 @@ router.patch(
                 return
             }
 
+            // 첨부할 파일들이 본인이 업로드한 파일들인지 체크
             if (!checkIsFileOwner(req.body.files)) {
                 const err = new Error('올바르지 않은 첨부파일입니다.')
                 err.status = 400
                 throw err
+            }
+            //
+            const links = await getFileLinks(req.body.files)
+            for (let link of links) {
+                if (link.target !== 'boardPost' || link.ref !== post.id) {
+                    const err = new Error('올바르지 않은 첨부파일입니다.')
+                    err.status = 400
+                    throw err
+                }
             }
 
             if (req.body.content) {

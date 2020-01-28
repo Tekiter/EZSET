@@ -246,6 +246,11 @@ export async function deleteFile(fileId) {
     } catch (error) {}
 }
 
+/**
+ * 파일들이 모두 특정 유저가 올린 것인지 확인한다.
+ * @param {*} files 파일 ID 또는 파일 ID의 배열
+ * @param {*} username 판단할 유저
+ */
 export async function checkIsFileOwner(files, username) {
     if (!Array.isArray(files)) {
         files = [files]
@@ -257,4 +262,38 @@ export async function checkIsFileOwner(files, username) {
         }
     }
     return true
+}
+
+/**
+ * 파일들이 모두 역참조가 존재하지 않는지 확인한다.
+ * @param {*} files
+ */
+export async function checkUnlinkedFile(files) {
+    if (!Array.isArray(files)) {
+        files = [files]
+    }
+    for (let fileId of files) {
+        const file = await File.findById(fileId)
+        if (file.hasLink()) {
+            return false
+        }
+    }
+    return true
+}
+
+export async function getFileLinks(files) {
+    if (!Array.isArray(files)) {
+        files = [files]
+    }
+    const res = []
+    for (let fileId of files) {
+        const file = await File.findById(fileId)
+        if (file.hasLink()) {
+            res.push({
+                target: file.link.target,
+                ref: file.link.ref,
+            })
+        }
+    }
+    return res
 }
