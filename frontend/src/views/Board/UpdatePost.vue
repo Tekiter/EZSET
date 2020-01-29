@@ -21,6 +21,7 @@
                 <file-upload
                     v-model="uploadFile.selected"
                     :uploaded="uploadFile.uploaded"
+                    class="mt-3"
                 ></file-upload>
                 <div class="d-flex mt-3">
                     <v-spacer></v-spacer>

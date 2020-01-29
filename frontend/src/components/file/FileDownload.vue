@@ -12,7 +12,7 @@
             class="mr-2"
         >
             {{ file.filename }}
-            <v-icon class="ml-1">mdi-file-outline</v-icon>
+            <v-icon class="ml-1">{{ iconConvert(file.filename) }}</v-icon>
         </v-btn>
     </div>
 </template>
@@ -20,6 +20,34 @@
 <script>
 import download from 'downloadjs'
 import axios from 'axios'
+
+const icons = {
+    default: 'mdi-file-outline',
+    picture: 'mdi-file-image-outline',
+    document: 'mdi-file-document-outline',
+    pdf: 'mdi-file-pdf-outline',
+    music: 'mdi-file-music-outline',
+    ppt: 'mdi-file-powerpoint-outline',
+    spreadsheet: 'mdi-file-table-outline',
+}
+
+const iconExtMap = {
+    picture: ['png', 'jpg', 'jpeg', 'gif'],
+    document: ['doc', 'docx', 'txt'],
+    pdf: ['pdf'],
+    music: ['mp3', 'wav'],
+    ppt: ['ppt'],
+    spreadsheet: ['xls', 'xlsx'],
+}
+
+const extIconMap = {}
+
+// 확장자-아이콘 쌍의 Object로 변환
+Object.keys(iconExtMap).forEach(iconName => {
+    iconExtMap[iconName].forEach(ext => {
+        extIconMap[ext] = icons[iconName]
+    })
+})
 
 export default {
     props: {
@@ -39,6 +67,19 @@ export default {
             })
             const blob = new Blob([res.data])
             download(blob, file.filename)
+        },
+        iconConvert(filename) {
+            const ext = filename
+                .toLowerCase()
+                .split('.')
+                .reverse()[0]
+
+            const icon = extIconMap[ext]
+            if (icon) {
+                return icon
+            } else {
+                return icons.default
+            }
         },
     },
 }

@@ -13,7 +13,10 @@
                     class="mb-4"
                 ></v-text-field>
                 <editor ref="editor" mode="wysiwyg" :options="editor.options" />
-                <file-upload v-model="uploadFile.selected"></file-upload>
+                <file-upload
+                    v-model="uploadFile.selected"
+                    class="mt-3"
+                ></file-upload>
                 <div class="d-flex mt-3">
                     <v-spacer></v-spacer>
                     <v-btn

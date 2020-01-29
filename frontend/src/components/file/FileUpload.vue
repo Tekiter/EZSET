@@ -1,6 +1,5 @@
 <template>
     <v-card
-        elevation="1"
         outlined
         :loading="loading"
         @drop.prevent="addFileByDragDrop"
@@ -26,7 +25,7 @@
                 <v-icon>mdi-plus</v-icon>
             </v-btn>
             <span class="ml-3" v-if="selectedFiles.length == 0"
-                >or Drag and Drop...</span
+                >또는 파일을 끌어다 넣으세요...</span
             >
         </v-card-text>
         <!-- <p v-if="dragOver">
