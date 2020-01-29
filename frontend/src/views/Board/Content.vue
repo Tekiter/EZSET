@@ -8,7 +8,7 @@
             <v-list class="mt-3">
                 <v-skeleton-loader
                     v-for="i in 3"
-                    :key="i"
+                    :key="`loader-${i}`"
                     type="list-item-three-line"
                 ></v-skeleton-loader>
             </v-list>
@@ -17,21 +17,26 @@
             <v-row v-if="!loading">
                 <v-col>
                     <v-card outlined>
-                        <v-card-title class="pb-5"
-                            >제목 {{ post.title }}</v-card-title
-                        >
-                        <v-card-subtitle class="row">
+                        <v-card-title>{{ post.title }}</v-card-title>
+                        <!-- <v-subheader class="row">
                             <div class="col" v-if="post.isAnonymous == false">
                                 작성자 {{ post.author }}
                             </div>
                             <div class="col" v-else>작성자 {{ '익명' }}</div>
                             <div class="col">
-                                <div class="justify-center">
-                                    <p>작성일 {{ post.created_date }}</p>
-                                </div>
+                                <p>작성일 {{ post.created_date }}</p>
                             </div>
+                        </v-subheader> -->
+                        <v-card-subtitle class="mt-0">
+                            <v-row no-gutters>
+                                <v-col v-if="post.isAnonymous == false"
+                                    >asdf</v-col
+                                >
+                                <v-col v-else>익명</v-col>
+                                <v-col>작성일 {{ post.created_date }}</v-col>
+                            </v-row>
                         </v-card-subtitle>
-                        <v-divider class="mx-4"></v-divider>
+                        <v-divider></v-divider>
                         <v-card-text>
                             <!-- {{ post.content }} -->
                             <viewer :value="post.content" />
@@ -132,7 +137,9 @@
                                         </v-btn>
                                     </template>
                                 </v-list-item>
-                                <v-divider :key="idx"></v-divider>
+                                <v-divider
+                                    :key="`comment-divider-${idx}`"
+                                ></v-divider>
                             </template>
                             <v-list-item>
                                 <v-list-item-content>
