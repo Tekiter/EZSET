@@ -11,8 +11,6 @@ import {
     getFilePath,
     increaseFileHit,
     setUploadExpireTimeout,
-    deleteFile,
-    deleteUnlinkedFile,
     cleanupUnlinkedFiles,
 } from '../../utils/file'
 import { asyncRoute, validateParams } from '../../utils/api'

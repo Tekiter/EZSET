@@ -133,9 +133,9 @@ export function setUploadExpireTimeout(fileId, timeout) {
  * @param {*} fileId 파일의 ID
  */
 export async function checkAttachableFile(fileId) {
-    let file
+    // let file
     try {
-        file = await File.findById(fileId + '')
+        await File.findById(fileId + '')
     } catch (error) {
         throw new Error('올바르지 않은 파일 ID 입니다.')
     }
