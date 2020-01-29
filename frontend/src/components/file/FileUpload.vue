@@ -1,30 +1,40 @@
 <template>
     <v-card
         outlined
-        :loading="loading"
+        :disabled="uploading"
         @drop.prevent="addFileByDragDrop"
         @dragover.prevent=""
         @dragenter.prevent="showDroppable"
         @dragleave.prevent="hideDroppable"
     >
-        <v-card-subtitle>
+        <v-card-subtitle class="d-flex">
             <v-icon>mdi-paperclip</v-icon>
-            <span class="ml-2">파일 첨부</span>
+            <span class="ml-2" v-if="!uploading">파일 첨부</span>
+            <span class="ml-2" v-else>파일 업로드 중...</span>
+            <v-fade-transition>
+                <div class="flex-grow-1 ml-3" v-if="uploading">
+                    <v-progress-linear :value="loadingProgress" height="15">
+                        <template v-slot="{ value }">
+                            <strong>{{ Math.ceil(value) }}%</strong>
+                        </template>
+                    </v-progress-linear>
+                </div>
+            </v-fade-transition>
         </v-card-subtitle>
-        <v-card-text class="d-flex">
+        <v-card-text class="d-flex flex-wrap">
             <v-chip
                 v-for="(fileinfo, idx) in selectedFiles"
                 :key="idx"
                 @click:close="removeFile(idx)"
                 close
                 :color="fileinfo.uploaded ? 'green' : ''"
-                class="mr-2"
+                class="mr-2 mt-1"
                 >{{ fileinfo.filename }}</v-chip
             >
-            <v-btn small icon @click="showFileUploadDialog">
+            <v-btn small icon @click="showFileUploadDialog" class="mt-1">
                 <v-icon>mdi-plus</v-icon>
             </v-btn>
-            <span class="ml-3" v-if="selectedFiles.length == 0"
+            <span class="ml-3 mt-1" v-if="selectedFiles.length == 0"
                 >또는 파일을 끌어다 넣으세요...</span
             >
         </v-card-text>
@@ -85,6 +95,18 @@ export default {
                 return []
             },
         },
+        uploading: {
+            type: Boolean,
+            default: false,
+        },
+        currentProgress: {
+            type: Number,
+            default: 0,
+        },
+        fileProgress: {
+            type: Number,
+            default: 0,
+        },
     },
     data() {
         return {
@@ -96,6 +118,13 @@ export default {
     computed: {
         dragOver() {
             return this.dragCount != 0
+        },
+        loadingProgress() {
+            const totalFiles = this.selectedFiles.length - this.uploaded.length
+            return (
+                this.currentProgress / totalFiles +
+                (this.fileProgress * 100) / totalFiles
+            )
         },
     },
     methods: {
@@ -144,6 +173,8 @@ export default {
             })
             this.$emit('input', this.selectedFiles)
         },
+        currentProgress(val) {},
+        fileProgress(val) {},
     },
 }
 </script>

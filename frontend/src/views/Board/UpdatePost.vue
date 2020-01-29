@@ -21,6 +21,9 @@
                 <file-upload
                     v-model="uploadFile.selected"
                     :uploaded="uploadFile.uploaded"
+                    :currentProgress="uploadFile.currentProgress"
+                    :fileProgress="uploadFile.fileProgress"
+                    :uploading="uploadFile.isUploading"
                     class="mt-3"
                 ></file-upload>
                 <div class="d-flex mt-3">
@@ -67,6 +70,9 @@ export default {
                 selected: [],
                 uploaded: [],
                 isLoading: false,
+                isUploading: false,
+                currentProgress: 0,
+                fileProgress: 0,
             },
         }
     },
@@ -114,19 +120,32 @@ export default {
         async uploadFiles() {
             const fileIds = []
 
-            if (this.uploadFile.selected.length > 0) {
-                this.uploadFile.isLoading = true
+            const fileCount = this.uploadFile.selected.length
+
+            if (fileCount > 0) {
+                this.uploadFile.isUploading = true
+                this.uploadFile.fileProgress = 0
+
                 for (let file of this.uploadFile.selected) {
                     if (file.uploaded) {
                         fileIds.push(file.id)
+                        // this.uploadFile.fileProgress += 1
                         continue
                     }
                     let form = new FormData()
                     form.append('file', file.file)
+                    this.uploadFile.currentProgress = 0
 
                     const res = await axios.post('file/upload', form, {
                         headers: { 'Content-Type': 'multipart/form-data' },
+                        // 진행상황 반영
+                        onUploadProgress(e) {
+                            this.uploadFile.currentProgress += Math.floor(
+                                (e.loaded * 100) / e.total
+                            )
+                        },
                     })
+                    this.uploadFile.fileProgress += 1
                     fileIds.push(res.data.id)
                 }
                 this.uploadFile.isLoading = false
