@@ -39,6 +39,10 @@ let postSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    isAnonymous: {
+        type: Boolean,
+        default: false,
+    },
     view: { type: Number, default: 0 },
     like: [{ liker: { type: String } }],
     comments: [commentSchema],

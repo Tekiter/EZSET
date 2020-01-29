@@ -15,7 +15,10 @@
                         >제목 {{ post.title }}</v-card-title
                     >
                     <v-card-subtitle class="row">
-                        <div class="col">작성자 {{ post.author }}</div>
+                        <div class="col" v-if="post.isAnonymous == false">
+                            작성자 {{ post.author }}
+                        </div>
+                        <div class="col" v-else>작성자 {{ '익명' }}</div>
                         <div class="col">
                             <div class="justify-center">
                                 <p>작성일 {{ post.created_date }}</p>
@@ -280,6 +283,7 @@ export default {
                 title: '',
                 content: '',
                 author: '',
+                isAnonymous: '',
                 created_date: '',
                 comment: '',
                 files: [],
@@ -353,7 +357,7 @@ export default {
         delPost() {
             axios.delete('/simple/posts/' + this.post._id)
             this.$router.push({
-                path: `/board`,
+                path: `/`,
             })
         },
         fetch_id(id) {
