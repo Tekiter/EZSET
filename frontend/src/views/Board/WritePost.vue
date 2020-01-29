@@ -20,12 +20,16 @@
                     :uploading="uploadFile.isUploading"
                     class="mt-3"
                 ></file-upload>
-                <div class="d-flex mt-3">
+                <div class="d-flex align-center mt-3">
                     <v-spacer></v-spacer>
+                    <small class="red--text mr-3" v-if="isError"
+                        >게시글 작성에 실패했습니다.</small
+                    >
                     <v-btn
                         class="ma-2"
                         tile
                         outlined
+                        :disabled="isLoading"
                         color="blue darken-3"
                         @click="submitClick"
                     >
@@ -56,6 +60,8 @@ export default {
             view: '',
             comment: '',
             curBoardName: '',
+            isLoading: false,
+            isError: false,
             editor: {
                 options: {
                     language: 'ko',
@@ -64,7 +70,6 @@ export default {
 
             uploadFile: {
                 selected: [],
-                isLoading: false,
                 isUploading: false,
                 currentProgress: 0,
                 fileProgress: 0,
@@ -83,6 +88,8 @@ export default {
         },
         async submitClick() {
             try {
+                this.isLoading = true
+
                 const content = this.getMarkdown()
 
                 // 첨부파일 업로드
@@ -100,7 +107,9 @@ export default {
                     path: `/board/${this.$route.params.board_id}`,
                 })
             } catch (error) {
-                console.log(error)
+                this.isError = true
+            } finally {
+                this.isLoading = false
             }
         },
         getMarkdown() {

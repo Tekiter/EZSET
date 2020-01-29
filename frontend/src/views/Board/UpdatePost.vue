@@ -26,13 +26,17 @@
                     :uploading="uploadFile.isUploading"
                     class="mt-3"
                 ></file-upload>
-                <div class="d-flex mt-3">
+                <div class="d-flex align-center mt-3">
                     <v-spacer></v-spacer>
+                    <small class="red--text mr-3" v-if="isError"
+                        >게시글 작성에 실패했습니다.</small
+                    >
                     <v-btn
                         class="ma-2"
                         tile
                         outlined
                         color="blue darken-3"
+                        :disabled="isLoading"
                         @click="updateClick"
                     >
                         <v-icon left>mdi-pencil</v-icon> 수정
@@ -61,6 +65,8 @@ export default {
             post_id: '',
             loading: true,
             curBoardName: '',
+            isLoading: false,
+            isError: false,
             editor: {
                 options: {
                     language: 'ko',
@@ -69,7 +75,6 @@ export default {
             uploadFile: {
                 selected: [],
                 uploaded: [],
-                isLoading: false,
                 isUploading: false,
                 currentProgress: 0,
                 fileProgress: 0,
@@ -103,16 +108,27 @@ export default {
             })
         },
         async updateClick() {
-            const content = this.getMarkdown()
+            try {
+                this.isLoading = true
 
-            const fileIds = await this.uploadFiles()
+                const content = this.getMarkdown()
 
-            await axios.patch('/simple/posts/' + this.$route.params.post_id, {
-                title: this.title,
-                content: content,
-                files: fileIds,
-            })
-            this.$router.push(`/post/${this.$route.params.post_id}`)
+                const fileIds = await this.uploadFiles()
+
+                await axios.patch(
+                    '/simple/posts/' + this.$route.params.post_id,
+                    {
+                        title: this.title,
+                        content: content,
+                        files: fileIds,
+                    }
+                )
+                this.$router.push(`/post/${this.$route.params.post_id}`)
+            } catch (error) {
+                this.isError = true
+            } finally {
+                this.isLoading = false
+            }
         },
         getMarkdown() {
             return this.$refs.editor.invoke('getMarkdown')
