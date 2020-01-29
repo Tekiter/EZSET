@@ -72,6 +72,7 @@ export default {
                     username: this.user.username,
                     password: this.user.password,
                 })
+                await this.$store.dispatch('role/fetchPermission')
 
                 let to
                 if (this.$route.query.redirect) {
@@ -82,7 +83,7 @@ export default {
                 this.$router.push({ path: to })
                 return
             } catch (error) {
-                console.log(error.data.message)
+                // console.log(error.data.message)
                 this.errorMsg = error.data.message
             }
             this.loading = false

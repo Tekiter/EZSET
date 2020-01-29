@@ -7,9 +7,16 @@ export function setDefaultRole(roles) {
 
         .resource('role')
         .canOwn('read')
+
+        .resource('board')
+        .can('read')
+
+        .resource('attendance')
+        .can('att')
 }
 
 export function setAdminRole(roles) {
+    roles.setRole({ tag: 'admin', name: 'admin' })
     roles
         .role('admin')
 
@@ -17,5 +24,19 @@ export function setAdminRole(roles) {
         .can(['read', 'update'])
 
         .resource('role')
-        .canOwn(['read', 'create', 'delete'])
+        .can(['read', 'create', 'delete', 'update'])
+
+        .resource('board')
+        .can(['read', 'create', 'delete'])
+
+        .resource('manageUsers')
+        .can('access')
+        .resource('manageRoles')
+        .can('access')
+
+        .resource('manageBoards')
+        .can('access')
+
+        .resource('attendance')
+        .can(['start', 'att'])
 }

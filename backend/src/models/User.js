@@ -18,7 +18,9 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.Mixed,
         default: {},
     },
-    roles: { type: [String] },
+    roles: {
+        type: [String],
+    },
 })
 
 userSchema

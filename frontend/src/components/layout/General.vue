@@ -14,9 +14,7 @@
             <v-menu offset-y :nudge-width="200">
                 <template v-slot:activator="{ on }">
                     <v-btn text large v-on="on" class="text-none">
-                        {{
-                        user.username
-                        }}
+                        {{ user.username }}
                     </v-btn>
                 </template>
                 <v-card>
@@ -27,9 +25,7 @@
                             </v-list-item-avatar>
                             <v-list-item-content>
                                 <v-list-item-title>
-                                    {{
-                                    user.username
-                                    }}
+                                    {{ user.username }}
                                 </v-list-item-title>
                                 <v-list-item-subtitle></v-list-item-subtitle>
                             </v-list-item-content>
@@ -50,7 +46,7 @@
             <router-view></router-view>
         </v-content>
 
-        <v-footer app>&copy; EZSET</v-footer>
+        <!-- <v-footer app>&copy; EZSET</v-footer> -->
     </v-app>
 </template>
 <style scoped></style>
@@ -73,6 +69,7 @@ export default {
     methods: {
         async logout() {
             await this.$store.dispatch('auth/logout')
+            await this.$store.dispatch('role/destroyPermission')
             this.$router.push({ path: '/login' })
         },
     },

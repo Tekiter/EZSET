@@ -28,7 +28,9 @@ router.route('/login').post(
                     accessToken,
                 })
             } else {
-                res.status(403).json({ message: '로그인 실패' })
+                res.status(403).json({
+                    message: '로그인 실패',
+                })
             }
         } catch (error) {
             databaseError(res, error)
@@ -85,7 +87,9 @@ router.route('/register').post(
             })
             await user.save()
 
-            res.status(201).json({ message: 'success' })
+            res.status(201).json({
+                message: 'success',
+            })
         } catch (error) {
             unexpectedError(res, error)
         }
@@ -114,7 +118,6 @@ router.route('/register/doublecheck/username').post(
 router.route('/edittoken/issue').post(
     [body('username').isString(), body('password').isString(), validateParams],
     asyncRoute(async (req, res) => {
-        console.log(6)
         try {
             const user = await User.findOne()
                 .where('username')
@@ -130,7 +133,6 @@ router.route('/edittoken/issue').post(
                 res.status(403).json({ message: '토큰 발급 실패' })
             }
         } catch (error) {
-            console.log(error)
             databaseError(res, error)
         }
     })
@@ -138,7 +140,6 @@ router.route('/edittoken/issue').post(
 router.route('/edittoken/check').post(
     [body('edittoken').isString(), validateParams],
     asyncRoute(async (req, res) => {
-        console.log(11)
         try {
             const decoded = await auth.checkToken(req.body.edittoken)
             if (decoded.is_edit_token) {

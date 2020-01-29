@@ -14,7 +14,11 @@ app.use(
     })
 )
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(
+    bodyParser.urlencoded({
+        extended: false,
+    })
+)
 app.use(express.static(path.join(__dirname, '../public')))
 
 app.use('/api/v1', v1API)
@@ -29,7 +33,9 @@ app.use((req, res, next) => {
 // Error handler
 app.use((err, req, res, next) => {
     // eslint-disable-line no-unused-vars
-    res.status(err.status || 500).json({ message: err.message })
+    res.status(err.status || 500).json({
+        message: err.message,
+    })
 })
 
 export default app

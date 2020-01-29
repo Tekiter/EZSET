@@ -1,7 +1,7 @@
 import Permission from './Permission'
 import Query from './Query'
 
-class RoleSystem {
+export class RoleSystem {
     constructor(...params) {
         this._roles = {}
         this._default = new Role({ tag: 'default', name: 'default' })
@@ -52,14 +52,6 @@ class RoleSystem {
         return !!this._roles[roletag]
     }
 
-    removeRole(roletag) {
-        if (!this._roles[roletag]) {
-            throw new Error('Invalid role tag')
-        }
-
-        delete this._roles[roletag]
-    }
-
     export(roletag) {
         if (this._roles[roletag]) {
             return {
@@ -101,7 +93,7 @@ class RoleSystem {
     }
 }
 
-class Role {
+export class Role {
     constructor({ perm, name, tag }) {
         if (perm) {
             this._perm = copyPerm(perm)
@@ -173,7 +165,7 @@ function copyGrant(grant) {
     }
 }
 
-module.exports = {
-    RoleSystem,
-    Role,
-}
+// export default {
+//     RoleSystem,
+//     Role,
+// }

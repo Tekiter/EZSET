@@ -3,7 +3,6 @@ import { body } from 'express-validator'
 import auth from '../../utils/auth'
 import { validateParams, asyncRoute } from '../../utils/api'
 import User from '../../models/User'
-import { checkToken } from '../../utils/auth'
 
 const router = Router()
 
@@ -43,7 +42,6 @@ router.route('/').get(
                     throw err
                 }
                 if (decoded.username == req.body.username) {
-                    console.log(100)
                     if (req.body.password != '') {
                         let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,16}$/
                         if (!pwreg.test(req.body.password)) {
@@ -66,7 +64,6 @@ router.route('/').get(
                     }
                     if (req.body.password != '') {
                         user.password = req.body.password
-                        console.log('passwordedit')
                     }
                     user.markModified('info')
                     await user.save()
@@ -77,9 +74,7 @@ router.route('/').get(
                         message: '정상적인 접근이 아닙니다',
                     })
                 }
-            } catch (error) {
-                console.log(error)
-            }
+            } catch (error) {}
         })
     )
 

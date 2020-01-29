@@ -91,10 +91,7 @@ class Query {
         if (!Array.isArray(action)) {
             action = [action]
         }
-        return this.can(
-            action.map(i => `!${i}`),
-            type
-        )
+        return this.can(action.map(i => `!${i}`), type)
     }
 
     cannotAny(action) {
@@ -185,4 +182,4 @@ function convertToAnyOwn(permarr) {
     return { any: [...permarr], own: [...permarr] }
 }
 
-module.exports = Query
+export default Query
