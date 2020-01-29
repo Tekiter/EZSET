@@ -7,12 +7,14 @@ import vuetify from './plugins/vuetify'
 import axios from 'axios'
 
 import { checkPerm } from './utils/role/role'
+import { actionHelper } from './utils/action'
 
 Vue.config.productionTip = false
 
 Vue.use(require('vue-moment'))
 
 Vue.prototype.$perm = checkPerm
+Vue.prototype.$action = actionHelper
 
 // api 호출의 기본 경로
 axios.defaults.baseURL = '/api/v1'
