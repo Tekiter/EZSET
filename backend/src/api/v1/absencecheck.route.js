@@ -30,17 +30,33 @@ router.post(
     })
 )
 
-//absence_reason_users Collection에서 자신의 공결 현황을 전부 가지고 옴
+//officialAbsences Collection에서 자신의 공결 현황을 전부 가지고 옴
 //AttendanceManagMonth 페이지에서 사용
 router.get(
     '/absenceUserData',
     [perm('attendance').canOwn('read')],
     asyncRoute(async function(req, res) {
         try {
-            const absenceReasonUser = await AbsenceReasonUser.find()
+            const officialAbsence = await OfficialAbsence.find()
                 .where('name')
                 .equals(req.user.username)
-            res.json(absenceReasonUser)
+            res.json(officialAbsence)
+        } catch (err) {
+            res.status(501).json()
+        }
+    })
+)
+
+//officialAbsences Collection에서 자신의 공결 현황을 전부 가지고 옴
+//AttendanceManagMonth 페이지에서 사용
+router.get(
+    '/absenceUsersData/:day',
+    asyncRoute(async function(req, res) {
+        try {
+            const officialAbsence = await OfficialAbsence.find()
+                .where('day')
+                .equals(req.params.day)
+            res.json(officialAbsence)
         } catch (err) {
             res.status(501).json()
         }

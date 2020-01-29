@@ -290,7 +290,7 @@ export default {
         }
         try {
             const res = await axios.get('absencecheck/absenceUserData')
-            this.absenceUserdata = res.data[0].reasons
+            this.absenceUserdata = res.data
         } catch (err) {
             console.log(err)
         }
@@ -409,7 +409,7 @@ export default {
                         name: '공결',
                         start: moment(item.date).format('YYYY-MM-DD'),
                         end: moment(item.date).format('YYYY-MM-DD'),
-                        details: '공결하셨습니다!',
+                        details: '공결처리되었습니다!',
                         color: 'red',
                     })
                 }
@@ -417,33 +417,27 @@ export default {
             })
             //공결내역삽입
             this.absenceUserdata.map(item => {
-                item.days.map(element => {
-                    //승인전 공결
-                    if (item.approval == 'No') {
-                        events.push({
-                            name: '공결 신청',
-                            start: moment(element).format('YYYY-MM-DD'),
-                            end: moment(element).format('YYYY-MM-DD'),
-                            details:
-                                item.reason +
-                                '(의) 사유의 공결이 승인 안됐습니다.',
-                            color: 'orange',
-                        })
-                    }
-                    //승인된 공결
-                    if (item.approval == 'Yes') {
-                        events.push({
-                            name: '공결 신청',
-                            start: moment(element).format('YYYY-MM-DD'),
-                            end: moment(element).format('YYYY-MM-DD'),
-                            details:
-                                item.reason +
-                                '(의) 사유의 공결이 승인 됐습니다.',
-                            color: 'green',
-                        })
-                    }
-                    return { name: item.name }
-                })
+                if (item.approval == 'No') {
+                    events.push({
+                        name: '비승인 공결',
+                        start: moment(item.day).format('YYYY-MM-DD'),
+                        end: moment(item.day).format('YYYY-MM-DD'),
+                        details:
+                            item.reason + '(의) 사유의 공결이 승인 안됐습니다.',
+                        color: 'orange',
+                    })
+                }
+                //승인된 공결
+                if (item.approval == 'Yes') {
+                    events.push({
+                        name: '승인 공결',
+                        start: moment(item.day).format('YYYY-MM-DD'),
+                        end: moment(item.day).format('YYYY-MM-DD'),
+                        details:
+                            item.reason + '(의) 사유의 공결이 승인 됐습니다.',
+                        color: 'green',
+                    })
+                }
                 return { name: item.name }
             })
 
