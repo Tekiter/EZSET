@@ -82,7 +82,10 @@
                                         >
                                     </v-btn>
                                     <v-dialog v-model="dialog" max-width="400">
-                                        <v-card v-if="!isTokenValid">
+                                        <v-card
+                                            v-if="!isTokenValid"
+                                            :loading="isloadingToEdit"
+                                        >
                                             <v-toolbar dark color="primary">
                                                 <v-btn
                                                     icon
@@ -268,11 +271,12 @@
                             <v-col>
                                 <v-row justify="center">
                                     <v-btn
+                                        :loading="isloadingToFinishEdit"
+                                        :disabled="isloadingToFinishEdit"
                                         absolute
-                                        dark
                                         battom
                                         right
-                                        color="blue darken-3"
+                                        color="blue"
                                         @click="editFinish"
                                     >
                                         FINISH
@@ -309,7 +313,8 @@ export default {
                 confirmpassword: '',
                 email: '',
             },
-            isloading: false, //로딩하는 코드 추가 필요
+            isloadingToEdit: false,
+            isloadingToFinishEdit: false, //로딩하는 코드 추가 필요
             isEditMode: false, //수정 가능 모드
             isTokenValid: false,
             dialog: false,
@@ -346,12 +351,14 @@ export default {
         },
         async editStart() {
             try {
+                this.isloadingToEdit = true
                 this.dialog = false
                 await this.$store.dispatch('auth/issueEditToken', {
                     username: this.userinfo.username,
                     password: this.password,
                 })
                 this.isEditMode = true
+                this.isloadingToEdit = false
             } catch (error) {
                 console.log(error.response)
             }
@@ -359,6 +366,7 @@ export default {
         async editFinish() {
             // this.isloading = true 로딩 시스템 필요
             try {
+                this.isloadingToFinishEdit = true
                 const res = await axios.post('/mypage/edit', {
                     username: this.userinfo.username,
                     password: this.form.password,
@@ -368,11 +376,10 @@ export default {
                 })
                 await this.patchUser()
                 console.log(res)
+                this.isloadingToFinishEdit = false
+                this.isEditMode = false
             } catch (error) {
                 console.log(error.response)
-            } finally {
-                this.isEditMode = false
-                // this.isloading = false 로딩 시스템 필요
             }
         },
         async patchUser() {
