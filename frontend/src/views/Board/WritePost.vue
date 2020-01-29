@@ -13,6 +13,10 @@
                     class="mb-4"
                 ></v-text-field>
                 <editor ref="editor" mode="wysiwyg" :options="editor.options" />
+                <file-upload
+                    v-model="uploadFile.selected"
+                    class="mt-3"
+                ></file-upload>
                 <div class="d-flex mt-3">
                     <v-spacer></v-spacer>
                     <v-btn
@@ -25,33 +29,6 @@
                         <v-icon left>mdi-pencil</v-icon> 작성
                     </v-btn>
                 </div>
-                <!-- <div class="row">
-                    <div class="col"></div>
-                    <div class="col"></div>
-                    <div class="col">
-                        <div class="d-flex flex-row-reverse">
-                            <v-btn
-                                class="ma-2"
-                                tile
-                                outlined
-                                color="blue darken-3"
-                                @click="clearClick"
-                            >
-                                <v-icon left>mdi-keyboard-backspace</v-icon>
-                                CLEAR
-                            </v-btn>
-                            <v-btn
-                                class="ma-2"
-                                tile
-                                outlined
-                                color="blue darken-3"
-                                @click="submitClick"
-                            >
-                                <v-icon left>mdi-pencil</v-icon> SUBMIT
-                            </v-btn>
-                        </div>
-                    </div>
-                </div> -->
             </v-card-text>
         </v-card>
     </v-container>
@@ -59,10 +36,12 @@
 <script>
 import axios from 'axios'
 import { Editor } from '@toast-ui/vue-editor'
+import FileUpload from '../../components/file/FileUpload'
 
 export default {
     components: {
         Editor,
+        FileUpload,
     },
     data() {
         return {
@@ -78,6 +57,11 @@ export default {
                 options: {
                     language: 'ko',
                 },
+            },
+
+            uploadFile: {
+                selected: [],
+                isLoading: false,
             },
         }
     },
@@ -95,17 +79,15 @@ export default {
             try {
                 const content = this.getMarkdown()
 
+                // 첨부파일 업로드
+                const fileIds = await this.uploadFiles()
+
                 await axios.post(
                     '/simple/boards/' + this.$route.params.board_id,
                     {
                         title: this.title,
                         content: content,
-                        author: this.author,
-                        created_date: this.created_date,
-                        like: 0,
-                        view: 0,
-                        comment: '',
-                        _id: this._id,
+                        files: fileIds,
                     }
                 )
                 this.$router.push({
@@ -117,6 +99,27 @@ export default {
         },
         getMarkdown() {
             return this.$refs.editor.invoke('getMarkdown')
+        },
+        async uploadFiles() {
+            const fileIds = []
+
+            if (this.uploadFile.selected.length > 0) {
+                this.uploadFile.isLoading = true
+                for (let file of this.uploadFile.selected) {
+                    if (file.uploaded) {
+                        continue
+                    }
+                    let form = new FormData()
+                    form.append('file', file.file)
+
+                    const res = await axios.post('file/upload', form, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    })
+                    fileIds.push(res.data.id)
+                }
+                this.uploadFile.isLoading = false
+            }
+            return fileIds
         },
     },
     async created() {

@@ -73,6 +73,7 @@ export default {
                     password: this.user.password,
                 })
                 await this.$store.dispatch('role/fetchPermission')
+                await this.$store.dispatch('board/fetchBoards')
 
                 let to
                 if (this.$route.query.redirect) {

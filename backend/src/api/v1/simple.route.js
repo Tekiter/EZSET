@@ -4,6 +4,16 @@ import Board from '../../models/Board'
 import Post from '../../models/Post'
 import { validateParams, asyncRoute } from '../../utils/api'
 import { perm } from '../../utils/role'
+import {
+    checkAttachableFileArray,
+    applyFileLink,
+    getFileInfoArray,
+    removeFileLink,
+    deleteUnlinkedFile,
+    checkIsFileOwner,
+    checkUnlinkedFile,
+    getFileLinks,
+} from '../../utils/file'
 const router = Router()
 
 //게시판 생성
@@ -68,6 +78,9 @@ router.post(
         param('board_id').isNumeric(),
         body('title').isString(),
         body('content').isString(),
+        body('files')
+            .custom(checkAttachableFileArray)
+            .optional(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
@@ -83,6 +96,15 @@ router.post(
                 res.status(404).json({ message: 'no board id ' + boardId })
                 return
             }
+            if (
+                !checkIsFileOwner(req.body.files) ||
+                !checkUnlinkedFile(req.body.files)
+            ) {
+                const err = new Error('올바르지 않은 첨부파일입니다.')
+                err.status = 400
+                throw err
+            }
+
             const post = new Post({
                 board: boardId,
                 title: req.body.title,
@@ -93,11 +115,15 @@ router.post(
 
             let newpost = await post.save()
 
+            // DB 파일 객체에 역참조 등록
+            await applyFileLink(req.body.files, 'board', newpost.id)
+            newpost.files = req.body.files
+
+            await newpost.save()
+
             res.status(201).json(newpost)
         } catch (err) {
-            const errr = new Error('database error')
-            errr.status = 500
-            throw errr
+            throw err
         }
     })
 )
@@ -120,6 +146,9 @@ router.delete(
                     return
                 }
 
+                await removeFileLink(post.files)
+                await deleteUnlinkedFile(post.files)
+
                 await post.delete()
                 res.status(200).json({ message: 'post deleted', target: post })
             } else {
@@ -138,7 +167,12 @@ router.delete(
 //게시글 수정
 router.patch(
     '/posts/:post_id',
-    [param('post_id').isNumeric(), body('content').isString(), validateParams],
+    [
+        param('post_id').isNumeric(),
+        body('title').isString(),
+        body('content').isString(),
+        validateParams,
+    ],
     asyncRoute(async function(req, res) {
         if (!req.user.perm('board', req.params.board_id).canOwn('update')) {
             res.status(403).end()
@@ -146,32 +180,55 @@ router.patch(
         }
         let post = await Post.findById(req.params.post_id)
 
-        try {
-            if (post) {
-                if (req.user.username != post.author) {
-                    res.status(403).end()
-                    return
-                }
-                if (req.body.content) {
-                    post.title = req.body.title
-                    post.content = req.body.content
-                    post.created_date = req.body.created_date
-                }
-                await post.save()
-
-                res.status(200).json({
-                    message: '수정 완료',
-                    target: post,
-                })
-            } else {
-                res.status(404).json({
-                    message: 'no post id' + req.params.post_id,
-                })
+        if (post) {
+            if (req.user.username != post.author) {
+                res.status(403).end()
+                return
             }
-        } catch (error) {
-            const errr = new Error('database error')
-            errr.status = 500
-            throw errr
+
+            // 첨부할 파일들이 본인이 업로드한 파일들인지 체크
+            if (!checkIsFileOwner(req.body.files)) {
+                const err = new Error('올바르지 않은 첨부파일입니다.')
+                err.status = 400
+                throw err
+            }
+            //
+            const links = await getFileLinks(req.body.files)
+            for (let link of links) {
+                if (link.target !== 'boardPost' || link.ref !== post.id) {
+                    const err = new Error('올바르지 않은 첨부파일입니다.')
+                    err.status = 400
+                    throw err
+                }
+            }
+
+            if (req.body.content) {
+                post.title = req.body.title
+                post.content = req.body.content
+            }
+            const newpost = await post.save()
+            const prevFiles = newpost.files
+
+            // 기존 파일들의 역참조 삭제
+            await removeFileLink(prevFiles)
+
+            // 새로운 파일들의 역참조 등록
+            await applyFileLink(req.body.files, 'boardPost', newpost.id)
+            newpost.files = req.body.files
+
+            await newpost.save()
+
+            // 기존에는 첨부되었지만, 수정시 제거된 파일들의 처리
+            await deleteUnlinkedFile(prevFiles)
+
+            res.status(200).json({
+                message: '수정 완료',
+                target: post,
+            })
+        } else {
+            res.status(404).json({
+                message: 'no post id' + req.params.post_id,
+            })
         }
     })
 )
@@ -180,28 +237,28 @@ router.patch(
 router.get(
     '/posts/:post_id',
     [param('post_id').isNumeric(), validateParams],
-    function(req, res) {
-        Post.findOne()
+    asyncRoute(async function(req, res) {
+        const post = await Post.findOne()
             .where('_id')
             .equals(req.params.post_id)
-            .then(post => {
-                if (post)
-                    res.status(200).json({
-                        _id: parseInt(post.id),
-                        title: post.title,
-                        content: post.content,
-                        author: post.author,
-                        created_date: post.created_date,
-                        view: post.view,
-                        like: post.likes_count,
-                        comment: post.comments,
-                    })
-                else
-                    res.status(404).json({
-                        message: 'no post id ' + req.params.post_id,
-                    })
+        if (post) {
+            res.status(200).json({
+                _id: parseInt(post.id),
+                title: post.title,
+                content: post.content,
+                author: post.author,
+                created_date: post.created_date,
+                view: post.view,
+                like: post.likes_count,
+                comment: post.comments,
+                files: await getFileInfoArray(post.files),
             })
-    }
+        } else {
+            res.status(404).json({
+                message: 'no post id ' + req.params.post_id,
+            })
+        }
+    })
 )
 
 //게시글 목록 보기

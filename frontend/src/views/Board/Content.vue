@@ -25,6 +25,8 @@
                     <v-card-text>
                         <!-- {{ post.content }} -->
                         <viewer :value="post.content" />
+
+                        <file-download :files="post.files"></file-download>
                     </v-card-text>
                 </v-card>
                 <v-card outlined>
@@ -269,10 +271,12 @@
 import axios from 'axios'
 import moment from 'moment'
 import { Viewer } from '@toast-ui/vue-editor'
+import FileDownload from '../../components/file/FileDownload.vue'
 
 export default {
     components: {
         Viewer,
+        FileDownload,
     },
     data() {
         return {
@@ -284,6 +288,7 @@ export default {
                 author: '',
                 created_date: '',
                 comment: '',
+                files: [],
             },
             deleteDialog: {
                 show: false,
