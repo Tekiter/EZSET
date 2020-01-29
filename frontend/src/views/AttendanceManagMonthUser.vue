@@ -1,7 +1,7 @@
 <template>
     <v-card>
         <v-card-title
-            v-if="this.$perm('attendance').can('read')"
+            v-if="this.$perm('attendance').canOwn('read')"
             class="font-weight-thin display-3"
         >
             Monthly attendance management
@@ -10,10 +10,95 @@
                 상세 현황을 조회하실 수 있습니다.
             </blockquote>
         </v-card-title>
+
         <div
             v-if="this.$perm('attendance').canOwn('read')"
             class="font-weight-medium subtitle-2"
         >
+            <div>
+                <!-- 이 div는 결석예약을 위한 다이얼로그를 띄우는 div입니다.  -->
+                <form>
+                    <v-dialog
+                        v-model="absenceResDialog.show"
+                        persistent
+                        max-width="290"
+                    >
+                        <template v-slot:activator="{ on }">
+                            <v-btn color="primary" dark v-on="on"
+                                >결석예약</v-btn
+                            >
+                        </template>
+                        <v-card>
+                            <v-date-picker
+                                v-model="dates"
+                                multiple
+                            ></v-date-picker>
+                            <v-menu
+                                ref="menu"
+                                v-model="menu"
+                                :close-on-content-click="false"
+                                :return-value.sync="dates"
+                                transition="scale-transition"
+                                offset-y
+                                full-width
+                                min-width="290px"
+                            >
+                                <template v-slot:activator="{ on }">
+                                    <v-combobox
+                                        v-model="dates"
+                                        multiple
+                                        chips
+                                        small-chips
+                                        label="Multiple picker in menu"
+                                        prepend-icon="mdi-plus"
+                                        readonly
+                                        v-on="on"
+                                    ></v-combobox>
+                                </template>
+                                <v-date-picker
+                                    v-model="dates"
+                                    multiple
+                                    no-title
+                                    scrollable
+                                >
+                                    <v-spacer></v-spacer>
+                                    <v-btn
+                                        text
+                                        color="primary"
+                                        @click="menu = false"
+                                        >Cancel</v-btn
+                                    >
+                                    <v-btn
+                                        text
+                                        color="primary"
+                                        @click="$refs.menu.save(dates)"
+                                        >OK</v-btn
+                                    >
+                                </v-date-picker>
+                            </v-menu>
+                            <v-text-field
+                                label="결석사유"
+                                v-model="absence_reason"
+                            ></v-text-field>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn
+                                    color="green darken-1"
+                                    text
+                                    @click="absenceResDialog.show = false"
+                                    >취소</v-btn
+                                >
+                                <v-btn
+                                    color="green darken-1"
+                                    text
+                                    @click="reservation"
+                                    >확인</v-btn
+                                >
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                </form>
+            </div>
             <v-container>
                 <v-row class="fill-height">
                     <v-col>
@@ -158,7 +243,7 @@
             </v-container>
         </div>
         <div>
-            <v-alert type="error" v-if="!$perm('attendance').can('read')">
+            <v-alert type="error" v-if="!$perm('attendance').canOwn('read')">
                 권한이 없습니다.
             </v-alert>
         </div>
@@ -194,6 +279,13 @@ export default {
         selectedOpen: false,
         events: [],
         attendanceUserdata: [],
+        //결석예약
+        absenceResDialog: {
+            show: false,
+        },
+        dates: [moment(new Date()).format('YYYY-MM-DD')],
+        menu: false,
+        absence_reason: '',
     }),
     async created() {
         try {
@@ -342,6 +434,20 @@ export default {
                 ? `${a.getFullYear()}-${a.getMonth() +
                       1}-${a.getDate()} ${a.getHours()}:${a.getMinutes()}`
                 : `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()}`
+        },
+        //결석예약
+        async reservation() {
+            try {
+                await axios.post('absencecheck/absenceBook', {
+                    Reason: this.absence_reason,
+                    dayList: this.dates,
+                })
+                this.dates = [this.$moment(new Date()).format('YYYY-MM-DD')]
+                this.absence_reason = ''
+                this.absenceResDialog.show = false
+            } catch (err) {
+                console.log(err)
+            }
         },
     },
 }

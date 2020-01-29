@@ -47,22 +47,12 @@ export default {
                             perm: this.$perm('attendance').can('att'),
                         },
                         {
-                            title: '출석현황',
-                            to: '/attendancestatus',
-                            perm: this.$perm('attendance').can('att'),
-                        },
-                        {
-                            title: '일별출석현황',
-                            to: '/AttendanceManageDay',
-                            perm: this.$perm('attendance').can('update'),
-                        },
-                        {
-                            title: '월별출석현황(관리자)',
+                            title: '월별출석현황',
                             to: '/AttendanceManageMonth',
                             perm: this.$perm('attendance').can('read'),
                         },
                         {
-                            title: '월별출석현황(사용자)',
+                            title: '출석현황',
                             to: '/AttendanceManageMonthUser',
                             perm: this.$perm('attendance').canOwn('read'),
                         },
