@@ -31,7 +31,16 @@
         <v-col cols="7">
             <v-card outlined>
                 <v-card-title>게시판 설정</v-card-title>
-                <v-list> </v-list>
+                <v-list>
+                    <v-list-item v-for="board in boards" :key="board._id">
+                        <v-list-item-title>{{ board.title }}</v-list-item-title>
+                        <v-list-item-action>
+                            <v-btn icon>
+                                <v-icon>mdi-file-edit-outline</v-icon>
+                            </v-btn>
+                        </v-list-item-action>
+                    </v-list-item>
+                </v-list>
             </v-card>
         </v-col>
 
