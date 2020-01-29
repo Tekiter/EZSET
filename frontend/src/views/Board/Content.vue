@@ -22,12 +22,13 @@
                             </div>
                         </div>
                     </v-card-subtitle>
+                    <v-divider class="mx-4"></v-divider>
                     <v-card-text>
                         <!-- {{ post.content }} -->
                         <viewer :value="post.content" />
                     </v-card-text>
                 </v-card>
-                <v-card outlined>
+                <v-card class="mt-2" outlined>
                     <v-list three-lines>
                         <v-list-item
                             v-for="(comment, idx) in post.comment"
@@ -35,12 +36,12 @@
                         >
                             <template v-if="commentIdx != idx">
                                 <v-list-item-content>
-                                    <v-list-item-title
+                                    <v-list-item-title class="subtitle-2"
                                         >{{ comment.writer
                                         }}<span class="ml-3">{{
                                             comment.created_date
                                         }}</span></v-list-item-title
-                                    ><span class="mt-2">
+                                    ><span class="mt-2 subtitle-1">
                                         {{ comment.content }}</span
                                     ></v-list-item-content
                                 >
@@ -48,11 +49,7 @@
                                     icon
                                     small
                                     v-if="del_auth(comment.writer)"
-                                    @click="
-                                        commentIdx = idx
-                                        fetchComment(comment.content)
-                                        fetch_id(comment._id)
-                                    "
+                                    @click="showUpdateComment(comment, idx)"
                                 >
                                     <v-icon>mdi-file-edit-outline</v-icon>
                                 </v-btn>
@@ -61,10 +58,7 @@
                                     icon
                                     small
                                     v-if="del_auth(comment.writer)"
-                                    @click="
-                                        deleteDialog.show = true
-                                        fetch_id(comment._id)
-                                    "
+                                    @click="showDeleteComment(comment)"
                                 >
                                     <v-icon>mdi-trash-can-outline</v-icon>
                                 </v-btn>
@@ -341,6 +335,10 @@ export default {
                 return false
             }
         },
+        showDeleteComment(comment) {
+            this.deleteDialog.show = true
+            this.fetch_id(comment._id)
+        },
         async del_comment(id) {
             await axios.delete(
                 '/simple/posts/' + this.post._id + '/comment/' + id
@@ -367,6 +365,11 @@ export default {
             this.fetch_data()
             this.commentContent = ''
             this.writeCommentDialog.show = false
+        },
+        showUpdateComment(comment, idx) {
+            this.commentIdx = idx
+            this.fetchComment(comment.content)
+            this.fetch_id(comment._id)
         },
         async updateComment() {
             this.fetchCommentContent = this.editContent
