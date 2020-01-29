@@ -8,6 +8,18 @@
                 disabled
             ></v-text-field>
         </div>
+        <div>
+            <v-divider class="mx-4" inset vertical></v-divider>
+
+            <v-toolbar-title class="d-flex justify-center"
+                ><h1>
+                    <strong class="blue--text text--darken-2">{{
+                        board.title
+                    }}</strong>
+                </h1></v-toolbar-title
+            >
+            <v-divider class="mx-4" inset vertical></v-divider>
+        </div>
         <v-data-table
             :headers="headers"
             :items="posts"
@@ -16,18 +28,11 @@
             hide-default-footer
             class="elevation-1"
             @page-count="pageCount = $event"
-            @click:row="read"
         >
-            <template v-slot:top>
-                <v-divider class="mx-4" inset vertical></v-divider>
-
-                <v-toolbar-title class="d-flex justify-center"
-                    ><h1>
-                        <strong class="blue--text text--darken-2">{{
-                            board.title
-                        }}</strong>
-                    </h1></v-toolbar-title
-                >
+            <template v-slot:item.title="props">
+                <a @click="read(props.item)">
+                    {{ props.item.title }}
+                </a>
             </template>
         </v-data-table>
         <div class="row">
