@@ -89,6 +89,11 @@ const routes = [
         name: 'error404',
         component: () => import('../views/Error/404.vue'),
     },
+    {
+        path: '/mypage',
+        name: 'mypage',
+        component: () => import('../views/Mypage.vue'),
+    },
 ]
 
 const router = new VueRouter({
