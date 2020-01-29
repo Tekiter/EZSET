@@ -34,11 +34,6 @@ const routes = [
         component: () => import('../views/Attendance.vue'),
     },
     {
-        path: '/attendancestatus',
-        name: 'attendancestatus',
-        component: () => import('../views/Attendancestatus.vue'),
-    },
-    {
         path: '/attendanceManageDay/:day',
         name: 'attendanceManage',
         component: () => import('../views/AttendanceManageDay.vue'),
@@ -51,8 +46,7 @@ const routes = [
     {
         path: '/attendanceManageMonthUser',
         name: 'attendanceManageMonthUser',
-        component: () =>
-            import ('../views/AttendanceManagMonthUser.vue'),
+        component: () => import('../views/AttendanceManagMonthUser.vue'),
     },
 ]
 
