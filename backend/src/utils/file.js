@@ -255,7 +255,7 @@ export async function checkIsFileOwner(files, username) {
     if (!Array.isArray(files)) {
         files = [files]
     }
-    for (let fileId in files) {
+    for (let fileId of files) {
         const file = await File.findById(fileId)
         if (file.uploader !== username) {
             return false

@@ -116,7 +116,7 @@ router.post(
             let newpost = await post.save()
 
             // DB 파일 객체에 역참조 등록
-            await applyFileLink(req.body.files, 'board', newpost.id)
+            await applyFileLink(req.body.files, 'boardPost', newpost.id)
             newpost.files = req.body.files
 
             await newpost.save()
@@ -192,7 +192,7 @@ router.patch(
                 err.status = 400
                 throw err
             }
-            //
+            // 이미 첨부된 파일을 첨부하는지 검사
             const links = await getFileLinks(req.body.files)
             for (let link of links) {
                 if (link.target !== 'boardPost' || link.ref !== post.id) {
