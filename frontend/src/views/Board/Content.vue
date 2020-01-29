@@ -32,38 +32,46 @@
                 <v-card outlined>
                     <v-list three-lines>
                         <v-list-item
-                            v-for="comment in post.comment"
+                            v-for="(comment, idx) in post.comment"
                             :key="comment._id"
                         >
-                            <template v-if="flag == true">
+                            <template v-if="commentIdx != idx">
                                 <v-list-item-content>
                                     <v-list-item-title
                                         >{{ comment.writer
                                         }}<span class="ml-3">{{
                                             comment.created_date
                                         }}</span></v-list-item-title
-                                    >{{ comment.content }}</v-list-item-content
+                                    ><span class="mt-2">
+                                        {{ comment.content }}</span
+                                    ></v-list-item-content
                                 >
-                                <v-btn
-                                    icon
-                                    small
-                                    v-if="del_auth(comment.writer)"
-                                    @click="flag = true"
-                                >
-                                    <v-icon>mdi-file-edit-outline</v-icon>
-                                </v-btn>
                                 <v-btn
                                     icon
                                     small
                                     v-if="del_auth(comment.writer)"
                                     @click="
-                                        deleteDialog.show = true
+                                        commentIdx = idx
                                         fetchComment(comment.content)
+                                        fetch_id(comment._id)
+                                    "
+                                >
+                                    <v-icon>mdi-file-edit-outline</v-icon>
+                                </v-btn>
+                                <v-btn
+                                    class="ml-2"
+                                    icon
+                                    small
+                                    v-if="del_auth(comment.writer)"
+                                    @click="
+                                        deleteDialog.show = true
+                                        fetch_id(comment._id)
                                     "
                                 >
                                     <v-icon>mdi-trash-can-outline</v-icon>
                                 </v-btn>
                             </template>
+                            <!-- 댓글 수정 -->
                             <template v-else>
                                 <v-list-item-content>
                                     <v-list-item-title
@@ -78,17 +86,15 @@
                                 <v-btn
                                     icon
                                     small
-                                    @click="writeCommentDialog.show = true"
+                                    @click="updateCommentDialog.show = true"
                                 >
                                     <v-icon>mdi-check-bold</v-icon>
                                 </v-btn>
                                 <v-btn
+                                    class="ml-2"
                                     icon
                                     small
-                                    @click="
-                                        deleteDialog.show = true
-                                        fetch_id(comment._id)
-                                    "
+                                    @click="commentIdx = -1"
                                 >
                                     <v-icon>mdi-close-outline</v-icon>
                                 </v-btn>
@@ -134,7 +140,7 @@
                 </div>
             </v-col>
         </v-row>
-        <v-dialog v-model="deleteDialog.show" max-width="290">
+        <v-dialog v-model="deleteDialog.show" max-width="330">
             <v-card>
                 <v-card-title class="headline"
                     >댓글을 삭제하시겠습니까?</v-card-title
@@ -164,7 +170,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="deletePostDialog.show" max-width="290">
+        <v-dialog v-model="deletePostDialog.show" max-width="330">
             <v-card>
                 <v-card-title class="headline"
                     >글을 삭제하시겠습니까?</v-card-title
@@ -227,7 +233,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="updateCommentDialog.show" max-width="290">
+        <v-dialog v-model="updateCommentDialog.show" max-width="330">
             <v-card>
                 <v-card-title class="headline"
                     >댓글을 수정하시겠습니까?</v-card-title
@@ -240,8 +246,9 @@
                         color="green darken-1"
                         text
                         @click="
-                            updateComment(temp_id)
+                            updateComment()
                             updateCommentDialog.show = false
+                            commentIdx = -1
                         "
                     >
                         예
@@ -301,9 +308,10 @@ export default {
             },
             temp_id: '',
             commentContent: '',
-            flag: false,
-            editContent: '',
+            flag: true,
             fetchCommentContent: '',
+            editContent: '',
+            commentIdx: '-1',
         }
     },
     mounted() {
@@ -365,9 +373,23 @@ export default {
             this.commentContent = ''
             this.writeCommentDialog.show = false
         },
-        updateComment() {},
+        async updateComment() {
+            this.fetchCommentContent = this.editContent
+            await axios.patch(
+                'simple/posts/' +
+                    this.$route.params.post_id +
+                    '/comment/' +
+                    this.temp_id,
+                {
+                    content: this.fetchCommentContent,
+                }
+            )
+            this.fetch_data()
+            this.fetchCommentContent = ''
+            this.updateCommentDialog.show = false
+        },
         fetchComment(content) {
-            this.fetchCommentContent = content
+            this.editContent = content
         },
     },
 }
