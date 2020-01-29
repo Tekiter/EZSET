@@ -102,6 +102,9 @@
                                             <v-text-field
                                                 v-model="password"
                                                 outlined
+                                                :error-messages="
+                                                    errors.passwordToEdit
+                                                "
                                                 :append-icon="
                                                     showpw
                                                         ? 'mdi-eye'
@@ -186,7 +189,9 @@
                                                 <v-btn
                                                     icon
                                                     dark
-                                                    @click="dialog2 = false"
+                                                    @click="
+                                                        cancelChangePassword()
+                                                    "
                                                 >
                                                     <v-icon>mdi-close</v-icon>
                                                 </v-btn>
@@ -309,6 +314,7 @@ export default {
                 email: '',
             },
             errors: {
+                passwordToEdit: '',
                 password: '',
                 confirmpassword: '',
                 email: '',
@@ -352,15 +358,18 @@ export default {
         async editStart() {
             try {
                 this.isloadingToEdit = true
-                this.dialog = false
                 await this.$store.dispatch('auth/issueEditToken', {
                     username: this.userinfo.username,
                     password: this.password,
                 })
+                this.dialog = false
                 this.isEditMode = true
-                this.isloadingToEdit = false
             } catch (error) {
+                this.errors.passwordToEdit = '비밀번호가 틀렸습니다'
                 console.log(error.response)
+            } finally {
+                this.password = ''
+                this.isloadingToEdit = false
             }
         },
         async editFinish() {
@@ -408,15 +417,20 @@ export default {
             if (!pwreg.test(this.form.password)) {
                 this.errors.password =
                     '비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요'
-                return
-            }
+            } else this.errors.password = ''
+            return
         },
         async checkConfirmPassword() {
             if (this.form.password != this.form.confirmpassword) {
                 this.errors.confirmpassword =
                     '비밀번호 확인이 일치하지 않습니다.'
-                return
-            }
+            } else this.errors.confirmpassword = ''
+            return
+        },
+        async cancelChangePassword() {
+            this.dialog2 = false
+            this.form.password = ''
+            this.form.confirmpassword = ''
         },
         async changePasswordFinish() {
             if (
