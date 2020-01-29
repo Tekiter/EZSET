@@ -28,7 +28,7 @@ router.route('/').get(
             body('username').isString(),
             body('password').isString(),
             body('realname').isString(),
-            body('email').isEmail(),
+            body('email').isString(),
             body('edittoken').isString(),
             validateParams,
         ],
@@ -60,14 +60,12 @@ router.route('/').get(
                         .equals(req.body.username)
                     if (req.body.realname != '') {
                         user.info.realname = req.body.realname
-                        console.log(user.info.realname)
                     }
                     if (req.body.email != '') {
                         user.info.email = req.body.email
-                        console.log(req.body.email)
                     }
                     if (req.body.password != '') {
-                        user.info.password = req.body.password
+                        user.password = req.body.password
                         console.log('passwordedit')
                     }
                     user.markModified('info')

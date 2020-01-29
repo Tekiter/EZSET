@@ -130,6 +130,16 @@
                         </v-row>
                         <!-- 수정 가능 모드 -->
                         <v-list dense v-if="isEditMode">
+                            <v-snackbar v-model="isSnackbar" :timeout="6000">
+                                FINISH 버튼을 누르면 비밀번호 변경이 적용됩니다.
+                                <v-btn
+                                    color="red"
+                                    text
+                                    @click="isSnackbar = false"
+                                >
+                                    Close
+                                </v-btn>
+                            </v-snackbar>
                             <v-list-item>
                                 <v-list-item-content
                                     class="d-flex justify-end pr-3"
@@ -228,7 +238,9 @@
                                                     type="submit"
                                                     text
                                                     large
-                                                    @click="dialog2 = false"
+                                                    @click="
+                                                        changePasswordFinish()
+                                                    "
                                                     >확인</v-btn
                                                 >
                                             </v-card-actions>
@@ -302,6 +314,7 @@ export default {
             isTokenValid: false,
             dialog: false,
             dialog2: false,
+            isSnackbar: false,
             showpw: false,
             password: '',
         }
@@ -396,6 +409,23 @@ export default {
                 this.errors.confirmpassword =
                     '비밀번호 확인이 일치하지 않습니다.'
                 return
+            }
+        },
+        async changePasswordFinish() {
+            if (
+                this.errors.password == '' &&
+                this.errors.confirmpassword == '' &&
+                this.form.password != ''
+            ) {
+                console.log(20000)
+                this.dialog2 = false
+                this.isSnackbar = true
+            }
+            return
+        },
+        async checkChangePasswordFinish() {
+            if (this.changePasswordFinish()) {
+                this.dialog2 = false
             }
         },
     },
