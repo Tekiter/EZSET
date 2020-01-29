@@ -56,6 +56,16 @@ export default {
                             to: '/AttendanceManageMonthUser',
                             perm: this.$perm('attendance').canOwn('read'),
                         },
+                        {
+                            title: '공결확인',
+                            to: '/OfficialAbsenceCheck',
+                            perm: this.$perm('attendance').canOwn('read'),
+                        },
+                        {
+                            title: '공결승인',
+                            to: '/OfficialAbsenceAccept',
+                            perm: this.$perm('attendance').can('read'),
+                        },
                     ],
                 },
             ],
