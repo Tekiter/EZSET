@@ -179,6 +179,7 @@
                             <!-- @click:more="viewDay" : 일력으로 넘어감
                             @click:date="viewDay" : 일력으로 넘어감 -->
                             <v-calendar
+                                class="text-center"
                                 ref="calendar"
                                 v-model="focus"
                                 color="primary"
@@ -207,34 +208,24 @@
                                         :color="selectedEvent.color"
                                         dark
                                     >
-                                        <v-btn icon>
-                                            <v-icon>mdi-pencil</v-icon>
-                                        </v-btn>
                                         <v-toolbar-title
                                             v-html="selectedEvent.name"
                                         ></v-toolbar-title>
                                         <v-spacer></v-spacer>
-                                        <v-btn icon>
-                                            <v-icon>mdi-heart</v-icon>
-                                        </v-btn>
-                                        <v-btn icon>
-                                            <v-icon>mdi-dots-vertical</v-icon>
-                                        </v-btn>
+                                        <v-card-actions>
+                                            <v-btn
+                                                icon
+                                                @click="selectedOpen = false"
+                                            >
+                                                <v-icon>mdi-close</v-icon>
+                                            </v-btn>
+                                        </v-card-actions>
                                     </v-toolbar>
                                     <v-card-text>
                                         <span
                                             v-html="selectedEvent.details"
                                         ></span>
                                     </v-card-text>
-                                    <v-card-actions>
-                                        <v-btn
-                                            text
-                                            color="secondary"
-                                            @click="selectedOpen = false"
-                                        >
-                                            Close
-                                        </v-btn>
-                                    </v-card-actions>
                                 </v-card>
                             </v-menu>
                         </v-sheet>
@@ -278,7 +269,10 @@ export default {
         selectedElement: null,
         selectedOpen: false,
         events: [],
+        //출석정보저장
         attendanceUserdata: [],
+        //공결정보저장
+        absenceUserdata: [],
         //결석예약
         absenceResDialog: {
             show: false,
@@ -291,10 +285,16 @@ export default {
         try {
             const res = await axios.get('attendance/attendanceUserData')
             this.attendanceUserdata = res.data[0].status
-            this.updateRange(this.start, this.end)
         } catch (err) {
             console.log(err)
         }
+        try {
+            const res = await axios.get('absencecheck/absenceUserData')
+            this.absenceUserdata = res.data[0].reasons
+        } catch (err) {
+            console.log(err)
+        }
+        this.updateRange(this.start, this.end)
     },
     computed: {
         title() {
@@ -371,7 +371,7 @@ export default {
         //기간이 변경될 시에 이벤트를 다시 가져오는 함수
         updateRange({ start, end }) {
             const events = []
-            console.log(this.date)
+            //출석현황삽입
             this.attendanceUserdata.map(item => {
                 //출석
                 if (item.state == 'attendance') {
@@ -390,7 +390,7 @@ export default {
                         start: moment(item.date).format('YYYY-MM-DD'),
                         end: moment(item.date).format('YYYY-MM-DD'),
                         details: '지각하셨습니다!',
-                        color: 'orange',
+                        color: 'amber',
                     })
                 }
                 //결석
@@ -413,8 +413,40 @@ export default {
                         color: 'red',
                     })
                 }
-                return { name: item.name, state: item.state }
+                return { name: item.name }
             })
+            //공결내역삽입
+            this.absenceUserdata.map(item => {
+                item.days.map(element => {
+                    //승인전 공결
+                    if (item.approval == 'No') {
+                        events.push({
+                            name: '공결 신청',
+                            start: moment(element).format('YYYY-MM-DD'),
+                            end: moment(element).format('YYYY-MM-DD'),
+                            details:
+                                item.reason +
+                                '(의) 사유의 공결이 승인 안됐습니다.',
+                            color: 'orange',
+                        })
+                    }
+                    //승인된 공결
+                    if (item.approval == 'Yes') {
+                        events.push({
+                            name: '공결 신청',
+                            start: moment(element).format('YYYY-MM-DD'),
+                            end: moment(element).format('YYYY-MM-DD'),
+                            details:
+                                item.reason +
+                                '(의) 사유의 공결이 승인 됐습니다.',
+                            color: 'green',
+                        })
+                    }
+                    return { name: item.name }
+                })
+                return { name: item.name }
+            })
+
             this.start = start
             this.end = end
             this.events = events

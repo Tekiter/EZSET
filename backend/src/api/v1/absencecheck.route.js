@@ -2,8 +2,7 @@ import Router from 'express'
 import { asyncRoute, validateParams } from '../../utils/api'
 import AbsenceReasonDay from '../../models/absenceReasonDay'
 import AbsenceReasonUser from '../../models/absenceReasonUser'
-//import { perm } from '../../utils/role'
-//import { param, body } from 'express-validator'
+import { perm } from '../../utils/role'
 const router = Router()
 
 //사용자가 결석예약 일들을 선택하면 프론트에서 list 형태로 백에 전달
@@ -46,4 +45,22 @@ router.post(
         }
     })
 )
+
+//absence_reason_users Collection에서 자신의 공결 현황을 전부 가지고 옴
+//AttendanceManagMonth 페이지에서 사용
+router.get(
+    '/absenceUserData',
+    [perm('attendance').canOwn('read')],
+    asyncRoute(async function(req, res) {
+        try {
+            const absenceReasonUser = await AbsenceReasonUser.find()
+                .where('name')
+                .equals(req.user.username)
+            res.json(absenceReasonUser)
+        } catch (err) {
+            res.status(501).json()
+        }
+    })
+)
+
 export default router
