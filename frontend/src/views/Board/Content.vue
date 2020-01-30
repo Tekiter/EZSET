@@ -59,6 +59,7 @@
                                     tile
                                     outlined
                                     color="blue darken-3"
+                                    v-if="del_auth(post.author)"
                                     @click="go_modify()"
                                 >
                                     <v-icon left>mdi-autorenew</v-icon> 수정하기
@@ -273,6 +274,7 @@ import axios from 'axios'
 import moment from 'moment'
 import { Viewer } from '@toast-ui/vue-editor'
 import FileDownload from '../../components/file/FileDownload.vue'
+const crypto = require('crypto')
 
 export default {
     components: {
@@ -342,10 +344,23 @@ export default {
             this.loading = false
         },
         del_auth(writer) {
-            if (this.$store.state.auth.user.username == writer) {
-                return true
+            if (this.post.isAnonymous == true) {
+                if (
+                    crypto
+                        .createHash('sha512')
+                        .update(this.$store.state.auth.user.username)
+                        .digest('base64') == writer
+                ) {
+                    return true
+                } else {
+                    return false
+                }
             } else {
-                return false
+                if (this.$store.state.auth.user.username == writer) {
+                    return true
+                } else {
+                    return false
+                }
             }
         },
         showDeleteComment(comment) {
