@@ -10,6 +10,10 @@ let commentSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    isAnonymous: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 commentSchema.plugin(autoIncrement.plugin, {

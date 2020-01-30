@@ -358,8 +358,17 @@ router.post(
                 res.status(404).json({ message: 'no post id ' + postId })
                 return
             }
-
-            await post.addComment(req.body.content, req.user.username)
+            if (post.isAnonymous == true) {
+                await post.addComment(
+                    req.body.content,
+                    crypto
+                        .createHash('sha512')
+                        .update(req.user.username)
+                        .digest('base64')
+                )
+            } else {
+                await post.addComment(req.body.content, req.user.username)
+            }
             res.status(201).json({ message: '댓글 작성 완료' })
         } catch (error) {
             const errr = new Error('database error')
@@ -385,7 +394,34 @@ router.patch(
                 })
                 return
             }
-            await post.updateComment(req.params.comment_id, req.body.content)
+            if (post.isAnonymous == false) {
+                if (post.author != req.user.username) {
+                    res.status(403).end()
+                    return
+                }
+            } else {
+                if (
+                    post.author !=
+                    crypto
+                        .createHash('sha512')
+                        .update(req.user.username)
+                        .digest('base64')
+                ) {
+                    res.status(403).end()
+                    return
+                }
+            }
+            if (post.isAnonymous == true) {
+                await post.updateComment(
+                    req.body.content,
+                    crypto
+                        .createHash('sha512')
+                        .update(req.user.username)
+                        .digest('base64')
+                )
+            } else {
+                await post.updateComment(req.body.content, req.user.username)
+            }
             res.status(201).json({ message: '댓글 수정 완료' })
         } catch (error) {
             const errr = new Error('database error')
@@ -415,7 +451,23 @@ router.delete(
                 })
                 return
             }
-
+            if (post.isAnonymous == false) {
+                if (post.author != req.user.username) {
+                    res.status(403).end()
+                    return
+                }
+            } else {
+                if (
+                    post.author !=
+                    crypto
+                        .createHash('sha512')
+                        .update(req.user.username)
+                        .digest('base64')
+                ) {
+                    res.status(403).end()
+                    return
+                }
+            }
             await post.removeComment(req.params.comment_id)
             res.status(200).json({ message: '삭제 성공' })
         } catch (error) {
