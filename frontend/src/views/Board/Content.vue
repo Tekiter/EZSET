@@ -91,7 +91,7 @@
                                     outlined
                                     color="black"
                                     v-if="del_auth(post.author)"
-                                    @click="deletePostDialog.show = true"
+                                    @click="deletePost"
                                 >
                                     <v-icon>mdi-trash-can</v-icon> 삭제하기
                                 </v-btn>
@@ -182,9 +182,7 @@
                                         <v-btn
                                             icon
                                             small
-                                            @click="
-                                                updateCommentDialog.show = true
-                                            "
+                                            @click="updateComment(comment)"
                                         >
                                             <v-icon>mdi-check-bold</v-icon>
                                         </v-btn>
@@ -235,97 +233,6 @@
                 </v-col>
             </v-row>
         </v-fade-transition>
-        <v-dialog v-model="deleteDialog.show" max-width="330">
-            <v-card>
-                <v-card-title class="headline"
-                    >댓글을 삭제하시겠습니까?</v-card-title
-                >
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="
-                            del_comment(temp_id)
-                            deleteDialog.show = false
-                        "
-                    >
-                        예
-                    </v-btn>
-
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="deleteDialog.show = false"
-                    >
-                        아니요
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-        <v-dialog v-model="deletePostDialog.show" max-width="330">
-            <v-card>
-                <v-card-title class="headline"
-                    >글을 삭제하시겠습니까?</v-card-title
-                >
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="
-                            delPost()
-                            deletePostDialog.show = false
-                        "
-                    >
-                        예
-                    </v-btn>
-
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="deletePostDialog.show = false"
-                    >
-                        아니요
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-        <v-dialog v-model="updateCommentDialog.show" max-width="330">
-            <v-card>
-                <v-card-title class="headline"
-                    >댓글을 수정하시겠습니까?</v-card-title
-                >
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="
-                            updateComment()
-                            updateCommentDialog.show = false
-                            commentIdx = -1
-                        "
-                    >
-                        예
-                    </v-btn>
-
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="updateCommentDialog.show = false"
-                    >
-                        아니요
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
     </v-container>
 </template>
 
@@ -334,7 +241,7 @@ import axios from 'axios'
 import moment from 'moment'
 import { Viewer } from '@toast-ui/vue-editor'
 import FileDownload from '../../components/file/FileDownload.vue'
-const crypto = require('crypto')
+import crypto from 'crypto'
 
 export default {
     components: {
@@ -357,21 +264,9 @@ export default {
                 view: '',
                 like: [],
             },
-            deleteDialog: {
-                show: false,
-                title: '',
-            },
-            deletePostDialog: {
-                show: false,
-                title: '',
-            },
             writeComment: {
                 content: '',
                 isLoading: false,
-            },
-            updateCommentDialog: {
-                show: false,
-                title: '',
             },
             temp_id: '',
             commentContent: '',
@@ -430,15 +325,29 @@ export default {
                 }
             }
         },
-        showDeleteComment(comment) {
-            this.deleteDialog.show = true
-            this.fetch_id(comment._id)
-        },
-        async del_comment(id) {
-            await axios.delete(
-                '/simple/posts/' + this.post._id + '/comment/' + id
+        async showDeleteComment(comment) {
+            const res = await this.$action.showConfirmDialog(
+                '댓글 삭제',
+                '댓글을 삭제하시겠습니까?'
             )
-            this.fetch_data()
+            if (res) {
+                await axios.delete(
+                    '/simple/posts/' + this.post._id + '/comment/' + comment._id
+                )
+                this.fetch_data()
+            }
+        },
+        async deletePost() {
+            const res = await this.$action.showConfirmDialog(
+                '게시글 삭제',
+                '게시글을 삭제하시겠습니까?'
+            )
+            if (res) {
+                axios.delete('/simple/posts/' + this.post._id)
+                this.$router.push({
+                    path: `/`,
+                })
+            }
         },
         delPost() {
             axios.delete('/simple/posts/' + this.post._id)
@@ -472,20 +381,17 @@ export default {
             this.fetchComment(comment.content)
             this.fetch_id(comment._id)
         },
-        async updateComment() {
-            this.fetchCommentContent = this.editContent
+        async updateComment(comment) {
             await axios.patch(
                 'simple/posts/' +
                     this.$route.params.post_id +
                     '/comment/' +
-                    this.temp_id,
+                    comment._id,
                 {
-                    content: this.fetchCommentContent,
+                    content: this.editContent,
                 }
             )
             this.fetch_data()
-            this.fetchCommentContent = ''
-            this.updateCommentDialog.show = false
         },
         fetchComment(content) {
             this.editContent = content
