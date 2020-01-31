@@ -16,10 +16,14 @@ const MaterialSchema = new mongoose.Schema({
         required: false,
         trim: true,
     },
+    created_date: {
+        type: Date,
+        default: Date.now,
+    },
     //업로드한 파일의 id 저장
     files: [{ type: mongoose.SchemaTypes.ObjectId }],
     //상위 폴더의 id 저장 (부모)
-    folder: {
+    parent: {
         type: mongoose.SchemaTypes.ObjectId,
         required: true,
     },
