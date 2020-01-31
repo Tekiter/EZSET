@@ -10,6 +10,10 @@ let commentSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    isAnonymous: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 commentSchema.plugin(autoIncrement.plugin, {
@@ -39,9 +43,14 @@ let postSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    isAnonymous: {
+        type: Boolean,
+        default: false,
+    },
     view: { type: Number, default: 0 },
     like: [{ liker: { type: String } }],
     comments: [commentSchema],
+    files: [{ type: String }],
 })
 
 //좋아요 카운트
@@ -57,6 +66,13 @@ postSchema.virtual('comments_count').get(function() {
 //댓글 작성
 postSchema.methods.addComment = function(content, writer) {
     this.comments.push(new Comment({ content, writer }))
+    return this.save()
+}
+
+//댓글 수정
+postSchema.methods.updateComment = function(comment_id, content) {
+    this.comment = this.comments.id(comment_id)
+    this.comment.content = content
     return this.save()
 }
 

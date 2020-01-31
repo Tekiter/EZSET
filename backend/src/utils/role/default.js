@@ -27,8 +27,10 @@ export function setAdminRole(roles) {
         .can(['read', 'create', 'delete', 'update'])
 
         .resource('board')
-        .can(['read', 'create', 'delete'])
+        .can(['read', 'create', 'delete', 'update'])
 
+        .resource('manageServer')
+        .can(['access'])
         .resource('manageUsers')
         .can('access')
         .resource('manageRoles')
