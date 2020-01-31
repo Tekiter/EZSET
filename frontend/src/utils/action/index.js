@@ -13,7 +13,7 @@ export const actionHelper = {
             store.dispatch('action/showAlertDialog', {
                 title,
                 content,
-                width: '' + options.width || '400',
+                width: options.width || 400,
                 callback: resolve,
             })
         })
@@ -26,7 +26,7 @@ export const actionHelper = {
             store.dispatch('action/showConfirmDialog', {
                 title,
                 content,
-                width: '' + options.width || '400',
+                width: options.width || 400,
                 yesButton: options.yesButton || '예',
                 noButton: options.noButton || '아니오',
                 callback: resolve,
