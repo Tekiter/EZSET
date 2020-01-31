@@ -10,6 +10,10 @@ let commentSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    isAnonymous: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 commentSchema.plugin(autoIncrement.plugin, {
@@ -38,6 +42,10 @@ let postSchema = new Schema({
     created_date: {
         type: Date,
         default: Date.now,
+    },
+    isAnonymous: {
+        type: Boolean,
+        default: false,
     },
     view: { type: Number, default: 0 },
     like: [{ liker: { type: String } }],

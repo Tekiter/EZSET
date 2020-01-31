@@ -6,8 +6,9 @@
 
         <v-app-bar app clipped-left>
             <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-            <v-toolbar-title>EZSET</v-toolbar-title>
-
+            <v-btn text large @click="$router.push('/')">
+                <v-toolbar-title>EZSET</v-toolbar-title>
+            </v-btn>
             <v-spacer></v-spacer>
 
             <v-menu offset-y :nudge-width="200">
@@ -35,7 +36,7 @@
                     </v-list>
                     <v-divider></v-divider>
                     <v-list>
-                        <v-list-item to="/user">사용자 정보</v-list-item>
+                        <v-list-item to="/mypage">마이페이지</v-list-item>
                     </v-list>
                 </v-card>
             </v-menu>

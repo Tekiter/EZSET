@@ -39,6 +39,8 @@ axios.interceptors.response.use(
 // 저장되어있는 로그인 세션 복원
 store.dispatch('auth/restore')
 
+store.dispatch('auth/restoreEditToken')
+
 // socket.io
 import io from 'socket.io-client'
 const socket = io('http://localhost:5050')

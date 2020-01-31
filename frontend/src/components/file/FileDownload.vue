@@ -1,19 +1,22 @@
 <template>
-    <div class="d-flex" v-if="files.length > 0">
-        <v-spacer></v-spacer>
-        <v-subheader>첨부</v-subheader>
-        <v-btn
-            v-for="file in files"
-            :key="file.id"
-            @click="onDownload(file)"
-            depressed
-            outlined
-            color="green"
-            class="mr-2"
-        >
-            {{ file.filename }}
-            <v-icon class="ml-1">{{ iconConvert(file.filename) }}</v-icon>
-        </v-btn>
+    <div v-if="files.length > 0">
+        <div class="d-flex justify-center justify-sm-end">
+            <v-subheader>첨부</v-subheader>
+        </div>
+        <div class="d-flex flex-wrap flex-sm-row-reverse flex-column">
+            <v-btn
+                v-for="file in files"
+                :key="file.id"
+                @click="onDownload(file)"
+                depressed
+                outlined
+                color="green"
+                class="mr-2 mb-1"
+            >
+                {{ file.filename }}
+                <v-icon class="ml-1">{{ iconConvert(file.filename) }}</v-icon>
+            </v-btn>
+        </div>
     </div>
 </template>
 

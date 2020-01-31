@@ -15,6 +15,7 @@ import {
     getFileLinks,
 } from '../../utils/file'
 const router = Router()
+const crypto = require('crypto')
 
 //게시판 생성
 router.post(
@@ -23,7 +24,7 @@ router.post(
     asyncRoute(async (req, res) => {
         let board = new Board()
         board.title = req.body.title
-
+        board.isAnonymous = req.body.isAnonymous
         await board.save()
         res.status(201).end()
     })
@@ -78,9 +79,7 @@ router.post(
         param('board_id').isNumeric(),
         body('title').isString(),
         body('content').isString(),
-        body('files')
-            .custom(checkAttachableFileArray)
-            .optional(),
+        body('files').custom(checkAttachableFileArray),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
@@ -104,14 +103,29 @@ router.post(
                 err.status = 400
                 throw err
             }
-
-            const post = new Post({
-                board: boardId,
-                title: req.body.title,
-                content: req.body.content,
-                author: req.user.username,
-                created_date: Date.now(),
-            })
+            let post
+            if (board.isAnonymous == false) {
+                post = new Post({
+                    board: boardId,
+                    title: req.body.title,
+                    content: req.body.content,
+                    author: req.user.username,
+                    isAnonymous: false,
+                    created_date: Date.now(),
+                })
+            } else {
+                post = new Post({
+                    board: boardId,
+                    title: req.body.title,
+                    content: req.body.content,
+                    author: crypto
+                        .createHash('sha512')
+                        .update(req.user.username)
+                        .digest('base64'),
+                    isAnonymous: true,
+                    created_date: Date.now(),
+                })
+            }
 
             let newpost = await post.save()
 
@@ -141,9 +155,22 @@ router.delete(
         try {
             let post = await Post.findById(req.params.post_id)
             if (post) {
-                if (post.owner != req.user.username) {
-                    res.status(403).end()
-                    return
+                if (post.isAnonymous == false) {
+                    if (post.author != req.user.username) {
+                        res.status(403).end()
+                        return
+                    }
+                } else {
+                    if (
+                        post.author !=
+                        crypto
+                            .createHash('sha512')
+                            .update(req.user.username)
+                            .digest('base64')
+                    ) {
+                        res.status(403).end()
+                        return
+                    }
                 }
 
                 await removeFileLink(post.files)
@@ -171,6 +198,7 @@ router.patch(
         param('post_id').isNumeric(),
         body('title').isString(),
         body('content').isString(),
+        body('files').custom(checkAttachableFileArray),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
@@ -181,9 +209,22 @@ router.patch(
         let post = await Post.findById(req.params.post_id)
 
         if (post) {
-            if (req.user.username != post.author) {
-                res.status(403).end()
-                return
+            if (post.isAnonymous == false) {
+                if (post.author != req.user.username) {
+                    res.status(403).end()
+                    return
+                }
+            } else {
+                if (
+                    post.author !=
+                    crypto
+                        .createHash('sha512')
+                        .update(req.user.username)
+                        .digest('base64')
+                ) {
+                    res.status(403).end()
+                    return
+                }
             }
 
             // 첨부할 파일들이 본인이 업로드한 파일들인지 체크
@@ -247,6 +288,7 @@ router.get(
                 title: post.title,
                 content: post.content,
                 author: post.author,
+                isAnonymous: post.isAnonymous,
                 created_date: post.created_date,
                 view: post.view,
                 like: post.likes_count,
@@ -287,6 +329,7 @@ router.get(
                         title: post.title,
                         content: post.content,
                         author: post.author,
+                        isAnonymous: post.isAnonymous,
                         created_date: post.created_date,
                         view: post.view,
                         like: post.likes_count,
@@ -314,8 +357,17 @@ router.post(
                 res.status(404).json({ message: 'no post id ' + postId })
                 return
             }
-
-            await post.addComment(req.body.content, req.user.username)
+            if (post.isAnonymous == true) {
+                await post.addComment(
+                    req.body.content,
+                    crypto
+                        .createHash('sha512')
+                        .update(req.user.username)
+                        .digest('base64')
+                )
+            } else {
+                await post.addComment(req.body.content, req.user.username)
+            }
             res.status(201).json({ message: '댓글 작성 완료' })
         } catch (error) {
             const errr = new Error('database error')
@@ -341,7 +393,34 @@ router.patch(
                 })
                 return
             }
-            await post.updateComment(req.params.comment_id, req.body.content)
+            if (post.isAnonymous == false) {
+                if (post.author != req.user.username) {
+                    res.status(403).end()
+                    return
+                }
+            } else {
+                if (
+                    post.author !=
+                    crypto
+                        .createHash('sha512')
+                        .update(req.user.username)
+                        .digest('base64')
+                ) {
+                    res.status(403).end()
+                    return
+                }
+            }
+            if (post.isAnonymous == true) {
+                await post.updateComment(
+                    req.body.content,
+                    crypto
+                        .createHash('sha512')
+                        .update(req.user.username)
+                        .digest('base64')
+                )
+            } else {
+                await post.updateComment(req.body.content, req.user.username)
+            }
             res.status(201).json({ message: '댓글 수정 완료' })
         } catch (error) {
             const errr = new Error('database error')
@@ -371,7 +450,23 @@ router.delete(
                 })
                 return
             }
-
+            if (post.isAnonymous == false) {
+                if (post.author != req.user.username) {
+                    res.status(403).end()
+                    return
+                }
+            } else {
+                if (
+                    post.author !=
+                    crypto
+                        .createHash('sha512')
+                        .update(req.user.username)
+                        .digest('base64')
+                ) {
+                    res.status(403).end()
+                    return
+                }
+            }
             await post.removeComment(req.params.comment_id)
             res.status(200).json({ message: '삭제 성공' })
         } catch (error) {

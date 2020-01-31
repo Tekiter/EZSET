@@ -122,6 +122,12 @@ export default {
                     post.number = post._id + 1
                     return post
                 })
+                this.posts = res.data.posts.map(post => {
+                    if (post.isAnonymous == true) {
+                        post.author = '익명'
+                    }
+                    return post
+                })
                 this.board = res.data.board
                 //console.log(res.data.posts)
                 this.loading = false

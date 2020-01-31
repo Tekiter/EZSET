@@ -55,6 +55,13 @@
                         :error-messages="createBoardDialog.error"
                     ></v-text-field>
                 </v-card-text>
+                <v-container fluid>
+                    <v-switch
+                        class="ml-3"
+                        v-model="isAnonymous"
+                        label="익명게시판"
+                    ></v-switch>
+                </v-container>
                 <v-card-actions>
                     <v-spacer></v-spacer>
 
@@ -125,6 +132,7 @@ export default {
                 curId: -1,
                 curTitle: '',
             },
+            isAnonymous: false,
         }
     },
     methods: {
@@ -149,6 +157,7 @@ export default {
             } catch (error) {
                 this.deleteBoardDialog.error = '게시판 삭제에 실패했습니다.'
             }
+            await this.$store.dispatch('board/fetchBoards')
         },
         delBoard(id) {
             axios.delete('/simple/boards/' + id)
@@ -171,6 +180,7 @@ export default {
             try {
                 await axios.post('simple/boards', {
                     title: this.createBoardDialog.title,
+                    isAnonymous: this.isAnonymous,
                 })
                 this.createBoardDialog.isLoading = false
                 this.createBoardDialog.show = false
@@ -179,6 +189,8 @@ export default {
                 console.log(error.response)
                 this.createBoardDialog.error = '게시판 생성에 실패했습니다.'
             }
+            this.isAnonymous = false
+            await this.$store.dispatch('board/fetchBoards')
         },
     },
     async created() {
