@@ -104,7 +104,7 @@ export default {
         },
         clearClick() {
             this.$router.push({
-                path: `/post/${this.$route.params.post_id}`,
+                path: `/board/${this.$route.params.board_id}/${this.$route.params.post_id}`,
             })
         },
         async updateClick() {
@@ -123,7 +123,9 @@ export default {
                         files: fileIds,
                     }
                 )
-                this.$router.push(`/post/${this.$route.params.post_id}`)
+                this.$router.push(
+                    `/board/${this.$route.params.board_id}/${this.$route.params.post_id}`
+                )
             } catch (error) {
                 this.isError = true
             } finally {

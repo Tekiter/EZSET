@@ -285,7 +285,9 @@ export default {
             this.authorLike = !this.authorLike
         },
         go_modify() {
-            this.$router.push(`/update/${this.$route.params.post_id}`)
+            this.$router.push(
+                `/update/${this.$route.params.board_id}/${this.$route.params.post_id}`
+            )
         },
         async fetch_data() {
             const res = await axios.get(
