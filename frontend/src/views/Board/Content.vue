@@ -4,7 +4,6 @@
             <v-skeleton-loader
                 type="article, list-item-two-line, list-item-three-line, actions"
             ></v-skeleton-loader>
-
             <v-list class="mt-3">
                 <v-skeleton-loader
                     v-for="i in 3"
@@ -29,11 +28,31 @@
                         </v-subheader> -->
                         <v-card-subtitle class="mt-0">
                             <v-row no-gutters>
-                                <v-col v-if="post.isAnonymous == false"
-                                    >asdf</v-col
+                                <span v-if="post.isAnonymous == false"
+                                    ><span class="font-weight-black"
+                                        >작성자</span
+                                    >
+                                    {{ post.author }}</span
                                 >
-                                <v-col v-else>익명</v-col>
-                                <v-col>작성일 {{ post.created_date }}</v-col>
+                                <span v-else>익명</span>
+                                <v-spacer></v-spacer>
+                                <span
+                                    ><span class="font-weight-black"
+                                        >작성일</span
+                                    >
+                                    {{ post.created_date }}</span
+                                ><v-divider class="mx-4" vertical></v-divider>
+                                <span
+                                    ><span class="font-weight-black"
+                                        >조회수</span
+                                    >
+                                    {{ post.view }}</span
+                                ><v-divider class="mx-4" vertical></v-divider>
+
+                                <span
+                                    ><span class="font-weight-black">추천</span>
+                                    {{ post.like }}</span
+                                >
                             </v-row>
                         </v-card-subtitle>
                         <v-divider></v-divider>
@@ -48,7 +67,29 @@
                                     class="ma-2"
                                     tile
                                     outlined
-                                    color="blue darken-3"
+                                    color="red darken-1"
+                                    v-if="!authorLike"
+                                    @click="clickLike()"
+                                >
+                                    <v-icon>mdi-heart-multiple</v-icon>
+                                    좋아요
+                                </v-btn>
+                                <v-btn
+                                    class="ma-2"
+                                    tile
+                                    outlined
+                                    color="black"
+                                    v-else
+                                    @click="clickLike()"
+                                >
+                                    <v-icon>mdi-heart-off</v-icon>
+                                    취소
+                                </v-btn>
+                                <v-btn
+                                    class="ma-2"
+                                    tile
+                                    outlined
+                                    color="black"
                                     v-if="del_auth(post.author)"
                                     @click="deletePostDialog.show = true"
                                 >
@@ -58,11 +99,20 @@
                                     class="ma-2"
                                     tile
                                     outlined
-                                    color="blue darken-3"
+                                    color="green darken-2"
                                     v-if="del_auth(post.author)"
                                     @click="go_modify()"
                                 >
                                     <v-icon left>mdi-autorenew</v-icon> 수정하기
+                                </v-btn>
+                                <v-btn
+                                    class="ma-2"
+                                    tile
+                                    outlined
+                                    color="blue darken-3"
+                                >
+                                    <v-icon left>mdi-post</v-icon>
+                                    목록
                                 </v-btn>
                             </div>
                         </v-card-text>
@@ -283,6 +333,7 @@ export default {
     },
     data() {
         return {
+            authorLike: false,
             loading: true,
             post: {
                 _id: '',
@@ -323,6 +374,9 @@ export default {
     },
 
     methods: {
+        clickLike() {
+            this.authorLike = !this.authorLike
+        },
         go_modify() {
             this.$router.push(`/update/${this.$route.params.post_id}`)
         },
