@@ -124,6 +124,15 @@
                                     <template v-if="commentIdx != idx">
                                         <v-list-item-content>
                                             <v-list-item-title
+                                                v-if="post.isAnonymous == true"
+                                                class="subtitle-2"
+                                                >{{ '익명'
+                                                }}<span class="ml-3">{{
+                                                    comment.created_date
+                                                }}</span></v-list-item-title
+                                            >
+                                            <v-list-item-title
+                                                v-else
                                                 class="subtitle-2"
                                                 >{{ comment.writer
                                                 }}<span class="ml-3">{{
@@ -394,6 +403,9 @@ export default {
                 comment.created_date = moment(comment.created_date).format(
                     'YYYY/MM/DD HH:MM'
                 )
+                // if (this.post.isAnonymous == true) {
+                //     comment.writer = '익명'
+                // }
             })
             this.loading = false
         },
