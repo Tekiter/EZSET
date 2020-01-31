@@ -59,6 +59,22 @@ postSchema.virtual('likes_count').get(function() {
     return this.likes ? this.likes.length : 0
 })
 
+//좋아요 생성
+postSchema.virtual('likes_create').get(function(liker) {
+    this.like.push({ liker })
+    return this.save()
+})
+
+//좋아요 삭제
+postSchema.virtual('likes_delete').get(function(liker) {
+    for (let i = 0; i < this.like.length; i++) {
+        if (this.like[i] == liker) {
+            this.like.splice(i, 1)
+        }
+    }
+    return this.save()
+})
+
 //댓글 갯수 카운트
 postSchema.virtual('comments_count').get(function() {
     return this.comments ? this.comments.length : 0
