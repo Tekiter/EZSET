@@ -50,7 +50,7 @@ const routes = [
         component: () => import('../views/Board/Post.vue'),
     },
     {
-        path: '/post/:post_id',
+        path: '/board/:board_id/:post_id',
         name: 'content',
         component: () => import('../views/Board/Content.vue'),
     },

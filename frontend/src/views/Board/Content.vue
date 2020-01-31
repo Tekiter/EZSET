@@ -110,6 +110,7 @@
                                     tile
                                     outlined
                                     color="blue darken-3"
+                                    @click="back()"
                                 >
                                     <v-icon left>mdi-post</v-icon>
                                     목록
@@ -351,7 +352,7 @@ export default {
         delPost() {
             axios.delete('/simple/posts/' + this.post._id)
             this.$router.push({
-                path: `/`,
+                path: '/board/' + this.$route.params.board_id,
             })
         },
         fetch_id(id) {
@@ -394,6 +395,11 @@ export default {
         },
         fetchComment(content) {
             this.editContent = content
+        },
+        back() {
+            this.$router.push({
+                path: '/board/' + this.$route.params.board_id,
+            })
         },
     },
 }

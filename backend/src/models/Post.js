@@ -25,6 +25,7 @@ let Comment = mongoose.model('comment', commentSchema)
 let postSchema = new Schema({
     board: {
         type: Number,
+        startAt: 1,
         ref: 'board',
     },
     title: {

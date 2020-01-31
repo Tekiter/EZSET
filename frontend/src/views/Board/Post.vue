@@ -101,10 +101,10 @@ export default {
     },
     methods: {
         read(evt) {
-            console.log(evt._id)
-            console.log(evt.title)
+            //console.log(evt._id)
+            //console.log(evt.title)
             this.$router.push({
-                path: '/post/' + evt._id,
+                path: '/board/' + this.$route.params.board_id + '/' + evt._id,
             })
         },
         async fetchPostList() {
@@ -119,7 +119,7 @@ export default {
                     return post
                 })
                 this.posts = res.data.posts.map(post => {
-                    post.number = post._id + 1
+                    post.number = post._id
                     return post
                 })
                 this.posts = res.data.posts.map(post => {
