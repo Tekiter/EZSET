@@ -49,11 +49,6 @@ const routes = [
         component: () => import('../views/AttendanceManagMonthUser.vue'),
     },
     {
-        path: '/officialAbsenceCheck',
-        name: 'officialAbsenceCheck',
-        component: () => import('../views/OfficialAbsenceCheck.vue'),
-    },
-    {
         path: '/officialAbsenceAccept',
         name: 'officialAbsenceAccept',
         component: () => import('../views/OfficialAbsenceAccept.vue'),
