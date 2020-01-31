@@ -4,6 +4,7 @@ import OfficialAbsence from '../../models/officialAbsenceReason'
 import { perm } from '../../utils/role'
 import { param, body } from 'express-validator'
 const router = Router()
+var moment = require('moment')
 
 //사용자가 결석예약 일들을 선택하면 프론트에서 list 형태로 백에 전달
 router.post(
@@ -83,6 +84,25 @@ router.post(
                 reason: req.body.reason,
             })
             res.status(200).json()
+        } catch (err) {
+            res.status(501).json()
+        }
+    })
+)
+
+router.get(
+    '/officialAbsenceList',
+    asyncRoute(async function(req, res) {
+        try {
+            const cursor_No = await OfficialAbsence.find({
+                day: { $gte: moment().format('YYYY-MM-DD') },
+                approval: 'No',
+            }).sort({ name: 1 })
+            const cursor_Yes = await OfficialAbsence.find({
+                day: { $gte: moment().format('YYYY-MM-DD') },
+                approval: 'Yes',
+            }).sort({ name: 1 })
+            res.json({ noanswer: cursor_No, yesanswer: cursor_Yes })
         } catch (err) {
             res.status(501).json()
         }

@@ -3,6 +3,8 @@ import Vuex from 'vuex'
 
 import auth from './auth'
 import role from './role'
+import action from './action'
+import board from './board'
 
 Vue.use(Vuex)
 
@@ -10,5 +12,5 @@ export default new Vuex.Store({
     state: {},
     mutations: {},
     actions: {},
-    modules: { auth, role },
+    modules: { auth, role, board, action },
 })

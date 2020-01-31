@@ -30,7 +30,12 @@
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer />
-                            <v-btn type="submit" color="primary" :to="'/register'">Sign up</v-btn>
+                            <v-btn
+                                type="submit"
+                                color="primary"
+                                :to="'/register'"
+                                >Sign up</v-btn
+                            >
                             <v-btn type="submit" color="primary">Login</v-btn>
                         </v-card-actions>
                     </v-form>
@@ -68,6 +73,7 @@ export default {
                     password: this.user.password,
                 })
                 await this.$store.dispatch('role/fetchPermission')
+                await this.$store.dispatch('board/fetchBoards')
 
                 let to
                 if (this.$route.query.redirect) {
@@ -78,7 +84,7 @@ export default {
                 this.$router.push({ path: to })
                 return
             } catch (error) {
-                console.log(error.data.message)
+                // console.log(error.data.message)
                 this.errorMsg = error.data.message
             }
             this.loading = false

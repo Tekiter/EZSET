@@ -6,7 +6,7 @@ var officialAbsenceSchema = new Schema({
         type: String,
     },
     day: {
-        type: String,
+        type: Date,
     },
     reason: {
         type: String,

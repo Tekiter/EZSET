@@ -52,6 +52,14 @@ class RoleSystem {
         return !!this._roles[roletag]
     }
 
+    removeRole(roletag) {
+        if (!this._roles[roletag]) {
+            throw new Error('Invalid role tag')
+        }
+
+        delete this._roles[roletag]
+    }
+
     export(roletag) {
         if (this._roles[roletag]) {
             return {
