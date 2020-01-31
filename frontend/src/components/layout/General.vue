@@ -6,16 +6,15 @@
 
         <v-app-bar app clipped-left>
             <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-            <v-toolbar-title>EZSET</v-toolbar-title>
-
+            <v-btn text large @click="$router.push('/')">
+                <v-toolbar-title>EZSET</v-toolbar-title>
+            </v-btn>
             <v-spacer></v-spacer>
 
             <v-menu offset-y :nudge-width="200">
                 <template v-slot:activator="{ on }">
                     <v-btn text large v-on="on" class="text-none">
-                        {{
-                        user.username
-                        }}
+                        {{ user.username }}
                     </v-btn>
                 </template>
                 <v-card>
@@ -26,9 +25,7 @@
                             </v-list-item-avatar>
                             <v-list-item-content>
                                 <v-list-item-title>
-                                    {{
-                                    user.username
-                                    }}
+                                    {{ user.username }}
                                 </v-list-item-title>
                                 <v-list-item-subtitle></v-list-item-subtitle>
                             </v-list-item-content>
@@ -39,7 +36,7 @@
                     </v-list>
                     <v-divider></v-divider>
                     <v-list>
-                        <v-list-item to="/user">사용자 정보</v-list-item>
+                        <v-list-item to="/mypage">마이페이지</v-list-item>
                     </v-list>
                 </v-card>
             </v-menu>
@@ -49,7 +46,7 @@
             <router-view></router-view>
         </v-content>
 
-        <v-footer app>&copy; EZSET</v-footer>
+        <!-- <v-footer app>&copy; EZSET</v-footer> -->
     </v-app>
 </template>
 <style scoped></style>

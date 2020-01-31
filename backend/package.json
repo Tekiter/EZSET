@@ -53,6 +53,7 @@
         "mongoose": "^5.7.8",
         "mongoose-auto-increment": "^5.0.1",
         "morgan": "^1.9.1",
+        "multer": "^1.4.2",
         "random-number-csprng": "^1.0.2",
         "rimraf": "^2.6.3",
         "socket.io": "^2.3.0"

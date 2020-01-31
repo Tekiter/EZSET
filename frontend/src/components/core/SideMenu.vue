@@ -14,8 +14,11 @@ import SideMenuItem from './SideMenuItem.vue'
 export default {
     components: { SideMenuItem },
     data() {
-        return {
-            mainMenus: [
+        return {}
+    },
+    computed: {
+        mainMenus() {
+            return [
                 {
                     type: 'simple',
                     icon: 'mdi-view-dashboard',
@@ -31,7 +34,17 @@ export default {
                         {
                             title: '유저 관리',
                             to: '/manage/users',
-                            perm: this.$perm('role').can('read'),
+                            perm: this.$perm('manageUsers').can('access'),
+                        },
+                        {
+                            title: '역할 관리',
+                            to: '/manage/roles',
+                            perm: this.$perm('manageRoles').can('access'),
+                        },
+                        {
+                            title: '게시판 관리',
+                            to: '/manage/boards',
+                            perm: this.$perm('manageBoards').can('access'),
                         },
                     ],
                 },
@@ -63,8 +76,15 @@ export default {
                         },
                     ],
                 },
-            ],
-        }
+                {
+                    type: 'simple',
+                    icon: 'mdi-clipboard-multiple-outline',
+                    title: '게시판',
+                    to: '/board',
+                    children: this.$store.getters['board/boardList'],
+                },
+            ]
+        },
     },
 }
 </script>

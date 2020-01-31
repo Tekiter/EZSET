@@ -16,9 +16,10 @@ Role과 거기에 대한 권한을 관리하는 API
 */
 
 import { Router } from 'express'
-import { validateParams, asyncRoute } from '../../utils/api'
+import { validateParams, asyncRoute, checkRoleTag } from '../../utils/api'
 import { body, param } from 'express-validator'
 import role from '../../utils/role'
+import User from '../../models/User'
 
 const router = Router()
 
@@ -80,6 +81,21 @@ router.route('/:role_tag').get(
     })
 )
 
+// 역할 유저 조회
+router.route('/:role_tag/users').get(
+    [param('role_tag').custom(checkRoleTag), validateParams],
+    asyncRoute(async (req, res) => {
+        const users = await User.find({ roles: req.params.role_tag }).select(
+            'username info'
+        )
+        res.json({
+            users: users.map(user => {
+                return { username: user.username, realname: user.info.realname }
+            }),
+        })
+    })
+)
+
 // 역할 권한 변경
 router.route('/:role_tag').patch(
     [
@@ -96,8 +112,22 @@ router.route('/:role_tag').patch(
 
 // 역할 제거
 router.route('/:role_tag').delete(
-    [role.perm('role').can('delete'), validateParams],
+    [
+        role.perm('role').can('delete'),
+        param('role_tag').custom(checkRoleTag),
+        validateParams,
+    ],
     asyncRoute(async (req, res) => {
+        if (req.params.role_tag == 'admin') {
+            const err = new Error('admin 역할은 삭제할 수 없습니다.')
+            err.status = 400
+            throw err
+        }
+
+        await role.removeRole(req.params.role_tag)
+
+        res.end()
+
         // NOT IMPLEMENTED
     })
 )
