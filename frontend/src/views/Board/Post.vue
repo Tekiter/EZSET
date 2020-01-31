@@ -8,52 +8,57 @@
                 disabled
             ></v-text-field>
         </div>
-        <div>
-            <v-divider class="mx-4" inset vertical></v-divider>
+        <v-container>
+            <div>
+                <v-divider class="mx-4" inset vertical></v-divider>
 
-            <v-toolbar-title class="d-flex justify-center"
-                ><h1>
-                    <strong class="blue--text text--darken-2">{{
-                        board.title
-                    }}</strong>
-                </h1></v-toolbar-title
-            >
-            <v-divider class="mx-4" inset vertical></v-divider>
-        </div>
-        <v-data-table
-            :headers="headers"
-            :items="posts"
-            :page.sync="page"
-            :items-per-page="10"
-            hide-default-footer
-            class="elevation-1"
-            @page-count="pageCount = $event"
-        >
-            <template v-slot:item.title="props">
-                <a @click="read(props.item)">
-                    {{ props.item.title }}
-                </a>
-            </template>
-        </v-data-table>
-        <div class="row">
-            <div class="col"></div>
-            <div class="col">
-                <v-pagination v-model="page" :length="pageCount"></v-pagination>
+                <v-toolbar-title class="d-flex justify-center"
+                    ><h1>
+                        <strong class="font-weight-medium">{{
+                            board.title
+                        }}</strong>
+                    </h1></v-toolbar-title
+                >
+                <v-divider class="mx-4" inset vertical></v-divider>
             </div>
-            <div class="col">
-                <div class="d-flex flex-row-reverse">
-                    <v-btn
-                        class="ma-2"
-                        tile
-                        outlined
-                        color="blue darken-3"
-                        :to="'/write/' + curid"
-                    >
-                        <v-icon left>mdi-pencil</v-icon> 글쓰기
-                    </v-btn>
+            <v-data-table
+                :headers="headers"
+                :items="posts"
+                :page.sync="page"
+                :items-per-page="10"
+                hide-default-footer
+                class="elevation-1"
+                @page-count="pageCount = $event"
+            >
+                <template v-slot:item.title="props">
+                    <a @click="read(props.item)">
+                        {{ props.item.title }}
+                    </a>
+                </template>
+            </v-data-table>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col">
+                    <v-pagination
+                        v-model="page"
+                        :length="pageCount"
+                    ></v-pagination>
+                </div>
+                <div class="col">
+                    <div class="d-flex flex-row-reverse">
+                        <v-btn
+                            class="ma-2"
+                            tile
+                            outlined
+                            color="blue darken-3"
+                            :to="'/write/' + curid"
+                        >
+                            <v-icon left>mdi-pencil</v-icon> 글쓰기
+                        </v-btn>
+                    </div>
                 </div>
             </div>
-        </div>
+        </v-container>
     </div>
 </template>
 <script>
@@ -76,7 +81,7 @@ export default {
             posts: [],
             headers: [
                 {
-                    text: '번호',
+                    text: '  번호',
                     align: 'left',
                     sortable: false,
                     value: 'number',
