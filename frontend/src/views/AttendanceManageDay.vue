@@ -10,6 +10,11 @@
                 있다면, 변경할 내용을 나타내는 아이콘을 선택하시면 됩니다.
             </blockquote>
         </v-card-title>
+        <v-skeleton-loader
+            class="mx-auto"
+            type="table"
+            v-if="!attLoad && this.$perm('attendance').can('read')"
+        ></v-skeleton-loader>
         <v-card>
             <v-card-title
                 v-if="this.$perm('attendance').can('read')"
@@ -17,7 +22,9 @@
             >
                 {{ this.Mdate }}
             </v-card-title>
-            <v-simple-table v-if="this.$perm('attendance').can('read')">
+            <v-simple-table
+                v-if="attLoad && this.$perm('attendance').can('read')"
+            >
                 <template v-slot:default>
                     <tbody>
                         <tr class="pa-2 d-flex">
@@ -99,7 +106,7 @@
                                 v-if="item.state == 'official_absence'"
                                 class="flex-grow-0"
                             >
-                                <v-btn text icon color="red" dark>
+                                <v-btn text icon color="green" dark>
                                     <v-icon>
                                         mdi-close-circle-outline
                                     </v-icon>
@@ -135,6 +142,11 @@
                 </v-alert>
             </div>
         </v-card>
+        <v-skeleton-loader
+            class="mx-auto"
+            type="table"
+            v-if="!absenLoad && this.$perm('absence').can('read')"
+        ></v-skeleton-loader>
         <v-card>
             <v-card-title
                 v-if="this.$perm('attendance').can('read')"
@@ -142,7 +154,9 @@
             >
                 공결신청내역
             </v-card-title>
-            <v-simple-table v-if="this.$perm('attendance').can('read')">
+            <v-simple-table
+                v-if="absenLoad && this.$perm('absence').can('read')"
+            >
                 <template v-slot:default>
                     <tbody>
                         <tr class="pa-2 d-flex">
@@ -203,6 +217,7 @@ export default {
                 `absencecheck/absenceUsersData/${this.Mdate}`
             )
             this.absenceDate = res.data
+            this.absenLoad = true
         } catch (err) {
             console.log(err)
         }
@@ -212,6 +227,7 @@ export default {
                 `attendance/attendanceState/${this.date}`
             )
             this.statusData = res.data[0]
+            this.attLoad = true
         } catch (err) {
             console.log(err)
         }
@@ -220,6 +236,8 @@ export default {
         return {
             statusData: [],
             absenceDate: [],
+            attLoad: false,
+            absenLoad: false,
         }
     },
     computed: {

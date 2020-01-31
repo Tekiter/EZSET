@@ -11,8 +11,13 @@
                 수 있습니다.
             </blockquote>
         </v-card-title>
+        <v-skeleton-loader
+            class="mx-auto"
+            type="table"
+            v-if="!tabLoad && this.$perm('attendance').can('read')"
+        ></v-skeleton-loader>
         <div
-            v-if="this.$perm('attendance').can('read')"
+            v-if="tabLoad && this.$perm('attendance').can('read')"
             class="font-weight-medium subtitle-2"
         >
             <v-container>
@@ -166,6 +171,7 @@ export default {
         } catch (err) {
             console.log(err)
         }
+        this.tabLoad = true
     },
     data() {
         return {
@@ -179,6 +185,7 @@ export default {
             Edate: new Date().toISOString().substr(0, 10),
             menu1: false,
             menu2: false,
+            tabLoad: false,
         }
     },
     computed: {

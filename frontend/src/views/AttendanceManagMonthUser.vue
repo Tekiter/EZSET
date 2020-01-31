@@ -10,96 +10,20 @@
                 상세 현황을 조회하실 수 있습니다.
             </blockquote>
         </v-card-title>
-
+        <v-skeleton-loader
+            class="mx-auto"
+            type="table"
+            v-if="!calLoad && this.$perm('absence').canOwn('read')"
+        ></v-skeleton-loader>
         <div
-            v-if="this.$perm('attendance').canOwn('read')"
+            v-if="
+                calLoad &&
+                    this.$perm('attendance').canOwn('read') &&
+                    this.$perm('absence').canOwn('read')
+            "
             class="font-weight-medium subtitle-2"
         >
             <v-container>
-                <div class="d-flex fles-row mb-6">
-                    <!-- 이 div는 결석예약을 위한 다이얼로그를 띄우는 div입니다.  -->
-                    <form>
-                        <v-dialog
-                            v-model="absenceResDialog.show"
-                            persistent
-                            max-width="290"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-btn color="primary" dark v-on="on"
-                                    >결석예약</v-btn
-                                >
-                            </template>
-                            <v-card>
-                                <v-date-picker
-                                    v-model="dates"
-                                    multiple
-                                ></v-date-picker>
-                                <v-menu
-                                    ref="menu"
-                                    v-model="menu"
-                                    :close-on-content-click="false"
-                                    :return-value.sync="dates"
-                                    transition="scale-transition"
-                                    offset-y
-                                    full-width
-                                    min-width="290px"
-                                >
-                                    <template v-slot:activator="{ on }">
-                                        <v-combobox
-                                            v-model="dates"
-                                            multiple
-                                            chips
-                                            small-chips
-                                            label="Multiple picker in menu"
-                                            prepend-icon="mdi-plus"
-                                            readonly
-                                            v-on="on"
-                                        ></v-combobox>
-                                    </template>
-                                    <v-date-picker
-                                        v-model="dates"
-                                        multiple
-                                        no-title
-                                        scrollable
-                                    >
-                                        <v-spacer></v-spacer>
-                                        <v-btn
-                                            text
-                                            color="primary"
-                                            @click="menu = false"
-                                            >Cancel</v-btn
-                                        >
-                                        <v-btn
-                                            text
-                                            color="primary"
-                                            @click="$refs.menu.save(dates)"
-                                            >OK</v-btn
-                                        >
-                                    </v-date-picker>
-                                </v-menu>
-                                <v-text-field
-                                    label="결석사유"
-                                    v-model="absence_reason"
-                                ></v-text-field>
-                                <v-card-actions>
-                                    <v-spacer></v-spacer>
-                                    <v-btn
-                                        color="green darken-1"
-                                        text
-                                        @click="absenceResDialog.show = false"
-                                        >취소</v-btn
-                                    >
-                                    <v-btn
-                                        color="green darken-1"
-                                        text
-                                        @click="reservation"
-                                        >확인</v-btn
-                                    >
-                                </v-card-actions>
-                            </v-card>
-                        </v-dialog>
-                    </form>
-                </div>
                 <v-row class="fill-height">
                     <v-col>
                         <v-sheet height="64">
@@ -136,6 +60,106 @@
                                 <!-- 월/주/4일/일별 선택시 기준이 되는 단위 Computed 속성에 존재-->
                                 <v-toolbar-title>{{ title }}</v-toolbar-title>
                                 <v-spacer></v-spacer>
+                          
+                                    <form>
+                                        <v-dialog
+                                            v-model="absenceResDialog.show"
+                                            persistent
+                                            max-width="290"
+                                        >
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn
+                                                    color="primary"
+                                                    dark
+                                                    v-on="on"
+                                                    >결석예약</v-btn
+                                                >
+                                            </template>
+                                            <v-card>
+                                                <v-date-picker
+                                                    v-model="dates"
+                                                    multiple
+                                                ></v-date-picker>
+                                                <v-menu
+                                                    ref="menu"
+                                                    v-model="menu"
+                                                    :close-on-content-click="
+                                                        false
+                                                    "
+                                                    :return-value.sync="dates"
+                                                    transition="scale-transition"
+                                                    offset-y
+                                                    full-width
+                                                    min-width="290px"
+                                                >
+                                                    <template
+                                                        v-slot:activator="{
+                                                            on,
+                                                        }"
+                                                    >
+                                                        <v-combobox
+                                                            v-model="dates"
+                                                            multiple
+                                                            chips
+                                                            small-chips
+                                                            label="Multiple picker in menu"
+                                                            prepend-icon="mdi-plus"
+                                                            readonly
+                                                            v-on="on"
+                                                        ></v-combobox>
+                                                    </template>
+                                                    <v-date-picker
+                                                        v-model="dates"
+                                                        multiple
+                                                        no-title
+                                                        scrollable
+                                                    >
+                                                        <v-spacer></v-spacer>
+                                                        <v-btn
+                                                            text
+                                                            color="primary"
+                                                            @click="
+                                                                menu = false
+                                                            "
+                                                            >Cancel</v-btn
+                                                        >
+                                                        <v-btn
+                                                            text
+                                                            color="primary"
+                                                            @click="
+                                                                $refs.menu.save(
+                                                                    dates
+                                                                )
+                                                            "
+                                                            >OK</v-btn
+                                                        >
+                                                    </v-date-picker>
+                                                </v-menu>
+                                                <v-text-field
+                                                    label="결석사유"
+                                                    v-model="absence_reason"
+                                                ></v-text-field>
+                                                <v-card-actions>
+                                                    <v-spacer></v-spacer>
+                                                    <v-btn
+                                                        color="green darken-1"
+                                                        text
+                                                        @click="
+                                                            absenceResDialog.show = false
+                                                        "
+                                                        >취소</v-btn
+                                                    >
+                                                    <v-btn
+                                                        color="green darken-1"
+                                                        text
+                                                        @click="reservation"
+                                                        >확인</v-btn
+                                                    >
+                                                </v-card-actions>
+                                            </v-card>
+                                        </v-dialog>
+                                    </form>
+                            
                                 <!-- 월/주/4일/일별을 선택하게 하는 드롭다운 메뉴 -->
                                 <v-menu bottom right>
                                     <template v-slot:activator="{ on }">
@@ -225,6 +249,63 @@
                                         <span
                                             v-html="selectedEvent.details"
                                         ></span>
+                                        <v-row
+                                            justify="center"
+                                            v-if="
+                                                selectedEvent.name ==
+                                                    '공결 비승인'
+                                            "
+                                        >
+                                            <v-dialog
+                                                v-model="dialog"
+                                                persistent
+                                                max-width="290"
+                                            >
+                                                <template
+                                                    v-slot:activator="{ on }"
+                                                >
+                                                    <v-btn v-on="on"
+                                                        >신청 취소</v-btn
+                                                    >
+                                                </template>
+                                                <v-card>
+                                                    <v-card-title
+                                                        class="headline"
+                                                        >공결 신청
+                                                        취소</v-card-title
+                                                    >
+                                                    <v-card-text
+                                                        >신청 하실 때의 모든
+                                                        날짜의 신청이 같이
+                                                        취소됩니다.
+                                                        취소하시겠습니까?</v-card-text
+                                                    >
+                                                    <v-card-actions>
+                                                        <v-spacer></v-spacer>
+                                                        <v-btn
+                                                            color="green darken-1"
+                                                            text
+                                                            @click="
+                                                                dialog = false
+                                                            "
+                                                            >아니요</v-btn
+                                                        >
+                                                        <v-btn
+                                                            color="green darken-1"
+                                                            text
+                                                            @click="
+                                                                cancleAbsence(
+                                                                    selectedEvent
+                                                                )
+                                                                dialog = false
+                                                                selectedOpen = false
+                                                            "
+                                                            >예</v-btn
+                                                        >
+                                                    </v-card-actions>
+                                                </v-card>
+                                            </v-dialog>
+                                        </v-row>
                                     </v-card-text>
                                 </v-card>
                             </v-menu>
@@ -238,6 +319,18 @@
                 권한이 없습니다.
             </v-alert>
         </div>
+        <v-snackbar v-model="cancleSnack" :timeout="2000" color="success">
+            취소되었습니다!
+            <v-btn dark text @click="snackbar = false">
+                Close
+            </v-btn>
+        </v-snackbar>
+        <v-snackbar v-model="applySnack" :timeout="2000" color="success">
+            신청되었습니다!
+            <v-btn dark text @click="snackbar = false">
+                Close
+            </v-btn>
+        </v-snackbar>
     </v-card>
 </template>
 <script>
@@ -248,7 +341,7 @@
 // 1. 모든 일정을 가지고있는 배열에 정보 받아오도록 함
 // 2. event 배열에 들어가도록 데이터 가공
 // 3. 팝업 창에서 세부 내용 표시 하도록
-// 4. 출석-초록 지각-주황 결석 - 빨강 공결 - 빨강
+// 4. 상태별 색 관리
 // 5. 필요없는 달력 기능 지우기(4day, day, week 표시 기능)
 import moment from 'moment'
 import axios from 'axios'
@@ -280,21 +373,26 @@ export default {
         dates: [moment(new Date()).format('YYYY-MM-DD')],
         menu: false,
         absence_reason: '',
+        dialog: false,
+        calLoad: false,
+        cancleSnack: false,
+        applySnack: false,
     }),
     async created() {
         try {
             const res = await axios.get('attendance/attendanceUserData')
             this.attendanceUserdata = res.data[0].status
+            try {
+                const res = await axios.get('absencecheck/absenceUserData')
+                this.absenceUserdata = res.data
+            } catch (err) {
+                console.log(err)
+            }
         } catch (err) {
             console.log(err)
         }
-        try {
-            const res = await axios.get('absencecheck/absenceUserData')
-            this.absenceUserdata = res.data
-        } catch (err) {
-            console.log(err)
-        }
-        this.updateRange(this.start, this.end)
+        this.updateRange({ start: this.start, end: this.end })
+        this.calLoad = true
     },
     computed: {
         title() {
@@ -410,7 +508,7 @@ export default {
                         start: moment(item.date).format('YYYY-MM-DD'),
                         end: moment(item.date).format('YYYY-MM-DD'),
                         details: '공결처리되었습니다!',
-                        color: 'red',
+                        color: 'green',
                     })
                 }
                 return { name: item.name }
@@ -419,31 +517,33 @@ export default {
             this.absenceUserdata.map(item => {
                 if (item.approval == 'No') {
                     events.push({
-                        name: '비승인 공결',
+                        name: '공결 비승인',
                         start: moment(item.day).format('YYYY-MM-DD'),
                         end: moment(item.day).format('YYYY-MM-DD'),
                         details:
                             item.reason + '(의) 사유의 공결이 승인 안됐습니다.',
                         color: 'orange',
+                        reason: item.reason,
                     })
                 }
                 //승인된 공결
                 if (item.approval == 'Yes') {
                     events.push({
-                        name: '승인 공결',
+                        name: '공결 승인',
                         start: moment(item.day).format('YYYY-MM-DD'),
                         end: moment(item.day).format('YYYY-MM-DD'),
                         details:
                             item.reason + '(의) 사유의 공결이 승인 됐습니다.',
                         color: 'green',
+                        reason: item.reason,
                     })
                 }
                 return { name: item.name }
             })
-
             this.start = start
             this.end = end
             this.events = events
+            this.calLoad = true
         },
         nth(d) {
             return d > 3 && d < 21
@@ -471,9 +571,41 @@ export default {
                 this.dates = [this.$moment(new Date()).format('YYYY-MM-DD')]
                 this.absence_reason = ''
                 this.absenceResDialog.show = false
+                await this.init()
+                this.applySnack = true
             } catch (err) {
                 console.log(err)
             }
+        },
+        //공결 신청 취소
+        async cancleAbsence(selectedEvent) {
+            try {
+                await axios.post('absencecheck/deleteAbsenceUser', {
+                    reason: selectedEvent.reason,
+                })
+            } catch (err) {
+                console.log(err)
+            }
+            this.cancleSnack = true
+            this.init()
+        },
+        //페이지 사용에 필요한 데이터 로드 및 표시
+        async init() {
+            this.calLoad = false
+            try {
+                const res = await axios.get('attendance/attendanceUserData')
+                this.attendanceUserdata = res.data[0].status
+            } catch (err) {
+                console.log(err)
+            }
+            try {
+                const res = await axios.get('absencecheck/absenceUserData')
+                this.absenceUserdata = res.data
+            } catch (err) {
+                console.log(err)
+            }
+            this.updateRange({ start: this.start, end: this.end })
+            this.calLoad = true
         },
     },
 }

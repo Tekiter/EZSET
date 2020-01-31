@@ -11,6 +11,8 @@ var moment = require('moment')
 var ranNum = random(100, 999)
 
 //사용자가 출석코드를 입력했을 경우 서버에서 생성한 코드와 사용자 입력코드가 일치한다면 db에 출석상태로 업데이트
+//body : code
+//Attendance 페이지에서 사용
 router.post(
     '/attendanceWrite',
     [perm('attendance').can('att')],
@@ -53,6 +55,7 @@ router.post(
 
 //출석 후 다시 출석하기 페이지에 접근시 이미 출석했음을 체크하는 API
 //출석을 했다면 1을 하지않았다면 0을 반환
+//Attendance 페이지에서 사용
 router.get(
     '/attendanceCheck',
     [perm('attendance').can('att')],
@@ -77,6 +80,7 @@ router.get(
 
 //관리자가 시작버튼을 눌렀을경우 관리자는 출석상태 다른 모든 유저는 결석상태로 업데이트됨
 //attendanceDays, attendanceUsers Collection에 시작버튼을 누른 관리자를 제외한 모두를 '결석'상태로 초기화한 Document가 생성됨
+//Attendance 페이지에서 사용
 router.get(
     '/startAttendance',
     [perm('attendance').can('start')],
@@ -201,6 +205,8 @@ router.get(
     })
 )
 
+//attendanceDay Collection에서 모든 정보를 가져옴
+//AttendanceManageMonth페이지에서 사용
 router.get(
     '/attendanceDayList',
     [perm('attendance').can('read')],
@@ -215,7 +221,7 @@ router.get(
 )
 
 //attendanceUser Collection에서 모든 정보를 가져옴
-// 월별출결관리(관리자)페이지에서 사용
+// AttendanceManageMonth페이지에서 사용
 router.get(
     '/attendanceUserListData',
     [perm('attendance').can('read')],
@@ -229,20 +235,16 @@ router.get(
     })
 )
 
-//attendanceUser Collection에서 현재 접속중인 사용자의 정보를 가져옴
-// 월별출결관리(사용자)페이지에서 사용
+//attendanceUser Collection에서 현재 접속중인 사용자의 정보만 가져옴
+// AttendanceManageMonthUser페이지에서 사용
 router.get(
     '/attendanceUserData',
     [perm('attendance').canOwn('read')],
     asyncRoute(async function(req, res) {
-        try {
-            const attendnaceUser = await AttendanceUser.find()
-                .where('name')
-                .equals(req.user.username)
-            res.json(attendnaceUser)
-        } catch (err) {
-            res.status(501).json()
-        }
+        const attendnaceUser = await AttendanceUser.find()
+            .where('name')
+            .equals(req.user.username)
+        res.json(attendnaceUser)
     })
 )
 export default router

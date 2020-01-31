@@ -2,6 +2,7 @@ import Router from 'express'
 import { asyncRoute, validateParams } from '../../utils/api'
 import OfficialAbsence from '../../models/officialAbsenceReason'
 import { perm } from '../../utils/role'
+import { param, body } from 'express-validator'
 const router = Router()
 
 //사용자가 결석예약 일들을 선택하면 프론트에서 list 형태로 백에 전달
@@ -31,7 +32,7 @@ router.post(
 )
 
 //officialAbsences Collection에서 자신의 공결 현황을 전부 가지고 옴
-//AttendanceManagMonth 페이지에서 사용
+//AttendanceManagMonthUser 페이지에서 사용
 router.get(
     '/absenceUserData',
     [perm('attendance').canOwn('read')],
@@ -47,16 +48,41 @@ router.get(
     })
 )
 
-//officialAbsences Collection에서 자신의 공결 현황을 전부 가지고 옴
-//AttendanceManagMonth 페이지에서 사용
+//officialAbsences Collection에서 일 단위 공결 현황을 전부 가지고 옴
+//param : day
+//AttendanceManageDay 페이지에서 사용
 router.get(
     '/absenceUsersData/:day',
+    [perm('absence').canOwn('read'), param('day').isString(), validateParams],
     asyncRoute(async function(req, res) {
         try {
             const officialAbsence = await OfficialAbsence.find()
                 .where('day')
                 .equals(req.params.day)
-            res.json(officialAbsence)
+            res.status(200).json(officialAbsence)
+        } catch (err) {
+            res.status(501).json()
+        }
+    })
+)
+
+//사용자의 공결 신청 내역 삭제
+//body : reason
+//AttendanceManagMonth 페이지에서 사용
+router.post(
+    '/deleteAbsenceUser',
+    [
+        perm('absence').canOwn('delete'),
+        body('reason').isString(),
+        validateParams,
+    ],
+    asyncRoute(async function(req, res) {
+        try {
+            await OfficialAbsence.deleteMany({
+                name: req.user.username,
+                reason: req.body.reason,
+            })
+            res.status(200).json()
         } catch (err) {
             res.status(501).json()
         }
