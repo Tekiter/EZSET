@@ -16,7 +16,9 @@
             <v-row v-if="!loading">
                 <v-col>
                     <v-card outlined>
-                        <v-card-title>{{ post.title }}</v-card-title>
+                        <v-card-title class="font-weight-black">{{
+                            post.title
+                        }}</v-card-title>
                         <!-- <v-subheader class="row">
                             <div class="col" v-if="post.isAnonymous == false">
                                 작성자 {{ post.author }}
@@ -71,19 +73,18 @@
                                     v-if="!authorLike"
                                     @click="clickLike(post.author)"
                                 >
-                                    <v-icon>mdi-heart-multiple</v-icon>
-                                    좋아요
+                                    <v-icon>mdi-heart-multiple</v-icon> 좋아요
                                 </v-btn>
                                 <v-btn
                                     class="ma-2"
                                     tile
                                     outlined
-                                    color="black"
+                                    color="purple"
                                     v-else
                                     @click="clickLike(post.author)"
                                 >
                                     <v-icon>mdi-heart-off</v-icon>
-                                    취소
+                                    좋아요
                                 </v-btn>
                                 <v-btn
                                     class="ma-2"
@@ -223,6 +224,8 @@
                                             outlined
                                             @click="createComment()"
                                             :disabled="writeComment.isLoading"
+                                            ><v-icon left
+                                                >mdi-pencil-outline</v-icon
                                             >댓글 작성</v-btn
                                         >
                                     </div>

@@ -10,7 +10,7 @@
         </div>
         <v-container>
             <div>
-                <v-divider class="mx-4" inset vertical></v-divider>
+                <br />
 
                 <v-toolbar-title class="d-flex justify-center"
                     ><h1>
@@ -19,13 +19,13 @@
                         }}</strong>
                     </h1></v-toolbar-title
                 >
-                <v-divider class="mx-4" inset vertical></v-divider>
+                <br />
             </div>
             <v-data-table
                 :headers="headers"
                 :items="posts"
                 :page.sync="page"
-                :items-per-page="10"
+                :items-per-page="8"
                 hide-default-footer
                 class="elevation-1"
                 @page-count="pageCount = $event"
@@ -50,7 +50,7 @@
                             class="ma-2"
                             tile
                             outlined
-                            color="blue darken-3"
+                            color="black"
                             :to="'/write/' + curid"
                         >
                             <v-icon left>mdi-pencil</v-icon> 글쓰기
