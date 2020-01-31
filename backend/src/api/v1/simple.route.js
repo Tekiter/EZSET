@@ -79,9 +79,7 @@ router.post(
         param('board_id').isNumeric(),
         body('title').isString(),
         body('content').isString(),
-        body('files')
-            .custom(checkAttachableFileArray)
-            .optional(),
+        body('files').custom(checkAttachableFileArray),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
@@ -200,6 +198,7 @@ router.patch(
         param('post_id').isNumeric(),
         body('title').isString(),
         body('content').isString(),
+        body('files').custom(checkAttachableFileArray),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
