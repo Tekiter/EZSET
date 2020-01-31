@@ -69,7 +69,7 @@
                                     outlined
                                     color="red darken-1"
                                     v-if="!authorLike"
-                                    @click="clickLike()"
+                                    @click="clickLike(post.author)"
                                 >
                                     <v-icon>mdi-heart-multiple</v-icon>
                                     좋아요
@@ -80,7 +80,7 @@
                                     outlined
                                     color="black"
                                     v-else
-                                    @click="clickLike()"
+                                    @click="clickLike(post.author)"
                                 >
                                     <v-icon>mdi-heart-off</v-icon>
                                     취소
@@ -386,7 +386,7 @@ export default {
     },
 
     methods: {
-        clickLike() {
+        clickLike(author) {
             this.authorLike = !this.authorLike
         },
         go_modify() {

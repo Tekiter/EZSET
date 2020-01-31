@@ -412,6 +412,7 @@ router.patch(
                     return
                 }
             }
+
             if (post.isAnonymous == true) {
                 await post.updateComment(
                     req.body.content,
@@ -421,8 +422,12 @@ router.patch(
                         .digest('base64')
                 )
             } else {
-                await post.updateComment(req.body.content, req.user.username)
+                await post.updateComment(
+                    req.params.comment_id,
+                    req.body.content
+                )
             }
+
             res.status(201).json({ message: '댓글 수정 완료' })
         } catch (error) {
             const errr = new Error('database error')
