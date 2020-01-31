@@ -6,6 +6,11 @@ import vuetify from './plugins/vuetify'
 
 import axios from 'axios'
 
+import 'tui-editor/dist/tui-editor.css'
+import 'tui-editor/dist/tui-editor-contents.css'
+import 'codemirror/lib/codemirror.css'
+import 'highlight.js/styles/github.css'
+
 import { checkPerm } from './utils/role/role'
 import { actionHelper } from './utils/action'
 
@@ -35,6 +40,8 @@ axios.interceptors.response.use(
 
 // 저장되어있는 로그인 세션 복원
 store.dispatch('auth/restore')
+
+store.dispatch('auth/restoreEditToken')
 
 // socket.io
 import io from 'socket.io-client'

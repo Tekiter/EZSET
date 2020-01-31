@@ -43,6 +43,7 @@ router.route('/register').post(
         body('username').isString(),
         body('password').isString(),
         body('realname').isString(),
+        body('email').isEmail(),
         validateParams,
     ],
     asyncRoute(async (req, res) => {
@@ -81,6 +82,7 @@ router.route('/register').post(
                 password: req.body.password,
                 info: {
                     realname: req.body.realname,
+                    email: req.body.email,
                 },
             })
             await user.save()
@@ -113,5 +115,39 @@ router.route('/register/doublecheck/username').post(
         }
     })
 )
+router.route('/edittoken/issue').post(
+    [body('username').isString(), body('password').isString(), validateParams],
+    asyncRoute(async (req, res) => {
+        try {
+            const user = await User.findOne()
+                .where('username')
+                .equals(req.body.username)
 
+            if (user && user.checkPassword(req.body.password)) {
+                const editToken = await auth.createEditToken(req.body.username)
+
+                res.status(200).json({
+                    editToken,
+                })
+            } else {
+                res.status(403).json({ message: '토큰 발급 실패' })
+            }
+        } catch (error) {
+            databaseError(res, error)
+        }
+    })
+)
+router.route('/edittoken/check').post(
+    [body('edittoken').isString(), validateParams],
+    asyncRoute(async (req, res) => {
+        try {
+            const decoded = await auth.checkToken(req.body.edittoken)
+            if (decoded.is_edit_token) {
+                res.status(200).end()
+            }
+        } catch (err) {
+            res.status(403).end()
+        }
+    })
+)
 export default router

@@ -1,64 +1,76 @@
 <template>
-    <div class="pa-10">
-        <v-card outlined>
-            <v-card-title class="pb-5">게시판 이름</v-card-title>
-            <v-col v-for="board in boards" :key="board._id">
-                <v-card class="row pl-5" flat>
-                    <v-card class="col" flat>{{ board.title }}</v-card>
+    <v-row class="ma-3 fill-height">
+        <v-col cols="5">
+            <v-card outlined :loading="isLoading">
+                <v-toolbar flat>
+                    <v-toolbar-title>
+                        게시판
+                    </v-toolbar-title>
+                    <v-spacer></v-spacer>
                     <v-btn
-                        icon
-                        small
-                        @click="
-                            deleteDialog.show = true
-                            fetch_id(board._id)
-                        "
+                        outlined
+                        tile
+                        color="primary"
+                        @click="showCreateBoardDialog()"
                     >
-                        <v-icon>mdi-trash-can-outline</v-icon>
+                        <v-icon left>mdi-pencil</v-icon> 게시판 생성
                     </v-btn>
-                </v-card>
-            </v-col>
-        </v-card>
+                </v-toolbar>
+                <v-list>
+                    <v-list-item v-for="board in boards" :key="board._id">
+                        <v-list-item-title>{{ board.title }}</v-list-item-title>
+                        <v-list-item-action>
+                            <v-btn icon @click="showDeleteBoardDialog(board)">
+                                <v-icon>mdi-trash-can-outline</v-icon>
+                            </v-btn>
+                        </v-list-item-action>
+                    </v-list-item>
+                </v-list>
+            </v-card>
+        </v-col>
+        <v-col cols="7">
+            <v-card outlined>
+                <v-card-title>게시판 설정</v-card-title>
+                <v-list>
+                    <v-list-item v-for="board in boards" :key="board._id">
+                        <v-list-item-title>{{ board.title }}</v-list-item-title>
+                        <v-list-item-action>
+                            <v-btn icon>
+                                <v-icon>mdi-file-edit-outline</v-icon>
+                            </v-btn>
+                        </v-list-item-action>
+                    </v-list-item>
+                </v-list>
+            </v-card>
+        </v-col>
 
-        <div class="col">
-            <div class="d-flex flex-row-reverse">
-                <v-btn
-                    class="ma-2"
-                    tile
-                    outlined
-                    color="blue darken-3"
-                    @click="createBoardDialog.show = true"
-                >
-                    <v-icon left>mdi-pencil</v-icon> 게시판 생성
-                </v-btn>
-            </div>
-        </div>
         <v-dialog v-model="createBoardDialog.show" max-width="300">
-            <v-card>
-                <v-card-title class="headline">게시판 생성</v-card-title>
-                <v-form>
-                    <v-textarea
-                        v-model="title"
-                        label="Title"
-                        counter
-                        maxlength="100"
-                        full-width
-                        single-line
-                    ></v-textarea>
-                </v-form>
+            <v-card :loading="createBoardDialog.isLoading">
+                <v-card-title>게시판 생성</v-card-title>
+                <v-card-text>
+                    <v-text-field
+                        v-model="createBoardDialog.title"
+                        label="게시판 이름"
+                        hide-details
+                        :error-messages="createBoardDialog.error"
+                    ></v-text-field>
+                </v-card-text>
+                <v-container fluid>
+                    <v-switch
+                        class="ml-3"
+                        v-model="isAnonymous"
+                        label="익명게시판"
+                    ></v-switch>
+                </v-container>
                 <v-card-actions>
                     <v-spacer></v-spacer>
 
                     <v-btn
                         color="green darken-1"
                         text
-                        @click="
-                            title = title
-                            createBoard()
-                            createBoardDialog.title = ' '
-                            createBoardDialog.show = false
-                        "
+                        @click="applyCreateBoardDialog()"
                     >
-                        Submit
+                        생성
                     </v-btn>
 
                     <v-btn
@@ -66,42 +78,39 @@
                         text
                         @click="createBoardDialog.show = false"
                     >
-                        Cancel
+                        취소
                     </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="deleteDialog.show" max-width="290">
-            <v-card>
-                <v-card-title class="headline"
-                    >게시판을 삭제하시겠습니까?</v-card-title
-                >
-
+        <v-dialog v-model="deleteBoardDialog.show" max-width="400">
+            <v-card :loading="deleteBoardDialog.isLoading">
+                <v-card-title>게시판을 삭제하시겠습니까? </v-card-title>
+                <v-card-text>
+                    {{ deleteBoardDialog.curTitle }}
+                </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
 
                     <v-btn
-                        color="green darken-1"
+                        color="error darken-1"
                         text
-                        @click="
-                            delBoard(temp_id)
-                            deleteDialog.show = false
-                        "
+                        @click="applyDeleteBoardDialog()"
                     >
-                        예
+                        삭제
                     </v-btn>
 
                     <v-btn
                         color="green darken-1"
                         text
-                        @click="deleteDialog.show = false"
+                        @click="deleteBoardDialog.show = false"
                     >
-                        아니요
+                        취소
                     </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </div>
+    </v-row>
 </template>
 
 <script>
@@ -109,39 +118,46 @@ import axios from 'axios'
 export default {
     data() {
         return {
-            boards: {
-                _id: ' ',
-                title: ' ',
-            },
-            title: ' ',
+            boards: [],
             createBoardDialog: {
                 show: false,
                 title: '',
+                isLoading: false,
+                error: '',
             },
-            deleteDialog: {
+            deleteBoardDialog: {
                 show: false,
-                title: '',
+                isLoading: false,
+                error: '',
+                curId: -1,
+                curTitle: '',
             },
+            isAnonymous: false,
         }
     },
     methods: {
-        read(evt) {
-            console.log(evt._id)
-            console.log(evt.title)
-            this.$router.push({
-                path: '/board/' + evt._id,
-            })
-        },
-        createBoard() {
-            axios.post('/simple/boards', {
-                title: this.title,
-            })
-            axios.get('/simple/boards').then(res => {
-                this.boards = res.data
-            })
-        },
         fetch_id(id) {
             this.temp_id = id
+        },
+        showDeleteBoardDialog(board) {
+            this.deleteBoardDialog.curId = board._id
+            this.deleteBoardDialog.curTitle = board.title
+            this.deleteBoardDialog.show = true
+        },
+        async applyDeleteBoardDialog() {
+            this.deleteBoardDialog.isLoading = true
+            try {
+                await axios.delete(
+                    'simple/boards/' + this.deleteBoardDialog.curId
+                )
+                this.deleteBoardDialog.isLoading = false
+                this.deleteBoardDialog.show = false
+
+                await this.fetchBoards()
+            } catch (error) {
+                this.deleteBoardDialog.error = '게시판 삭제에 실패했습니다.'
+            }
+            await this.$store.dispatch('board/fetchBoards')
         },
         delBoard(id) {
             axios.delete('/simple/boards/' + id)
@@ -149,11 +165,36 @@ export default {
                 this.boards = res.data
             })
         },
-    },
-    mounted() {
-        axios.get('/simple/boards').then(res => {
+        async fetchBoards() {
+            this.isLoading = true
+            const res = await axios.get('simple/boards')
             this.boards = res.data
-        })
+            this.isLoading = false
+        },
+        showCreateBoardDialog() {
+            this.createBoardDialog.title = ''
+            this.createBoardDialog.show = true
+        },
+        async applyCreateBoardDialog() {
+            this.createBoardDialog.isLoading = true
+            try {
+                await axios.post('simple/boards', {
+                    title: this.createBoardDialog.title,
+                    isAnonymous: this.isAnonymous,
+                })
+                this.createBoardDialog.isLoading = false
+                this.createBoardDialog.show = false
+                await this.fetchBoards()
+            } catch (error) {
+                console.log(error.response)
+                this.createBoardDialog.error = '게시판 생성에 실패했습니다.'
+            }
+            this.isAnonymous = false
+            await this.$store.dispatch('board/fetchBoards')
+        },
+    },
+    async created() {
+        await this.fetchBoards()
     },
 }
 </script>
