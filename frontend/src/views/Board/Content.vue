@@ -302,6 +302,8 @@ export default {
                 created_date: '',
                 comment: '',
                 files: [],
+                view: '',
+                like: [],
             },
             deleteDialog: {
                 show: false,
@@ -341,17 +343,15 @@ export default {
             )
 
             this.post = res.data
-            console.log(res.data)
             this.post.created_date = moment(res.data.created_date).format(
                 'YYYY/MM/DD HH:MM'
             )
+            console.log(this.post.view)
+            console.log(res.data.view)
             this.comment = res.data.comment.map(comment => {
                 comment.created_date = moment(comment.created_date).format(
                     'YYYY/MM/DD HH:MM'
                 )
-                // if (this.post.isAnonymous == true) {
-                //     comment.writer = '익명'
-                // }
             })
             this.loading = false
         },

@@ -283,6 +283,8 @@ router.get(
             .where('_id')
             .equals(req.params.post_id)
         if (post) {
+            post.view += 1
+            await post.save()
             res.status(200).json({
                 _id: parseInt(post.id),
                 title: post.title,
