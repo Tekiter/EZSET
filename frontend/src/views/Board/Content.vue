@@ -71,19 +71,18 @@
                                     v-if="!authorLike"
                                     @click="clickLike()"
                                 >
-                                    <v-icon>mdi-heart-multiple</v-icon>
-                                    좋아요
+                                    <v-icon>mdi-heart-multiple</v-icon> 좋아요
                                 </v-btn>
                                 <v-btn
                                     class="ma-2"
                                     tile
                                     outlined
-                                    color="black"
+                                    color="purple"
                                     v-else
                                     @click="clickLike()"
                                 >
                                     <v-icon>mdi-heart-off</v-icon>
-                                    취소
+                                    좋아요
                                 </v-btn>
                                 <v-btn
                                     class="ma-2"
