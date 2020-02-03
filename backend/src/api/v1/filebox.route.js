@@ -13,6 +13,8 @@ router.route('/').get(
             const res = await Group.find()
                 .where('parent')
                 .equals(item.id)
+                .sort('isfolder')
+
             if (res) {
                 for (let children of res) {
                     let temp = {
@@ -28,7 +30,9 @@ router.route('/').get(
             return
         }
 
-        const roots = await Group.find().exists('parent', false)
+        const roots = await Group.find()
+            .exists('parent', false)
+            .sort('isfolder')
 
         const result = roots.map(root => {
             return {
@@ -43,7 +47,9 @@ router.route('/').get(
             await loops(root)
         }
 
-        res.json(result)
+        res.json({
+            groups: result,
+        })
     })
 )
 //group 생성 : group의 부모는 항상  group, 자식은 group(isfolder) 이거나 material

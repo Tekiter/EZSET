@@ -94,6 +94,11 @@ const routes = [
         name: 'mypage',
         component: () => import('../views/Mypage.vue'),
     },
+    {
+        path: '/filebox',
+        name: 'filebox',
+        component: () => import('../views/FileBox.vue'),
+    },
 ]
 
 const router = new VueRouter({
