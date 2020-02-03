@@ -294,6 +294,7 @@ router.get(
                 created_date: post.created_date,
                 view: post.view_count,
                 like: post.likes_count,
+                isLike: post.likes_flag(req.user.username),
                 comment: post.comments,
                 files: await getFileInfoArray(post.files),
             })

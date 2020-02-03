@@ -102,7 +102,7 @@
                                         tile
                                         outlined
                                         color="red darken-1"
-                                        v-if="!authorLike"
+                                        v-if="!post.isLike"
                                         @click="clickLike(post.author)"
                                     >
                                         <span
@@ -263,7 +263,6 @@ export default {
     },
     data() {
         return {
-            authorLike: false,
             loading: true,
             post: {
                 _id: '',
@@ -276,6 +275,7 @@ export default {
                 files: [],
                 view: '',
                 like: '',
+                isLike: '',
             },
             writeComment: {
                 content: '',
@@ -315,6 +315,7 @@ export default {
                 )
             })
             this.loading = false
+            console.log(res)
         },
         del_auth(writer) {
             if (this.post.isAnonymous == true) {
@@ -415,7 +416,7 @@ export default {
         },
         async clickLike(author) {
             this.likeLoading = true
-            this.authorLike = !this.authorLike
+            this.post.isLike = !this.post.isLike
             await axios.post(
                 'simple/posts/' + this.$route.params.post_id + '/like'
             )
@@ -425,7 +426,7 @@ export default {
         },
         async clickDislike(author) {
             this.likeLoading = true
-            this.authorLike = !this.authorLike
+            this.post.isLike = !this.post.isLike
             await axios.delete(
                 'simple/posts/' + this.$route.params.post_id + '/like'
             )

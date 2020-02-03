@@ -50,6 +50,10 @@ let postSchema = new Schema({
     },
     view: [{ type: String }],
     like: [{ type: String }],
+    isLike: {
+        type: Boolean,
+        default: false,
+    },
     comments: [commentSchema],
     files: [{ type: String }],
 })
@@ -58,6 +62,16 @@ let postSchema = new Schema({
 postSchema.virtual('view_count').get(function() {
     return this.view ? this.view.length : 0
 })
+
+//좋아요 확인
+postSchema.methods.likes_flag = function(liker) {
+    for (let i = 0; i < this.like.length; i++) {
+        if (this.like[i] == liker) {
+            return true
+        }
+    }
+    return false
+}
 
 //좋아요 카운트
 postSchema.virtual('likes_count').get(function() {
