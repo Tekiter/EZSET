@@ -85,8 +85,9 @@
                                     outlined
                                     color="purple"
                                     v-else
-                                    @click="clickLike(post.author)"
+                                    @click="clickDislike(post.author)"
                                 >
+                                    <!--  -->
                                     <span
                                         ><v-icon>mdi-heart-off</v-icon> 좋아요
                                         <span>{{ post.like }}</span></span
@@ -271,7 +272,7 @@ export default {
                 comment: '',
                 files: [],
                 view: '',
-                like: [],
+                like: '',
             },
             writeComment: {
                 content: '',
@@ -290,9 +291,6 @@ export default {
     },
 
     methods: {
-        clickLike(author) {
-            this.authorLike = !this.authorLike
-        },
         go_modify() {
             this.$router.push(
                 `/update/${this.$route.params.board_id}/${this.$route.params.post_id}`
@@ -307,8 +305,6 @@ export default {
             this.post.created_date = moment(res.data.created_date).format(
                 'YYYY/MM/DD HH:MM'
             )
-            console.log(this.post.view)
-            console.log(res.data.view)
             this.comment = res.data.comment.map(comment => {
                 comment.created_date = moment(comment.created_date).format(
                     'YYYY/MM/DD HH:MM'
@@ -411,6 +407,21 @@ export default {
             this.$router.push({
                 path: '/board/' + this.$route.params.board_id,
             })
+        },
+        async clickLike(author) {
+            this.authorLike = !this.authorLike
+            await axios.post(
+                'simple/posts/' + this.$route.params.post_id + '/like'
+            )
+            this.fetch_data()
+            console.log(this.post)
+        },
+        async clickDislike(author) {
+            this.authorLike = !this.authorLike
+            await axios.delete(
+                'simple/posts/' + this.$route.params.post_id + '/like'
+            )
+            this.fetch_data()
         },
     },
 }

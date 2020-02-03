@@ -484,4 +484,48 @@ router.delete(
     })
 )
 
+//좋아요 생성
+router.post(
+    '/posts/:post_id/like',
+    [param('post_id').isNumeric(), validateParams],
+    asyncRoute(async function(req, res) {
+        try {
+            let postId = parseInt(req.params.post_id)
+            let post = await Post.findOne({ _id: postId })
+            if (!post) {
+                res.status(404).json({ message: 'no post id ' + postId })
+                return
+            }
+            await post.likes_create(req.user.username)
+            res.status(201).json({ message: '좋아요 생성 완료' })
+        } catch (error) {
+            const errr = new Error('database error')
+            errr.status = 500
+            throw errr
+        }
+    })
+)
+
+//좋아요 삭제
+router.delete(
+    '/posts/:post_id/like',
+    [param('post_id').isNumeric(), validateParams],
+    asyncRoute(async function(req, res) {
+        try {
+            let postId = parseInt(req.params.post_id)
+            let post = await Post.findOne({ _id: postId })
+            if (!post) {
+                res.status(404).json({ message: 'no post id ' + postId })
+                return
+            }
+            await post.likes_delete(req.user.username)
+            res.status(201).json({ message: '좋아요 삭제 완료' })
+        } catch (error) {
+            const errr = new Error('database error')
+            errr.status = 500
+            throw errr
+        }
+    })
+)
+
 export default router
