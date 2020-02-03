@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema({
     roles: {
         type: [String],
     },
+    attFlag: {
+        type: Boolean,
+        default: true,
+    },
 })
 
 userSchema

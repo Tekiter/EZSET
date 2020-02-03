@@ -1,76 +1,74 @@
 <template>
-    <v-card>
-        <v-card-title
-            v-if="this.$perm('attendance').can('read')"
-            class="font-weight-thin display-3"
-        >
-            Monthly attendance management
-            <blockquote class="blockquote">
-                설정하신 기간동안의 출석, 지각, 결석, 공결 현황을 조회합니다.
-                날짜를 클릭할 경우, 그 날의 일별 출결 현황을 조회 및 수정 하실
-                수 있습니다.
-            </blockquote>
-        </v-card-title>
+    <div class="ma-3 pa-3 fill-width">
+        <v-skeleton-loader
+            class="mx-auto"
+            type="table"
+            v-if="!tabLoad && this.$perm('attendance').can('read')"
+        ></v-skeleton-loader>
         <div
-            v-if="this.$perm('attendance').can('read')"
-            class="font-weight-medium subtitle-2"
+            v-if="tabLoad && this.$perm('attendance').can('read')"
+            class="fill-height"
         >
-            <v-container>
-                <v-row>
-                    <v-col cols="8" lg="4">
-                        <v-menu
-                            v-model="menu1"
-                            :close-on-content-click="false"
-                            max-width="290"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-text-field
-                                    :value="computedDateStart"
-                                    clearable
-                                    label="Start date"
-                                    readonly
-                                    v-on="on"
-                                    @click:clear="date = null"
-                                ></v-text-field>
-                            </template>
-                            <v-date-picker
-                                v-model="Sdate"
-                                @change="menu1 = false"
-                                locale="ko"
-                            ></v-date-picker>
-                        </v-menu>
-                    </v-col>
-                    <v-col>
-                        부터
-                    </v-col>
-                    <v-col cols="8" lg="4">
-                        <v-menu
-                            v-model="menu2"
-                            :close-on-content-click="false"
-                            max-width="290"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-text-field
-                                    :value="computedDateEnd"
-                                    clearable
-                                    label="End date"
-                                    readonly
-                                    v-on="on"
-                                    @click:clear="date = null"
-                                ></v-text-field>
-                            </template>
-                            <v-date-picker
-                                v-model="Edate"
-                                @change="menu2 = false"
-                                locale="ko"
-                            ></v-date-picker>
-                        </v-menu>
-                    </v-col>
-                    <v-col>
-                        까지
-                    </v-col>
-                </v-row>
-            </v-container>
+            <v-card tile minHeight="95%">
+                <v-container>
+                    <v-row>
+                        <v-col cols="12" lg="5">
+                            <v-menu
+                                v-model="menu1"
+                                :close-on-content-click="false"
+                                max-width="290"
+                            >
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field
+                                        :value="computedDateStart"
+                                        clearable
+                                        label="Start date"
+                                        readonly
+                                        v-on="on"
+                                        @click:clear="date = null"
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker
+                                    v-model="Sdate"
+                                    @change="menu1 = false"
+                                    locale="ko"
+                                ></v-date-picker>
+                            </v-menu>
+                        </v-col>
+                        <v-col cols="12" lg="2" class="text-center">
+                            <v-icon>
+                                mdi-arrow-right-circle
+                            </v-icon>
+                        </v-col>
+                        <v-col cols="12" lg="5">
+                            <v-menu
+                                v-model="menu2"
+                                :close-on-content-click="false"
+                                max-width="290"
+                            >
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field
+                                        :value="computedDateEnd"
+                                        clearable
+                                        label="End date"
+                                        readonly
+                                        v-on="on"
+                                        @click:clear="date = null"
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker
+                                    v-model="Edate"
+                                    @change="menu2 = false"
+                                    locale="ko"
+                                ></v-date-picker>
+                            </v-menu>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-card>
+        </div>
+
+        <div>
             <v-data-table
                 :headers="headers"
                 :items="dataItems"
@@ -114,7 +112,7 @@
                                     >mdi-close</v-icon
                                 >
                                 <v-icon
-                                    color="red"
+                                    color="green"
                                     v-else-if="
                                         item[header.value] == 'official_absence'
                                     "
@@ -141,7 +139,7 @@
                 권한이 없습니다.
             </v-alert>
         </div>
-    </v-card>
+    </div>
 </template>
 <script>
 import moment from 'moment'
@@ -166,6 +164,7 @@ export default {
         } catch (err) {
             console.log(err)
         }
+        this.tabLoad = true
     },
     data() {
         return {
@@ -179,6 +178,7 @@ export default {
             Edate: new Date().toISOString().substr(0, 10),
             menu1: false,
             menu2: false,
+            tabLoad: false,
         }
     },
     computed: {

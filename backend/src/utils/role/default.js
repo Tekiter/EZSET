@@ -14,6 +14,9 @@ export function setDefaultRole(roles) {
         .resource('attendance')
         .canOwn('read')
         .can('att')
+
+        .resource('absence')
+        .canOwn(['create', 'read', 'delete'])
 }
 
 export function setAdminRole(roles) {
@@ -42,4 +45,12 @@ export function setAdminRole(roles) {
 
         .resource('attendance')
         .can(['start', 'att', 'read', 'update'])
+
+        .resource('attendance')
+        .canOwn('read')
+        .can(['start', 'att', 'read', 'update'])
+
+        .resource('absence')
+        .canOwn(['create', 'read', 'delete'])
+        .can(['create', 'read', 'delete'])
 }

@@ -47,6 +47,16 @@
                     >
                 </v-card-actions>
             </v-card>
+            <div>
+                <v-alert
+                    type="warning"
+                    v-if="
+                        !this.$perm('attendance').can('start') && flag == false
+                    "
+                >
+                    출석중이 아닙니다.
+                </v-alert>
+            </div>
         </v-form>
 
         <v-snackbar v-model="snackbar_c" color="success">
@@ -60,6 +70,7 @@
     </v-container>
 </template>
 <script>
+import moment from 'moment'
 import axios from 'axios'
 export default {
     name: 'attendance',
@@ -114,6 +125,9 @@ export default {
             })
             this.flag = false
             this.input_attendance_code = ''
+            this.$router.push(
+                `/AttendanceManageDay/${moment().format('YYYYMMDD')}`
+            )
         },
         async attendanceCheck() {
             try {
