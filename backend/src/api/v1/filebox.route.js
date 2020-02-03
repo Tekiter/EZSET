@@ -9,15 +9,41 @@ const router = Router()
 
 router.route('/').get(
     asyncRoute(async (req, res) => {
-        const groups = await Group.find()
-        res.json(
-            groups.map(group => {
-                return {
-                    _id: board._id,
-                    title: board.title,
+        const loops = async item => {
+            const res = await Group.find()
+                .where('parent')
+                .equals(item.id)
+            if (res) {
+                for (let children of res) {
+                    let temp = {
+                        id: children.id,
+                        name: children.name,
+                        isfolder: children.isfolder,
+                        children: [],
+                    }
+                    item.children.push(temp)
+                    await loops(temp)
                 }
-            })
-        )
+            }
+            return
+        }
+
+        const roots = await Group.find().exists('parent', false)
+
+        const result = roots.map(root => {
+            return {
+                id: root.id,
+                name: root.name,
+                isfolder: root.isfolder,
+                children: [],
+            }
+        })
+
+        for (let root of result) {
+            await loops(root)
+        }
+
+        res.json(result)
     })
 )
 //group 생성 : group의 부모는 항상  group, 자식은 group(isfolder) 이거나 material

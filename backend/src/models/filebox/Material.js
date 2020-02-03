@@ -29,4 +29,4 @@ const MaterialSchema = new mongoose.Schema({
     },
 })
 
-export default mongoose.model('Material', MaterialSchema)
+export default mongoose.model('FileboxMaterial', MaterialSchema)

@@ -1,10 +1,6 @@
 <template>
     <v-list dense>
-        <side-menu-item
-            v-for="(menu, index) in mainMenus"
-            :options="menu"
-            :key="index"
-        />
+        <side-menu-item v-for="(menu, index) in mainMenus" :options="menu" :key="index" />
     </v-list>
 </template>
 <style scoped></style>
@@ -60,6 +56,12 @@ export default {
                     title: '게시판',
                     to: '/board',
                     children: this.$store.getters['board/boardList'],
+                },
+                {
+                    type: 'simple',
+                    icon: 'mdi-package-variant-closed',
+                    title: '자료실',
+                    to: '/filebox',
                 },
             ]
         },

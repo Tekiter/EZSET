@@ -19,4 +19,4 @@ const GroupSchema = new mongoose.Schema({
     children: [{ type: mongoose.SchemaTypes.ObjectId }],
 })
 
-export default mongoose.model('Group', GroupSchema)
+export default mongoose.model('FileboxGroup', GroupSchema)
