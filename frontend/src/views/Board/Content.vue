@@ -73,7 +73,11 @@
                                     v-if="!authorLike"
                                     @click="clickLike(post.author)"
                                 >
-                                    <v-icon>mdi-heart-multiple</v-icon> 좋아요
+                                    <span
+                                        ><v-icon>mdi-heart-multiple</v-icon>
+                                        좋아요
+                                        <span>{{ post.like }}</span></span
+                                    >
                                 </v-btn>
                                 <v-btn
                                     class="ma-2"
@@ -83,8 +87,10 @@
                                     v-else
                                     @click="clickLike(post.author)"
                                 >
-                                    <v-icon>mdi-heart-off</v-icon>
-                                    좋아요
+                                    <span
+                                        ><v-icon>mdi-heart-off</v-icon> 좋아요
+                                        <span>{{ post.like }}</span></span
+                                    >
                                 </v-btn>
                                 <v-btn
                                     class="ma-2"
