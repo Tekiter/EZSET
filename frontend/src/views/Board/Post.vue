@@ -10,8 +10,6 @@
         </div>
         <v-container grid-list-md>
             <div>
-                <br />
-
                 <v-toolbar-title class="d-flex justify-center"
                     ><h1>
                         <strong class="font-weight-medium">{{
@@ -19,40 +17,41 @@
                         }}</strong>
                     </h1></v-toolbar-title
                 >
-                <br />
             </div>
-            <v-data-table
-                :headers="headers"
-                :items="posts"
-                :page.sync="page"
-                :items-per-page="8"
-                hide-default-footer
-                mobile-breakpoint="0"
-                class="hidden-sm-and-down"
-                @page-count="pageCount = $event"
-            >
-                <template v-slot:item.title="props">
-                    <a @click="read(props.item)">
-                        {{ props.item.title }}
-                    </a>
-                </template>
-            </v-data-table>
-            <v-data-table
-                :headers="headersTwo"
-                :items="posts"
-                :page.sync="page"
-                :items-per-page="8"
-                hide-default-footer
-                mobile-breakpoint="0"
-                class="hidden-md-and-up"
-                @page-count="pageCount = $event"
-            >
-                <template v-slot:item.title="props">
-                    <a @click="read(props.item)">
-                        {{ props.item.title }}
-                    </a>
-                </template>
-            </v-data-table>
+            <v-card outlined>
+                <v-data-table
+                    :headers="headers"
+                    :items="posts"
+                    :page.sync="page"
+                    :items-per-page="8"
+                    hide-default-footer
+                    mobile-breakpoint="0"
+                    class="hidden-sm-and-down"
+                    @page-count="pageCount = $event"
+                >
+                    <template v-slot:item.title="props">
+                        <a @click="read(props.item)">
+                            {{ props.item.title }}
+                        </a>
+                    </template>
+                </v-data-table>
+                <v-data-table
+                    :headers="headersTwo"
+                    :items="posts"
+                    :page.sync="page"
+                    :items-per-page="8"
+                    hide-default-footer
+                    mobile-breakpoint="0"
+                    class="hidden-md-and-up"
+                    @page-count="pageCount = $event"
+                >
+                    <template v-slot:item.title="props">
+                        <a @click="read(props.item)">
+                            {{ props.item.title }}
+                        </a>
+                    </template>
+                </v-data-table>
+            </v-card>
             <div class="row">
                 <div class="col"></div>
                 <div class="col">
