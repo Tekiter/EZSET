@@ -48,10 +48,15 @@ let postSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    view: { type: Number, default: 0 },
+    view: [{ type: String }],
     like: [{ type: String }],
     comments: [commentSchema],
     files: [{ type: String }],
+})
+
+//조회수 카운트
+postSchema.virtual('view_count').get(function() {
+    return this.view ? this.view.length : 0
 })
 
 //좋아요 카운트

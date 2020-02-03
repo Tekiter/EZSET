@@ -71,6 +71,7 @@
                                     outlined
                                     color="red darken-1"
                                     v-if="!authorLike"
+                                    :loading="likeLoading"
                                     @click="clickLike(post.author)"
                                 >
                                     <span
@@ -85,9 +86,9 @@
                                     outlined
                                     color="purple"
                                     v-else
+                                    :loading="likeLoading"
                                     @click="clickDislike(post.author)"
                                 >
-                                    <!--  -->
                                     <span
                                         ><v-icon>mdi-heart-off</v-icon> 좋아요
                                         <span>{{ post.like }}</span></span
@@ -284,6 +285,7 @@ export default {
             fetchCommentContent: '',
             editContent: '',
             commentIdx: '-1',
+            likeLoading: false,
         }
     },
     mounted() {
@@ -399,6 +401,7 @@ export default {
                 }
             )
             this.fetch_data()
+            this.commentIdx = -1
         },
         fetchComment(content) {
             this.editContent = content
@@ -409,19 +412,23 @@ export default {
             })
         },
         async clickLike(author) {
+            this.likeLoading = true
             this.authorLike = !this.authorLike
             await axios.post(
                 'simple/posts/' + this.$route.params.post_id + '/like'
             )
             this.fetch_data()
             console.log(this.post)
+            this.likeLoading = false
         },
         async clickDislike(author) {
+            this.likeLoading = true
             this.authorLike = !this.authorLike
             await axios.delete(
                 'simple/posts/' + this.$route.params.post_id + '/like'
             )
             this.fetch_data()
+            this.likeLoading = false
         },
     },
 }

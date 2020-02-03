@@ -283,7 +283,7 @@ router.get(
             .where('_id')
             .equals(req.params.post_id)
         if (post) {
-            post.view += 1
+            //조회수 증가수정필요
             await post.save()
             res.status(200).json({
                 _id: parseInt(post.id),
@@ -292,7 +292,7 @@ router.get(
                 author: post.author,
                 isAnonymous: post.isAnonymous,
                 created_date: post.created_date,
-                view: post.view,
+                view: post.view_count,
                 like: post.likes_count,
                 comment: post.comments,
                 files: await getFileInfoArray(post.files),
@@ -333,7 +333,7 @@ router.get(
                         author: post.author,
                         isAnonymous: post.isAnonymous,
                         created_date: post.created_date,
-                        view: post.view,
+                        view: post.view_count,
                         like: post.likes_count,
                         comment: post.comments,
                     }
