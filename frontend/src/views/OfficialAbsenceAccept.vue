@@ -1,5 +1,29 @@
 <template>
-    <v-container>
+    <v-container class="fill-height">
+        <v-row>
+            <v-col cols="4" class="fill-height">
+                <v-card>
+                    <v-card-title>
+                        날짜 선택
+                    </v-card-title>
+                    <v-card-text>
+                        2020년 N 월 N 일
+                    </v-card-text>
+                    <v-date-picker
+                        full-width
+                        class="mt-0"
+                        no-title
+                    ></v-date-picker>
+                </v-card>
+            </v-col>
+            <v-col cols="8" class="fill-height">
+                <v-card>
+                    <v-card-title>
+                        유저들
+                    </v-card-title>
+                </v-card>
+            </v-col>
+        </v-row>
         <v-row>
             <v-col>
                 <div class="d-flex flex-row mb-6">
