@@ -1,5 +1,6 @@
 <template>
-    <v-card>
+<div class ="ma-3 fill-height">
+    <v-card tile minHeight="95%">
         <v-skeleton-loader
             class="mx-auto"
             type="table"
@@ -50,106 +51,102 @@
                                 <!-- 월/주/4일/일별 선택시 기준이 되는 단위 Computed 속성에 존재-->
                                 <v-toolbar-title>{{ title }}</v-toolbar-title>
                                 <v-spacer></v-spacer>
-                          
-                                    <form>
-                                        <v-dialog
-                                            v-model="absenceResDialog.show"
-                                            persistent
-                                            max-width="290"
-                                        >
-                                            <template v-slot:activator="{ on }">
-                                                <v-btn
-                                                    color="primary"
-                                                    dark
-                                                    v-on="on"
-                                                    >결석예약</v-btn
+
+                                <form>
+                                    <v-dialog
+                                        v-model="absenceResDialog.show"
+                                        persistent
+                                        max-width="290"
+                                    >
+                                        <template v-slot:activator="{ on }">
+                                            <v-btn
+                                                color="primary"
+                                                dark
+                                                v-on="on"
+                                                >결석예약</v-btn
+                                            >
+                                        </template>
+                                        <v-card>
+                                            <v-date-picker
+                                                v-model="dates"
+                                                multiple
+                                            ></v-date-picker>
+                                            <v-menu
+                                                ref="menu"
+                                                v-model="menu"
+                                                :close-on-content-click="false"
+                                                :return-value.sync="dates"
+                                                transition="scale-transition"
+                                                offset-y
+                                                full-width
+                                                min-width="290px"
+                                            >
+                                                <template
+                                                    v-slot:activator="{
+                                                        on,
+                                                    }"
                                                 >
-                                            </template>
-                                            <v-card>
+                                                    <v-combobox
+                                                        v-model="dates"
+                                                        multiple
+                                                        chips
+                                                        small-chips
+                                                        label="Multiple picker in menu"
+                                                        prepend-icon="mdi-plus"
+                                                        readonly
+                                                        v-on="on"
+                                                    ></v-combobox>
+                                                </template>
                                                 <v-date-picker
                                                     v-model="dates"
                                                     multiple
-                                                ></v-date-picker>
-                                                <v-menu
-                                                    ref="menu"
-                                                    v-model="menu"
-                                                    :close-on-content-click="
-                                                        false
-                                                    "
-                                                    :return-value.sync="dates"
-                                                    transition="scale-transition"
-                                                    offset-y
-                                                    full-width
-                                                    min-width="290px"
+                                                    no-title
+                                                    scrollable
                                                 >
-                                                    <template
-                                                        v-slot:activator="{
-                                                            on,
-                                                        }"
-                                                    >
-                                                        <v-combobox
-                                                            v-model="dates"
-                                                            multiple
-                                                            chips
-                                                            small-chips
-                                                            label="Multiple picker in menu"
-                                                            prepend-icon="mdi-plus"
-                                                            readonly
-                                                            v-on="on"
-                                                        ></v-combobox>
-                                                    </template>
-                                                    <v-date-picker
-                                                        v-model="dates"
-                                                        multiple
-                                                        no-title
-                                                        scrollable
-                                                    >
-                                                        <v-spacer></v-spacer>
-                                                        <v-btn
-                                                            text
-                                                            color="primary"
-                                                            @click="
-                                                                menu = false
-                                                            "
-                                                            >Cancel</v-btn
-                                                        >
-                                                        <v-btn
-                                                            text
-                                                            color="primary"
-                                                            @click="
-                                                                $refs.menu.save(
-                                                                    dates
-                                                                )
-                                                            "
-                                                            >OK</v-btn
-                                                        >
-                                                    </v-date-picker>
-                                                </v-menu>
-                                                <v-text-field
-                                                    label="결석사유"
-                                                    v-model="absence_reason"
-                                                ></v-text-field>
-                                                <v-card-actions>
                                                     <v-spacer></v-spacer>
                                                     <v-btn
-                                                        color="green darken-1"
                                                         text
-                                                        @click="
-                                                            absenceResDialog.show = false
-                                                        "
-                                                        >취소</v-btn
+                                                        color="primary"
+                                                        @click="menu = false"
+                                                        >Cancel</v-btn
                                                     >
                                                     <v-btn
-                                                        color="green darken-1"
                                                         text
-                                                        @click="reservation"
-                                                        >확인</v-btn
+                                                        color="primary"
+                                                        @click="
+                                                            $refs.menu.save(
+                                                                dates
+                                                            )
+                                                        "
+                                                        >OK</v-btn
                                                     >
-                                                </v-card-actions>
-                                            </v-card>
-                                        </v-dialog>
-                                    </form>
-                            
+                                                </v-date-picker>
+                                            </v-menu>
+                                            <v-text-field
+                                                label="결석사유"
+                                                v-model="absence_reason"
+                                            ></v-text-field>
+                                            <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-btn
+                                                    color="green darken-1"
+                                                    text
+                                                    @click="
+                                                        absenceResDialog.show = false
+                                                    "
+                                                    >취소</v-btn
+                                                >
+                                                <v-btn
+                                                    color="green darken-1"
+                                                    text
+                                                    @click="reservation"
+                                                    >확인</v-btn
+                                                >
+                                            </v-card-actions>
+                                        </v-card>
+                                    </v-dialog>
+                                </form>
+
                                 <!-- 월/주/4일/일별을 선택하게 하는 드롭다운 메뉴 -->
                                 <v-menu bottom right>
                                     <template v-slot:activator="{ on }">
@@ -199,7 +196,6 @@
                                 color="primary"
                                 :events="events"
                                 :event-color="getEventColor"
-                                :now="today"
                                 :type="type"
                                 @click:event="showEvent"
                                 @click:more="viewDay"
@@ -322,6 +318,7 @@
             </v-btn>
         </v-snackbar>
     </v-card>
+    </div>
 </template>
 <script>
 // 모든 출결정보를 가지고있다가 event 배열에 이벤트를 월이 변경될 때마다 골라서 넣어주면 된다.
@@ -420,9 +417,6 @@ export default {
             })
         },
     },
-    mounted() {
-        this.$refs.calendar.checkChange()
-    },
     methods: {
         viewDay({ date }) {
             this.focus = date
@@ -432,7 +426,7 @@ export default {
             return event.color
         },
         setToday() {
-            this.focus = this.today
+            this.focus = undefined
         },
         prev() {
             this.$refs.calendar.prev()
