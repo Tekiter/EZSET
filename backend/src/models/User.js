@@ -21,7 +21,9 @@ const userSchema = new mongoose.Schema({
     roles: {
         type: [String],
     },
-    attFlag: {
+
+    // 출석 대상 유저인지 표시
+    attable: {
         type: Boolean,
         default: true,
     },
