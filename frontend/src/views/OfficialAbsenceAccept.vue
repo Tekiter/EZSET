@@ -15,7 +15,7 @@
         <v-row>
             <v-col
                 cols="12"
-                md="4"
+                md="3"
                 sm="6"
                 v-for="(item, index) in Official_Absence_No"
                 :key="index"
@@ -27,15 +27,23 @@
                         <div class="text--primary">
                             {{ item.reason }}
                         </div>
+                        <v-checkbox
+                            v-model="checkbox"
+                            :value="item.name"
+                        ></v-checkbox>
                     </v-card-text>
-                    <v-content>
-                        <!--<v-checkbox v-model="checkbox" + index></v-checkbox>-->
-                    </v-content>
                 </v-card>
             </v-col>
         </v-row>
 
-        <div>승인된 목록</div>
+        <v-row>
+            <v-col><div class="d-flex flex-row mb-6">승인된 목록</div></v-col>
+            <v-col class="d-flex flex-row-reverse">
+                <v-btn text color="deep-purple accent-4">
+                    승인취소
+                </v-btn>
+            </v-col>
+        </v-row>
         <v-row v-for="item_Y in Official_Absence_Yes" :key="item_Y.id">
             <v-col cols="12" md="4" sm="6">
                 <v-card>
@@ -48,14 +56,6 @@
                             {{ item_Y.reason }}
                         </div>
                     </v-card-text>
-                    <v-card-actions>
-                        <v-btn text color="deep-purple accent-4">
-                            승인
-                        </v-btn>
-                        <v-btn text color="deep-purple accent-4">
-                            승인취소
-                        </v-btn>
-                    </v-card-actions>
                 </v-card>
             </v-col>
         </v-row>
@@ -68,6 +68,7 @@ export default {
     data: () => ({
         Official_Absence_No: [],
         Official_Absence_Yes: [],
+        checkbox: [],
     }),
     async created() {
         try {
