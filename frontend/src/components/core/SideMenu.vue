@@ -74,6 +74,11 @@ export default {
                             to: '/OfficialAbsenceAccept',
                             perm: this.$perm('attendance').can('read'),
                         },
+                        {
+                            title: '출석 설정',
+                            to: '/manage/attendance',
+                            perm: this.$perm('attendance').can('read'),
+                        },
                     ],
                 },
                 {
