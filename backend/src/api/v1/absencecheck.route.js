@@ -75,7 +75,7 @@ router.get(
             const cursor_Yes = await OfficialAbsence.find({
                 day: { $gte: moment().format('YYYY-MM-DD') },
                 approval: 'Yes',
-            }).sort({ name: 1 })
+            }).sort({ day: 1 })
             res.json({ noanswer: cursor_No, yesanswer: cursor_Yes })
         } catch (err) {
             res.status(501).json()
