@@ -87,7 +87,9 @@ router.get(
     asyncRoute(async function(req, res) {
         var Date = moment().format('YYYYMMDD')
         //get Userlist in User collection
-        const userList = await User.find().select('username')
+        const userList = await User.find({
+            attFlag: true,
+        }).select('username')
         //create db - AttendanceDay
         var attendanceDay = new AttendanceDay()
         attendanceDay.day = Date
@@ -191,6 +193,8 @@ router.post(
     })
 )
 
+//users Collection에서 모든 사용자를 가져옴
+//AttendnaceManageDay 페이지에서 사용
 router.get(
     '/attendanceUserList',
     [perm('attendance').can('read')],
@@ -199,7 +203,6 @@ router.get(
             const userList = await User.find().select('username')
             res.json(userList)
         } catch (err) {
-            //console.log(err)
             res.status(501).json()
         }
     })

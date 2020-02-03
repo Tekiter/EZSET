@@ -1,15 +1,5 @@
 <template>
     <v-card>
-        <v-card-title
-            v-if="this.$perm('attendance').canOwn('read')"
-            class="font-weight-thin display-3"
-        >
-            Monthly attendance management
-            <blockquote class="blockquote">
-                출석, 지각, 결석, 공결 현황을 조회합니다. 날짜를 클릭할 경우,
-                상세 현황을 조회하실 수 있습니다.
-            </blockquote>
-        </v-card-title>
         <v-skeleton-loader
             class="mx-auto"
             type="table"

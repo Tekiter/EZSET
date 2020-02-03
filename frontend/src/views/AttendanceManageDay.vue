@@ -1,15 +1,5 @@
 <template>
     <v-card>
-        <v-card-title
-            v-if="this.$perm('attendance').can('read')"
-            class="font-weight-thin display-3"
-        >
-            Daily attendance management
-            <blockquote class="blockquote">
-                하루의 출결 현황을 수정 및 확인하실 수 있습니다. 변경하실 내용이
-                있다면, 변경할 내용을 나타내는 아이콘을 선택하시면 됩니다.
-            </blockquote>
-        </v-card-title>
         <v-skeleton-loader
             class="mx-auto"
             type="table"
@@ -196,7 +186,7 @@
                 </template>
             </v-simple-table>
             <div>
-                <v-alert type="warning" v-if="absenceDate == []">
+                <v-alert type="warning" v-if="absenceDate.length == 0">
                     공결정보가 없습니다.
                 </v-alert>
             </div>

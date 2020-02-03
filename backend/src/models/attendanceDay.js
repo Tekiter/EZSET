@@ -14,6 +14,7 @@ const Status = mongoose.model('status', statusSchema)
 var attendanceDaySchema = new Schema({
     day: {
         type: String,
+        unique: true,
     },
     status: [statusSchema],
 })
