@@ -55,6 +55,11 @@ const routes = [
         component: () => import('../views/OfficialAbsenceAccept.vue'),
     },
     {
+        path: '/manage/attendance',
+        name: 'attendanceusermanage',
+        component: () => import('../views/AttendanceManage.vue'),
+    },
+    {
         path: '/board',
         name: 'board',
         component: () => import('../views/Board/Board.vue'),
