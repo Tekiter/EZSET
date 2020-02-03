@@ -48,7 +48,7 @@ let postSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    view: [{ type: String }],
+    view: { type: Number, default: 0 },
     like: [{ type: String }],
     isLike: {
         type: Boolean,
@@ -56,11 +56,6 @@ let postSchema = new Schema({
     },
     comments: [commentSchema],
     files: [{ type: String }],
-})
-
-//조회수 카운트
-postSchema.virtual('view_count').get(function() {
-    return this.view ? this.view.length : 0
 })
 
 //좋아요 확인

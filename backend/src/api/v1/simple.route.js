@@ -16,6 +16,7 @@ import {
 } from '../../utils/file'
 const router = Router()
 const crypto = require('crypto')
+const viewArray = []
 
 //게시판 생성
 router.post(
@@ -283,7 +284,24 @@ router.get(
             .where('_id')
             .equals(req.params.post_id)
         if (post) {
-            //조회수 증가수정필요
+            if (viewArray.indexOf(req.params.post_id) == -1) {
+                viewArray.push({
+                    id: req.params.post_id,
+                    name: req.user.username,
+                })
+                setTimeout(function() {
+                    viewArray.delete({
+                        id: req.params.post_id,
+                        name: req.user.username,
+                    })
+                }, 30000)
+            }
+            for (let i = 0; i < viewArray.length; i++) {
+                if (viewArray[i].id == req.params.post_id) {
+                    post.view++
+                }
+            }
+
             await post.save()
             res.status(200).json({
                 _id: parseInt(post.id),
@@ -292,7 +310,7 @@ router.get(
                 author: post.author,
                 isAnonymous: post.isAnonymous,
                 created_date: post.created_date,
-                view: post.view_count,
+                view: post.view,
                 like: post.likes_count,
                 isLike: post.likes_flag(req.user.username),
                 comment: post.comments,
@@ -334,7 +352,7 @@ router.get(
                         author: post.author,
                         isAnonymous: post.isAnonymous,
                         created_date: post.created_date,
-                        view: post.view_count,
+                        view: post.view,
                         like: post.likes_count,
                         comment: post.comments,
                     }
