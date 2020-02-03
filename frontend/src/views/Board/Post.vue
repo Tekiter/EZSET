@@ -8,7 +8,7 @@
                 disabled
             ></v-text-field>
         </div>
-        <v-container>
+        <v-container grid-list-md>
             <div>
                 <br />
 
@@ -27,7 +27,24 @@
                 :page.sync="page"
                 :items-per-page="8"
                 hide-default-footer
-                class="elevation-1"
+                mobile-breakpoint="0"
+                class="hidden-sm-and-down"
+                @page-count="pageCount = $event"
+            >
+                <template v-slot:item.title="props">
+                    <a @click="read(props.item)">
+                        {{ props.item.title }}
+                    </a>
+                </template>
+            </v-data-table>
+            <v-data-table
+                :headers="headersTwo"
+                :items="posts"
+                :page.sync="page"
+                :items-per-page="8"
+                hide-default-footer
+                mobile-breakpoint="0"
+                class="hidden-md-and-up"
                 @page-count="pageCount = $event"
             >
                 <template v-slot:item.title="props">
@@ -50,7 +67,7 @@
                             class="ma-2"
                             tile
                             outlined
-                            color="black"
+                            color="black darken-2"
                             :to="'/write/' + curid"
                         >
                             <v-icon left>mdi-pencil</v-icon> 글쓰기
@@ -94,6 +111,23 @@ export default {
                 },
                 { text: '작성자', value: 'author', sortable: false },
                 { text: '작성일', value: 'created_date', width: '20%' },
+                { text: '추천', value: 'like' },
+                { text: '조회', value: 'view' },
+            ],
+            headersTwo: [
+                {
+                    text: '  번호',
+                    align: 'left',
+                    sortable: false,
+                    value: 'number',
+                },
+                {
+                    text: '제목',
+                    value: 'title',
+                    sortable: false,
+                    width: '50%',
+                },
+                { text: '작성자', value: 'author', sortable: false },
                 { text: '추천', value: 'like' },
                 { text: '조회', value: 'view' },
             ],
