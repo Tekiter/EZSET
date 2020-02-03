@@ -16,9 +16,20 @@
             <v-row v-if="!loading">
                 <v-col>
                     <v-card outlined>
-                        <v-card-title class="font-weight-black">{{
-                            post.title
-                        }}</v-card-title>
+                        <v-card-title class="font-weight-black"
+                            >{{ post.title }}
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                class="ma-2"
+                                tile
+                                outlined
+                                color="blue darken-2"
+                                @click="back()"
+                            >
+                                <v-icon left>mdi-arrow-left-circle</v-icon>
+                                목록
+                            </v-btn>
+                        </v-card-title>
                         <!-- <v-subheader class="row">
                             <div class="col" v-if="post.isAnonymous == false">
                                 작성자 {{ post.author }}
@@ -63,67 +74,60 @@
                             <viewer :value="post.content" />
 
                             <file-download :files="post.files"></file-download>
-
-                            <div class="d-flex flex-row-reverse">
-                                <v-btn
-                                    class="ma-2"
-                                    tile
-                                    outlined
-                                    color="red darken-1"
-                                    v-if="!authorLike"
-                                    @click="clickLike(post.author)"
-                                >
-                                    <span
-                                        ><v-icon>mdi-heart-multiple</v-icon>
-                                        좋아요
-                                        <span>{{ post.like }}</span></span
+                            <v-row class="d-flex flex-row-reverse">
+                                <div>
+                                    <v-btn
+                                        class="ma-2"
+                                        tile
+                                        outlined
+                                        color="green darken-2"
+                                        v-if="del_auth(post.author)"
+                                        @click="go_modify()"
                                     >
-                                </v-btn>
-                                <v-btn
-                                    class="ma-2"
-                                    tile
-                                    outlined
-                                    color="purple"
-                                    v-else
-                                    @click="clickDislike(post.author)"
-                                >
-                                    <!--  -->
-                                    <span
-                                        ><v-icon>mdi-heart-off</v-icon> 좋아요
-                                        <span>{{ post.like }}</span></span
+                                        <v-icon left>mdi-autorenew</v-icon>
+                                        수정하기
+                                    </v-btn>
+                                    <v-btn
+                                        class="ma-2"
+                                        tile
+                                        outlined
+                                        color="black"
+                                        v-if="del_auth(post.author)"
+                                        @click="deletePost"
                                     >
-                                </v-btn>
-                                <v-btn
-                                    class="ma-2"
-                                    tile
-                                    outlined
-                                    color="black"
-                                    v-if="del_auth(post.author)"
-                                    @click="deletePost"
-                                >
-                                    <v-icon>mdi-trash-can</v-icon> 삭제하기
-                                </v-btn>
-                                <v-btn
-                                    class="ma-2"
-                                    tile
-                                    outlined
-                                    color="green darken-2"
-                                    v-if="del_auth(post.author)"
-                                    @click="go_modify()"
-                                >
-                                    <v-icon left>mdi-autorenew</v-icon> 수정하기
-                                </v-btn>
-                                <v-btn
-                                    class="ma-2"
-                                    tile
-                                    outlined
-                                    color="blue darken-3"
-                                    @click="back()"
-                                >
-                                    <v-icon left>mdi-post</v-icon>
-                                    목록
-                                </v-btn>
-                            </div>
+                                        <v-icon>mdi-trash-can</v-icon> 삭제하기
+                                    </v-btn>
+                                    <v-btn
+                                        class="ma-2"
+                                        tile
+                                        outlined
+                                        color="red darken-1"
+                                        v-if="!authorLike"
+                                        @click="clickLike(post.author)"
+                                    >
+                                        <span
+                                            ><v-icon>mdi-heart-multiple</v-icon>
+                                            좋아요
+                                            <span>{{ post.like }}</span></span
+                                        >
+                                    </v-btn>
+                                    <v-btn
+                                        class="ma-2"
+                                        tile
+                                        outlined
+                                        color="purple"
+                                        v-else
+                                        @click="clickDislike(post.author)"
+                                    >
+                                        <!--  -->
+                                        <span
+                                            ><v-icon>mdi-heart-off</v-icon>
+                                            좋아요
+                                            <span>{{ post.like }}</span></span
+                                        >
+                                    </v-btn>
+                                </div>
+                            </v-row>
                         </v-card-text>
                     </v-card>
                     <v-card class="mt-2" outlined>
