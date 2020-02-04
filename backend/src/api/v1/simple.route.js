@@ -284,27 +284,18 @@ router.get(
             .where('_id')
             .equals(req.params.post_id)
         if (post) {
-            let flag = false
             if (!viewObj[req.params.post_id]) {
-                viewObj[req.params.post_id] = [req.user.username]
-                post.view++
-                flag = true
-            } else {
-                if (
-                    viewObj[req.params.post_id].indexOf(req.user.username) == -1
-                ) {
-                    viewObj[req.params.post_id].push(req.user.username)
-                    post.view++
-                    flag = true
-                }
+                viewObj[req.params.post_id] = []
             }
-            if (flag) {
+            if (viewObj[req.params.post_id].indexOf(req.user.username) == -1) {
+                viewObj[req.params.post_id].push(req.user.username)
+                post.view++
                 setTimeout(() => {
                     viewObj[req.params.post_id].splice(
                         viewObj[req.params.post_id].indexOf(req.user.username),
                         1
                     )
-                }, 30000)
+                }, 600000)
                 for (let i in viewObj) {
                     if (i.length == 0) {
                         delete viewObj.i
