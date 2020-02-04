@@ -16,7 +16,7 @@ import {
 } from '../../utils/file'
 const router = Router()
 const crypto = require('crypto')
-const viewArray = []
+const viewObj = new Object()
 
 //게시판 생성
 router.post(
@@ -284,21 +284,31 @@ router.get(
             .where('_id')
             .equals(req.params.post_id)
         if (post) {
-            if (viewArray.indexOf(req.params.post_id) == -1) {
-                viewArray.push({
-                    id: req.params.post_id,
-                    name: req.user.username,
-                })
-                setTimeout(function() {
-                    viewArray.delete({
-                        id: req.params.post_id,
-                        name: req.user.username,
-                    })
-                }, 30000)
-            }
-            for (let i = 0; i < viewArray.length; i++) {
-                if (viewArray[i].id == req.params.post_id) {
+            let flag = false
+            if (!viewObj[req.params.post_id]) {
+                viewObj[req.params.post_id] = [req.user.username]
+                post.view++
+                flag = true
+            } else {
+                if (
+                    viewObj[req.params.post_id].indexOf(req.user.username) == -1
+                ) {
+                    viewObj[req.params.post_id].push(req.user.username)
                     post.view++
+                    flag = true
+                }
+            }
+            if (flag) {
+                setTimeout(() => {
+                    viewObj[req.params.post_id].splice(
+                        viewObj[req.params.post_id].indexOf(req.user.username),
+                        1
+                    )
+                }, 30000)
+                for (let i in viewObj) {
+                    if (i.length == 0) {
+                        delete viewObj.i
+                    }
                 }
             }
 
