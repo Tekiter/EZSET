@@ -25,7 +25,7 @@
                     :page.sync="page"
                     :items-per-page="8"
                     hide-default-footer
-                    mobile-breakpoint="0"
+                    :mobile-breakpoint="NaN"
                     class="hidden-sm-and-down"
                     @page-count="pageCount = $event"
                 >
@@ -41,7 +41,7 @@
                     :page.sync="page"
                     :items-per-page="8"
                     hide-default-footer
-                    mobile-breakpoint="0"
+                    :mobile-breakpoint="NaN"
                     class="hidden-md-and-up"
                     @page-count="pageCount = $event"
                 >
