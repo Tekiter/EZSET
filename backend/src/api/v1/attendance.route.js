@@ -260,22 +260,26 @@ router.get(
         const users = await User.find()
             .where('attable')
             .equals(true)
-            .select('username')
+            .sort('username')
+            .select('username info')
 
         const excludedUsers = await User.find()
             .where('attable')
             .ne(true)
-            .select('username')
+            .sort('username')
+            .select('username info')
 
         res.json({
             attableUsers: users.map(user => {
                 return {
                     username: user.username,
+                    realname: user.info.realname,
                 }
             }),
             excludedUsers: excludedUsers.map(user => {
                 return {
                     username: user.username,
+                    realname: user.info.realname,
                 }
             }),
         })
@@ -310,6 +314,8 @@ router.put(
     })
 )
 
+// manage/user/:username
+// 출석 대상인 유저 삭제
 router.delete(
     '/manage/user/:username',
     [param('username').custom(checkUsername), validateParams],

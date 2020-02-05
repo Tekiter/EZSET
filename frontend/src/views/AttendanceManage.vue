@@ -9,7 +9,7 @@
                 </v-card>
             </v-col>
             <v-col cols="6" class="fill-height">
-                <v-card class="fill-height">
+                <v-card class="fill-height" :loading="attable.isLoading">
                     <v-toolbar flat>
                         <v-toolbar-title>
                             출석 대상 유저
@@ -85,6 +85,11 @@
                                     <v-list-item-content>
                                         <v-list-item-title>
                                             {{ user.username }}
+                                            <span
+                                                class="caption font-weight-light ml-3"
+                                            >
+                                                {{ user.realname }}
+                                            </span>
                                         </v-list-item-title>
                                     </v-list-item-content>
                                 </template>
