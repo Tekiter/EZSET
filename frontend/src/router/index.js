@@ -65,6 +65,11 @@ const routes = [
         component: () => import('../views/Board/UpdatePost.vue'),
     },
     {
+        path: '/searchpost',
+        name: 'serchPost',
+        component: () => import('../views/Board/SearchPost.vue'),
+    },
+    {
         path: '/manage/users',
         name: 'manageUsers',
         component: () => import('../views/Manage/UserManage.vue'),
