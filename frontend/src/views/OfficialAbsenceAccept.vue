@@ -21,64 +21,80 @@
                 </v-card>
             </v-col>
             <v-col>
-                <v-row>
-                    <v-col>
-                        승인되지 않은 목록
-                        <v-btn text color="deep-purple accent-4">
-                            승인
-                        </v-btn>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <!--사람들 목록 출력하는 data table 부분-->
-                    <v-col cols="" class="fill-height">
-                        <v-card>
-                            <template>
-                                <v-data-table
-                                    :headers="headers"
-                                    :items="official_absence_arr"
-                                    :items-per-page="5"
-                                    class="elevation-1"
-                                    disable-sort
-                                >
-                                    <tr>
-                                        <td></td>
-                                    </tr>
-                                </v-data-table>
+                <v-toolbar dense flat>
+                    <v-toolbar-title>승인 안됨</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        text
+                        color="deep-purple accent-4"
+                        small
+                        class="d-flex flex-row-reverse"
+                    >
+                        승인</v-btn
+                    >
+                </v-toolbar>
+                <v-list three-line flat>
+                    <v-divider></v-divider>
+                    <v-list-item-group v-model="checkbox" multiple>
+                        <v-list-item
+                            v-for="item in official_absence_No_arr"
+                            :key="item.name"
+                        >
+                            <template v-slot:default="{ active, toggle }">
+                                <v-list-item-action>
+                                    <v-checkbox
+                                        :input-value="active"
+                                        @click="toggle"
+                                    ></v-checkbox>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>{{
+                                        item.name
+                                    }}</v-list-item-title>
+                                    <v-list-item-subtitle>
+                                        {{ item.reason }}
+                                    </v-list-item-subtitle>
+                                </v-list-item-content>
                             </template>
-                        </v-card>
-                    </v-col>
-                </v-row>
+                        </v-list-item>
+                    </v-list-item-group>
+                </v-list>
             </v-col>
             <v-col>
-                <v-row>
-                    <v-col>
-                        승인된 목록
-                        <v-btn text color="deep-purple accent-4">
-                            승인취소
-                        </v-btn>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <!--사람들 목록 출력하는 data table 부분-->
-                    <v-col cols="" class="fill-height">
-                        <v-card>
-                            <template>
-                                <v-data-table
-                                    :headers="headers"
-                                    :items="official_absence_arr"
-                                    :items-per-page="5"
-                                    class="elevation-1"
-                                    disable-sort
-                                >
-                                    <tr>
-                                        <td></td>
-                                    </tr>
-                                </v-data-table>
-                            </template>
-                        </v-card>
-                    </v-col>
-                </v-row>
+                <v-toolbar dense flat>
+                    <v-toolbar-title>승인 됨</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        text
+                        color="deep-purple accent-4"
+                        small
+                        class="d-flex flex-row-reverse"
+                    >
+                        승인취소</v-btn
+                    >
+                </v-toolbar>
+                <v-list three-line>
+                    <v-divider></v-divider>
+                    <v-list-item
+                        v-for="item in official_absence_Yes_arr"
+                        :key="item"
+                    >
+                        <v-list-item-avatar>
+                            <v-checkbox
+                                v-model="checkbox"
+                                :value="item.name"
+                            ></v-checkbox>
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                            <v-list-item-title>{{
+                                item.name
+                            }}</v-list-item-title>
+                            <v-list-item-subtitle>
+                                {{ item.reason }}
+                            </v-list-item-subtitle>
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list>
             </v-col>
         </v-row>
     </v-container>
@@ -92,16 +108,6 @@ export default {
         Official_Absence_Yes: [],
         checkbox: [],
         picker_date: moment(new Date()).format('YYYY-MM-DD'),
-        headers: [
-            {
-                text: 'Name',
-                align: 'left',
-                sortable: false,
-                value: 'name',
-            },
-            { text: 'Reason', value: 'reason' },
-            { text: '', align: 'right', value: 'checkbox' },
-        ],
     }),
     async created() {
         try {
@@ -118,11 +124,15 @@ export default {
                 return this.dayprint(item.day)
             })
         },
-        official_absence_arr() {
+        official_absence_No_arr() {
             return this.Official_Absence_No.filter(d => {
-                console.log(this.dayprint(d.day))
-                console.log(this.dayprint(this.picker_date))
-                console.log(this.picker_date)
+                return this.dayprint(d.day) == this.dayprint(this.picker_date)
+            }).map(item => {
+                return { name: item.name, reason: item.reason }
+            })
+        },
+        official_absence_Yes_arr() {
+            return this.Official_Absence_Yes.filter(d => {
                 return this.dayprint(d.day) == this.dayprint(this.picker_date)
             }).map(item => {
                 return { name: item.name, reason: item.reason }

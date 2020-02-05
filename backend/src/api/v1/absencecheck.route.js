@@ -108,5 +108,16 @@ router.get(
         }
     })
 )
-
+/*
+router.post(
+    '/officialAbsenceAccept',
+    asyncRoute(async function(req, res) {
+        try{
+            const cursor = await OfficialAbsence.findOneAndUpdate({
+                
+            })
+        }
+    })
+)
+*/
 export default router
