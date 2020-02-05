@@ -38,6 +38,26 @@
                 </div>
             </v-card-text>
         </v-card>
+        <div>
+            <v-dialog v-model="titleAlert" max-width="290">
+                <v-card>
+                    <v-card-title class="headline"
+                        >제목을 입력해주세요.</v-card-title
+                    >
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+
+                        <v-btn
+                            color="green darken-1"
+                            text
+                            @click="titleAlert = false"
+                        >
+                            확인
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+        </div>
     </v-container>
 </template>
 <script>
@@ -53,6 +73,7 @@ export default {
     data() {
         return {
             title: '',
+            titleAlert: false,
             content: '',
             author: '',
             created_date: '',
@@ -87,6 +108,10 @@ export default {
             })
         },
         async submitClick() {
+            if (!this.title) {
+                this.titleAlert = true
+                return
+            }
             try {
                 this.isLoading = true
 
