@@ -20,7 +20,7 @@
                 <v-row class="d-flex justify-center">
                     <v-col cols="5" sm="2">
                         <v-select
-                            v-model="defaultSelect"
+                            v-model="Selecter"
                             :items="selects"
                             label="Select"
                             outlined
@@ -90,7 +90,7 @@ export default {
     data() {
         return {
             loading: false,
-            defaultSelect: '제목',
+            Selecter: '옵션 선택',
             selects: ['제목', '내용', '제목 + 내용'],
             searchObject: '',
             showData: false,
