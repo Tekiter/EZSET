@@ -1,7 +1,19 @@
 <template>
-    <v-container>
-        <group-tree :items="groups"></group-tree>
-    </v-container>
+    <div class="fill-height">
+        <v-row no-gutters class="fill-height">
+            <v-col class="fill-height" :cols="3" xl="2">
+                <v-card tile outlined class="fill-height">
+                    <group-tree :items="groups"></group-tree>
+                </v-card>
+            </v-col>
+            <v-col>
+                <div>
+                    <!-- :files="post.files" -->
+                    <file-download></file-download>
+                </div>
+            </v-col>
+        </v-row>
+    </div>
 </template>
 
 <script>
