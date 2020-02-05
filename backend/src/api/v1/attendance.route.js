@@ -264,7 +264,7 @@ router.post(
         // Users.forEach(element => {
         //     if (!attendnaceDay.status.includes(element)) result.push('element')
         // })
-        console.log(attendnaceDay)
+        //console.log(attendnaceDay)
         res.json(attendnaceDay.status)
     })
 )
