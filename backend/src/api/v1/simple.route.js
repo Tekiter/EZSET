@@ -16,7 +16,7 @@ import {
 } from '../../utils/file'
 const router = Router()
 const crypto = require('crypto')
-const viewArray = []
+const viewObj = new Object()
 
 //게시판 생성
 router.post(
@@ -284,21 +284,26 @@ router.get(
             .where('_id')
             .equals(req.params.post_id)
         if (post) {
-            if (viewArray.indexOf(req.params.post_id) == -1) {
-                viewArray.push({
-                    id: req.params.post_id,
-                    name: req.user.username,
-                })
-                setTimeout(function() {
-                    viewArray.delete({
-                        id: req.params.post_id,
-                        name: req.user.username,
-                    })
-                }, 30000)
+            //조회수 증가 viewObj 오브젝트 만들어서 post_id : [username] 형식으로 저장
+            if (!viewObj[req.params.post_id]) {
+                viewObj[req.params.post_id] = []
             }
-            for (let i = 0; i < viewArray.length; i++) {
-                if (viewArray[i].id == req.params.post_id) {
-                    post.view++
+            if (viewObj[req.params.post_id].indexOf(req.user.username) == -1) {
+                //username이 없다면 배열에 추가하고 조회수 증가
+                viewObj[req.params.post_id].push(req.user.username)
+                post.view++
+                setTimeout(() => {
+                    //10분이 지나면 배열에서 삭제해서 다시 조회수가 증가할 수 있게 만듦
+                    viewObj[req.params.post_id].splice(
+                        viewObj[req.params.post_id].indexOf(req.user.username),
+                        1
+                    )
+                }, 600000)
+                for (let i in viewObj) {
+                    //username이 하나도 없으면 해당 오브젝트 삭제
+                    if (i.length == 0) {
+                        delete viewObj.i
+                    }
                 }
             }
 
