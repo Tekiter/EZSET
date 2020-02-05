@@ -1,10 +1,8 @@
 <template>
     <v-container>
         <v-card outlined>
-            <v-card-title>
-                게시글 작성
-            </v-card-title>
-            <v-card-subtitle> 게시판: {{ curBoardName }} </v-card-subtitle>
+            <v-card-title> 게시글 작성</v-card-title>
+            <v-card-subtitle> 게시판: {{ curBoardName }}</v-card-subtitle>
             <v-card-text>
                 <v-text-field
                     v-model="title"
@@ -57,6 +55,24 @@
                     </v-card-actions>
                 </v-card>
             </v-dialog>
+            <v-dialog v-model="contentAlert" max-width="290">
+                <v-card>
+                    <v-card-title class="headline"
+                        >내용을 입력해주세요.</v-card-title
+                    >
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+
+                        <v-btn
+                            color="green darken-1"
+                            text
+                            @click="contentAlert = false"
+                        >
+                            확인
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
         </div>
     </v-container>
 </template>
@@ -75,6 +91,7 @@ export default {
             title: '',
             titleAlert: false,
             content: '',
+            contentAlert: false,
             author: '',
             created_date: '',
             like: '',
@@ -133,6 +150,7 @@ export default {
                 })
             } catch (error) {
                 this.isError = true
+                this.contentAlert = true
             } finally {
                 this.isLoading = false
             }
