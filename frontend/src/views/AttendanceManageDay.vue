@@ -1,31 +1,18 @@
 <template>
     <div class="ma-3 fill-height">
-        <!-- <v-toolbar class="mb-1" flat></v-toolbar> -->
-        <!-- <v-navigation-drawer permanent>
-            
-        </v-navigation-drawer> -->
-
-        <v-row :no-gutters="isMobileMode" class="fill-height">
-            <v-col v-show="isMobileMode" cols="12">
-                <v-tabs v-model="curTab" class="mt-3">
-                    <v-tab>
-                        출석 현황
-                    </v-tab>
-                    <v-tab>
-                        공결 현황
-                    </v-tab>
-                </v-tabs>
-            </v-col>
-
+        <v-row class="fill-height">
             <!-- 출석 현황 column  -->
-            <v-col
-                cols="12"
-                md="6"
-                v-show="!isMobileMode || curTab == 0"
-                class="fill-screen"
-            >
+            <v-col cols="12" md="6" class="fill-screen">
                 <v-card tile minHeight="95%">
-                    <v-card-title>출석 현황</v-card-title>
+                    <v-toolbar flat>
+                        <v-toolbar-title>
+                            출석현황
+                        </v-toolbar-title>
+                        <v-spacer></v-spacer>
+                        <v-btn icon @click="userAddDialog.show = true">
+                            <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                    </v-toolbar>
                     <v-divider></v-divider>
                     <v-subheader>{{ this.Mdate }} </v-subheader>
                     <v-divider></v-divider>
@@ -175,13 +162,7 @@
                 </v-card>
             </v-col>
 
-            <!-- 소속 유저 column -->
-            <v-col
-                cols="12"
-                md="6"
-                v-show="!isMobileMode || curTab == 1"
-                class="fill-height"
-            >
+            <v-col cols="12" md="6" class="fill-height">
                 <v-card tile minHeight="95%">
                     <v-card-title>공결 현황</v-card-title>
                     <v-divider></v-divider>
@@ -247,6 +228,101 @@
                 </v-card>
             </v-col>
         </v-row>
+        <v-row justify="center">
+            <v-dialog
+                v-model="userAddDialog.show"
+                max-width="800px"
+                height="500px"
+            >
+                <!-- <v-card>
+                    <v-card-title class="headline">출석 정보 추가</v-card-title>
+                    <v-card-text>
+                        출석대상이 설정으로 누락된 유저의 출석 정보를
+                        추가합니다.
+                    </v-card-text> -->
+                <v-card :loading="userAddDialog.isLoading">
+                    <v-card-title>출석 대상 유저 </v-card-title>
+                    <v-toolbar flat>
+                        <v-btn icon @click="userAddDialog.show = false">
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                        <v-toolbar-title>유저 추가</v-toolbar-title>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            outlined
+                            @click.native="userAddDialog.show = false"
+                            color="primary"
+                            >추가</v-btn
+                        >
+                    </v-toolbar>
+                    <v-card-text>
+                        <v-container>
+                            <v-text-field
+                                v-model="userAddDialog.search"
+                                clearable
+                                solo
+                                outlined
+                                flat
+                                hide-details
+                                dense
+                                label="검색"
+                                prepend-inner-icon="mdi-magnify"
+                            ></v-text-field>
+                            <v-row no-gutters>
+                                <v-col
+                                    v-for="user in attable.excludedUsers"
+                                    :key="user.username"
+                                    v-show="
+                                        searchMatches(
+                                            user.username,
+                                            userAddDialog.search
+                                        )
+                                    "
+                                    cols="12"
+                                    lg="3"
+                                    md="3"
+                                    sm="6"
+                                >
+                                    <v-checkbox
+                                        :label="`${user.username}`"
+                                        v-model="userAddDialog.selections"
+                                        :value="user.username"
+                                        hide-details
+                                    ></v-checkbox>
+                                </v-col>
+                                <v-col
+                                    cols="12"
+                                    class="text-center mt-5"
+                                    v-if="attable.users.length == 0"
+                                >
+                                    <p>추가 할 유저가 없습니다.</p>
+                                </v-col>
+                            </v-row>
+                        </v-container>
+                    </v-card-text>
+                    <v-spacer></v-spacer>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+
+                        <v-btn
+                            color="green darken-1"
+                            text
+                            @click="userAddDialog.show = false"
+                        >
+                            취소
+                        </v-btn>
+
+                        <v-btn
+                            color="green darken-1"
+                            text
+                            @click="userAddDialog.show = false"
+                        >
+                            추가
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+        </v-row>
     </div>
 </template>
 <script>
@@ -272,6 +348,7 @@ export default {
         } catch (err) {
             console.log(err)
         }
+        await this.fetchAttableUsers()
     },
     data() {
         return {
@@ -279,6 +356,21 @@ export default {
             absenceDate: [],
             attLoad: false,
             absenLoad: false,
+            allUsers: [],
+            attable: {
+                users: [],
+                excludedUsers: [],
+                search: '',
+                selections: [],
+                isLoading: false,
+            },
+            userAddDialog: {
+                show: false,
+                search: '',
+                isLoading: false,
+                selections: [],
+                message: '',
+            },
         }
     },
     computed: {
@@ -296,6 +388,16 @@ export default {
         },
     },
     methods: {
+        async fetchAttableUsers() {
+            this.attable.isLoading = true
+            this.attable.selections = []
+
+            const res = await axios.get('attendance/manage/user')
+            this.attable.users = res.data.attableUsers
+            this.attable.excludedUsers = res.data.excludedUsers
+
+            this.attable.isLoading = false
+        },
         async updateStateToAttendance(item) {
             try {
                 await axios.post(
@@ -368,6 +470,9 @@ export default {
                     }
                 }
             }
+        },
+        searchMatches(haystack, niddle) {
+            return haystack.includes(niddle || '')
         },
     },
 }

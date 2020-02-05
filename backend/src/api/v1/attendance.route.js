@@ -251,6 +251,24 @@ router.get(
     })
 )
 
+//attendanceDay Collection에서 출석 정보가 없는 유저를 가져옴
+// AttendanceManageDay 페이지에서사용
+router.post(
+    '/attendanceNUserData:day',
+    [perm('attendance').can('read')],
+    asyncRoute(async function(req, res) {
+        const reslut = ''
+        const Users = await User.find()
+        const attendnaceDay = await AttendanceDay.find()
+
+        // Users.forEach(element => {
+        //     if (!attendnaceDay.status.includes(element)) result.push('element')
+        // })
+        console.log(attendnaceDay)
+        res.json(attendnaceDay.status)
+    })
+)
+
 // manage/user
 // 출석 대상인 유저들을 가져옴
 router.get(
