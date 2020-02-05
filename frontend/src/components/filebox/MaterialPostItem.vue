@@ -10,7 +10,9 @@
             <v-list-item-avatar tile size="80" color="grey"></v-list-item-avatar>
         </v-list-item>
 
-        <v-card-actions></v-card-actions>
+        <v-card-actions>
+            <file-download></file-download>
+        </v-card-actions>
     </v-card>
 </template>
 <script>

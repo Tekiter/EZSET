@@ -5,7 +5,7 @@
         :items="items"
         activatable
         item-key="name"
-        open-on-click
+        :open-on-click="!selectable"
     >
         <template v-slot:prepend="{ item, open }">
             <v-icon
@@ -21,6 +21,10 @@ export default {
         items: {
             type: Array,
             default: () => [],
+        },
+        selectable: {
+            type: Boolean,
+            default: false,
         },
     },
     data: () => ({
