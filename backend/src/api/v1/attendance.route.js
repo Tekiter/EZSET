@@ -1,5 +1,5 @@
 import Router from 'express'
-import { asyncRoute, validateParams } from '../../utils/api'
+import { asyncRoute, validateParams, checkUsername } from '../../utils/api'
 import random from 'random-number-csprng'
 import User from '../../models/User'
 import AttendanceDay from '../../models/attendanceDay'
@@ -88,7 +88,7 @@ router.get(
         var Date = moment().format('YYYYMMDD')
         //get Userlist in User collection
         const userList = await User.find({
-            attFlag: true,
+            attable: true,
         }).select('username')
         //create db - AttendanceDay
         var attendanceDay = new AttendanceDay()
@@ -250,4 +250,84 @@ router.get(
         res.json(attendnaceUser)
     })
 )
+
+// manage/user
+// 출석 대상인 유저들을 가져옴
+router.get(
+    '/manage/user',
+    [validateParams],
+    asyncRoute(async function(req, res) {
+        const users = await User.find()
+            .where('attable')
+            .equals(true)
+            .sort('username')
+            .select('username info')
+
+        const excludedUsers = await User.find()
+            .where('attable')
+            .ne(true)
+            .sort('username')
+            .select('username info')
+
+        res.json({
+            attableUsers: users.map(user => {
+                return {
+                    username: user.username,
+                    realname: user.info.realname,
+                }
+            }),
+            excludedUsers: excludedUsers.map(user => {
+                return {
+                    username: user.username,
+                    realname: user.info.realname,
+                }
+            }),
+        })
+    })
+)
+
+// manage/user
+// 출석 대상인 유저들을 추가 등록
+router.put(
+    '/manage/user',
+    [body('users').isArray(), validateParams],
+    asyncRoute(async (req, res) => {
+        try {
+            for (let user of req.body.users) {
+                await checkUsername(user)
+            }
+        } catch (error) {
+            const err = new Error('존재하지 않는 유저입니다.')
+            err.status = 400
+            throw err
+        }
+
+        for (let username of req.body.users) {
+            const user = await User.findOne()
+                .where('username')
+                .equals(username)
+            user.attable = true
+            await user.save()
+        }
+
+        res.end()
+    })
+)
+
+// manage/user/:username
+// 출석 대상인 유저 삭제
+router.delete(
+    '/manage/user/:username',
+    [param('username').custom(checkUsername), validateParams],
+    asyncRoute(async (req, res) => {
+        const user = await User.findOne()
+            .where('username')
+            .equals(req.params.username)
+        user.attable = false
+        await user.save()
+
+        res.end()
+    })
+)
+
 export default router
