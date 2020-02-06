@@ -22,7 +22,11 @@
                         v-if="!attLoad && this.$perm('attendance').can('read')"
                     ></v-skeleton-loader>
                     <v-simple-table
-                        v-if="attLoad && this.$perm('attendance').can('read')"
+                        v-if="
+                            attLoad &&
+                                this.$perm('attendance').can('read') &&
+                                statusData != null
+                        "
                     >
                         <template v-slot:default>
                             <tbody>
@@ -147,7 +151,7 @@
                         </template>
                     </v-simple-table>
                     <div>
-                        <v-alert type="warning" v-if="statusData == undefind">
+                        <v-alert type="warning" v-if="statusData === null">
                             출석정보가 없습니다.
                         </v-alert>
                     </div>
@@ -172,7 +176,11 @@
                         v-if="!absenLoad && this.$perm('absence').can('read')"
                     ></v-skeleton-loader>
                     <v-simple-table
-                        v-if="absenLoad && this.$perm('absence').can('read')"
+                        v-if="
+                            absenLoad &&
+                                this.$perm('absence').can('read') &&
+                                absenceDate.length != 0
+                        "
                     >
                         <template v-slot:default>
                             <tbody>
@@ -240,20 +248,9 @@
                         출석대상이 설정으로 누락된 유저의 출석 정보를
                         추가합니다.
                     </v-card-text> -->
-                <v-card :loading="userAddDialog.isLoading">
-                    <v-card-title>출석 대상 유저 </v-card-title>
+                <v-card>
                     <v-toolbar flat>
-                        <v-btn icon @click="userAddDialog.show = false">
-                            <v-icon>mdi-close</v-icon>
-                        </v-btn>
-                        <v-toolbar-title>유저 추가</v-toolbar-title>
-                        <v-spacer></v-spacer>
-                        <v-btn
-                            outlined
-                            @click.native="userAddDialog.show = false"
-                            color="primary"
-                            >추가</v-btn
-                        >
+                        <v-card-title>출석 기록 추가 </v-card-title>
                     </v-toolbar>
                     <v-card-text>
                         <v-container>
@@ -270,11 +267,11 @@
                             ></v-text-field>
                             <v-row no-gutters>
                                 <v-col
-                                    v-for="user in attable.excludedUsers"
-                                    :key="user.username"
+                                    v-for="user in userAddDialog.users"
+                                    :key="user"
                                     v-show="
                                         searchMatches(
-                                            user.username,
+                                            user,
                                             userAddDialog.search
                                         )
                                     "
@@ -284,16 +281,16 @@
                                     sm="6"
                                 >
                                     <v-checkbox
-                                        :label="`${user.username}`"
+                                        :label="`${user}`"
                                         v-model="userAddDialog.selections"
-                                        :value="user.username"
+                                        :value="user"
                                         hide-details
                                     ></v-checkbox>
                                 </v-col>
                                 <v-col
                                     cols="12"
                                     class="text-center mt-5"
-                                    v-if="attable.users.length == 0"
+                                    v-if="userAddDialog.users.length == 0"
                                 >
                                     <p>추가 할 유저가 없습니다.</p>
                                 </v-col>
@@ -307,7 +304,7 @@
                         <v-btn
                             color="green darken-1"
                             text
-                            @click="userAddDialog.show = false"
+                            @click="cancelUserAdd()"
                         >
                             취소
                         </v-btn>
@@ -315,7 +312,7 @@
                         <v-btn
                             color="green darken-1"
                             text
-                            @click="userAddDialog.show = false"
+                            @click="applyUserAdd()"
                         >
                             추가
                         </v-btn>
@@ -326,29 +323,11 @@
     </div>
 </template>
 <script>
+import moment from 'moment'
 import axios from 'axios'
 export default {
     async created() {
-        try {
-            const res = await axios.get(
-                `absencecheck/absenceUsersData/${this.Mdate}`
-            )
-            this.absenceDate = res.data
-            this.absenLoad = true
-        } catch (err) {
-            console.log(err)
-        }
-        await this.updateAbsenceState()
-        try {
-            const res = await axios.get(
-                `attendance/attendanceState/${this.date}`
-            )
-            this.statusData = res.data[0]
-            this.attLoad = true
-        } catch (err) {
-            console.log(err)
-        }
-        await this.fetchAttableUsers()
+        await this.fetchAttUsers()
     },
     data() {
         return {
@@ -357,14 +336,8 @@ export default {
             attLoad: false,
             absenLoad: false,
             allUsers: [],
-            attable: {
-                users: [],
-                excludedUsers: [],
-                search: '',
-                selections: [],
-                isLoading: false,
-            },
             userAddDialog: {
+                users: [],
                 show: false,
                 search: '',
                 isLoading: false,
@@ -378,25 +351,51 @@ export default {
             return this.$route.params.day
         },
         Mdate() {
-            return (
-                this.$route.params.day.substr(0, 4) +
-                '-' +
-                this.$route.params.day.substr(4, 2) +
-                '-' +
-                this.$route.params.day.substr(6, 2)
-            )
+            return moment(this.$route.params.day).format('YYYY-MM-DD')
         },
     },
     methods: {
-        async fetchAttableUsers() {
-            this.attable.isLoading = true
-            this.attable.selections = []
-
-            const res = await axios.get('attendance/manage/user')
-            this.attable.users = res.data.attableUsers
-            this.attable.excludedUsers = res.data.excludedUsers
-
-            this.attable.isLoading = false
+        async fetchAttUsers() {
+            this.attLoad = false
+            try {
+                const res = await axios.get(
+                    `absencecheck/absenceUsersData/${this.Mdate}`
+                )
+                this.absenceDate = res.data
+                this.absenLoad = true
+            } catch (err) {
+                console.log(err)
+            }
+            await this.updateAbsenceState()
+            try {
+                const res = await axios.get(
+                    `attendance/attendanceState/${this.date}`
+                )
+                this.statusData = res.data
+                this.attLoad = true
+            } catch (err) {
+                console.log(err)
+            }
+            const res = await axios.post('attendance/attendanceNUserData', {
+                day: this.date,
+            })
+            this.userAddDialog.users = res.data
+            this.attLoad = true
+        },
+        searchMatches(haystack, niddle) {
+            return haystack.includes(niddle || '')
+        },
+        async applyUserAdd() {
+            await axios.put('attendance/addUsersRecords', {
+                users: this.userAddDialog.selections,
+                day: this.date,
+            })
+            this.userAddDialog.show = false
+            this.fetchAttUsers()
+        },
+        async cancelUserAdd() {
+            this.userAddDialog.selections = []
+            this.userAddDialog.show = false
         },
         async updateStateToAttendance(item) {
             try {
@@ -470,9 +469,6 @@ export default {
                     }
                 }
             }
-        },
-        searchMatches(haystack, niddle) {
-            return haystack.includes(niddle || '')
         },
     },
 }
