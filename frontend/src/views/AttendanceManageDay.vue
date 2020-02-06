@@ -13,8 +13,17 @@
                             <v-icon>mdi-plus</v-icon>
                         </v-btn>
                     </v-toolbar>
-                    <v-divider></v-divider>
-                    <v-subheader>{{ this.Mdate }} </v-subheader>
+                    <v-toolbar flat>
+                        <v-subheader>{{ this.Mdate }} </v-subheader>
+                        <v-spacer></v-spacer>
+                        <v-subheader v-if="attLoad"
+                            >총원: {{ this.total.sum }}명, 출석:
+                            {{ this.total.attendance }}명, 지각:
+                            {{ this.total.late }}명, 결석:
+                            {{ this.total.absence }}명, 공결:
+                            {{ this.total.official_absence }}명
+                        </v-subheader>
+                    </v-toolbar>
                     <v-divider></v-divider>
                     <v-skeleton-loader
                         class="mx-auto"
@@ -320,6 +329,12 @@
                 </v-card>
             </v-dialog>
         </v-row>
+        <v-snackbar v-model="snackbar.show" :timeout="2000" color="success">
+            {{ snackbar.text }}
+            <v-btn text @click="snackbar = false">
+                닫기
+            </v-btn>
+        </v-snackbar>
     </div>
 </template>
 <script>
@@ -344,6 +359,10 @@ export default {
                 selections: [],
                 message: '',
             },
+            snackbar: {
+                show: false,
+                text: '',
+            },
         }
     },
     computed: {
@@ -353,33 +372,48 @@ export default {
         Mdate() {
             return moment(this.$route.params.day).format('YYYY-MM-DD')
         },
+        total() {
+            const cols = {
+                sum: 0,
+                attendance: 0,
+                late: 0,
+                absence: 0,
+                official_absence: 0,
+            }
+
+            this.statusData.status.forEach(element => {
+                cols.sum += 1
+                if (element.state == 'attendance') cols.attendance += 1
+                else if (element.state == 'late') cols.late += 1
+                else if (element.state == 'absence') cols.absence += 1
+                else if (element.state == 'official_absence')
+                    cols.official_absence += 1
+            })
+            return cols
+        },
     },
     methods: {
         async fetchAttUsers() {
             this.attLoad = false
-            try {
-                const res = await axios.get(
-                    `absencecheck/absenceUsersData/${this.Mdate}`
-                )
-                this.absenceDate = res.data
-                this.absenLoad = true
-            } catch (err) {
-                console.log(err)
-            }
+
+            const res = await axios.get(
+                `absencecheck/absenceUsersData/${this.Mdate}`
+            )
+            this.absenceDate = res.data
+            this.absenLoad = true
+
             await this.updateAbsenceState()
-            try {
-                const res = await axios.get(
-                    `attendance/attendanceState/${this.date}`
-                )
-                this.statusData = res.data
-                this.attLoad = true
-            } catch (err) {
-                console.log(err)
-            }
-            const res = await axios.post('attendance/attendanceNUserData', {
+
+            const res1 = await axios.get(
+                `attendance/attendanceState/${this.date}`
+            )
+            this.statusData = res1.data
+            this.attLoad = true
+
+            const res2 = await axios.post('attendance/attendanceNUserData', {
                 day: this.date,
             })
-            this.userAddDialog.users = res.data
+            this.userAddDialog.users = res2.data
             this.attLoad = true
         },
         searchMatches(haystack, niddle) {
@@ -392,83 +426,63 @@ export default {
             })
             this.userAddDialog.show = false
             this.fetchAttUsers()
+            this.openSnackbar('추가했습니다!')
         },
         async cancelUserAdd() {
             this.userAddDialog.selections = []
             this.userAddDialog.show = false
         },
         async updateStateToAttendance(item) {
-            try {
-                await axios.post(
-                    `attendance/attendancestateupdate/${this.$route.params.day}`,
-                    {
-                        state: 'attendance',
-                        name: item.name,
-                    }
-                )
-                item.state = 'attendance'
-            } catch (err) {
-                console.log(err)
-            }
+            await axios.post(
+                `attendance/attendancestateupdate/${this.$route.params.day}`,
+                {
+                    state: 'attendance',
+                    name: item.name,
+                }
+            )
+            item.state = 'attendance'
+            this.openSnackbar('변경되었습니다!')
         },
         async updateStateToLate(item) {
-            try {
-                await axios.post(
-                    `attendance/attendancestateupdate/${this.date}`,
-                    {
-                        state: 'late',
-                        name: item.name,
-                    }
-                )
-                item.state = 'late'
-            } catch (err) {
-                console.log(err)
-            }
+            await axios.post(`attendance/attendancestateupdate/${this.date}`, {
+                state: 'late',
+                name: item.name,
+            })
+            item.state = 'late'
+            this.openSnackbar('변경되었습니다!')
         },
         async updateStateToAbsence(item) {
-            try {
-                await axios.post(
-                    `attendance/attendancestateupdate/${this.date}`,
-                    {
-                        state: 'absence',
-                        name: item.name,
-                    }
-                )
-                item.state = 'absence'
-            } catch (err) {
-                console.log(err)
-            }
+            await axios.post(`attendance/attendancestateupdate/${this.date}`, {
+                state: 'absence',
+                name: item.name,
+            })
+            item.state = 'absence'
+            this.openSnackbar('변경되었습니다!')
         },
         async updateStateToOfficialAbsence(item) {
-            try {
-                await axios.post(
-                    `attendance/attendancestateupdate/${this.date}`,
-                    {
-                        state: 'official_absence',
-                        name: item.name,
-                    }
-                )
-                item.state = 'official_absence'
-            } catch (err) {
-                console.log(err)
-            }
+            await axios.post(`attendance/attendancestateupdate/${this.date}`, {
+                state: 'official_absence',
+                name: item.name,
+            })
+            item.state = 'official_absence'
+            this.openSnackbar('변경되었습니다!')
         },
         async updateAbsenceState() {
             for (let item of this.absenceDate) {
                 if (item.approval == 'Yes') {
-                    try {
-                        await axios.post(
-                            `attendance/attendancestateupdate/${this.date}`,
-                            {
-                                state: 'official_absence',
-                                name: item.name,
-                            }
-                        )
-                    } catch (err) {
-                        console.log(err)
-                    }
+                    await axios.post(
+                        `attendance/attendancestateupdate/${this.date}`,
+                        {
+                            state: 'official_absence',
+                            name: item.name,
+                        }
+                    )
                 }
             }
+        },
+        openSnackbar(text) {
+            this.snackbar.text = text
+            this.snackbar.show = true
         },
     },
 }
