@@ -380,15 +380,16 @@ export default {
                 absence: 0,
                 official_absence: 0,
             }
-
-            this.statusData.status.forEach(element => {
-                cols.sum += 1
-                if (element.state == 'attendance') cols.attendance += 1
-                else if (element.state == 'late') cols.late += 1
-                else if (element.state == 'absence') cols.absence += 1
-                else if (element.state == 'official_absence')
-                    cols.official_absence += 1
-            })
+            if (this.statusData.status.length != 0) {
+                this.statusData.status.forEach(element => {
+                    cols.sum += 1
+                    if (element.state == 'attendance') cols.attendance += 1
+                    else if (element.state == 'late') cols.late += 1
+                    else if (element.state == 'absence') cols.absence += 1
+                    else if (element.state == 'official_absence')
+                        cols.official_absence += 1
+                })
+            }
             return cols
         },
     },

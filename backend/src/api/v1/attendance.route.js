@@ -236,15 +236,16 @@ router.post(
             .where('day')
             .equals(req.body.day)
             .select({ _id: 0, __v: 0, day: 0 })
-
-        Users.forEach(element => {
-            if (
-                attendanceDay.status.filter(function(e) {
-                    return e.name === element.username
-                }).length == 0
-            )
-                result.push(element.username)
-        })
+        if (attendanceDay != null) {
+            Users.forEach(element => {
+                if (
+                    attendanceDay.status.filter(function(e) {
+                        return e.name === element.username
+                    }).length == 0
+                )
+                    result.push(element.username)
+            })
+        }
         res.json(result)
     })
 )
