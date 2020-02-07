@@ -5,44 +5,86 @@
                 <v-card tile outlined class="fill-height">
                     <group-tree :items="groups"></group-tree>
                     <v-list>
-                        <v-list-item link @click="showPlusGroupDialog()">
+                        <v-list-item link @click="showPlusGroup()">
                             <v-list-item-icon>
                                 <v-icon>mdi-plus</v-icon>
                             </v-list-item-icon>
                             <v-list-item-title class="grey--text">새 그룹 추가</v-list-item-title>
                         </v-list-item>
                     </v-list>
-                    <v-dialog v-model="plusGroupDialog.show" max-width="400" class="fill-height">
-                        <v-card>
-                            <v-toolbar dark short color="primary">
-                                <v-btn icon dark @click="closePlusGroupDialog()">
-                                    <v-icon>mdi-close</v-icon>
-                                </v-btn>
-                                <v-toolbar-title>새 그룹 추가</v-toolbar-title>
-                            </v-toolbar>
-                            <div>
-                                <group-tree :items="groups" selectable></group-tree>저장위치
-                                그룹인지 폴더인디
-                            </div>
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn
-                                    color="blue darken-4"
-                                    type="submit"
-                                    text
-                                    large
-                                    @click="applyPlusGroupDialog()"
-                                >확인</v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </v-dialog>
                 </v-card>
             </v-col>
-            <v-col>
-                <div>
-                    <!-- :files="post.files" -->
-                    <file-download></file-download>
-                </div>
+            <v-col class="fill-height">
+                <v-card v-if="plusGroup.show" class="fill-height">
+                    <v-toolbar dark short color="primary">
+                        <v-btn icon dark @click="closePlusGroup()">
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                        <v-toolbar-title>새 그룹 추가</v-toolbar-title>
+                    </v-toolbar>
+                    <div>
+                        <v-row>
+                            <v-col>
+                                <template>
+                                    <v-banner>
+                                        추가할 위치:
+                                        <v-chip
+                                            class="ma-2"
+                                            outlined
+                                            label
+                                            v-if="plusGroup.selected.length > 0"
+                                        >{{plusGroup.selected[0].name}}</v-chip>
+                                    </v-banner>
+                                    <v-banner>
+                                        그룹? 폴더?
+                                        <v-radio-group class="ml-3" mandatory>
+                                            <v-radio
+                                                label="폴더를 저장할 그룹"
+                                                color="info"
+                                                @change="isFolderFalse()"
+                                                hide-details
+                                            ></v-radio>
+                                            <v-radio
+                                                label="게시글(파일)을 저장할 폴더"
+                                                color="info"
+                                                @change="isFolderTrue()"
+                                                hide-details
+                                            ></v-radio>
+                                        </v-radio-group>
+                                    </v-banner>
+                                    <v-banner>
+                                        이름
+                                        <v-text-field
+                                            v-model="plusGroup.name"
+                                            placeholder="새 그룹"
+                                            dense
+                                        ></v-text-field>
+                                    </v-banner>
+                                </template>
+                            </v-col>
+                            <v-col>
+                                <group-tree
+                                    :items="groups"
+                                    selectable
+                                    color="warning"
+                                    v-model="plusGroup.selected"
+                                ></group-tree>
+                            </v-col>
+                        </v-row>
+                    </div>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            color="primary"
+                            type="submit"
+                            large
+                            @click="applyPlusGroup()"
+                            :disabled="isError"
+                        >확인</v-btn>
+                    </v-card-actions>
+                </v-card>
+                <!-- :files="post.files" -->
+                <!-- <file-download></file-download> -->
             </v-col>
         </v-row>
     </div>
@@ -60,9 +102,16 @@ export default {
         return {
             fileboxes: [],
             groups: [],
-            plusGroupDialog: {
+            plusGroup: {
                 show: false,
+                parent: '',
+                name: '',
                 isfolder: false,
+                selected: [],
+            },
+            errors: {
+                name: '',
+                parent: '',
             },
         }
     },
@@ -72,14 +121,33 @@ export default {
         this.groups = res.data.groups
     },
     methods: {
-        async plusGroup() {},
-        showPlusGroupDialog() {
-            this.plusGroupDialog.show = true
+        showPlusGroup() {
+            this.plusGroup.show = true
         },
-        closePlusGroupDialog() {
-            this.plusGroupDialog.show = false
+        closePlusGroup() {
+            this.plusGroup.show = false
+            this.plusGroup.name = ''
+            this.plusGroup.isfolder = false
+            this.plusGroup.selected = []
         },
-        async applyPlusGroupDialog() {},
+        async applyPlusGroup() {},
+        isFolderTrue() {
+            this.plusGroup.isfolder = true
+        },
+        isFolderFalse() {
+            this.plusGroup.isfolder = false
+        },
+    },
+    computed: {
+        isError() {
+            if (
+                this.plusGroup.selected.length > 0 &&
+                this.plusGroup.name != ''
+            ) {
+                return false
+            }
+            return true
+        },
     },
 }
 </script>

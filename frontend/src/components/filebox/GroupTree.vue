@@ -1,11 +1,15 @@
 <template>
     <v-treeview
-        v-model="tree"
         :open="open"
         :items="items"
         activatable
-        item-key="name"
+        item-key="id"
         :open-on-click="!selectable"
+        :item-disabled="selectable ? 'isfolder' : null"
+        :color="color"
+        :value="value"
+        @update:active="$emit('input',arguments[0])"
+        return-object
     >
         <template v-slot:prepend="{ item, open }">
             <v-icon
@@ -25,6 +29,14 @@ export default {
         selectable: {
             type: Boolean,
             default: false,
+        },
+        color: {
+            type: String,
+            default: 'primary',
+        },
+        value: {
+            type: Array,
+            default: () => [],
         },
     },
     data: () => ({
