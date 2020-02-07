@@ -31,12 +31,10 @@ let postSchema = new Schema({
     title: {
         type: String,
         required: [true, 'post title required'],
-        index: true,
     },
     content: {
         type: String,
         required: [true, 'post title required'],
-        index: true,
     },
     author: {
         type: String,

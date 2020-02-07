@@ -552,4 +552,49 @@ router.delete(
     })
 )
 
+//게시물 검색
+router.get(
+    '/searchpost',
+    asyncRoute(async function(req, res) {
+        let options = []
+        if (req.query.option == 'title') {
+            options = [{ title: new RegExp(req.query.content) }]
+        } else if (req.query.option == 'content') {
+            options = [{ content: new RegExp(req.query.content) }]
+        } else if (req.query.option == 'title+content') {
+            options = [
+                { title: new RegExp(req.query.content) },
+                { content: new RegExp(req.query.content) },
+            ]
+        } else {
+            const err = new Error('검색 옵션이 없습니다.')
+            err.status = 400
+            throw err
+        }
+        try {
+            const posts = await Post.find({ $or: options })
+
+            res.status(200).json({
+                posts: posts.map(post => {
+                    return {
+                        _id: parseInt(post.id),
+                        title: post.title,
+                        content: post.content,
+                        author: post.author,
+                        isAnonymous: post.isAnonymous,
+                        created_date: post.created_date,
+                        view: post.view,
+                        like: post.likes_count,
+                        comment: post.comments,
+                    }
+                }),
+            })
+        } catch (error) {
+            const errr = new Error('database error')
+            errr.status = 500
+            throw errr
+        }
+    })
+)
+
 export default router
