@@ -529,7 +529,8 @@ export default {
                         start: moment(item.day).format('YYYY-MM-DD'),
                         end: moment(item.day).format('YYYY-MM-DD'),
                         details:
-                            item.reason + '(의) 사유의 공결이 승인 대기중입니다.',
+                            item.reason +
+                            '(의) 사유의 공결이 승인 대기중입니다.',
                         color: 'orange',
                         reason: item.reason,
                     })
@@ -541,7 +542,8 @@ export default {
                         start: moment(item.day).format('YYYY-MM-DD'),
                         end: moment(item.day).format('YYYY-MM-DD'),
                         details:
-                            item.reason + '(의) 사유의 공결이 승인 완료 되었습니다.',
+                            item.reason +
+                            '(의) 사유의 공결이 승인 완료 되었습니다.',
                         color: 'green',
                         reason: item.reason,
                     })

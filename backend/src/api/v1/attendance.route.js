@@ -164,7 +164,8 @@ router.get(
         const cur = await AttendanceDay.findOne({
             day: req.params.day,
         }).select({ _id: 0, __v: 0, day: 0 })
-        res.json(cur)
+        if (cur != null) res.json(cur)
+        else res.status(404).json()
     })
 )
 
@@ -268,8 +269,8 @@ router.post(
                 )
                     result.push(element.username)
             })
-        }
-        res.json(result)
+            res.json(result)
+        } else res.status(404).json()
     })
 )
 
