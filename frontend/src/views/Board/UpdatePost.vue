@@ -91,6 +91,27 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="cancelAlert" max-width="290">
+            <v-card>
+                <v-card-title class="title"
+                    >수정을 취소하시겠습니까?</v-card-title
+                >
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn color="red darken-2" text @click="goCancle()">
+                        예
+                    </v-btn>
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="cancelAlert = false"
+                    >
+                        아니오
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 <script>
@@ -109,6 +130,7 @@ export default {
             titleAlert: false,
             content: '',
             contentAlert: false,
+            cancelAlert: false,
             author: '',
             created_date: '',
             post_id: '',
@@ -132,6 +154,9 @@ export default {
     },
     methods: {
         backClick() {
+            this.cancelAlert = true
+        },
+        goCancle() {
             this.$router.push({
                 path:
                     '/board/' +
