@@ -67,6 +67,15 @@
                             tile
                             outlined
                             color="black darken-2"
+                            :to="'/searchpost'"
+                        >
+                            <v-icon left>mdi-magnify</v-icon> 검색
+                        </v-btn>
+                        <v-btn
+                            class="ma-2"
+                            tile
+                            outlined
+                            color="black darken-2"
                             :to="'/write/' + curid"
                         >
                             <v-icon left>mdi-pencil</v-icon> 글쓰기
