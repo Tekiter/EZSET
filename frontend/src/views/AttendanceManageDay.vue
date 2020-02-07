@@ -28,14 +28,10 @@
                     <v-skeleton-loader
                         class="mx-auto"
                         type="table"
-                        v-if="!attLoad && this.$perm('attendance').can('read')"
+                        v-if="!attLoad"
                     ></v-skeleton-loader>
                     <v-simple-table
-                        v-if="
-                            attLoad &&
-                                this.$perm('attendance').can('read') &&
-                                statusData != null
-                        "
+                        v-if="attLoad && this.$perm('attendance').can('read')"
                     >
                         <template v-slot:default>
                             <tbody>
@@ -160,7 +156,7 @@
                         </template>
                     </v-simple-table>
                     <div>
-                        <v-alert type="warning" v-if="statusData === null">
+                        <v-alert type="warning" v-if="statusData.length == 0">
                             출석정보가 없습니다.
                         </v-alert>
                     </div>
@@ -363,6 +359,7 @@ export default {
                 show: false,
                 text: '',
             },
+            state: '',
         }
     },
     computed: {
@@ -380,7 +377,7 @@ export default {
                 absence: 0,
                 official_absence: 0,
             }
-            if (this.statusData.status.length != 0) {
+            if (this.statusData.length != 0) {
                 this.statusData.status.forEach(element => {
                     cols.sum += 1
                     if (element.state == 'attendance') cols.attendance += 1
@@ -396,7 +393,7 @@ export default {
     methods: {
         async fetchAttUsers() {
             this.attLoad = false
-
+            this.absenLoad = false
             const res = await axios.get(
                 `absencecheck/absenceUsersData/${this.Mdate}`
             )
@@ -405,17 +402,20 @@ export default {
 
             await this.updateAbsenceState()
 
-            const res1 = await axios.get(
-                `attendance/attendanceState/${this.date}`
-            )
-            this.statusData = res1.data
-            this.attLoad = true
-
+            try {
+                const res1 = await axios.get(
+                    `attendance/attendanceState/${this.date}`
+                )
+                this.state = res1.status
+                this.statusData = res1.data
+                this.attLoad = true
+            } catch (err) {
+                this.attLoad = true
+            }
             const res2 = await axios.post('attendance/attendanceNUserData', {
                 day: this.date,
             })
             this.userAddDialog.users = res2.data
-            this.attLoad = true
         },
         searchMatches(haystack, niddle) {
             return haystack.includes(niddle || '')
