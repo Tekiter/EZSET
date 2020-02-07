@@ -88,6 +88,8 @@ export default {
         } catch (err) {
             console.log(err)
         }
+        const res = await axios.get('attendance/attendanceCheckAdmin')
+        if (res.data != 0) this.output_attendance_code = parseInt(res.data)
     },
 
     data() {
@@ -119,12 +121,13 @@ export default {
             })
             this.flag = true
         },
-        endAttendance() {
+        async endAttendance() {
             this.$socket.emit('attendance', {
                 flag: false,
             })
             this.flag = false
             this.input_attendance_code = ''
+            await axios.post('attendance/attendanceCheckEnd')
             this.$router.push(
                 `/AttendanceManageDay/${moment().format('YYYYMMDD')}`
             )

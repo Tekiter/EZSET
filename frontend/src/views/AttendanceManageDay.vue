@@ -470,7 +470,7 @@ export default {
         },
         async updateAbsenceState() {
             for (let item of this.absenceDate) {
-                if (item.approval == 'Yes') {
+                if (item.approval == true) {
                     await axios.post(
                         `attendance/attendancestateupdate/${this.date}`,
                         {

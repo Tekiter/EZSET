@@ -9,7 +9,7 @@ import { param, body } from 'express-validator'
 const router = Router()
 var moment = require('moment')
 var ranNum = random(100, 999)
-
+var startUser = ''
 //사용자가 출석코드를 입력했을 경우 서버에서 생성한 코드와 사용자 입력코드가 일치한다면 db에 출석상태로 업데이트
 //body : code
 //Attendance 페이지에서 사용
@@ -72,6 +72,28 @@ router.get(
     })
 )
 
+//출석 시작 후 관리자가 새로고침을 했을때 출석번호를 유지하기 위함
+//Attendance 페이지에서 사용
+router.get(
+    '/attendanceCheckAdmin',
+    [perm('attendance').can('att')],
+    asyncRoute(async function(req, res) {
+        if (startUser == req.user.username) res.json(ranNum)
+        else res.json(0)
+    })
+)
+//출석 종료 후 초기화
+//Attendance 페이지에서 사용
+router.post(
+    '/attendanceCheckEnd',
+    [perm('attendance').can('att')],
+    asyncRoute(async function(req, res) {
+        startUser = ''
+        ranNum = -1
+        res.end()
+    })
+)
+
 //관리자가 시작버튼을 눌렀을경우 관리자는 출석상태 다른 모든 유저는 결석상태로 업데이트됨
 //attendanceDays, attendanceUsers Collection에 시작버튼을 누른 관리자를 제외한 모두를 '결석'상태로 초기화한 Document가 생성됨
 //Attendance 페이지에서 사용
@@ -127,6 +149,7 @@ router.get(
         //Generate Attendance Code and return
         try {
             ranNum = await random(100, 999)
+            startUser = req.user.username
             res.json({ code: ranNum })
         } catch (err) {
             res.status(501).json()
