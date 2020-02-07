@@ -151,8 +151,9 @@ export default {
     },
     methods: {
         read(evt) {
+            console.log(evt)
             this.$router.push({
-                path: '/board/' + this.$route.params.board_id + '/' + evt._id,
+                path: '/board/' + evt.board + '/' + evt._id,
             })
         },
         clickSearch() {

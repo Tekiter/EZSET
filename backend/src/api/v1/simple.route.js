@@ -577,6 +577,7 @@ router.get(
             res.status(200).json({
                 posts: posts.map(post => {
                     return {
+                        board: post.board,
                         _id: parseInt(post.id),
                         title: post.title,
                         content: post.content,
