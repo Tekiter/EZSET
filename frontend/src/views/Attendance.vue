@@ -3,7 +3,8 @@
         <v-form>
             <v-card
                 class="mx-auto"
-                max-width="400"
+                max-width="500"
+                max-height="500"
                 v-if="flag == true && code == 0"
             >
                 <v-card-title>
@@ -20,29 +21,38 @@
             </v-card>
             <v-card
                 class="mx-auto"
-                max-width="400"
+                max-width="500"
+                max-height="500"
                 v-if="flag && this.$perm('attendance').can('start')"
             >
-                <v-card-title>{{ output_attendance_code }}</v-card-title>
-                <v-card-actions>
-                    <v-btn
-                        color="purple"
-                        text
-                        v-if="flag"
-                        @click="endAttendance"
-                        >종료</v-btn
-                    >
-                </v-card-actions>
+                <v-card-text>
+                    <div class="d-flex justify-center">
+                        <span class="display-3">{{
+                            output_attendance_code
+                        }}</span>
+                    </div>
+                    <div class="d-flex justify-center">
+                        <v-btn
+                            color="purple"
+                            text
+                            v-if="flag"
+                            @click="endAttendance"
+                            large
+                            >종료</v-btn
+                        >
+                    </div>
+                </v-card-text>
             </v-card>
 
             <v-card
                 class="mx-auto"
-                max-width="400"
+                max-width="500"
+                max-height="500"
                 text
                 v-if="!flag && this.$perm('attendance').can('start')"
             >
                 <v-card-actions>
-                    <v-btn color="purple" text @click="startAttendance"
+                    <v-btn color="purple" text @click="startAttendance" large
                         >시작</v-btn
                     >
                 </v-card-actions>
