@@ -44,6 +44,42 @@
                 </div>
             </v-card-text>
         </v-card>
+        <v-dialog v-model="titleAlert" max-width="290">
+            <v-card>
+                <v-card-title class="headline"
+                    >제목을 입력해주세요.</v-card-title
+                >
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="titleAlert = false"
+                    >
+                        확인
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="contentAlert" max-width="290">
+            <v-card>
+                <v-card-title class="headline"
+                    >내용을 입력해주세요.</v-card-title
+                >
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="contentAlert = false"
+                    >
+                        확인
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 <script>
@@ -59,7 +95,9 @@ export default {
     data() {
         return {
             title: '',
+            titleAlert: false,
             content: '',
+            contentAlert: false,
             author: '',
             created_date: '',
             post_id: '',
@@ -108,6 +146,14 @@ export default {
             })
         },
         async updateClick() {
+            if (!this.title) {
+                this.titleAlert = true
+                return
+            }
+            if (!this.getMarkdown()) {
+                this.contentAlert = true
+                return
+            }
             try {
                 this.isLoading = true
 
