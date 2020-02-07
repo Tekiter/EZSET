@@ -3,6 +3,17 @@
         <v-card outlined>
             <v-card-title>
                 게시글 수정
+                <v-spacer></v-spacer>
+                <v-btn
+                    class="ma-2"
+                    tile
+                    outlined
+                    color="black darken-2"
+                    @click="backClick()"
+                >
+                    <v-icon left>mdi-close-circle</v-icon>
+                    수정취소
+                </v-btn>
             </v-card-title>
             <!-- <v-card-subtitle> 게시판: {{ curBoardName }} </v-card-subtitle> -->
             <v-card-text>
@@ -120,6 +131,15 @@ export default {
         }
     },
     methods: {
+        backClick() {
+            this.$router.push({
+                path:
+                    '/board/' +
+                    this.$route.params.board_id +
+                    '/' +
+                    this.$route.params.post_id,
+            })
+        },
         async getBoards() {
             const res = await axios.get('simple/boards')
             return res.data
