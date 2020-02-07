@@ -48,6 +48,6 @@ export function setAdminRole(roles) {
         .can(['start', 'att', 'read', 'update'])
 
         .resource('absence')
-        .canOwn(['create', 'read', 'delete'])
-        .can(['create', 'read', 'delete'])
+        .canOwn(['create', 'read', 'delete', 'update'])
+        .can(['create', 'read', 'delete', 'update'])
 }

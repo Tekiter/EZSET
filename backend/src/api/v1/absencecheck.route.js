@@ -75,13 +75,15 @@ router.post(
     [
         perm('absence').canOwn('delete'),
         body('reason').isString(),
+        body('day').isString(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
         try {
-            await OfficialAbsence.deleteMany({
+            await OfficialAbsence.deleteOne({
                 name: req.user.username,
                 reason: req.body.reason,
+                day: req.body.day,
             })
             res.status(200).json()
         } catch (err) {
@@ -90,8 +92,11 @@ router.post(
     })
 )
 
+//오늘날짜 이후의 공결신청 리스트 반환
+//OfficialAbsenceAccept 페이지에서 사용
 router.get(
     '/officialAbsenceList',
+    [perm('absence').can('read'), validateParams],
     asyncRoute(async function(req, res) {
         try {
             const cursor_No = await OfficialAbsence.find({
@@ -109,8 +114,16 @@ router.get(
     })
 )
 
+//오늘날짜 이후의 공결신청 리스트 반환
+//OfficialAbsenceAccept 페이지에서 사용
 router.post(
     '/officialAbsenceAccept',
+    [
+        perm('absence').can('update'),
+        body('day').isString(),
+        body('approval').isBoolean(),
+        validateParams,
+    ],
     asyncRoute(async function(req, res) {
         try {
             const cursor = await OfficialAbsence.findOneAndUpdate(

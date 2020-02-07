@@ -276,10 +276,10 @@
                                                             >공결 신청
                                                             취소</v-card-title
                                                         >
-                                                        <v-card-text
-                                                            >신청 하실 때의 모든
-                                                            날짜의 신청이 같이
-                                                            취소됩니다.
+                                                        <v-card-text>
+                                                            {{
+                                                                selectedEvent.reson
+                                                            }}신청하신 공결을
                                                             취소하시겠습니까?</v-card-text
                                                         >
                                                         <v-card-actions>
@@ -525,11 +525,11 @@ export default {
             this.absenceUserdata.map(item => {
                 if (item.approval == false) {
                     events.push({
-                        name: '공결 비승인',
+                        name: '공결(승인대기)',
                         start: moment(item.day).format('YYYY-MM-DD'),
                         end: moment(item.day).format('YYYY-MM-DD'),
                         details:
-                            item.reason + '(의) 사유의 공결이 승인 안됐습니다.',
+                            item.reason + '(의) 사유의 공결이 승인 대기중입니다.',
                         color: 'orange',
                         reason: item.reason,
                     })
@@ -537,11 +537,11 @@ export default {
                 //승인된 공결
                 if (item.approval == true) {
                     events.push({
-                        name: '공결 승인',
+                        name: '공결(승인완료)',
                         start: moment(item.day).format('YYYY-MM-DD'),
                         end: moment(item.day).format('YYYY-MM-DD'),
                         details:
-                            item.reason + '(의) 사유의 공결이 승인 됐습니다.',
+                            item.reason + '(의) 사유의 공결이 승인 완료 되었습니다.',
                         color: 'green',
                         reason: item.reason,
                     })
@@ -590,6 +590,7 @@ export default {
             try {
                 await axios.post('absencecheck/deleteAbsenceUser', {
                     reason: selectedEvent.reason,
+                    day: selectedEvent.start,
                 })
             } catch (err) {
                 console.log(err)
