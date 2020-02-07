@@ -129,6 +129,10 @@ export default {
                 this.titleAlert = true
                 return
             }
+            if (!this.getMarkdown()) {
+                this.contentAlert = true
+                return
+            }
             try {
                 this.isLoading = true
 
@@ -150,7 +154,6 @@ export default {
                 })
             } catch (error) {
                 this.isError = true
-                this.contentAlert = true
             } finally {
                 this.isLoading = false
             }
