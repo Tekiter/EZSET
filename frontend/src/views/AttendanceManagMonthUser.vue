@@ -435,6 +435,11 @@ export default {
                 month: 'long',
             })
         },
+        dayList_fab() {
+            return this.dates.map(item => {
+                return moment(item).format('YYYY-MM-DD')
+            })
+        },
     },
     methods: {
         viewDay({ date }) {
@@ -569,7 +574,7 @@ export default {
             try {
                 await axios.post('absencecheck/absenceBook', {
                     Reason: this.absence_reason,
-                    dayList: this.dates,
+                    dayList: this.dayList_fab,
                 })
                 this.dates = [this.$moment(new Date()).format('YYYY-MM-DD')]
                 this.absence_reason = ''

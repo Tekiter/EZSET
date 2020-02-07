@@ -14,7 +14,7 @@ router.post(
         var Name = req.user.username
         var Reason = req.body.Reason
         var dayList = req.body.dayList
-        var approval = 'No'
+        var approval = false
         try {
             //백에서 list안의 원소를 각 날짜별로 결석 내용 저장 officialabsencereason
             for (var k in dayList) {
@@ -96,28 +96,36 @@ router.get(
         try {
             const cursor_No = await OfficialAbsence.find({
                 day: { $gte: moment().format('YYYY-MM-DD') },
-                approval: 'No',
+                approval: false,
             }).sort({ name: 1 })
             const cursor_Yes = await OfficialAbsence.find({
                 day: { $gte: moment().format('YYYY-MM-DD') },
-                approval: 'Yes',
-            }).sort({ day: 1 })
+                approval: true,
+            }).sort({ name: 1 })
             res.json({ noanswer: cursor_No, yesanswer: cursor_Yes })
         } catch (err) {
             res.status(501).json()
         }
     })
 )
-/*
+
 router.post(
     '/officialAbsenceAccept',
     asyncRoute(async function(req, res) {
-        try{
-            const cursor = await OfficialAbsence.findOneAndUpdate({
-                
-            })
+        try {
+            const cursor = await OfficialAbsence.findOneAndUpdate(
+                {
+                    name: req.body.name,
+                    day: req.body.day,
+                },
+                { approval: req.body.approval },
+                function(err, doc) {}
+            )
+            res.json(cursor)
+        } catch (err) {
+            res.status(501).json()
         }
     })
 )
-*/
+
 export default router
