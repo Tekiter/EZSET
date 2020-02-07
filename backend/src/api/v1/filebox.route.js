@@ -1,13 +1,22 @@
 import { Router } from 'express'
 import { validateParams, asyncRoute } from '../../utils/api'
-import { body } from 'express-validator'
+import { body, param } from 'express-validator'
 import Group from '../../models/filebox/Group'
 import Material from '../../models/filebox/Material'
-import { checkAttachableFileArray } from '../../utils/file'
+import {
+    checkAttachableFileArray,
+    checkIsFileOwner,
+    checkUnlinkedFile,
+    applyFileLink,
+    removeFileLink,
+    deleteUnlinkedFile,
+} from '../../utils/file'
 
 const router = Router()
 
-router.route('/').get(
+router.get(
+    '/',
+    [],
     asyncRoute(async (req, res) => {
         const loops = async item => {
             const res = await Group.find()
@@ -53,7 +62,8 @@ router.route('/').get(
     })
 )
 //group 생성 : group의 부모는 항상  group, 자식은 group(isfolder) 이거나 material
-router.route('/group').post(
+router.post(
+    '/group',
     [
         body('name').isString(),
         body('isfolder').isBoolean(),
@@ -63,75 +73,141 @@ router.route('/group').post(
         validateParams,
     ],
     asyncRoute(async (req, res) => {
-        try {
-            let parent
-            //부모 id가 없다면 첫 번째 group
-            if (req.body.parent_id) {
-                parent = await Group.findById(req.body.parent_id)
+        let parent
+        //부모 id가 없다면 첫 번째 group
+        if (req.body.parent_id) {
+            parent = await Group.findById(req.body.parent_id)
+            if (!parent || parent.isfolder) {
+                const err = new Error('올바르지 않은 parent group id 입니다.')
+                err.status = 400
+                throw err
             }
-            let newGroup = new Group()
-            newGroup.name = req.body.name
-            newGroup.isfolder = req.body.isfolder
-            if (req.body.parent_id) newGroup.parent = req.body.parent_id
-            await newGroup.save()
-            //부모에 새로 만든 그룹의 주소를 자식 배열에 넣어준다
-            if (req.body.parent_id) {
-                parent.children.push(newGroup.id)
-                parent.markModified('children')
-                await parent.save()
-            }
+        }
+        let newGroup = new Group()
+        newGroup.name = req.body.name
+        newGroup.isfolder = req.body.isfolder
+        if (req.body.parent_id) newGroup.parent = req.body.parent_id
+        await newGroup.save()
+        //부모에 새로 만든 그룹의 주소를 자식 배열에 넣어준다
+        if (req.body.parent_id) {
+            parent.children.push(newGroup.id)
+            parent.markModified('children')
+            await parent.save()
+        }
 
-            res.status(201).json({
-                group: {
-                    id: newGroup.id,
-                    name: newGroup.name,
-                },
-            })
-        } catch (error) {
-            const err = new Error('group을 생성할 수 없습니다')
-            err.status = 400
+        res.status(201).json({
+            group: {
+                id: newGroup.id,
+                name: newGroup.name,
+            },
+        })
+    })
+)
+
+//material 조회
+router.get(
+    '/folder/:parent_id',
+    [param('parent_id').isMongoId(), validateParams],
+    asyncRoute(async (req, res) => {
+        const folder = await Group.findById(req.params.parent_id)
+        if (!folder) {
+            const err = new Error('존재하지 않는 group id 입니다.')
+            err.status = 404
             throw err
         }
+
+        const materials = await Material.find()
+            .where('parent')
+            .equals(req.params.parent_id)
+
+        res.json({
+            folder: {
+                name: folder.name,
+            },
+            materials: materials.map(item => {
+                return {
+                    id: item.id,
+                    title: item.title,
+                    author: item.author,
+                    content: item.content,
+                    created_date: item.created_date,
+                    files: item.files,
+                }
+            }),
+        })
     })
 )
 
 //material 생성 : material의 부모는 항상 isfolder
-router.route('/material').post(
+router.post(
+    '/folder/:parent_id',
     [
         body('title').isString(),
         body('content').isString(),
         body('files').custom(checkAttachableFileArray),
-        body('parent_id').isMongoId(),
+        param('parent_id').isMongoId(),
         validateParams,
     ],
     asyncRoute(async (req, res) => {
-        try {
-            let parent = await Group.findById(req.body.parent_id)
-
-            let newMaterial = new Material()
-            newMaterial.title = req.body.title
-            newMaterial.author = req.user.username
-            newMaterial.content = req.body.content
-            newMaterial.created_date = Date.now()
-            newMaterial.files = req.body.files
-            newMaterial.parent = req.body.parent_id
-            await newMaterial.save()
-
-            parent.children.push(newMaterial.id)
-            parent.markModified('children')
-            await parent.save()
-
-            res.status(201).json({
-                material: {
-                    id: newMaterial.id,
-                    name: newMaterial.title,
-                },
-            })
-        } catch (error) {
-            const err = new Error('material을 생성할 수 없습니다')
+        const parent = await Group.findById(req.params.parent_id)
+        if (!parent) {
+            const err = new Error('올바르지 않은 parent id 입니다.')
             err.status = 400
             throw err
         }
+        if (
+            !checkIsFileOwner(req.body.files) ||
+            !checkUnlinkedFile(req.body.files)
+        ) {
+            const err = new Error('올바르지 않은 첨부파일입니다.')
+            err.status = 400
+            throw err
+        }
+
+        const newMaterial = new Material({
+            title: req.body.title,
+            author: req.user.username,
+            content: req.body.content,
+            created_date: Date.now(),
+            files: req.body.files,
+            parent: req.params.parent_id,
+        })
+        await newMaterial.save()
+
+        // DB 파일 객체에 역참조 등록
+        await applyFileLink(req.body.files, 'filebox', newMaterial.id)
+        newMaterial.files = req.body.files
+
+        await newMaterial.save()
+
+        res.status(201).json({
+            material: {
+                id: newMaterial.id,
+                name: newMaterial.title,
+            },
+        })
+    })
+)
+
+// material 삭제
+router.delete(
+    '/material/:material_id',
+    [param('material_id').isMongoId(), validateParams],
+    asyncRoute(async (req, res) => {
+        const material = await Material.findById(req.params.material_id)
+
+        if (!material) {
+            const err = new Error('존재하지 않는 자료입니다.')
+            err.status = 404
+            throw err
+        }
+
+        await removeFileLink(material.files)
+        await deleteUnlinkedFile(material.files)
+
+        await material.delete()
+
+        res.status(200).json({ message: '자료가 삭제되었습니다.' })
     })
 )
 export default router
