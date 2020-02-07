@@ -12,7 +12,7 @@ var officialAbsenceSchema = new Schema({
         type: String,
     },
     approval: {
-        type: String,
+        type: Boolean,
     },
 })
 

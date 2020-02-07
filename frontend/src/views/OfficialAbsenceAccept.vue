@@ -29,13 +29,14 @@
                         color="deep-purple accent-4"
                         small
                         class="d-flex flex-row-reverse"
+                        @click="Accept"
                     >
                         승인</v-btn
                     >
                 </v-toolbar>
                 <v-list three-line flat>
                     <v-divider></v-divider>
-                    <v-list-item-group v-model="checkbox" multiple>
+                    <v-list-item-group v-model="checkbox_No" multiple>
                         <v-list-item
                             v-for="item in official_absence_No_arr"
                             :key="item.name"
@@ -69,31 +70,36 @@
                         color="deep-purple accent-4"
                         small
                         class="d-flex flex-row-reverse"
+                        @click="Cancle"
                     >
                         승인취소</v-btn
                     >
                 </v-toolbar>
-                <v-list three-line>
+                <v-list three-line flat>
                     <v-divider></v-divider>
-                    <v-list-item
-                        v-for="item in official_absence_Yes_arr"
-                        :key="item"
-                    >
-                        <v-list-item-avatar>
-                            <v-checkbox
-                                v-model="checkbox"
-                                :value="item.name"
-                            ></v-checkbox>
-                        </v-list-item-avatar>
-                        <v-list-item-content>
-                            <v-list-item-title>{{
-                                item.name
-                            }}</v-list-item-title>
-                            <v-list-item-subtitle>
-                                {{ item.reason }}
-                            </v-list-item-subtitle>
-                        </v-list-item-content>
-                    </v-list-item>
+                    <v-list-item-group v-model="checkbox_Yes" multiple>
+                        <v-list-item
+                            v-for="item in official_absence_Yes_arr"
+                            :key="item.name"
+                        >
+                            <template v-slot:default="{ active, toggle }">
+                                <v-list-item-action>
+                                    <v-checkbox
+                                        :input-value="active"
+                                        @click="toggle"
+                                    ></v-checkbox>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>{{
+                                        item.name
+                                    }}</v-list-item-title>
+                                    <v-list-item-subtitle>
+                                        {{ item.reason }}
+                                    </v-list-item-subtitle>
+                                </v-list-item-content>
+                            </template>
+                        </v-list-item>
+                    </v-list-item-group>
                 </v-list>
             </v-col>
         </v-row>
@@ -106,17 +112,12 @@ export default {
     data: () => ({
         Official_Absence_No: [],
         Official_Absence_Yes: [],
-        checkbox: [],
+        checkbox_No: [],
+        checkbox_Yes: [],
         picker_date: moment(new Date()).format('YYYY-MM-DD'),
     }),
-    async created() {
-        try {
-            const cursor = await axios.get('absencecheck/officialAbsenceList')
-            this.Official_Absence_No = cursor.data.noanswer
-            this.Official_Absence_Yes = cursor.data.yesanswer
-        } catch (err) {
-            console.log(err)
-        }
+    created() {
+        this.listprint()
     },
     computed: {
         arraydays() {
@@ -140,11 +141,52 @@ export default {
         },
     },
     methods: {
+        async listprint() {
+            try {
+                const cursor = await axios.get(
+                    'absencecheck/officialAbsenceList'
+                )
+                this.Official_Absence_No = cursor.data.noanswer
+                this.Official_Absence_Yes = cursor.data.yesanswer
+            } catch (err) {
+                console.log(err)
+            }
+        },
         dayprint(day) {
             return moment(day).format('YYYY-MM-DD')
         },
         dateprint(date) {
             this.picker_date = this.dayprint(date)
+        },
+        async Accept() {
+            try {
+                for (let ii of this.checkbox_No) {
+                    console.log(ii)
+                    console.log(this.official_absence_No_arr[ii].name)
+                    await axios.post('absencecheck/officialAbsenceAccept', {
+                        name: this.official_absence_No_arr[ii].name,
+                        day: this.picker_date,
+                        approval: true,
+                    })
+                }
+                this.listprint()
+            } catch (err) {
+                console.log(err)
+            }
+        },
+        async Cancle() {
+            try {
+                for (let ii of this.checkbox_Yes) {
+                    await axios.post('absencecheck/officialAbsenceAccept', {
+                        name: this.official_absence_Yes_arr[ii].name,
+                        day: this.picker_date,
+                        approval: false,
+                    })
+                }
+                this.listprint()
+            } catch (err) {
+                console.log(err)
+            }
         },
     },
 }
