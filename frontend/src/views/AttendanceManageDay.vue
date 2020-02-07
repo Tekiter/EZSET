@@ -208,7 +208,7 @@
                                         {{ item.reason }}
                                     </td>
                                     <td
-                                        v-if="item.approval == 'Yes'"
+                                        v-if="item.approval == true"
                                         class="flex-grow-0"
                                     >
                                         <v-btn text icon color="green">
@@ -218,7 +218,7 @@
                                         </v-btn>
                                     </td>
                                     <td
-                                        v-if="item.approval == 'No'"
+                                        v-if="item.approval == false"
                                         class="flex-grow-0"
                                     >
                                         <v-btn text icon color="red">
