@@ -107,7 +107,7 @@ export default {
     methods: {
         async startAttendance() {
             try {
-                const res_code = await axios.get('attendance/startAttendance')
+                const res_code = await axios.post('attendance/startAttendance')
                 this.output_attendance_code = res_code.data.code
                 this.code = 1
             } catch (err) {

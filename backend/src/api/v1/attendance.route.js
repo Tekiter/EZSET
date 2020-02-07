@@ -97,7 +97,7 @@ router.post(
 //관리자가 시작버튼을 눌렀을경우 관리자는 출석상태 다른 모든 유저는 결석상태로 업데이트됨
 //attendanceDays, attendanceUsers Collection에 시작버튼을 누른 관리자를 제외한 모두를 '결석'상태로 초기화한 Document가 생성됨
 //Attendance 페이지에서 사용
-router.get(
+router.post(
     '/startAttendance',
     [perm('attendance').can('start')],
     asyncRoute(async function(req, res) {
