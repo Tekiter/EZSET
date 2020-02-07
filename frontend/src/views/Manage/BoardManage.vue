@@ -1,6 +1,6 @@
 <template>
     <v-row class="ma-3 fill-height">
-        <v-col class="ma-5">
+        <v-col cols="5">
             <v-card outlined :loading="isLoading">
                 <v-toolbar flat>
                     <v-toolbar-title>
@@ -28,7 +28,7 @@
                 </v-list>
             </v-card>
         </v-col>
-        <!-- <v-col cols="7">
+        <v-col cols="7">
             <v-card outlined>
                 <v-card-title>게시판 설정</v-card-title>
                 <v-list>
@@ -42,7 +42,7 @@
                     </v-list-item>
                 </v-list>
             </v-card>
-        </v-col> -->
+        </v-col>
 
         <v-dialog v-model="createBoardDialog.show" max-width="300">
             <v-card :loading="createBoardDialog.isLoading">
