@@ -518,7 +518,7 @@ export default {
             })
             //공결내역삽입
             this.absenceUserdata.map(item => {
-                if (item.approval == 'No') {
+                if (item.approval == false) {
                     events.push({
                         name: '공결 비승인',
                         start: moment(item.day).format('YYYY-MM-DD'),
@@ -530,7 +530,7 @@ export default {
                     })
                 }
                 //승인된 공결
-                if (item.approval == 'Yes') {
+                if (item.approval == true) {
                     events.push({
                         name: '공결 승인',
                         start: moment(item.day).format('YYYY-MM-DD'),

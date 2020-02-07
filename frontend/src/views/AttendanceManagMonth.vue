@@ -175,8 +175,12 @@ export default {
             attendanceUserData: [],
             userList: [],
             //date-picker
-            Sdate: new Date().toISOString().substr(0, 10),
-            Edate: new Date().toISOString().substr(0, 10),
+            Sdate: moment()
+                .startOf('month')
+                .format('YYYY-MM-DD'),
+            Edate: moment()
+                .endOf('month')
+                .format('YYYY-MM-DD'),
             menu1: false,
             menu2: false,
             tabLoad: false,
