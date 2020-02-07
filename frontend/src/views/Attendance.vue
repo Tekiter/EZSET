@@ -3,7 +3,8 @@
         <v-form>
             <v-card
                 class="mx-auto"
-                max-width="400"
+                max-width="500"
+                max-height="500"
                 v-if="flag == true && code == 0"
             >
                 <v-card-title>
@@ -18,26 +19,54 @@
                     >
                 </v-card-actions>
             </v-card>
-            <v-card class="mx-auto" max-width="400" v-if="flag">
-                <v-card-title>{{ output_attendance_code }}</v-card-title>
-                <v-card-actions>
-                    <v-btn
-                        color="purple"
-                        text
-                        v-if="flag"
-                        @click="endAttendance"
-                        >종료</v-btn
-                    >
-                </v-card-actions>
+            <v-card
+                class="mx-auto"
+                max-width="500"
+                max-height="500"
+                v-if="flag && this.$perm('attendance').can('start')"
+            >
+                <v-card-text>
+                    <div class="d-flex justify-center">
+                        <span class="display-3">{{
+                            output_attendance_code
+                        }}</span>
+                    </div>
+                    <div class="d-flex justify-center">
+                        <v-btn
+                            color="purple"
+                            text
+                            v-if="flag"
+                            @click="endAttendance"
+                            large
+                            >종료</v-btn
+                        >
+                    </div>
+                </v-card-text>
             </v-card>
 
-            <v-card class="mx-auto" max-width="400" text v-if="!flag">
+            <v-card
+                class="mx-auto"
+                max-width="500"
+                max-height="500"
+                text
+                v-if="!flag && this.$perm('attendance').can('start')"
+            >
                 <v-card-actions>
-                    <v-btn color="purple" text @click="startAttendance"
+                    <v-btn color="purple" text @click="startAttendance" large
                         >시작</v-btn
                     >
                 </v-card-actions>
             </v-card>
+            <div>
+                <v-alert
+                    type="warning"
+                    v-if="
+                        !this.$perm('attendance').can('start') && flag == false
+                    "
+                >
+                    출석중이 아닙니다.
+                </v-alert>
+            </div>
         </v-form>
 
         <v-snackbar v-model="snackbar_c" color="success">
@@ -51,6 +80,7 @@
     </v-container>
 </template>
 <script>
+import moment from 'moment'
 import axios from 'axios'
 export default {
     name: 'attendance',
@@ -60,18 +90,16 @@ export default {
         })
         this.$socket.on('attendance', data => {
             this.flag = data.flag
+            console.log(data.flag)
         })
         try {
             const res = await axios.get('attendance/attendanceCheck')
             this.code = parseInt(res.data)
-            // console.log(res.data)
-            // if (this.code == 1 && this.flag == true) {
-            //     this.endCard = false
-            //     this.attendanceCard = false
-            // }
         } catch (err) {
             console.log(err)
         }
+        const res = await axios.get('attendance/attendanceCheckAdmin')
+        if (res.data != 0) this.output_attendance_code = parseInt(res.data)
     },
 
     data() {
@@ -89,7 +117,7 @@ export default {
     methods: {
         async startAttendance() {
             try {
-                const res_code = await axios.get('attendance/startAttendance')
+                const res_code = await axios.post('attendance/startAttendance')
                 this.output_attendance_code = res_code.data.code
                 this.code = 1
             } catch (err) {
@@ -98,14 +126,21 @@ export default {
             this.$socket.emit('attendance', {
                 flag: true,
             })
+            this.$socket.emit('start', {
+                flag: true,
+            })
             this.flag = true
         },
-        endAttendance() {
+        async endAttendance() {
             this.$socket.emit('attendance', {
                 flag: false,
             })
             this.flag = false
             this.input_attendance_code = ''
+            await axios.post('attendance/attendanceCheckEnd')
+            this.$router.push(
+                `/AttendanceManageDay/${moment().format('YYYYMMDD')}`
+            )
         },
         async attendanceCheck() {
             try {
@@ -113,8 +148,12 @@ export default {
                     code: this.input_attendance_code,
                     state: 'attendance',
                 })
-                if (res.data.result) this.snackbar_c = true
-                else this.snackbar_e = true
+                if (res.data.result) {
+                    this.snackbar_c = true
+                    setTimeout(() => {
+                        this.$router.push('/')
+                    }, 2000)
+                } else this.snackbar_e = true
             } catch (err) {
                 console.log(err)
             }

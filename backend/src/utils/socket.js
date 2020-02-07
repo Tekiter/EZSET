@@ -30,11 +30,23 @@ export async function initSocket(app, SOCKET_PORT) {
             socket.broadcast.to('attendance').emit('attendance', rtnMessage)
         })
         //connect after attendance start
-        setInterval(function() {
-            if (curState.flag == true) {
+        socket.on('start', function(data) {
+            var emitFlag = setInterval(function() {
                 socket.to('attendance').emit('attendance', curState)
-            }
-        }, 1000)
+                if (curState.flag == false) clearInterval(emitFlag)
+            }, 500)
+
+            setTimeout(function() {
+                if (curState.flag == true) {
+                    var endMsg = {
+                        flag: false,
+                    }
+                    //broadcast changed state
+                    curState.flag = false
+                    socket.to('attendance').emit('attendance', endMsg)
+                }
+            }, 300000)
+        })
     })
     //start socket.io server
     server.listen(SOCKET_PORT, function() {

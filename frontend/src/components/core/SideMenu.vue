@@ -51,8 +51,35 @@ export default {
                 {
                     type: 'simple',
                     icon: 'mdi-checkbox-marked-circle-outline',
-                    title: '출석체크',
-                    to: '/attendance',
+                    title: '출석',
+
+                    children: [
+                        {
+                            title: '출석체크',
+                            to: '/attendance',
+                            perm: this.$perm('attendance').can('att'),
+                        },
+                        {
+                            title: '월별출석현황',
+                            to: '/AttendanceManageMonth',
+                            perm: this.$perm('attendance').can('read'),
+                        },
+                        {
+                            title: '출석현황',
+                            to: '/AttendanceManageMonthUser',
+                            perm: this.$perm('attendance').canOwn('read'),
+                        },
+                        {
+                            title: '공결승인',
+                            to: '/OfficialAbsenceAccept',
+                            perm: this.$perm('attendance').can('read'),
+                        },
+                        {
+                            title: '출석 설정',
+                            to: '/manage/attendance',
+                            perm: this.$perm('attendance').can('read'),
+                        },
+                    ],
                 },
                 {
                     type: 'simple',
