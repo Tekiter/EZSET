@@ -80,6 +80,11 @@ const routes = [
         component: () => import('../views/Manage/BoardManage.vue'),
     },
     {
+        path: '/manage/server',
+        name: 'manageServer',
+        component: () => import('../views/Manage/ServerManage.vue'),
+    },
+    {
         path: '/403',
         name: 'error403',
         component: () => import('../views/Error/403.vue'),
