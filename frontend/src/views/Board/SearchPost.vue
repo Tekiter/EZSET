@@ -22,7 +22,6 @@
                         <v-select
                             v-model="select"
                             :items="item"
-                            :hint="`${select.state}, ${select.value}`"
                             item-text="state"
                             item-value="value"
                             outlined
@@ -36,8 +35,8 @@
                             color="blue darken-2"
                             label="Search"
                             counter
-                            maxlength="100"
-                            append-icon="mdi-magnify"
+                            @change="clickSearch()"
+                            :rules="[rules.min]"
                         ></v-text-field>
                     </v-col>
                     <v-col cols="2" sm="1">
@@ -145,11 +144,21 @@ export default {
                 { text: '추천', value: 'like' },
                 { text: '조회', value: 'view' },
             ],
+            rules: {
+                min: v => v.length >= 2 || '최소 2글자 이상 입력하세요.',
+            },
         }
     },
     methods: {
+        read(evt) {
+            this.$router.push({
+                path: '/board/' + this.$route.params.board_id + '/' + evt._id,
+            })
+        },
         clickSearch() {
-            console.log(this.Selecter)
+            if (this.searchObject.length < 2) {
+                return
+            }
             this.getData()
             this.showData = true
         },
