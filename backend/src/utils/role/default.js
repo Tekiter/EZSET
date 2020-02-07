@@ -44,9 +44,6 @@ export function setAdminRole(roles) {
         .can('access')
 
         .resource('attendance')
-        .can(['start', 'att', 'read', 'update'])
-
-        .resource('attendance')
         .canOwn('read')
         .can(['start', 'att', 'read', 'update'])
 

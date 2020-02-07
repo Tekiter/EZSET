@@ -76,6 +76,7 @@
                 class="elevation-1 font-weight-medium headline"
                 :search="search"
                 :custom-filter="filterOnlyCapsText"
+                v-if="tabLoad && this.$perm('attendance').can('read')"
             >
                 <template v-slot:item="{ item, headers }">
                     <tr>
