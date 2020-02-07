@@ -151,7 +151,6 @@ export default {
     },
     methods: {
         read(evt) {
-            console.log(evt)
             this.$router.push({
                 path: '/board/' + evt.board + '/' + evt._id,
             })
