@@ -253,7 +253,7 @@
                                                 justify="center"
                                                 v-if="
                                                     selectedEvent.name ==
-                                                        '공결 비승인'
+                                                        '공결(승인대기)'
                                                 "
                                             >
                                                 <v-dialog
