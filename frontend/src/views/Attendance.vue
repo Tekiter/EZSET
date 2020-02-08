@@ -66,6 +66,16 @@
                 >
                     출석중이 아닙니다.
                 </v-alert>
+                <v-alert
+                    type="success"
+                    v-if="
+                        !this.$perm('attendance').can('start') &&
+                            flag == true &&
+                            code == 1
+                    "
+                >
+                    이미 출석하셨습니다!
+                </v-alert>
             </div>
         </v-form>
 
@@ -85,12 +95,11 @@ import axios from 'axios'
 export default {
     name: 'attendance',
     async created() {
-        this.$socket.emit('join', {
+        await this.$socket.emit('join', {
             roomName: 'attendance',
         })
-        this.$socket.on('attendance', data => {
+        await this.$socket.on('attendance', data => {
             this.flag = data.flag
-            console.log(data.flag)
         })
         try {
             const res = await axios.get('attendance/attendanceCheck')
