@@ -52,18 +52,7 @@ export async function initSocket(app, SOCKET_PORT) {
     io.on('connection', function(socket) {
         socket.on('join', function(data) {
             socket.join(data.roomName)
-            console.log('[socket.io] ' + socket.id + '  user connected') // eslint-disable-line no-console
-            console.log(
-                '[socket.io] emit curState to ' +
-                    socket.id +
-                    'in room' +
-                    data.roomName
-            ) // eslint-disable-line no-console
             io.to(data.roomName).emit('attendance', curState)
-        })
-        //disconnect event
-        socket.on('disconnect', () => {
-            console.log('[socket.io] ' + socket.id + '  user disconnected') // eslint-disable-line no-console
         })
         //attendance event lisner
         socket.on('attendance', function(data) {
@@ -72,7 +61,6 @@ export async function initSocket(app, SOCKET_PORT) {
                 flag: data.flag,
             }
             //broadcast changed state
-            console.log('[socket.io] broadcast to attendance room') // eslint-disable-line no-console
             socket.broadcast.to('attendance').emit('attendance', msg)
         })
         //setTimeout 3m when attendance start
@@ -83,7 +71,6 @@ export async function initSocket(app, SOCKET_PORT) {
                         flag: false,
                     }
                     curState.flag = false
-                    //console.log('[socket.io] attendance close because timeout')
                     socket.broadcast.to('attendance').emit('attendance', msg)
                 }
             }, 300000)
