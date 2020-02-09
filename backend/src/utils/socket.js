@@ -11,39 +11,67 @@ export async function initSocket(app, SOCKET_PORT) {
         flag: false,
     }
 
+    // //connect event
+    // io.on('connection', function(socket) {
+    //     socket.on('join', function(data) {
+    //         socket.join(data.roomName)
+    //     })
+    //     //disconnect event
+    //     socket.on('disconnect', () => {
+    //         // console.log('[socket.io] ' + socket.id + 'user disconnected')
+    //     })
+    //     //attendance event lisner
+    //     socket.on('attendance', function(data) {
+    //         curState.flag = data.flag
+    //         var rtnMessage = {
+    //             flag: data.flag,
+    //         }
+    //         //broadcast changed state
+    //         socket.broadcast.to('attendance').emit('attendance', rtnMessage)
+    //     })
+    //     //connect after attendance start
+    //     socket.on('start', function(data) {
+    //         var emitFlag = setInterval(function() {
+    //             socket.to('attendance').emit('attendance', curState)
+    //             if (curState.flag == false) clearInterval(emitFlag)
+    //         }, 500)
+
+    //         setTimeout(function() {
+    //             if (curState.flag == true) {
+    //                 var endMsg = {
+    //                     flag: false,
+    //                 }
+    //                 //broadcast changed state
+    //                 curState.flag = false
+    //                 socket.to('attendance').emit('attendance', endMsg)
+    //             }
+    //         }, 300000)
+    //     })
+    // })
     //connect event
     io.on('connection', function(socket) {
         socket.on('join', function(data) {
             socket.join(data.roomName)
-        })
-        //disconnect event
-        socket.on('disconnect', () => {
-            // console.log('[socket.io] ' + socket.id + 'user disconnected')
+            io.to(data.roomName).emit('attendance', curState)
         })
         //attendance event lisner
         socket.on('attendance', function(data) {
             curState.flag = data.flag
-            var rtnMessage = {
+            var msg = {
                 flag: data.flag,
             }
             //broadcast changed state
-            socket.broadcast.to('attendance').emit('attendance', rtnMessage)
+            socket.broadcast.to('attendance').emit('attendance', msg)
         })
-        //connect after attendance start
+        //setTimeout 3m when attendance start
         socket.on('start', function(data) {
-            var emitFlag = setInterval(function() {
-                socket.to('attendance').emit('attendance', curState)
-                if (curState.flag == false) clearInterval(emitFlag)
-            }, 500)
-
             setTimeout(function() {
                 if (curState.flag == true) {
-                    var endMsg = {
+                    var msg = {
                         flag: false,
                     }
-                    //broadcast changed state
                     curState.flag = false
-                    socket.to('attendance').emit('attendance', endMsg)
+                    socket.broadcast.to('attendance').emit('attendance', msg)
                 }
             }, 300000)
         })
