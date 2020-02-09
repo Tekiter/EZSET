@@ -20,6 +20,9 @@ export function setAdminRole(roles) {
     roles
         .role('admin')
 
+        .resource('serverConfig')
+        .can('change')
+
         .resource('profile')
         .can(['read', 'update'])
 

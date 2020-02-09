@@ -6,11 +6,12 @@ import { getConfig, setConfig } from '../../utils/config'
 
 const router = Router()
 
+const configNames = ['groupName']
+
 // 서버 설정을 가져온다.
 router.get(
     '/',
     asyncRoute(async (req, res) => {
-        const configNames = ['groupName']
         const configs = {}
 
         for (let configName of configNames) {
@@ -24,14 +25,14 @@ router.get(
 router.post(
     '/groupName',
     [
-        perm('serverConfig').can('access'),
+        perm('serverConfig').can('change'),
         body('value').isString(),
         validateParams,
     ],
     asyncRoute(async (req, res) => {
         await setConfig('groupName', req.body.value)
 
-        res.status(200)
+        res.status(200).end()
     })
 )
 
