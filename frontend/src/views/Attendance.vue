@@ -85,6 +85,11 @@ import axios from 'axios'
 export default {
     name: 'attendance',
     async created() {
+        /*
+        if (!this.$perm('manageRoles').can('access')) {
+            this.$router.push({ name: 'error403' })
+            return
+        }*/
         this.$socket.emit('join', {
             roomName: 'attendance',
         })
