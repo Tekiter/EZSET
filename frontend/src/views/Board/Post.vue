@@ -47,7 +47,7 @@
                     :headers="headersTwo"
                     :items="posts"
                     :page.sync="page"
-                    :items-per-page="8"
+                    :items-per-page="select.value"
                     hide-default-footer
                     :mobile-breakpoint="NaN"
                     class="hidden-md-and-up"
