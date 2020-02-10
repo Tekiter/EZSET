@@ -68,6 +68,12 @@ const routes = [{
             import ('../views/AttendanceManage.vue'),
     },
     {
+        path: '/Schedule',
+        name: 'Schedule',
+        component: () =>
+            import ('../views/Schedule/Schedule.vue'),
+    },
+    {
         path: '/board',
         name: 'board',
         component: () =>
