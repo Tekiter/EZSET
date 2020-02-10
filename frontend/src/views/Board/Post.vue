@@ -168,7 +168,13 @@ export default {
         async fetchPostList() {
             try {
                 const res = await axios.get(
-                    '/simple/boards/' + this.$route.params.board_id
+                    '/simple/boards/' + this.$route.params.board_id,
+                    {
+                        params: {
+                            page: this.page,
+                            pagesize: this.viewCount.value,
+                        },
+                    }
                 )
                 this.posts = res.data.posts.map(post => {
                     post.created_date = moment(post.created_date).format(
