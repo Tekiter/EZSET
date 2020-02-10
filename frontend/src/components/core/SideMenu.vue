@@ -46,6 +46,11 @@ export default {
                             to: '/manage/boards',
                             perm: this.$perm('manageBoards').can('access'),
                         },
+                        {
+                            title: '서버 설정',
+                            to: '/manage/server',
+                            perm: this.$perm('serverConfig').can('change'),
+                        },
                     ],
                 },
                 {

@@ -15,6 +15,8 @@ export default {
             try {
                 const res = await axios.get('config')
                 context.commit('SET_CONFIGS', res.data)
+
+                document.title = context.state.groupName
             } catch (error) {
                 throw error
             }
