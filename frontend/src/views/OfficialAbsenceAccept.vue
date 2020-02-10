@@ -2,7 +2,7 @@
     <v-container class="fill-height">
         <v-row style="height:30em">
             <v-col cols="12" md="3" class="fill-height">
-                <v-card>
+                <v-card outlined>
                     <!-- 날짜 선택하는 date picker부분-->
                     <v-card-title>
                         날짜 선택
@@ -14,8 +14,9 @@
                         full-width
                         class="mt-0"
                         no-title
-                        :events="arraydays"
-                        event-color="green lighten-1"
+                        outlined
+                        :events="funcdays"
+                        event-color=""
                         @click:date="dateprint"
                     ></v-date-picker>
                 </v-card>
@@ -132,14 +133,13 @@ export default {
         picker_date: moment(new Date()).format('YYYY-MM-DD'),
     }),
     created() {
+        if (!this.$perm('manageRoles').can('access')) {
+            this.$router.push({ name: 'error403' })
+            return
+        }
         this.listprint()
     },
     computed: {
-        arraydays() {
-            return this.Official_Absence_No.map(item => {
-                return this.dayprint(item.day)
-            })
-        },
         official_absence_No_arr() {
             return this.Official_Absence_No.filter(d => {
                 return this.dayprint(d.day) == this.dayprint(this.picker_date)
@@ -156,6 +156,19 @@ export default {
         },
     },
     methods: {
+        funcdays(date) {
+            let no_map = false
+            let yes_map = false
+            this.Official_Absence_No.forEach(ii => {
+                if (date == this.dayprint(ii.day)) no_map = true
+            })
+            this.Official_Absence_Yes.forEach(item => {
+                if (date == this.dayprint(item.day)) yes_map = true
+            })
+            if (no_map && yes_map) return ['teal lighten-2', 'blue lighten-1']
+            if (no_map) return 'teal lighten-2'
+            if (yes_map) return 'blue lighten-1'
+        },
         async listprint() {
             try {
                 const cursor = await axios.get(
