@@ -48,6 +48,8 @@ router.get(
     })
 )
 
+// 변경 가능한 서버 설정들을 수정한다.
+// body에 Object 로 key: value 쌍을 넣으면 반영된다.
 router.patch(
     '/admin',
     [
@@ -59,20 +61,6 @@ router.patch(
         for (let { key } of changeableConfigs) {
             await setConfig(key, req.body[key])
         }
-
-        res.status(200).end()
-    })
-)
-
-router.post(
-    '/option/groupName',
-    [
-        perm('serverConfig').can('change'),
-        body('value').isString(),
-        validateParams,
-    ],
-    asyncRoute(async (req, res) => {
-        await setConfig('groupName', req.body.value)
 
         res.status(200).end()
     })

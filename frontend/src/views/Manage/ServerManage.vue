@@ -57,15 +57,7 @@ export default {
         },
         async saveChanges() {
             this.isLoading = true
-            // for (let key of Object.keys(this.settingData)) {
-            //     try {
-            //         await axios.post(`config/option/${key}`, {
-            //             value: this.settingData[key],
-            //         })
-            //     } catch (__) {
-            //         //
-            //     }
-            // }
+
             await axios.patch('config/admin', this.settingData)
             await this.$store.dispatch('config/fetchConfig')
             await this.fetchSettings()
