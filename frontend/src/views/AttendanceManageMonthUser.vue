@@ -350,6 +350,12 @@
                     Close
                 </v-btn>
             </v-snackbar>
+            <v-snackbar v-model="snackbar.show" :timeout="2000" color="success">
+                {{ snackbar.text }}
+                <v-btn text @click="snackbar = false">
+                    닫기
+                </v-btn>
+            </v-snackbar>
         </v-card>
     </div>
 </template>
@@ -397,6 +403,10 @@ export default {
         calLoad: false,
         cancleSnack: false,
         applySnack: false,
+        snackbar: {
+            show: false,
+            text: '',
+        },
     }),
     async created() {
         try {
@@ -638,6 +648,10 @@ export default {
             }
             this.updateRange({ start: this.start, end: this.end })
             this.calLoad = true
+        },
+        openSnackbar(text) {
+            this.snackbar.text = text
+            this.snackbar.show = true
         },
     },
 }
