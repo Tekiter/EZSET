@@ -53,13 +53,13 @@
             </div>
             <v-card outlined v-if="showData">
                 <v-data-table
+                    v-if="$vuetify.breakpoint.mdAndUp"
                     :headers="headers"
                     :items="posts"
                     :page.sync="page"
                     :items-per-page="8"
                     hide-default-footer
                     :mobile-breakpoint="NaN"
-                    class="hidden-sm-and-down"
                     @page-count="pageCount = $event"
                 >
                     <template v-slot:item.title="props">
@@ -69,13 +69,13 @@
                     </template>
                 </v-data-table>
                 <v-data-table
+                    v-else
                     :headers="headersTwo"
                     :items="posts"
                     :page.sync="page"
                     :items-per-page="8"
                     hide-default-footer
                     :mobile-breakpoint="NaN"
-                    class="hidden-md-and-up"
                     @page-count="pageCount = $event"
                 >
                     <template v-slot:item.title="props">
