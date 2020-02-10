@@ -588,6 +588,13 @@ export default {
         //결석예약
         async reservation() {
             try {
+                /*
+                this.dates.forEach(item => {
+                    this.attendanceUserdata.forEach(ii => {
+                        if(item == ii) return 
+                    })
+                })
+                */
                 await axios.post('absencecheck/absenceBook', {
                     Reason: this.absence_reason,
                     dayList: this.dayList_fab,
