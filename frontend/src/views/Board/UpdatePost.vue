@@ -120,12 +120,17 @@ import { Editor } from '@toast-ui/vue-editor'
 import fileUpload from '../../components/file/FileUpload.vue'
 
 export default {
+    beforeRouteLeave(to, from, next) {
+        if (this.certification) next()
+        else this.nextConfirm(next)
+    },
     components: {
         Editor,
         fileUpload,
     },
     data() {
         return {
+            certification: false,
             title: '',
             titleAlert: false,
             content: '',
@@ -153,6 +158,17 @@ export default {
         }
     },
     methods: {
+        async nextConfirm(next) {
+            const res = await this.$action.showConfirmDialog(
+                '게시글 수정 취소',
+                '수정을 취소하시겠습니까?'
+            )
+            if (res) {
+                next()
+            } else {
+                next(false)
+            }
+        },
         backClick() {
             this.cancelAlert = true
         },
@@ -199,6 +215,7 @@ export default {
                 this.contentAlert = true
                 return
             }
+            this.certification = true
             try {
                 this.isLoading = true
 
