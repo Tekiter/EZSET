@@ -396,7 +396,7 @@ export default {
         absenceResDialog: {
             show: false,
         },
-        dates: [moment(new Date()).format('YYYY-MM-DD')],
+        dates: [],
         menu: false,
         absence_reason: '',
         dialog: false,
@@ -598,22 +598,28 @@ export default {
         //결석예약
         async reservation() {
             try {
-                /*
-                this.dates.forEach(item => {
-                    this.attendanceUserdata.forEach(ii => {
-                        if(item == ii) return 
+                let check_date = true
+                this.dayList_fab.forEach(item => {
+                    this.absenceUserdata.forEach(ii => {
+                        if (item == moment(ii.day).format('YYYY-MM-DD')) {
+                            check_date = false
+                            return this.openSnackbar(
+                                '같은 날짜에 이미 공결 예약을 하셨습니다.'
+                            )
+                        }
                     })
                 })
-                */
-                await axios.post('absencecheck/absenceBook', {
-                    Reason: this.absence_reason,
-                    dayList: this.dayList_fab,
-                })
-                this.dates = [this.$moment(new Date()).format('YYYY-MM-DD')]
-                this.absence_reason = ''
-                this.absenceResDialog.show = false
-                await this.init()
-                this.applySnack = true
+                if (check_date) {
+                    await axios.post('absencecheck/absenceBook', {
+                        Reason: this.absence_reason,
+                        dayList: this.dayList_fab,
+                    })
+                    this.dates = [this.$moment(new Date()).format('YYYY-MM-DD')]
+                    this.absence_reason = ''
+                    this.absenceResDialog.show = false
+                    await this.init()
+                    this.applySnack = true
+                }
             } catch (err) {
                 console.log(err)
             }
