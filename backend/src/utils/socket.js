@@ -13,7 +13,7 @@ export async function initSocket(app, SOCKET_PORT) {
     io.on('connection', function(socket) {
         socket.on('join', function(data) {
             socket.join(data.roomName)
-            io.to('attendance').emit('attendance', curState)
+            io.to(socket.id).emit('attendance', curState)
         })
         //attendance event lisner
         socket.on('attendance', function(data) {
@@ -22,7 +22,7 @@ export async function initSocket(app, SOCKET_PORT) {
                 flag: data.flag,
             }
             //broadcast changed state
-            io.to('attendance').emit('attendance', msg)
+            socket.broadcast.to('attendance').emit('attendance', msg)
         })
         //setTimeout 3m when attendance start
         socket.on('start', function(data) {
