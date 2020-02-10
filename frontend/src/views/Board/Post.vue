@@ -9,14 +9,16 @@
             ></v-text-field>
         </div>
         <v-container grid-list-md>
-            <div>
-                <strong
-                    class="font-weight-medium d-flex justify-center display-2"
-                    >{{ board.title }}</strong
-                >
-            </div>
-            <v-row class="d-flex flex-row-reverse">
-                <v-col cols="3" sm="1">
+            <v-row>
+                <v-col></v-col>
+                <v-col></v-col>
+                <v-col class="d-flex justify-center">
+                    <strong class="font-weight-medium display-2">{{
+                        board.title
+                    }}</strong>
+                </v-col>
+                <v-col></v-col>
+                <v-col>
                     <v-select
                         v-model="select"
                         :items="viewCount"
@@ -24,8 +26,10 @@
                         item-value="value"
                         persistent-hint
                         return-object
-                    ></v-select> </v-col
-            ></v-row>
+                        style="width: 100px"
+                    ></v-select
+                ></v-col>
+            </v-row>
             <v-card outlined>
                 <v-data-table
                     :headers="headers"
@@ -47,7 +51,7 @@
                     :headers="headersTwo"
                     :items="posts"
                     :page.sync="page"
-                    :items-per-page="8"
+                    :items-per-page="select.value"
                     hide-default-footer
                     :mobile-breakpoint="NaN"
                     class="hidden-md-and-up"
