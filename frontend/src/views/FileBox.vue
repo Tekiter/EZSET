@@ -32,6 +32,12 @@
                                             class="ma-2"
                                             outlined
                                             label
+                                            v-if="plusGroup.selected.length == 0"
+                                        >기본 위치</v-chip>
+                                        <v-chip
+                                            class="ma-2"
+                                            outlined
+                                            label
                                             v-if="plusGroup.selected.length > 0"
                                         >{{plusGroup.selected[0].name}}</v-chip>
                                     </v-banner>
@@ -69,6 +75,19 @@
                                     color="warning"
                                     v-model="plusGroup.selected"
                                 ></group-tree>
+                                <v-card
+                                    class="mx-auto"
+                                    max-width="400"
+                                    outlined
+                                    v-if="plusGroup.selected.length == 0"
+                                    color="orange lighten-4"
+                                >
+                                    <v-list-item>
+                                        <v-list-item-content>
+                                            <v-list-item-title>기본 위치</v-list-item-title>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-card>
                             </v-col>
                         </v-row>
                     </div>
@@ -113,14 +132,18 @@ export default {
                 name: '',
                 parent: '',
             },
+            isloading: false,
         }
     },
     async created() {
-        const res = await axios.get('/filebox')
-        console.log(res)
-        this.groups = res.data.groups
+        this.patch()
     },
     methods: {
+        async patch() {
+            const res = await axios.get('/filebox')
+            console.log(res)
+            this.groups = res.data.groups
+        },
         showPlusGroup() {
             this.plusGroup.show = true
         },
@@ -130,7 +153,25 @@ export default {
             this.plusGroup.isfolder = false
             this.plusGroup.selected = []
         },
-        async applyPlusGroup() {},
+        async applyPlusGroup() {
+            this.isloading = true
+            try {
+                const body = {
+                    name: this.plusGroup.name,
+                    isfolder: this.plusGroup.isfolder,
+                }
+                if (this.plusGroup.selected.length > 0) {
+                    body.parent_id = this.plusGroup.selected[0].id
+                }
+                await axios.post('filebox/group', body)
+                this.closePlusGroup()
+                this.patch()
+            } catch (error) {
+                if (error.response.status == 409) console.log(error.response) // eslint-disable-line no-console
+            } finally {
+                this.isloading = false
+            }
+        },
         isFolderTrue() {
             this.plusGroup.isfolder = true
         },
@@ -140,10 +181,8 @@ export default {
     },
     computed: {
         isError() {
-            if (
-                this.plusGroup.selected.length > 0 &&
-                this.plusGroup.name != ''
-            ) {
+            //이름이 설정된 경우에만 확인버튼 클릭 가능
+            if (this.plusGroup.name != '') {
                 return false
             }
             return true
