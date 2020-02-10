@@ -10,20 +10,28 @@
         </div>
         <v-container grid-list-md>
             <div>
-                <v-toolbar-title class="d-flex justify-center"
-                    ><h1>
-                        <strong class="font-weight-medium">{{
-                            board.title
-                        }}</strong>
-                    </h1></v-toolbar-title
+                <strong
+                    class="font-weight-medium d-flex justify-center display-2"
+                    >{{ board.title }}</strong
                 >
             </div>
+            <v-row class="d-flex flex-row-reverse">
+                <v-col cols="3" sm="1">
+                    <v-select
+                        v-model="select"
+                        :items="viewCount"
+                        item-text="state"
+                        item-value="value"
+                        persistent-hint
+                        return-object
+                    ></v-select> </v-col
+            ></v-row>
             <v-card outlined>
                 <v-data-table
                     :headers="headers"
                     :items="posts"
                     :page.sync="page"
-                    :items-per-page="8"
+                    :items-per-page="select.value"
                     hide-default-footer
                     :mobile-breakpoint="NaN"
                     class="hidden-sm-and-down"
@@ -101,9 +109,14 @@ export default {
             loading: true,
             page: 1,
             pageCount: 0,
-            itemsPerPage: 10,
             board: '',
             posts: [],
+            select: { state: '8개', value: 8 },
+            viewCount: [
+                { state: '8개', value: 8 },
+                { state: '20개', value: 20 },
+                { state: '50개', value: 50 },
+            ],
             headers: [
                 {
                     text: '  번호',
@@ -142,6 +155,9 @@ export default {
         }
     },
     methods: {
+        changeRowPost() {
+            this.itemsPerPage = 2
+        },
         read(evt) {
             //console.log(evt._id)
             //console.log(evt.title)
