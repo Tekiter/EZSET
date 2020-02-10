@@ -73,6 +73,27 @@
                     </v-card-actions>
                 </v-card>
             </v-dialog>
+            <v-dialog v-model="backAlert" max-width="290">
+                <v-card>
+                    <v-card-title class="title"
+                        >게시글 작성을 취소하시겠습니까?</v-card-title
+                    >
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+
+                        <v-btn color="red darken-2" text @click="answer = true">
+                            예
+                        </v-btn>
+                        <v-btn
+                            color="green darken-1"
+                            text
+                            @click="backAlert = false"
+                        >
+                            아니오
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
         </div>
     </v-container>
 </template>
@@ -82,12 +103,19 @@ import { Editor } from '@toast-ui/vue-editor'
 import FileUpload from '../../components/file/FileUpload'
 
 export default {
+    beforeRouteLeave(to, from, next) {
+        if (this.certification) next()
+        else this.nextConfirm(next)
+    },
     components: {
         Editor,
         FileUpload,
     },
     data() {
         return {
+            answer: false,
+            backAlert: false,
+            certification: false,
             title: '',
             titleAlert: false,
             content: '',
@@ -115,6 +143,17 @@ export default {
         }
     },
     methods: {
+        async nextConfirm(next) {
+            const res = await this.$action.showConfirmDialog(
+                '게시글 작성 취소',
+                '작성을 취소하시겠습니까?'
+            )
+            if (res) {
+                next()
+            } else {
+                next(false)
+            }
+        },
         async getBoards() {
             const res = await axios.get('simple/boards')
             return res.data
@@ -133,6 +172,7 @@ export default {
                 this.contentAlert = true
                 return
             }
+            this.certification = true
             try {
                 this.isLoading = true
 
