@@ -4,14 +4,10 @@
             <v-skeleton-loader
                 class="mx-auto"
                 type="table"
-                v-if="!calLoad && this.$perm('absence').canOwn('read')"
+                v-if="!calLoad && this.$perm('schedule').can('read')"
             ></v-skeleton-loader>
             <div
-                v-if="
-                    calLoad &&
-                        this.$perm('attendance').canOwn('read') &&
-                        this.$perm('absence').canOwn('read')
-                "
+                v-if="calLoad && this.$perm('schedule').can('read')"
                 class="font-weight-medium subtitle-2"
             >
                 <v-container>
@@ -266,7 +262,7 @@
                                             <v-row
                                                 justify="center"
                                                 v-if="
-                                                    $perm('schecule').can(
+                                                    $perm('schedule').can(
                                                         'delete'
                                                     )
                                                 "
@@ -293,10 +289,10 @@
                                                         >
                                                         <v-card-text>
                                                             {{
-                                                                selectedEvent.title
+                                                                selectedEvent.name
                                                             }}
                                                             {{
-                                                                selectedEvent.content
+                                                                selectedEvent.details
                                                             }}
                                                             해당 일정을
                                                             삭제하시겠습니까?
@@ -318,8 +314,12 @@
                                                                     deleteSchedule(
                                                                         selectedEvent
                                                                     )
+                                                                    calLoad = false
                                                                     dialog = false
                                                                     selectedOpen = false
+                                                                    this.openSnackbar(
+                                                                        '취소되었습니다!'
+                                                                    )
                                                                 "
                                                                 >예</v-btn
                                                             >
@@ -542,17 +542,16 @@ export default {
         async deleteSchedule(selectedEvent) {
             try {
                 await axios.post('schedule/delete', {
-                    name: selectedEvent.title,
-                    start: moment(selectedEvent.start).format('YYYY-MM-DD'),
-                    end: moment(selectedEvent.end).format('YYYY-MM-DD'),
-                    detatils: selectedEvent.content,
+                    title: selectedEvent.name,
+                    start: selectedEvent.start,
+                    end: selectedEvent.end,
+                    content: selectedEvent.details,
                     color: selectedEvent.color,
                     type: selectedEvent.type,
                 })
             } catch (err) {
                 console.log(err)
             }
-            this.cancleSnack = true
             this.init()
         },
         //페이지 사용에 필요한 데이터 로드 및 표시

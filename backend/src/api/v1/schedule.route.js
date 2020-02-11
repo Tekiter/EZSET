@@ -54,8 +54,8 @@ router.post(
     '/delete',
     [
         perm('schedule').can('delete'),
-        body('start').isString(),
-        body('end').isString(),
+        //body('start').isString(),
+        //body('end').isString(),
         body('type').isString(),
         body('title').isString(),
         body('content').isString(),
