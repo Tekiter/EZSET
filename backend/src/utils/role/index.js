@@ -103,6 +103,17 @@ const role = {
         // 메모리의 role 제거
         roles.removeRole(roletag)
     },
+    async updateRole(roletag) {
+        const dbrole = await RoleModel.findOne()
+            .where('tag')
+            .equals(roletag)
+
+        const newrole = roles.export(roletag)
+        dbrole.name = newrole.name
+        dbrole.perm = newrole.perm
+
+        await dbrole.save()
+    },
     async loadRoles() {
         const roleobjs = await RoleModel.find()
         roleobjs.forEach(role => {

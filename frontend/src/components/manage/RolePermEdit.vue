@@ -5,7 +5,9 @@
                 설정
             </v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn outlined tile color="primary">변경사항 저장</v-btn>
+            <v-btn outlined tile color="primary" @click="savePerms">
+                변경사항 저장
+            </v-btn>
         </v-toolbar>
         <v-list>
             <v-subheader>기본 설정</v-subheader>
@@ -33,6 +35,11 @@
         </v-list>
 
         <v-divider></v-divider>
+
+        <setting-select
+            v-model="manageData"
+            :items="manageItems"
+        ></setting-select>
 
         <v-dialog v-model="removeRoleDialog.show" max-width="500px">
             <v-card :loading="removeRoleDialog.isLoading">
@@ -68,7 +75,15 @@
 </template>
 <script>
 import axios from 'axios'
+import SettingSelect from './SettingSelect.vue'
+
+// import { Role } from '../../utils/role/libs/Role'
+// import { filterAllPerms } from '../../utils/role/role'
+
 export default {
+    components: {
+        SettingSelect,
+    },
     props: {
         roletag: {
             type: String,
@@ -84,16 +99,78 @@ export default {
                 isLoading: false,
                 error: '',
             },
+            manageItems: [],
+            manageData: {},
+            roleObj: null,
         }
     },
-    computed: {},
     methods: {
         async fetchRole() {
             this.isLoading = true
             const res = await axios.get(`role/${this.roletag}`)
             this.rolename = res.data.name
+            this.manageData = this.createPermData(res.data.perm)
             this.isLoading = false
         },
+        createPermData(permdata) {
+            const res = {}
+            for (let { key } of this.manageItems) {
+                if (!key) {
+                    continue
+                }
+                let { resource, action, range } = JSON.parse(key)
+
+                range = range || 'any'
+                if (permdata[resource] && permdata[resource].all) {
+                    const obj = permdata[resource].all
+
+                    let target
+                    if (Array.isArray(obj)) {
+                        target = obj
+                    } else {
+                        target = obj[range]
+                    }
+
+                    if (target.indexOf(action) >= -1) {
+                        res[key] = true
+                    } else {
+                        res[key] = false
+                    }
+                }
+            }
+
+            return res
+        },
+        convertPermItems(items) {
+            return items.map(item => {
+                const res = { ...item }
+                res.key = JSON.stringify(item.target)
+                return res
+            })
+        },
+
+        async savePerms() {
+            this.isLoading = true
+            const perms = []
+            for (let key of Object.keys(this.manageData)) {
+                let { resource, action, range } = JSON.parse(key)
+                perms.push({
+                    allow: this.manageData[key] ? true : false,
+                    resource,
+                    action,
+                    range: range || 'any',
+                })
+            }
+
+            await axios.patch(`role/${this.roletag}`, {
+                perms,
+            })
+            console.log(perms)
+
+            this.isLoading = false
+        },
+
+        // 역할 삭제 Dialog
         showRemoveRoleDialog() {
             this.removeRoleDialog.show = true
             this.removeRoleDialog.name = ''
@@ -122,6 +199,10 @@ export default {
                 await this.fetchRole()
             },
         },
+    },
+    async created() {
+        const res = await axios.get('role/managepage')
+        this.manageItems = this.convertPermItems(res.data)
     },
 }
 </script>
