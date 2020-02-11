@@ -2,8 +2,11 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
 var ScheduleSchema = new Schema({
-    day: {
-        type: String,
+    start: {
+        type: Date,
+    },
+    end: {
+        type: Date,
     },
     type: {
         type: String,
@@ -12,6 +15,9 @@ var ScheduleSchema = new Schema({
         type: String,
     },
     content: {
+        type: String,
+    },
+    color: {
         type: String,
     },
 })
