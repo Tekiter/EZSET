@@ -52,7 +52,7 @@
 
                                     <form>
                                         <v-dialog
-                                            v-model="absenceResDialog.show"
+                                            v-model="scheduleDialog.show"
                                             persistent
                                             max-width="650"
                                         >
@@ -61,7 +61,7 @@
                                                     color="primary"
                                                     dark
                                                     v-on="on"
-                                                    >결석예약</v-btn
+                                                    >일정추가</v-btn
                                                 >
                                             </template>
                                             <v-card>
@@ -133,18 +133,37 @@
                                                             </v-date-picker>
                                                         </v-menu>
                                                         <v-text-field
-                                                            label="결석사유"
+                                                            label="제목"
                                                             v-model="
-                                                                absence_reason
+                                                                schedule_title
                                                             "
+                                                            dense
                                                         ></v-text-field>
+                                                        <v-text-field
+                                                            label="내용"
+                                                            v-model="
+                                                                schedule_contents
+                                                            "
+                                                            dense
+                                                        ></v-text-field>
+                                                        <v-color-picker
+                                                            v-model="
+                                                                schedule_color
+                                                            "
+                                                            disabled
+                                                            hide-canvas
+                                                            hide-inputs
+                                                            show-swatches
+                                                            flat
+                                                            swatches-max-height="90"
+                                                        ></v-color-picker>
                                                         <v-card-actions>
                                                             <v-spacer></v-spacer>
                                                             <v-btn
                                                                 color="green darken-1"
                                                                 text
                                                                 @click="
-                                                                    absenceResDialog.show = false
+                                                                    scheduleDialog.show = false
                                                                 "
                                                                 >취소</v-btn
                                                             >
@@ -386,13 +405,15 @@ export default {
         events: [],
         //DB로 부터 일정들을 받아옴
         scheduleData: [],
-        //결석예약
-        absenceResDialog: {
+        //일정추가
+        scheduleDialog: {
             show: false,
         },
         dates: [moment(new Date()).format('YYYY-MM-DD')],
         menu: false,
-        absence_reason: '',
+        schedule_title: '',
+        schedule_contents: '',
+        schedule_color: '',
         dialog: false,
         calLoad: false,
         cancleSnack: false,
@@ -530,17 +551,22 @@ export default {
         },
         //일정등록
         async reservation() {
-            await axios.post('schedule/write', {
-                dayList: this.dayList_fab,
-                title: this.applyEvent.title,
-                content: this.applyEvent.content,
-                color: this.applyEvent.color,
-            })
-            this.dates = [this.$moment(new Date()).format('YYYY-MM-DD')]
-            this.absence_reason = ''
-            this.absenceResDialog.show = false
-            await this.init()
-            this.openSnackbar('등록되었습니다!')
+            try {
+                await axios.post('schedule/write', {
+                    dayList: this.dayList_fab,
+                    title: this.schedule_title,
+                    content: this.schedule_contents,
+                    color: this.schedule_color,
+                })
+                this.dates = [this.$moment(new Date()).format('YYYY-MM-DD')]
+                this.schedule_title = ''
+                this.schedule_contents = ''
+                this.scheduleDialog.show = false
+                await this.init()
+                this.applySnack = true
+            } catch (err) {
+                console.log(err)
+            }
         },
         //일정 삭제
         async deleteSchedule(selectedEvent) {
