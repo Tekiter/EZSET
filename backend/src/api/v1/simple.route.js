@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import { body, param } from 'express-validator'
+import { body, param, query } from 'express-validator'
 import Board from '../../models/Board'
 import Post from '../../models/Post'
-import { validateParams, asyncRoute } from '../../utils/api'
+import { validateParams, asyncRoute, isPositive } from '../../utils/api'
 import { perm } from '../../utils/role'
 import {
     checkAttachableFileArray,
@@ -332,7 +332,12 @@ router.get(
 //게시글 목록 보기
 router.get(
     '/boards/:board_id',
-    [param('board_id').isNumeric(), validateParams],
+    [
+        param('board_id').isNumeric(),
+        query('page').custom(isPositive),
+        query('pagesize').custom(isPositive),
+        validateParams,
+    ],
     asyncRoute(async function(req, res) {
         let boardId = parseInt(req.params.board_id)
 
@@ -343,12 +348,23 @@ router.get(
                 return
             }
 
+            const page = parseInt(req.query.page)
+            const pagesize = parseInt(req.query.pagesize || 8)
+
+            let postcount = await Post.find()
+                .count()
+                .where('board')
+                .equals(boardId)
+
             let posts = await Post.find()
                 .where('board')
                 .equals(boardId)
+                .limit(pagesize)
+                .skip((page - 1) * pagesize)
                 .sort('-_id')
             res.status(200).json({
                 board: board,
+                totalpage: postcount,
                 posts: posts.map(post => {
                     return {
                         _id: parseInt(post.id),
@@ -555,6 +571,7 @@ router.delete(
 //게시물 검색
 router.get(
     '/searchpost',
+    [query('content'), query('option'), validateParams],
     asyncRoute(async function(req, res) {
         let options = []
         if (req.query.option == 'title') {
