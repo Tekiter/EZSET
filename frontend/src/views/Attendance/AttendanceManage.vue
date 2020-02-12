@@ -282,8 +282,11 @@ export default {
         },
     },
     async created() {
+        if (!this.$perm('manageRoles').can('access')) {
+            this.$router.push({ name: 'error403' })
+            return
+        }
         await this.fetchAttableUsers()
     },
 }
-//출석대상유저가 하나도 없는 경우 예외처리 해주기
 </script>

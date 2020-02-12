@@ -338,6 +338,10 @@ import moment from 'moment'
 import axios from 'axios'
 export default {
     async created() {
+        if (!this.$perm('manageRoles').can('access')) {
+            this.$router.push({ name: 'error403' })
+            return
+        }
         await this.fetchAttUsers()
     },
     data() {

@@ -4,14 +4,10 @@
             <v-skeleton-loader
                 class="mx-auto"
                 type="table"
-                v-if="!calLoad && this.$perm('absence').canOwn('read')"
+                v-if="!calLoad && this.$perm('schedule').can('read')"
             ></v-skeleton-loader>
             <div
-                v-if="
-                    calLoad &&
-                        this.$perm('attendance').canOwn('read') &&
-                        this.$perm('absence').canOwn('read')
-                "
+                v-if="calLoad && this.$perm('schedule').can('read')"
                 class="font-weight-medium subtitle-2"
             >
                 <v-container>
@@ -56,7 +52,7 @@
 
                                     <form>
                                         <v-dialog
-                                            v-model="absenceResDialog.show"
+                                            v-model="scheduleDialog.show"
                                             persistent
                                             max-width="650"
                                         >
@@ -65,7 +61,7 @@
                                                     color="primary"
                                                     dark
                                                     v-on="on"
-                                                    >결석예약</v-btn
+                                                    >일정추가</v-btn
                                                 >
                                             </template>
                                             <v-card>
@@ -137,18 +133,37 @@
                                                             </v-date-picker>
                                                         </v-menu>
                                                         <v-text-field
-                                                            label="결석사유"
+                                                            label="제목"
                                                             v-model="
-                                                                absence_reason
+                                                                schedule_title
                                                             "
+                                                            dense
                                                         ></v-text-field>
+                                                        <v-text-field
+                                                            label="내용"
+                                                            v-model="
+                                                                schedule_contents
+                                                            "
+                                                            dense
+                                                        ></v-text-field>
+                                                        <v-color-picker
+                                                            v-model="
+                                                                schedule_color
+                                                            "
+                                                            disabled
+                                                            hide-canvas
+                                                            hide-inputs
+                                                            show-swatches
+                                                            flat
+                                                            swatches-max-height="90"
+                                                        ></v-color-picker>
                                                         <v-card-actions>
                                                             <v-spacer></v-spacer>
                                                             <v-btn
                                                                 color="green darken-1"
                                                                 text
                                                                 @click="
-                                                                    absenceResDialog.show = false
+                                                                    scheduleDialog.show = false
                                                                 "
                                                                 >취소</v-btn
                                                             >
@@ -266,8 +281,9 @@
                                             <v-row
                                                 justify="center"
                                                 v-if="
-                                                    selectedEvent.name ==
-                                                        '공결(승인대기)'
+                                                    $perm('schedule').can(
+                                                        'delete'
+                                                    )
                                                 "
                                             >
                                                 <v-dialog
@@ -281,21 +297,25 @@
                                                         }"
                                                     >
                                                         <v-btn v-on="on"
-                                                            >신청 취소</v-btn
+                                                            >일정 삭제</v-btn
                                                         >
                                                     </template>
                                                     <v-card>
                                                         <v-card-title
                                                             class="headline"
-                                                            >공결 신청
-                                                            취소</v-card-title
+                                                            >일정
+                                                            삭제</v-card-title
                                                         >
                                                         <v-card-text>
                                                             {{
-                                                                selectedEvent.reson
-                                                            }}신청하신 공결을
-                                                            취소하시겠습니까?</v-card-text
-                                                        >
+                                                                selectedEvent.name
+                                                            }}
+                                                            {{
+                                                                selectedEvent.details
+                                                            }}
+                                                            해당 일정을
+                                                            삭제하시겠습니까?
+                                                        </v-card-text>
                                                         <v-card-actions>
                                                             <v-spacer></v-spacer>
                                                             <v-btn
@@ -310,11 +330,15 @@
                                                                 color="green darken-1"
                                                                 text
                                                                 @click="
-                                                                    cancleAbsence(
+                                                                    deleteSchedule(
                                                                         selectedEvent
                                                                     )
+                                                                    calLoad = false
                                                                     dialog = false
                                                                     selectedOpen = false
+                                                                    this.openSnackbar(
+                                                                        '취소되었습니다!'
+                                                                    )
                                                                 "
                                                                 >예</v-btn
                                                             >
@@ -350,19 +374,16 @@
                     Close
                 </v-btn>
             </v-snackbar>
+            <v-snackbar v-model="snackbar.show" :timeout="2000" color="success">
+                {{ snackbar.text }}
+                <v-btn text @click="snackbar = false">
+                    닫기
+                </v-btn>
+            </v-snackbar>
         </v-card>
     </div>
 </template>
 <script>
-// 모든 출결정보를 가지고있다가 event 배열에 이벤트를 월이 변경될 때마다 골라서 넣어주면 된다.
-// 즉 모든 일정을 받아오는 API하나면 해결
-// event 배열은 name,start,end,color,세부내용 을 들고있어야함
-// 모든 일정을 가지고있는 배열 하나가 필요함
-// 1. 모든 일정을 가지고있는 배열에 정보 받아오도록 함
-// 2. event 배열에 들어가도록 데이터 가공
-// 3. 팝업 창에서 세부 내용 표시 하도록
-// 4. 상태별 색 관리
-// 5. 필요없는 달력 기능 지우기(4day, day, week 표시 기능)
 import moment from 'moment'
 import axios from 'axios'
 export default {
@@ -382,32 +403,36 @@ export default {
         selectedElement: null,
         selectedOpen: false,
         events: [],
-        //출석정보저장
-        attendanceUserdata: [],
-        //공결정보저장
-        absenceUserdata: [],
-        //결석예약
-        absenceResDialog: {
+        //DB로 부터 일정들을 받아옴
+        scheduleData: [],
+        //일정추가
+        scheduleDialog: {
             show: false,
         },
         dates: [moment(new Date()).format('YYYY-MM-DD')],
         menu: false,
-        absence_reason: '',
+        schedule_title: '',
+        schedule_contents: '',
+        schedule_color: '',
         dialog: false,
         calLoad: false,
         cancleSnack: false,
         applySnack: false,
+        snackbar: {
+            show: false,
+            text: '',
+        },
+        applyEvent: {
+            title: '',
+            type: '',
+            content: '',
+            color: '',
+        },
     }),
     async created() {
         try {
-            const res = await axios.get('attendance/attendanceUserData')
-            this.attendanceUserdata = res.data[0].status
-            try {
-                const res = await axios.get('absencecheck/absenceUserData')
-                this.absenceUserdata = res.data
-            } catch (err) {
-                console.log(err)
-            }
+            const res = await axios.get('schedule/read')
+            this.scheduleData = res.data
         } catch (err) {
             console.log(err)
         }
@@ -491,77 +516,16 @@ export default {
         //기간이 변경될 시에 이벤트를 다시 가져오는 함수
         updateRange({ start, end }) {
             const events = []
-            //출석현황삽입
-            this.attendanceUserdata.map(item => {
-                //출석
-                if (item.state == 'attendance') {
-                    events.push({
-                        name: '출석',
-                        start: moment(item.date).format('YYYY-MM-DD'),
-                        end: moment(item.date).format('YYYY-MM-DD'),
-                        details: '출석하셨습니다!',
-                        color: 'green',
-                    })
-                }
-                //지각
-                if (item.state == 'late') {
-                    events.push({
-                        name: '지각',
-                        start: moment(item.date).format('YYYY-MM-DD'),
-                        end: moment(item.date).format('YYYY-MM-DD'),
-                        details: '지각하셨습니다!',
-                        color: 'amber',
-                    })
-                }
-                //결석
-                if (item.state == 'absence') {
-                    events.push({
-                        name: '결석',
-                        start: moment(item.date).format('YYYY-MM-DD'),
-                        end: moment(item.date).format('YYYY-MM-DD'),
-                        details: '결석하셨습니다!',
-                        color: 'red',
-                    })
-                }
-                //공결
-                if (item.state == 'official_absence') {
-                    events.push({
-                        name: '공결',
-                        start: moment(item.date).format('YYYY-MM-DD'),
-                        end: moment(item.date).format('YYYY-MM-DD'),
-                        details: '공결처리되었습니다!',
-                        color: 'green',
-                    })
-                }
-                return { name: item.name }
-            })
-            //공결내역삽입
-            this.absenceUserdata.map(item => {
-                if (item.approval == false) {
-                    events.push({
-                        name: '공결(승인대기)',
-                        start: moment(item.day).format('YYYY-MM-DD'),
-                        end: moment(item.day).format('YYYY-MM-DD'),
-                        details:
-                            item.reason +
-                            '(의) 사유의 공결이 승인 대기중입니다.',
-                        color: 'orange',
-                        reason: item.reason,
-                    })
-                }
-                //승인된 공결
-                if (item.approval == true) {
-                    events.push({
-                        name: '공결(승인완료)',
-                        start: moment(item.day).format('YYYY-MM-DD'),
-                        end: moment(item.day).format('YYYY-MM-DD'),
-                        details:
-                            item.reason +
-                            '(의) 사유의 공결이 승인 완료 되었습니다.',
-                        color: 'green',
-                        reason: item.reason,
-                    })
-                }
+            //일정 삽입
+            this.scheduleData.map(item => {
+                events.push({
+                    name: item.title,
+                    start: moment(item.start).format('YYYY-MM-DD'),
+                    end: moment(item.end).format('YYYY-MM-DD'),
+                    details: item.content,
+                    color: item.color,
+                    type: item.type,
+                })
                 return { name: item.name }
             })
             this.start = start
@@ -585,52 +549,55 @@ export default {
                       1}-${a.getDate()} ${a.getHours()}:${a.getMinutes()}`
                 : `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()}`
         },
-        //결석예약
+        //일정등록
         async reservation() {
             try {
-                await axios.post('absencecheck/absenceBook', {
-                    Reason: this.absence_reason,
+                await axios.post('schedule/write', {
                     dayList: this.dayList_fab,
+                    title: this.schedule_title,
+                    content: this.schedule_contents,
+                    color: this.schedule_color,
                 })
                 this.dates = [this.$moment(new Date()).format('YYYY-MM-DD')]
-                this.absence_reason = ''
-                this.absenceResDialog.show = false
+                this.schedule_title = ''
+                this.schedule_contents = ''
+                this.scheduleDialog.show = false
                 await this.init()
                 this.applySnack = true
             } catch (err) {
                 console.log(err)
             }
         },
-        //공결 신청 취소
-        async cancleAbsence(selectedEvent) {
+        //일정 삭제
+        async deleteSchedule(selectedEvent) {
             try {
-                await axios.post('absencecheck/deleteAbsenceUser', {
-                    reason: selectedEvent.reason,
-                    day: selectedEvent.start,
+                await axios.post('schedule/delete', {
+                    title: selectedEvent.name,
+                    start: moment(selectedEvent.start).format('YYYY-MM-DD'),
+                    end: moment(selectedEvent.end).format('YYYY-MM-DD'),
+                    content: selectedEvent.details,
+                    color: selectedEvent.color,
                 })
+                console.log(selectedEvent)
             } catch (err) {
                 console.log(err)
             }
-            this.cancleSnack = true
             this.init()
         },
         //페이지 사용에 필요한 데이터 로드 및 표시
         async init() {
-            this.calLoad = false
             try {
-                const res = await axios.get('attendance/attendanceUserData')
-                this.attendanceUserdata = res.data[0].status
-            } catch (err) {
-                console.log(err)
-            }
-            try {
-                const res = await axios.get('absencecheck/absenceUserData')
-                this.absenceUserdata = res.data
+                const res = await axios.get('schedule/read')
+                this.scheduleData = res.data
             } catch (err) {
                 console.log(err)
             }
             this.updateRange({ start: this.start, end: this.end })
             this.calLoad = true
+        },
+        openSnackbar(text) {
+            this.snackbar.text = text
+            this.snackbar.show = true
         },
     },
 }

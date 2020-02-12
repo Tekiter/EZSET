@@ -93,6 +93,13 @@ export default {
                     to: '/board',
                     children: this.$store.getters['board/boardList'],
                 },
+                {
+                    type: 'simple',
+                    icon: 'mdi-calendar-month ',
+                    title: '일정표',
+                    to: '/Schedule',
+                    perm: this.$perm('schedule').can('read'),
+                },
             ]
         },
     },

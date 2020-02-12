@@ -1,73 +1,75 @@
 <template>
     <v-container>
-        <v-form>
-            <v-card
-                class="mx-auto"
-                max-width="500"
-                max-height="500"
-                v-if="flag == true && code == 0"
-            >
-                <v-card-title>
-                    <v-text-field
-                        v-model="input_attendance_code"
-                    ></v-text-field>
-                </v-card-title>
+        <v-card
+            class="mx-auto"
+            max-width="500"
+            max-height="500"
+            v-if="flag == true && code == 0"
+        >
+            <v-card-title>
+                <v-text-field v-model="input_attendance_code"></v-text-field>
+            </v-card-title>
 
-                <v-card-actions>
-                    <v-btn color="purple" text @click="attendanceCheck"
-                        >출석하기</v-btn
-                    >
-                </v-card-actions>
-            </v-card>
-            <v-card
-                class="mx-auto"
-                max-width="500"
-                max-height="500"
-                v-if="flag && this.$perm('attendance').can('start')"
-            >
-                <v-card-text>
-                    <div class="d-flex justify-center">
-                        <span class="display-3">{{
-                            output_attendance_code
-                        }}</span>
-                    </div>
-                    <div class="d-flex justify-center">
-                        <v-btn
-                            color="purple"
-                            text
-                            v-if="flag"
-                            @click="endAttendance"
-                            large
-                            >종료</v-btn
-                        >
-                    </div>
-                </v-card-text>
-            </v-card>
-
-            <v-card
-                class="mx-auto"
-                max-width="500"
-                max-height="500"
-                text
-                v-if="!flag && this.$perm('attendance').can('start')"
-            >
-                <v-card-actions>
-                    <v-btn color="purple" text @click="startAttendance" large
-                        >시작</v-btn
-                    >
-                </v-card-actions>
-            </v-card>
-            <div>
-                <v-alert
-                    type="warning"
-                    v-if="
-                        !this.$perm('attendance').can('start') && flag == false
-                    "
+            <v-card-actions>
+                <v-btn color="purple" text @click="attendanceCheck"
+                    >출석하기</v-btn
                 >
-                    출석중이 아닙니다.
-                </v-alert>
-            </div>
-        </v-form>
+            </v-card-actions>
+        </v-card>
+        <v-card
+            class="mx-auto"
+            max-width="500"
+            max-height="500"
+            v-if="flag && this.$perm('attendance').can('start')"
+        >
+            <v-card-text>
+                <div class="d-flex justify-center">
+                    <span class="display-3">{{ output_attendance_code }}</span>
+                </div>
+                <div class="d-flex justify-center">
+                    <v-btn
+                        color="purple"
+                        text
+                        v-if="flag"
+                        @click="endAttendance"
+                        large
+                        >종료</v-btn
+                    >
+                </div>
+            </v-card-text>
+        </v-card>
+
+        <v-card
+            class="mx-auto"
+            max-width="500"
+            max-height="500"
+            text
+            v-if="!flag && this.$perm('attendance').can('start')"
+        >
+            <v-card-actions>
+                <v-btn color="purple" text @click="startAttendance" large
+                    >시작</v-btn
+                >
+            </v-card-actions>
+        </v-card>
+        <div>
+            <v-alert
+                type="warning"
+                v-if="!this.$perm('attendance').can('start') && flag == false"
+            >
+                출석중이 아닙니다.
+            </v-alert>
+            <v-alert
+                type="success"
+                v-if="
+                    !this.$perm('attendance').can('start') &&
+                        flag == true &&
+                        code == 1
+                "
+            >
+                이미 출석하셨습니다!
+            </v-alert>
+        </div>
 
         <v-snackbar v-model="snackbar_c" color="success">
             출석되었습니다.
@@ -85,12 +87,15 @@ import axios from 'axios'
 export default {
     name: 'attendance',
     async created() {
-        this.$socket.emit('join', {
+        if (!this.$perm('manageRoles').can('access')) {
+            this.$router.push({ name: 'error403' })
+            return
+        }
+        await this.$socket.emit('join', {
             roomName: 'attendance',
         })
-        this.$socket.on('attendance', data => {
+        await this.$socket.on('attendance', data => {
             this.flag = data.flag
-            console.log(data.flag)
         })
         try {
             const res = await axios.get('attendance/attendanceCheck')
