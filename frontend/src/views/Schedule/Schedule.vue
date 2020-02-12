@@ -401,6 +401,12 @@ export default {
             show: false,
             text: '',
         },
+        applyEvent: {
+            title: '',
+            type: '',
+            content: '',
+            color: '',
+        },
     }),
     async created() {
         try {
@@ -524,18 +530,17 @@ export default {
         },
         //일정등록
         async reservation() {
-            try {
-                await axios.post('absencecheck/absenceBook', {
-                    dayList: this.dayList_fab,
-                })
-                this.dates = [this.$moment(new Date()).format('YYYY-MM-DD')]
-                this.absence_reason = ''
-                this.absenceResDialog.show = false
-                await this.init()
-                this.applySnack = true
-            } catch (err) {
-                console.log(err)
-            }
+            await axios.post('schedule/write', {
+                dayList: this.dayList_fab,
+                title: this.applyEvent.title,
+                content: this.applyEvent.content,
+                color: this.applyEvent.color,
+            })
+            this.dates = [this.$moment(new Date()).format('YYYY-MM-DD')]
+            this.absence_reason = ''
+            this.absenceResDialog.show = false
+            await this.init()
+            this.openSnackbar('등록되었습니다!')
         },
         //일정 삭제
         async deleteSchedule(selectedEvent) {

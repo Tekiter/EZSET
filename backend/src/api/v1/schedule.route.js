@@ -4,6 +4,7 @@ import Schedule from '../../models/Schedule'
 import { perm } from '../../utils/role'
 //import { param, body } from 'express-validator'
 import { body } from 'express-validator'
+var moment = require('moment')
 const router = Router()
 
 //schedule Collection 에서 모든 일정을 가져옴
@@ -25,23 +26,43 @@ router.post(
     [
         perm('schedule').can('create'),
         body('dayList').isArray(),
-        body('type').isString(),
         body('title').isString(),
         body('content').isString(),
         body('color').isString(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
+        var dayArray = req.body.dayList.sort()
         //날짜 배열을 기준으로 순회하면서 저장
-        for (var k in req.body.dayList) {
-            var schedule = new Schedule()
-            schedule.type = req.body.type
-            schedule.start = req.body.dayList[k].start
-            schedule.end = req.body.dayList[k].end
-            schedule.title = req.body.title
-            schedule.content = req.body.content
-            schedule.color = req.body.color
-            await schedule.save()
+        var schedule = new Schedule()
+        for (var k in dayArray) {
+            if (k == 0) {
+                schedule.title = req.body.title
+                schedule.content = req.body.content
+                schedule.color = req.body.color
+                schedule.start = dayArray[0]
+                schedule.end = dayArray[0]
+                continue
+            }
+            if (
+                moment(schedule.end)
+                    .add(1, 'days')
+                    .format('YYYY-MM-DD') ==
+                moment(req.body.dayList[k]).format('YYYY-MM-DD')
+            ) {
+                schedule.end = dayArray[k]
+            } else {
+                await schedule.save()
+                schedule = new Schedule()
+                schedule.title = req.body.title
+                schedule.content = req.body.content
+                schedule.color = req.body.color
+                schedule.start = dayArray[k]
+                schedule.end = dayArray[k]
+            }
+            if (k == req.body.dayList.length - 1) {
+                await schedule.save()
+            }
         }
         res.end()
     })
