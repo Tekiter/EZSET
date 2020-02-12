@@ -55,6 +55,18 @@ const role = {
             },
         }
     },
+    permOr(callback) {
+        return (req, res, next) => {
+            console.log(callback(req.user.perm))
+            if (callback(req.user.perm)) {
+                next()
+            } else {
+                const err = new Error('권한이 없습니다.')
+                err.status = 403
+                throw err
+            }
+        }
+    },
     async getRoleNames() {
         return roles.roleNames()
     },
@@ -102,6 +114,17 @@ const role = {
 
         // 메모리의 role 제거
         roles.removeRole(roletag)
+    },
+    async updateRole(roletag) {
+        const dbrole = await RoleModel.findOne()
+            .where('tag')
+            .equals(roletag)
+
+        const newrole = roles.export(roletag)
+        dbrole.name = newrole.name
+        dbrole.perm = newrole.perm
+
+        await dbrole.save()
     },
     async loadRoles() {
         const roleobjs = await RoleModel.find()

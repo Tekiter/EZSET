@@ -72,6 +72,7 @@ export default {
                     username: this.user.username,
                     password: this.user.password,
                 })
+                await this.$store.dispatch('config/fetchConfig')
                 await this.$store.dispatch('role/fetchPermission')
                 await this.$store.dispatch('board/fetchBoards')
 
