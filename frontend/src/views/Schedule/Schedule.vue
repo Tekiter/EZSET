@@ -61,7 +61,7 @@
                                                     color="primary"
                                                     dark
                                                     v-on="on"
-                                                    >결석예약</v-btn
+                                                    >일정추가</v-btn
                                                 >
                                             </template>
                                             <v-card>
@@ -133,9 +133,15 @@
                                                             </v-date-picker>
                                                         </v-menu>
                                                         <v-text-field
-                                                            label="결석사유"
+                                                            label="제목"
                                                             v-model="
-                                                                absence_reason
+                                                                schedule_title
+                                                            "
+                                                        ></v-text-field>
+                                                        <v-text-field
+                                                            label="내용"
+                                                            v-model="
+                                                                schedule_contents
                                                             "
                                                         ></v-text-field>
                                                         <v-card-actions>
@@ -392,7 +398,8 @@ export default {
         },
         dates: [moment(new Date()).format('YYYY-MM-DD')],
         menu: false,
-        absence_reason: '',
+        schedule_title: '',
+        schedule_contents: '',
         dialog: false,
         calLoad: false,
         cancleSnack: false,
