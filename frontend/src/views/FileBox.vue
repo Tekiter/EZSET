@@ -3,7 +3,11 @@
         <v-row no-gutters class="fill-height">
             <v-col class="fill-height" :cols="3" xl="2">
                 <v-card tile outlined class="fill-height">
-                    <group-tree :items="groups"></group-tree>
+                    <group-tree
+                        v-model="showMetarials.selected"
+                        :items="groups"
+                        @change="isFolder()"
+                    ></group-tree>
                     <v-list>
                         <v-list-item link @click="showPlusGroup()">
                             <v-list-item-icon>
@@ -102,8 +106,10 @@
                         >확인</v-btn>
                     </v-card-actions>
                 </v-card>
-                <!-- :files="post.files" -->
-                <!-- <file-download></file-download> -->
+                <material-post
+                    v-if="showMetarials.show"
+                    :folderId="this.showMetarials.selected[0].id"
+                ></material-post>
             </v-col>
         </v-row>
     </div>
@@ -112,10 +118,12 @@
 <script>
 import axios from 'axios'
 import GroupTree from '../components/filebox/GroupTree.vue'
+import MaterialPost from '../components/filebox/MaterialPost.vue'
 
 export default {
     components: {
         GroupTree,
+        MaterialPost,
     },
     data() {
         return {
@@ -126,6 +134,10 @@ export default {
                 parent: '',
                 name: '',
                 isfolder: false,
+                selected: [],
+            },
+            showMetarials: {
+                show: false,
                 selected: [],
             },
             errors: {
@@ -177,6 +189,11 @@ export default {
         },
         isFolderFalse() {
             this.plusGroup.isfolder = false
+        },
+        isFolder() {
+            if (this.showMetarials.selected[0].isfolder) {
+                this.showMetarials.show = true
+            }
         },
     },
     computed: {

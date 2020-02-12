@@ -8,7 +8,7 @@
         :item-disabled="selectable ? 'isfolder' : null"
         :color="color"
         :value="value"
-        @update:active="$emit('input',arguments[0])"
+        @update:active="onChange"
         return-object
     >
         <template v-slot:prepend="{ item, open }">
@@ -43,5 +43,11 @@ export default {
         open: ['public'],
         tree: [],
     }),
+    methods: {
+        onChange() {
+            this.$emit('input', arguments[0])
+            this.$emit('change')
+        },
+    },
 }
 </script>
