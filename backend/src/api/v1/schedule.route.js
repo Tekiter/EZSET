@@ -35,9 +35,9 @@ router.post(
         //날짜 배열을 기준으로 순회하면서 저장
         for (var k in req.body.dayList) {
             var schedule = new Schedule()
-            schedule.type = req.body.type
-            schedule.start = req.body.dayList[k].start
-            schedule.end = req.body.dayList[k].end
+            //schedule.type = req.body.type
+            //schedule.start = req.body.dayList[k].start
+            //schedule.end = req.body.dayList[k].end
             schedule.title = req.body.title
             schedule.content = req.body.content
             schedule.color = req.body.color
