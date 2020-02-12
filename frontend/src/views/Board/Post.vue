@@ -1,13 +1,13 @@
 <template>
     <div>
-        <div>
+        <!-- <div>
             <v-text-field
                 v-if="loading"
                 color="blue darken-2"
                 loading
                 disabled
             ></v-text-field>
-        </div>
+        </div> -->
         <v-container grid-list-md>
             <v-row>
                 <v-col></v-col>
@@ -32,13 +32,17 @@
             </v-row>
             <v-card outlined>
                 <v-data-table
+                    v-if="$vuetify.breakpoint.mdAndUp"
                     :headers="headers"
                     :items="posts"
                     :page.sync="page"
-                    :items-per-page="select.value"
+                    :loading="loading"
+                    :server-items-length="totalpage"
+                    :options.sync="options"
+                    @update:items-per-page="fetchPostList()"
+                    :items-per-page.sync="select.value"
                     hide-default-footer
                     :mobile-breakpoint="NaN"
-                    class="hidden-sm-and-down"
                     @page-count="pageCount = $event"
                 >
                     <template v-slot:item.title="props">
@@ -48,13 +52,17 @@
                     </template>
                 </v-data-table>
                 <v-data-table
+                    v-else
                     :headers="headersTwo"
                     :items="posts"
                     :page.sync="page"
-                    :items-per-page="select.value"
+                    :server-items-length="totalpage"
+                    :options.sync="options"
+                    :loading="loading"
+                    @update:items-per-page="fetchPostList()"
+                    :items-per-page.sync="select.value"
                     hide-default-footer
                     :mobile-breakpoint="NaN"
-                    class="hidden-md-and-up"
                     @page-count="pageCount = $event"
                 >
                     <template v-slot:item.title="props">
@@ -70,6 +78,7 @@
                     <v-pagination
                         v-model="page"
                         :length="pageCount"
+                        :items-per-page.sync="page"
                     ></v-pagination>
                 </div>
                 <div class="col">
@@ -113,6 +122,8 @@ export default {
             loading: true,
             page: 1,
             pageCount: 0,
+            totalpage: 0,
+            options: {},
             board: '',
             posts: [],
             select: { state: '8개', value: 8 },
@@ -158,28 +169,43 @@ export default {
             ],
         }
     },
+    watch: {
+        'select.value': {
+            async handler() {
+                await this.fetchPostList()
+            },
+        },
+        page: {
+            async handler() {
+                await this.fetchPostList()
+            },
+        },
+        async $route(to, from) {
+            await this.fetchPostList()
+        },
+    },
     methods: {
         changeRowPost() {
             this.itemsPerPage = 2
         },
         read(evt) {
-            //console.log(evt._id)
-            //console.log(evt.title)
             this.$router.push({
                 path: '/board/' + this.$route.params.board_id + '/' + evt._id,
             })
         },
         async fetchPostList() {
+            this.loading = true
             try {
                 const res = await axios.get(
                     '/simple/boards/' + this.$route.params.board_id,
                     {
                         params: {
                             page: this.page,
-                            pagesize: this.viewCount.value,
+                            pagesize: this.select.value,
                         },
                     }
                 )
+                console.log(res)
                 this.posts = res.data.posts.map(post => {
                     post.created_date = moment(post.created_date).format(
                         'YYYY/MM/DD HH:MM'
@@ -197,20 +223,23 @@ export default {
                     return post
                 })
                 this.board = res.data.board
-                //console.log(res.data.posts)
                 this.loading = false
+                this.totalpage = res.data.totalpage
+                this.pageCount =
+                    Math.floor(res.data.totalpage / this.select.value) + 1
             } catch (error) {
                 //
             }
+            this.loading = false
         },
     },
     async created() {
         await this.fetchPostList()
     },
-    watch: {
-        async $route(to, from) {
-            await this.fetchPostList()
-        },
-    },
+    // watch: {
+    //     async $route(to, from) {
+    //         await this.fetchPostList()
+    //     },
+    // },
 }
 </script>
