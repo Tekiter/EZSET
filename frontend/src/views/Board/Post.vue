@@ -27,6 +27,7 @@
                         persistent-hint
                         return-object
                         style="width: 100px"
+                        @change="clickSelect"
                     ></v-select
                 ></v-col>
             </v-row>
@@ -182,9 +183,13 @@ export default {
         },
         async $route(to, from) {
             await this.fetchPostList()
+            this.page = 1
         },
     },
     methods: {
+        clickSelect() {
+            this.page = 1
+        },
         changeRowPost() {
             this.itemsPerPage = 2
         },
