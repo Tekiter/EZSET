@@ -51,9 +51,28 @@ router.delete(
             throw err
         }
 
-        await board.remove()
-        // await Board.remove({ _id: req.params.board_id })
-        res.end()
+        try {
+            const posts = await Post.find()
+                .where('board')
+                .equals(req.params.board_id)
+
+            for (let i = 0; i < posts.length; i++) {
+                await removeFileLink(posts[i].files)
+                await deleteUnlinkedFile(posts[i].files)
+            }
+
+            for (let j = 0; j < posts.length; j++) {
+                await posts[j].remove()
+            }
+
+            await board.remove()
+            // await Board.remove({ _id: req.params.board_id })
+            res.end()
+        } catch (error) {
+            const errr = new Error('database error')
+            errr.status = 500
+            throw errr
+        }
     })
 )
 
