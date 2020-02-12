@@ -522,11 +522,10 @@ export default {
                       1}-${a.getDate()} ${a.getHours()}:${a.getMinutes()}`
                 : `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()}`
         },
-        //결석예약
+        //일정등록
         async reservation() {
             try {
                 await axios.post('absencecheck/absenceBook', {
-                    Reason: this.absence_reason,
                     dayList: this.dayList_fab,
                 })
                 this.dates = [this.$moment(new Date()).format('YYYY-MM-DD')]
@@ -543,12 +542,13 @@ export default {
             try {
                 await axios.post('schedule/delete', {
                     title: selectedEvent.name,
-                    start: selectedEvent.start,
-                    end: selectedEvent.end,
+                    start: moment(selectedEvent.start).format('YYYY-MM-DD'),
+                    end: moment(selectedEvent.end).format('YYYY-MM-DD'),
                     content: selectedEvent.details,
                     color: selectedEvent.color,
                     type: selectedEvent.type,
                 })
+                console.log(moment(selectedEvent.start).format())
             } catch (err) {
                 console.log(err)
             }

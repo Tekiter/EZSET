@@ -54,8 +54,8 @@ router.post(
     '/delete',
     [
         perm('schedule').can('delete'),
-        //body('start').isString(),
-        //body('end').isString(),
+        body('start').isString(),
+        body('end').isString(),
         body('type').isString(),
         body('title').isString(),
         body('content').isString(),
@@ -66,7 +66,7 @@ router.post(
         await Schedule.deleteOne({
             start: req.body.start,
             end: req.body.end,
-            type: teq.body.type,
+            type: req.body.type,
             title: req.body.title,
             content: req.body.content,
             color: req.body.color,
