@@ -6,10 +6,15 @@ import { param, body } from 'express-validator'
 const router = Router()
 var moment = require('moment')
 
-//사용자가 결석예약 일들을 선택하면 프론트에서 list 형태로 백에 전달
+//사용자가 결석예약 날짜들을 선택하면 프론트에서 list 형태로 백에 전달
 router.post(
     '/absenceBook',
-    [validateParams],
+    [
+        perm('absence').can('create'),
+        body('dayList').isArray(),
+        body('Reason').isString(),
+        validateParams,
+    ],
     asyncRoute(async function(req, res) {
         var Name = req.user.username
         var Reason = req.body.Reason
@@ -114,7 +119,7 @@ router.get(
     })
 )
 
-//오늘날짜 이후의 공결신청 리스트 반환
+//공결 승인 내역 저장
 //OfficialAbsenceAccept 페이지에서 사용
 router.post(
     '/officialAbsenceAccept',
