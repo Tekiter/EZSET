@@ -36,9 +36,9 @@ router.post(
         for (var k in req.body.dayList) {
             var schedule = new Schedule()
             schedule.type = req.body.type
-            ;(schedule.start = req.body.dayList[k].start),
-                (schedule.end = req.body.dayList[k].end),
-                (schedule.title = req.body.title)
+            schedule.start = req.body.dayList[k].start
+            schedule.end = req.body.dayList[k].end
+            schedule.title = req.body.title
             schedule.content = req.body.content
             schedule.color = req.body.color
             await schedule.save()
@@ -54,8 +54,8 @@ router.post(
     '/delete',
     [
         perm('schedule').can('delete'),
-        //body('start').isString(),
-        //body('end').isString(),
+        body('start').isString(),
+        body('end').isString(),
         body('type').isString(),
         body('title').isString(),
         body('content').isString(),
@@ -66,7 +66,7 @@ router.post(
         await Schedule.deleteOne({
             start: req.body.start,
             end: req.body.end,
-            type: teq.body.type,
+            type: req.body.type,
             title: req.body.title,
             content: req.body.content,
             color: req.body.color,
