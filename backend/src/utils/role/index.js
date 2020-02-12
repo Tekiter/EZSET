@@ -55,6 +55,18 @@ const role = {
             },
         }
     },
+    permOr(callback) {
+        return (req, res, next) => {
+            console.log(callback(req.user.perm))
+            if (callback(req.user.perm)) {
+                next()
+            } else {
+                const err = new Error('권한이 없습니다.')
+                err.status = 403
+                throw err
+            }
+        }
+    },
     async getRoleNames() {
         return roles.roleNames()
     },

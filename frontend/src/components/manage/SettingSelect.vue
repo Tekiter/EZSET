@@ -1,5 +1,5 @@
 <template>
-    <v-list>
+    <v-list :disabled="disabled">
         <template v-for="(item, idx) of items">
             <!-- header 타입 -->
             <v-subheader
@@ -76,6 +76,10 @@ export default {
         value: {
             type: Object,
             default: () => ({}),
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
         },
     },
     data: () => ({

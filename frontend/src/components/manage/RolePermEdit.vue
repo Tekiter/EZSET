@@ -1,13 +1,21 @@
 <template>
-    <v-card tile minHeight="95%" :loading="isLoading">
+    <v-card tile minHeight="95%" :loading="isLoading" :disabled="disabled">
         <v-toolbar flat>
             <v-toolbar-title>
                 설정
             </v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn outlined tile color="primary" @click="savePerms">
-                변경사항 저장
-            </v-btn>
+            <v-fade-transition>
+                <v-btn
+                    v-if="changed"
+                    outlined
+                    tile
+                    color="primary"
+                    @click="savePerms"
+                >
+                    변경사항 저장
+                </v-btn>
+            </v-fade-transition>
         </v-toolbar>
         <v-list>
             <v-subheader>기본 설정</v-subheader>
@@ -18,6 +26,7 @@
                     placeholder="역할 이름"
                     outlined
                     hide-details
+                    @input="changed = true"
                 ></v-text-field>
             </v-list-item>
             <v-list-item>
@@ -28,7 +37,7 @@
                     tile
                     color="error"
                     @click="showRemoveRoleDialog"
-                    :disabled="roletag === 'admin'"
+                    :disabled="disabled"
                     >역할 삭제</v-btn
                 >
             </v-list-item>
@@ -39,6 +48,8 @@
         <setting-select
             v-model="manageData"
             :items="manageItems"
+            @change="changed = true"
+            :disabled="permdisabled"
         ></setting-select>
 
         <v-dialog v-model="removeRoleDialog.show" max-width="500px">
@@ -88,10 +99,15 @@ export default {
         roletag: {
             type: String,
         },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
             isLoading: false,
+            changed: false,
             rolename: '',
             removeRoleDialog: {
                 show: false,
@@ -104,6 +120,11 @@ export default {
             roleObj: null,
         }
     },
+    computed: {
+        permdisabled() {
+            return this.roletag === 'admin' || this.disabled
+        },
+    },
     methods: {
         async fetchRole() {
             this.isLoading = true
@@ -113,16 +134,25 @@ export default {
             this.isLoading = false
         },
         createPermData(permdata) {
+            const checkAction = (arr, action) => {
+                if (arr.indexOf(action) >= 0) {
+                    return true
+                }
+                if (arr.indexOf('!' + action) >= 0) {
+                    return false
+                }
+                return undefined
+            }
             const res = {}
             for (let { key } of this.manageItems) {
                 if (!key) {
                     continue
                 }
-                let { resource, action, range } = JSON.parse(key)
+                let { resource, action, range, param } = JSON.parse(key)
 
                 range = range || 'any'
                 if (permdata[resource] && permdata[resource].all) {
-                    const obj = permdata[resource].all
+                    let obj = permdata[resource].all
 
                     let target
                     if (Array.isArray(obj)) {
@@ -131,10 +161,21 @@ export default {
                         target = obj[range]
                     }
 
-                    if (target.indexOf(action) >= -1) {
-                        res[key] = true
-                    } else {
-                        res[key] = false
+                    res[key] = checkAction(target, action)
+
+                    if (param) {
+                        obj = permdata[resource].params[param]
+                        if (Array.isArray(obj)) {
+                            target = obj
+                        } else {
+                            target = obj[range]
+                        }
+
+                        const po = checkAction(target, action)
+
+                        if (po != undefined) {
+                            res[key] = po
+                        }
                     }
                 }
             }
@@ -153,11 +194,12 @@ export default {
             this.isLoading = true
             const perms = []
             for (let key of Object.keys(this.manageData)) {
-                let { resource, action, range } = JSON.parse(key)
+                let { resource, action, range, param } = JSON.parse(key)
                 perms.push({
                     allow: this.manageData[key] ? true : false,
                     resource,
                     action,
+                    param,
                     range: range || 'any',
                 })
             }
@@ -165,7 +207,8 @@ export default {
             await axios.patch(`role/${this.roletag}`, {
                 perms,
             })
-            console.log(perms)
+
+            this.changed = false
 
             this.isLoading = false
         },
@@ -196,6 +239,7 @@ export default {
         roletag: {
             immediate: true,
             async handler(newVal) {
+                this.changed = false
                 await this.fetchRole()
             },
         },

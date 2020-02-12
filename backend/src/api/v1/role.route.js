@@ -7,7 +7,7 @@ Role과 거기에 대한 권한을 관리하는 API
 import { Router } from 'express'
 import { validateParams, asyncRoute, checkRoleTag } from '../../utils/api'
 import { body, param } from 'express-validator'
-import role, { perm, roles } from '../../utils/role'
+import role, { perm, roles, permOr } from '../../utils/role'
 import permissions from '../../utils/role/permissions'
 import User from '../../models/User'
 
@@ -32,7 +32,10 @@ router.get(
 // 모든 역할 목록 조회
 router.get(
     '/',
-    [perm('role').can('read'), validateParams],
+    [
+        permOr(perm => perm('role').can('modify') || perm('role').can('grant')),
+        validateParams,
+    ],
     asyncRoute(async (req, res) => {
         const roles = await role.getRoleNames()
         res.json(roles)
@@ -42,7 +45,7 @@ router.get(
 // 역할 생성
 router.post(
     '/',
-    [perm('role').can('create'), body('name').isString(), validateParams],
+    [perm('role').can('modify'), body('name').isString(), validateParams],
     asyncRoute(async (req, res) => {
         // if (req.user.perm('role').can('create')) {
         //     const newrole = await role.createRole({ name: req.body.name })
@@ -103,13 +106,19 @@ router.get(
 router.patch(
     '/:role_tag',
     [
-        perm('role').can('update'),
+        perm('role').can('modify'),
         param('role_tag').custom(checkRoleTag),
         // body('mode').custom(value => ['grant', 'deny'].includes(value)),
         body('perms').isArray(),
         validateParams,
     ],
     asyncRoute(async (req, res) => {
+        if (req.params.role_tag == 'admin') {
+            const err = new Error('admin 역할은 변경할 수 없습니다.')
+            err.status = 400
+            throw err
+        }
+
         // Validation
         // 올바른 perm 배열인지 체크
         for (let item of req.body.perms) {
@@ -145,7 +154,7 @@ router.patch(
 router.delete(
     '/:role_tag',
     [
-        perm('role').can('delete'),
+        perm('role').can('modify'),
         param('role_tag').custom(checkRoleTag),
         validateParams,
     ],
