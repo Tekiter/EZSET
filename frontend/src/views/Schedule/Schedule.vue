@@ -577,9 +577,8 @@ export default {
                     end: moment(selectedEvent.end).format('YYYY-MM-DD'),
                     content: selectedEvent.details,
                     color: selectedEvent.color,
-                    type: selectedEvent.type,
                 })
-                console.log(moment(selectedEvent.start).format())
+                console.log(selectedEvent)
             } catch (err) {
                 console.log(err)
             }

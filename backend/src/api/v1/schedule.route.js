@@ -42,6 +42,7 @@ router.post(
                 schedule.color = req.body.color
                 schedule.start = dayArray[0]
                 schedule.end = dayArray[0]
+                if (1 == req.body.dayList.length) schedule.save()
                 continue
             }
             if (
@@ -77,7 +78,6 @@ router.post(
         perm('schedule').can('delete'),
         body('start').isString(),
         body('end').isString(),
-        body('type').isString(),
         body('title').isString(),
         body('content').isString(),
         body('color').isString(),
@@ -87,7 +87,6 @@ router.post(
         await Schedule.deleteOne({
             start: req.body.start,
             end: req.body.end,
-            type: req.body.type,
             title: req.body.title,
             content: req.body.content,
             color: req.body.color,

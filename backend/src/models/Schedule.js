@@ -8,9 +8,6 @@ var ScheduleSchema = new Schema({
     end: {
         type: Date,
     },
-    type: {
-        type: String,
-    },
     title: {
         type: String,
     },
