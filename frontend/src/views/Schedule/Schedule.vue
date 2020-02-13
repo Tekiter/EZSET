@@ -266,6 +266,17 @@
                                             <v-card-actions>
                                                 <v-btn
                                                     icon
+                                                    @click="dialog = true"
+                                                    v-if="
+                                                        $perm('schedule').can(
+                                                            'delete'
+                                                        )
+                                                    "
+                                                >
+                                                    <v-icon>mdi-delete</v-icon>
+                                                </v-btn>
+                                                <v-btn
+                                                    icon
                                                     @click="
                                                         selectedOpen = false
                                                     "
@@ -278,74 +289,6 @@
                                             <span
                                                 v-html="selectedEvent.details"
                                             ></span>
-                                            <v-row
-                                                justify="center"
-                                                v-if="
-                                                    $perm('schedule').can(
-                                                        'delete'
-                                                    )
-                                                "
-                                            >
-                                                <v-dialog
-                                                    v-model="dialog"
-                                                    persistent
-                                                    max-width="290"
-                                                >
-                                                    <template
-                                                        v-slot:activator="{
-                                                            on,
-                                                        }"
-                                                    >
-                                                        <v-btn v-on="on"
-                                                            >일정 삭제</v-btn
-                                                        >
-                                                    </template>
-                                                    <v-card>
-                                                        <v-card-title
-                                                            class="headline"
-                                                            >일정
-                                                            삭제</v-card-title
-                                                        >
-                                                        <v-card-text>
-                                                            {{
-                                                                selectedEvent.name
-                                                            }}
-                                                            {{
-                                                                selectedEvent.details
-                                                            }}
-                                                            해당 일정을
-                                                            삭제하시겠습니까?
-                                                        </v-card-text>
-                                                        <v-card-actions>
-                                                            <v-spacer></v-spacer>
-                                                            <v-btn
-                                                                color="green darken-1"
-                                                                text
-                                                                @click="
-                                                                    dialog = false
-                                                                "
-                                                                >아니요</v-btn
-                                                            >
-                                                            <v-btn
-                                                                color="green darken-1"
-                                                                text
-                                                                @click="
-                                                                    deleteSchedule(
-                                                                        selectedEvent
-                                                                    )
-                                                                    calLoad = false
-                                                                    dialog = false
-                                                                    selectedOpen = false
-                                                                    this.openSnackbar(
-                                                                        '취소되었습니다!'
-                                                                    )
-                                                                "
-                                                                >예</v-btn
-                                                            >
-                                                        </v-card-actions>
-                                                    </v-card>
-                                                </v-dialog>
-                                            </v-row>
                                         </v-card-text>
                                     </v-card>
                                 </v-menu>
@@ -362,25 +305,45 @@
                     권한이 없습니다.
                 </v-alert>
             </div>
-            <v-snackbar v-model="cancleSnack" :timeout="2000" color="success">
-                취소되었습니다!
-                <v-btn dark text @click="snackbar = false">
-                    Close
-                </v-btn>
-            </v-snackbar>
-            <v-snackbar v-model="applySnack" :timeout="2000" color="success">
-                신청되었습니다!
-                <v-btn dark text @click="snackbar = false">
-                    Close
-                </v-btn>
-            </v-snackbar>
-            <v-snackbar v-model="snackbar.show" :timeout="2000" color="success">
+            <v-snackbar
+                v-model="snackbar.show"
+                :timeout="2000"
+                :color="snackbar.color"
+            >
                 {{ snackbar.text }}
                 <v-btn text @click="snackbar = false">
                     닫기
                 </v-btn>
             </v-snackbar>
         </v-card>
+        <v-dialog v-model="dialog" max-width="290">
+            <v-card>
+                <v-card-title class="headline">일정 삭제</v-card-title>
+                <v-card-text> 시작 :{{ selectedEvent.start }} </v-card-text>
+                <v-card-text> 종료 :{{ selectedEvent.end }} </v-card-text>
+                <v-card-text> 제목 : {{ selectedEvent.name }} </v-card-text>
+                <v-card-text> 내용 :{{ selectedEvent.details }} </v-card-text>
+                <v-card-text>
+                    해당 일정을 삭제하시겠습니까?
+                </v-card-text>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn color="green darken-1" text @click="dialog = false">
+                        아니요
+                    </v-btn>
+
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="deleteSchedule(selectedEvent)"
+                    >
+                        예
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 <script>
@@ -416,11 +379,10 @@ export default {
         schedule_color: '',
         dialog: false,
         calLoad: false,
-        cancleSnack: false,
-        applySnack: false,
         snackbar: {
             show: false,
             text: '',
+            color: '',
         },
         applyEvent: {
             title: '',
@@ -563,13 +525,16 @@ export default {
                 this.schedule_contents = ''
                 this.scheduleDialog.show = false
                 await this.init()
-                this.applySnack = true
+                this.openSnackbar('등록되었습니다!', 'success')
             } catch (err) {
                 console.log(err)
             }
         },
         //일정 삭제
         async deleteSchedule(selectedEvent) {
+            this.calLoad = false
+            this.dialog = false
+            this.selectedOpen = false
             try {
                 await axios.post('schedule/delete', {
                     title: selectedEvent.name,
@@ -578,7 +543,7 @@ export default {
                     content: selectedEvent.details,
                     color: selectedEvent.color,
                 })
-                console.log(selectedEvent)
+                this.openSnackbar('삭제 되었습니다!', 'success')
             } catch (err) {
                 console.log(err)
             }
@@ -595,8 +560,9 @@ export default {
             this.updateRange({ start: this.start, end: this.end })
             this.calLoad = true
         },
-        openSnackbar(text) {
+        openSnackbar(text, color) {
             this.snackbar.text = text
+            this.snackbar.color = color
             this.snackbar.show = true
         },
     },
