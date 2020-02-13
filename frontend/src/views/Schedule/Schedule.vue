@@ -58,6 +58,11 @@
                                         >
                                             <template v-slot:activator="{ on }">
                                                 <v-btn
+                                                    v-if="
+                                                        $perm('schedule').can(
+                                                            'create'
+                                                        )
+                                                    "
                                                     color="primary"
                                                     dark
                                                     v-on="on"
