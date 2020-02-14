@@ -14,6 +14,7 @@ import {
 
 const router = Router()
 
+//group 목록 보기
 router.get(
     '/',
     [],
@@ -61,6 +62,7 @@ router.get(
         })
     })
 )
+
 //group 생성 : group의 부모는 항상  group, 자식은 group(isfolder) 이거나 material
 router.post(
     '/group',
@@ -101,6 +103,30 @@ router.post(
                 name: newGroup.name,
             },
         })
+    })
+)
+
+//group 수정
+router.patch(
+    '/group/:group_id',
+    [
+        param('group_id').isNumeric(),
+        body('name').isString(),
+        body('isfolder').isBoolean(),
+        body('parent_id')
+            .isMongoId()
+            .optional(),
+        validateParams,
+    ],
+    asyncRoute(async function(res, req) {
+        let group = await Group.findById(req.params.group_id)
+        if (group) {
+            group.name = req.body.name
+        } else {
+            res.status(404).json({
+                message: 'no group id' + req.params.group_id,
+            })
+        }
     })
 )
 
@@ -208,6 +234,56 @@ router.delete(
         await material.delete()
 
         res.status(200).json({ message: '자료가 삭제되었습니다.' })
+    })
+)
+
+// material 수정
+router.patch(
+    '/material/:material_id',
+    [
+        param('material_id').isMongoId(),
+        body('title').isString(),
+        body('content').isString(),
+        body('files').custom(checkAttachableFileArray),
+        param('parent_id').isMongoId(),
+        validateParams,
+    ],
+    asyncRoute(async (req, res) => {
+        const material = await Material.findById(req.params.material_id)
+
+        if (!material) {
+            const err = new Error('존재하지 않는 자료입니다.')
+            err.status = 404
+            throw err
+        }
+        if (
+            !checkIsFileOwner(req.body.files) ||
+            !checkUnlinkedFile(req.body.files)
+        ) {
+            const err = new Error('올바르지 않은 첨부파일입니다.')
+            err.status = 400
+            throw err
+        }
+        await removeFileLink(material.files)
+        await deleteUnlinkedFile(material.files)
+
+        const newMaterial = new Material({
+            title: req.body.title,
+            author: req.user.username,
+            content: req.body.content,
+            created_date: Date.now(),
+            files: req.body.files,
+            parent: req.params.parent_id,
+        })
+        await newMaterial.save()
+
+        // DB 파일 객체에 역참조 등록
+        await applyFileLink(req.body.files, 'filebox', newMaterial.id)
+        newMaterial.files = req.body.files
+
+        await newMaterial.save()
+
+        res.status(200).json({ message: '자료가 수정되었습니다.' })
     })
 )
 export default router
