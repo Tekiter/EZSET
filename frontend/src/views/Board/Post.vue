@@ -210,7 +210,6 @@ export default {
                         },
                     }
                 )
-                console.log(res)
                 this.posts = res.data.posts.map(post => {
                     post.created_date = moment(post.created_date).format(
                         'YYYY/MM/DD HH:MM'

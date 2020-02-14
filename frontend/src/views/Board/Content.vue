@@ -315,7 +315,6 @@ export default {
                 )
             })
             this.loading = false
-            console.log(res)
         },
         del_auth(writer) {
             if (this.post.isAnonymous == true) {
@@ -421,7 +420,7 @@ export default {
                 'simple/posts/' + this.$route.params.post_id + '/like'
             )
             this.fetch_data()
-            console.log(this.post)
+
             this.likeLoading = false
         },
         async clickDislike(author) {
