@@ -67,7 +67,10 @@
                                             icon
                                             color="gray"
                                             @click="
-                                                updateStateToAttendance(item)
+                                                changeAttendanceState(
+                                                    item,
+                                                    'attendance'
+                                                )
                                             "
                                         >
                                             <v-icon>
@@ -94,7 +97,12 @@
                                             text
                                             icon
                                             color="gray"
-                                            @click="updateStateToLate(item)"
+                                            @click="
+                                                changeAttendanceState(
+                                                    item,
+                                                    'late'
+                                                )
+                                            "
                                         >
                                             <v-icon>
                                                 mdi-triangle-outline
@@ -117,7 +125,12 @@
                                             text
                                             icon
                                             color="gray"
-                                            @click="updateStateToAbsence(item)"
+                                            @click="
+                                                changeAttendanceState(
+                                                    item,
+                                                    'absence'
+                                                )
+                                            "
                                         >
                                             <v-icon> mdi-close </v-icon>
                                         </v-btn>
@@ -141,8 +154,9 @@
                                             icon
                                             color="gray lighten-2"
                                             @click="
-                                                updateStateToOfficialAbsence(
-                                                    item
+                                                changeAttendanceState(
+                                                    item,
+                                                    'official_absence'
                                                 )
                                             "
                                         >
@@ -212,11 +226,27 @@
                                                 mdi-checkbox-blank-circle-outline
                                             </v-icon>
                                         </v-btn>
+                                        <v-btn
+                                            text
+                                            icon
+                                            @click="changeAbsenceState(item)"
+                                        >
+                                            <v-icon> mdi-close </v-icon>
+                                        </v-btn>
                                     </td>
                                     <td
                                         v-if="item.approval == false"
                                         class="flex-grow-0"
                                     >
+                                        <v-btn
+                                            text
+                                            icon
+                                            @click="changeAbsenceState(item)"
+                                        >
+                                            <v-icon>
+                                                mdi-checkbox-blank-circle-outline
+                                            </v-icon>
+                                        </v-btn>
                                         <v-btn text icon color="red">
                                             <v-icon> mdi-close </v-icon>
                                         </v-btn>
@@ -325,7 +355,11 @@
                 </v-card>
             </v-dialog>
         </v-row>
-        <v-snackbar v-model="snackbar.show" :timeout="2000" color="success">
+        <v-snackbar
+            v-model="snackbar.show"
+            :timeout="2000"
+            :color="snackbar.color"
+        >
             {{ snackbar.text }}
             <v-btn text @click="snackbar = false">
                 닫기
@@ -362,6 +396,7 @@ export default {
             snackbar: {
                 show: false,
                 text: '',
+                color: '',
             },
             state: '',
         }
@@ -437,41 +472,6 @@ export default {
             this.userAddDialog.selections = []
             this.userAddDialog.show = false
         },
-        async updateStateToAttendance(item) {
-            await axios.post(
-                `attendance/attendancestateupdate/${this.$route.params.day}`,
-                {
-                    state: 'attendance',
-                    name: item.name,
-                }
-            )
-            item.state = 'attendance'
-            this.openSnackbar('변경되었습니다!')
-        },
-        async updateStateToLate(item) {
-            await axios.post(`attendance/attendancestateupdate/${this.date}`, {
-                state: 'late',
-                name: item.name,
-            })
-            item.state = 'late'
-            this.openSnackbar('변경되었습니다!')
-        },
-        async updateStateToAbsence(item) {
-            await axios.post(`attendance/attendancestateupdate/${this.date}`, {
-                state: 'absence',
-                name: item.name,
-            })
-            item.state = 'absence'
-            this.openSnackbar('변경되었습니다!')
-        },
-        async updateStateToOfficialAbsence(item) {
-            await axios.post(`attendance/attendancestateupdate/${this.date}`, {
-                state: 'official_absence',
-                name: item.name,
-            })
-            item.state = 'official_absence'
-            this.openSnackbar('변경되었습니다!')
-        },
         async updateAbsenceState() {
             for (let item of this.absenceDate) {
                 if (item.approval == true) {
@@ -485,8 +485,57 @@ export default {
                 }
             }
         },
-        openSnackbar(text) {
+        async changeAttendanceState(item, to) {
+            try {
+                await axios.post(
+                    `attendance/attendancestateupdate/${this.date}`,
+                    {
+                        state: to,
+                        name: item.name,
+                    }
+                )
+                item.state = to
+                this.openSnackbar('변경되었습니다!', 'success')
+            } catch (err) {
+                console.log(err)
+            }
+        },
+        async changeAbsenceState(item) {
+            try {
+                await axios.post('absencecheck/officialAbsenceAccept', {
+                    name: item.name,
+                    day: item.day,
+                    approval: !item.approval,
+                })
+                item.approval = !item.approval
+
+                if (item.approval) {
+                    await axios.post(
+                        `attendance/attendancestateupdate/${this.date}`,
+                        {
+                            state: 'absence',
+                            name: item.name,
+                        }
+                    )
+                } else {
+                    await axios.post(
+                        `attendance/attendancestateupdate/${this.date}`,
+                        {
+                            state: 'absence',
+                            name: item.name,
+                        }
+                    )
+                }
+                this.fetchAttUsers()
+                this.openSnackbar('변경되었습니다!', 'success')
+            } catch (err) {
+                console.log(err)
+                this.openSnackbar('error', 'error')
+            }
+        },
+        openSnackbar(text, color) {
             this.snackbar.text = text
+            this.snackbar.color = color
             this.snackbar.show = true
         },
     },

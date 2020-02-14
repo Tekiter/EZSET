@@ -114,6 +114,16 @@
                 <v-spacer></v-spacer>
             </v-col>
         </v-row>
+        <v-snackbar
+            v-model="snackbar.show"
+            :timeout="2000"
+            :color="snackbar.color"
+        >
+            {{ snackbar.text }}
+            <v-btn text @click="snackbar = false">
+                닫기
+            </v-btn>
+        </v-snackbar>
     </v-container>
 </template>
 <style scoped>
@@ -131,6 +141,11 @@ export default {
         checkbox_No: [],
         checkbox_Yes: [],
         picker_date: moment(new Date()).format('YYYY-MM-DD'),
+        snackbar: {
+            show: false,
+            text: '',
+            color: '',
+        },
     }),
     created() {
         if (!this.$perm('manageRoles').can('access')) {
@@ -198,6 +213,7 @@ export default {
                     })
                 }
                 this.listprint()
+                this.openSnackbar('승인완료!', 'success')
             } catch (err) {
                 console.log(err)
             }
@@ -212,9 +228,15 @@ export default {
                     })
                 }
                 this.listprint()
+                this.openSnackbar('승인취소완료!', 'success')
             } catch (err) {
                 console.log(err)
             }
+        },
+        openSnackbar(text, color) {
+            this.snackbar.text = text
+            this.snackbar.color = color
+            this.snackbar.show = true
         },
     },
 }

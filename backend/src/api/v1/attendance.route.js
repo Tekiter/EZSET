@@ -188,7 +188,7 @@ router.post(
     asyncRoute(async function(req, res) {
         var Day = req.params.day
 
-        const cur = await AttendanceDay.findOneAndUpdate(
+        await AttendanceDay.findOneAndUpdate(
             {
                 day: Day,
                 'status.name': req.body.name,
@@ -196,8 +196,8 @@ router.post(
             { 'status.$.state': req.body.state },
             function(err, doc) {}
         )
-        res.json(cur)
-        const cur_user = await AttendanceUser.findOneAndUpdate(
+
+        await AttendanceUser.findOneAndUpdate(
             {
                 name: req.body.name,
                 'status.date': Day,
@@ -205,7 +205,7 @@ router.post(
             { 'status.$.state': req.body.state },
             function(err, doc) {}
         )
-        res.json(cur_user)
+        res.end()
     })
 )
 
