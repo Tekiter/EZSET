@@ -26,6 +26,7 @@
                     placeholder="역할 이름"
                     outlined
                     hide-details
+                    :disabled="permdisabled"
                     @input="changed = true"
                 ></v-text-field>
             </v-list-item>
@@ -37,7 +38,7 @@
                     tile
                     color="error"
                     @click="showRemoveRoleDialog"
-                    :disabled="disabled"
+                    :disabled="permdisabled"
                     >역할 삭제</v-btn
                 >
             </v-list-item>
@@ -192,6 +193,8 @@ export default {
 
         async savePerms() {
             this.isLoading = true
+
+            // 권한 수정 목록 구축
             const perms = []
             for (let key of Object.keys(this.manageData)) {
                 let { resource, action, range, param } = JSON.parse(key)
@@ -205,10 +208,13 @@ export default {
             }
 
             await axios.patch(`role/${this.roletag}`, {
+                name: this.rolename,
                 perms,
             })
 
             this.changed = false
+
+            this.$emit('change')
 
             this.isLoading = false
         },

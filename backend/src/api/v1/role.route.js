@@ -109,6 +109,7 @@ router.patch(
         perm('role').can('modify'),
         param('role_tag').custom(checkRoleTag),
         // body('mode').custom(value => ['grant', 'deny'].includes(value)),
+        body('name').isString(),
         body('perms').isArray(),
         validateParams,
     ],
@@ -132,6 +133,9 @@ router.patch(
                 throw err
             }
         }
+
+        // 역할 name 변경
+        roles.getRole(req.params.role_tag).name = req.body.name
 
         // 수정할 데이터를 Role 에 반영
         const context = roles.role(req.params.role_tag)

@@ -27,11 +27,11 @@
                 v-show="!isMobileMode || curTab == 0"
                 class="fill-screen"
             >
-                <v-card tile minHeight="95%">
+                <v-card tile minHeight="95%" :loading="isLoading">
                     <v-card-title>역할</v-card-title>
                     <v-list>
                         <!-- <v-subheader>역할</v-subheader> -->
-                        <template v-if="isLoading">
+                        <template v-if="isLoading && roles.length == 0">
                             <v-skeleton-loader
                                 v-for="i in 7"
                                 :key="`role-loading-${i}`"
@@ -111,6 +111,7 @@
                     :roletag="curRole.tag"
                     :disabled="!$perm('role').can('modify')"
                     @removed="roleRemoved()"
+                    @change="fetchRoles()"
                 ></role-perm-edit>
             </v-col>
 

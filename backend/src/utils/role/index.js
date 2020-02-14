@@ -68,7 +68,7 @@ const role = {
         }
     },
     async getRoleNames() {
-        return roles.roleNames()
+        return roles.roleNames().sort((a, b) => a.name.localeCompare(b.name))
     },
     async createRole({ name }) {
         let newtag
