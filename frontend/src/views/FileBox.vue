@@ -106,10 +106,18 @@
                         >확인</v-btn>
                     </v-card-actions>
                 </v-card>
-                <material-post
-                    v-if="showMetarials.show"
-                    :folderId="this.showMetarials.selected[0].id"
-                ></material-post>
+                <div class="mr-4">
+                    <div class="text-center">
+                        <v-btn class="mx-2" block dark large color="cyan" v-if="showMetarials.show">
+                            Upload
+                            <v-icon right dark>mdi-cloud-upload</v-icon>
+                        </v-btn>
+                    </div>
+                    <material-post
+                        v-if="showMetarials.show"
+                        :folderId="this.showMetarials.selected[0].id"
+                    ></material-post>
+                </div>
             </v-col>
         </v-row>
     </div>
@@ -191,7 +199,7 @@ export default {
             this.plusGroup.isfolder = false
         },
         isFolder() {
-            if (this.showMetarials.selected[0].isfolder) {
+            if (this.showMetarials.selected[0].isfolder == true) {
                 this.showMetarials.show = true
             }
         },
