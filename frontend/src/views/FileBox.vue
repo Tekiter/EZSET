@@ -201,6 +201,8 @@ export default {
         isFolder() {
             if (this.showMetarials.selected[0].isfolder == true) {
                 this.showMetarials.show = true
+            } else {
+                this.showMetarials.show = false
             }
         },
     },
