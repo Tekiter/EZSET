@@ -11,6 +11,7 @@
 
             <!-- switch 타입 -->
             <v-list-item
+                three-line
                 v-else-if="item.type == 'switch'"
                 :key="`setiing-select-item-${idx}`"
             >

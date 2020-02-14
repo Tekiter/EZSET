@@ -45,18 +45,18 @@ export function setAdminRole(roles) {
         .can('access')
         .resource('manageRoles')
         .can('access')
+        .resource('manageAttendance')
+        .can('access')
 
         .resource('manageBoards')
         .can('access')
 
         .resource('attendance')
-        .canOwn('read')
-        .can(['start', 'att', 'read', 'update'])
+        .can('update')
 
         .resource('absence')
-        .canOwn(['create', 'read', 'delete', 'update'])
-        .can(['create', 'read', 'delete', 'update'])
+        .can('update')
 
         .resource('schedule')
-        .can(['read', 'create', 'update', 'delete'])
+        .can('update')
 }

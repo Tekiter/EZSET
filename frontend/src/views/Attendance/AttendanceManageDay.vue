@@ -31,7 +31,7 @@
                         v-if="!attLoad"
                     ></v-skeleton-loader>
                     <v-simple-table
-                        v-if="attLoad && this.$perm('attendance').can('read')"
+                        v-if="attLoad && this.$perm('attendance').can('update')"
                     >
                         <template v-slot:default>
                             <tbody>
@@ -177,7 +177,7 @@
                     <div>
                         <v-alert
                             type="error"
-                            v-if="!$perm('attendance').can('read')"
+                            v-if="!$perm('attendance').can('update')"
                         >
                             권한이 없습니다.
                         </v-alert>
@@ -192,12 +192,12 @@
                     <v-skeleton-loader
                         class="mx-auto"
                         type="table"
-                        v-if="!absenLoad && this.$perm('absence').can('read')"
+                        v-if="!absenLoad && this.$perm('absence').can('update')"
                     ></v-skeleton-loader>
                     <v-simple-table
                         v-if="
                             absenLoad &&
-                                this.$perm('absence').can('read') &&
+                                this.$perm('absence').can('update') &&
                                 absenceDate.length != 0
                         "
                     >
@@ -263,7 +263,7 @@
                     <div>
                         <v-alert
                             type="error"
-                            v-if="!$perm('attendance').can('read')"
+                            v-if="!$perm('attendance').can('update')"
                         >
                             권한이 없습니다.
                         </v-alert>
@@ -497,7 +497,7 @@ export default {
                 item.state = to
                 this.openSnackbar('변경되었습니다!', 'success')
             } catch (err) {
-                console.log(err)
+                //console.log(err)
             }
         },
         async changeAbsenceState(item) {
@@ -529,7 +529,7 @@ export default {
                 this.fetchAttUsers()
                 this.openSnackbar('변경되었습니다!', 'success')
             } catch (err) {
-                console.log(err)
+                //console.log(err)
                 this.openSnackbar('error', 'error')
             }
         },

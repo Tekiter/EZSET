@@ -3,10 +3,10 @@
         <v-skeleton-loader
             class="mx-auto"
             type="table"
-            v-if="!tabLoad && this.$perm('attendance').can('read')"
+            v-if="!tabLoad && this.$perm('attendance').can('update')"
         ></v-skeleton-loader>
         <div
-            v-if="tabLoad && this.$perm('attendance').can('read')"
+            v-if="tabLoad && this.$perm('attendance').can('update')"
             class="fill-height"
         >
             <v-card tile minHeight="95%">
@@ -76,7 +76,7 @@
                 class="elevation-1 font-weight-medium headline"
                 :search="search"
                 :custom-filter="filterOnlyCapsText"
-                v-if="tabLoad && this.$perm('attendance').can('read')"
+                v-if="tabLoad && this.$perm('attendance').can('update')"
             >
                 <template v-slot:item="{ item, headers }">
                     <tr>
@@ -136,7 +136,7 @@
             </v-data-table>
         </div>
         <div>
-            <v-alert type="error" v-if="!$perm('attendance').can('read')">
+            <v-alert type="error" v-if="!$perm('attendance').can('update')">
                 권한이 없습니다.
             </v-alert>
         </div>
@@ -151,19 +151,19 @@ export default {
             const res = await axios.get('attendance/attendanceUserList')
             this.userList = res.data
         } catch (err) {
-            console.log(err)
+            //console.log(err)
         }
         try {
             const res = await axios.get('attendance/attendanceDayList')
             this.attendanceDayData = res.data
         } catch (err) {
-            console.log(err)
+            //console.log(err)
         }
         try {
             const res = await axios.get('attendance/attendanceUserListData')
             this.attendanceUserData = res.data
         } catch (err) {
-            console.log(err)
+            //console.log(err)
         }
         this.tabLoad = true
     },

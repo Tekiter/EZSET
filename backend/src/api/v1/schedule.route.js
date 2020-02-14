@@ -11,7 +11,7 @@ const router = Router()
 // schedule 페이지에서 사용
 router.get(
     '/read',
-    [perm('schedule').can('read')],
+    [perm('schedule').can('update')],
     asyncRoute(async function(req, res) {
         const schedule = await Schedule.find()
         res.json(schedule)
@@ -24,7 +24,7 @@ router.get(
 router.post(
     '/write',
     [
-        perm('schedule').can('create'),
+        perm('schedule').can('update'),
         body('dayList').isArray(),
         body('title').isString(),
         body('content').isString(),
@@ -75,7 +75,7 @@ router.post(
 router.post(
     '/delete',
     [
-        perm('schedule').can('delete'),
+        perm('schedule').can('update'),
         body('start').isString(),
         body('end').isString(),
         body('title').isString(),

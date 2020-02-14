@@ -12,7 +12,7 @@ var moment = require('moment')
 router.post(
     '/absenceBook',
     [
-        perm('absence').can('create'),
+        perm('absence').can('update'),
         body('dayList').isArray(),
         body('Reason').isString(),
         validateParams,
@@ -103,7 +103,7 @@ router.post(
 //OfficialAbsenceAccept 페이지에서 사용
 router.get(
     '/officialAbsenceList',
-    [perm('absence').can('read'), validateParams],
+    [perm('absence').can('update'), validateParams],
     asyncRoute(async function(req, res) {
         try {
             const cursor_No = await OfficialAbsence.find({
