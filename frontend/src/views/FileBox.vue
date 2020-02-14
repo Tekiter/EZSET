@@ -13,7 +13,9 @@
                             <v-list-item-icon>
                                 <v-icon>mdi-plus</v-icon>
                             </v-list-item-icon>
-                            <v-list-item-title class="grey--text">새 그룹 추가</v-list-item-title>
+                            <v-list-item-title class="grey--text"
+                                >새 그룹 추가</v-list-item-title
+                            >
                         </v-list-item>
                     </v-list>
                 </v-card>
@@ -36,14 +38,20 @@
                                             class="ma-2"
                                             outlined
                                             label
-                                            v-if="plusGroup.selected.length == 0"
-                                        >기본 위치</v-chip>
+                                            v-if="
+                                                plusGroup.selected.length == 0
+                                            "
+                                            >기본 위치</v-chip
+                                        >
                                         <v-chip
                                             class="ma-2"
                                             outlined
                                             label
                                             v-if="plusGroup.selected.length > 0"
-                                        >{{plusGroup.selected[0].name}}</v-chip>
+                                            >{{
+                                                plusGroup.selected[0].name
+                                            }}</v-chip
+                                        >
                                     </v-banner>
                                     <v-banner>
                                         그룹? 폴더?
@@ -88,7 +96,9 @@
                                 >
                                     <v-list-item>
                                         <v-list-item-content>
-                                            <v-list-item-title>기본 위치</v-list-item-title>
+                                            <v-list-item-title
+                                                >기본 위치</v-list-item-title
+                                            >
                                         </v-list-item-content>
                                     </v-list-item>
                                 </v-card>
@@ -103,12 +113,20 @@
                             large
                             @click="applyPlusGroup()"
                             :disabled="isError"
-                        >확인</v-btn>
+                            >확인</v-btn
+                        >
                     </v-card-actions>
                 </v-card>
                 <div class="mr-4">
                     <div class="text-center">
-                        <v-btn class="mx-2" block dark large color="cyan" v-if="showMetarials.show">
+                        <v-btn
+                            class="mx-2"
+                            block
+                            dark
+                            large
+                            color="cyan"
+                            v-if="showMetarials.show"
+                        >
                             Upload
                             <v-icon right dark>mdi-cloud-upload</v-icon>
                         </v-btn>
