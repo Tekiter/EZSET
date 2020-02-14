@@ -25,6 +25,7 @@ let Comment = mongoose.model('comment', commentSchema)
 let postSchema = new Schema({
     board: {
         type: Number,
+        startAt: 1,
         ref: 'board',
     },
     title: {
@@ -48,15 +49,50 @@ let postSchema = new Schema({
         default: false,
     },
     view: { type: Number, default: 0 },
-    like: [{ liker: { type: String } }],
+    like: [{ type: String }],
+    isLike: {
+        type: Boolean,
+        default: false,
+    },
     comments: [commentSchema],
     files: [{ type: String }],
 })
 
+//좋아요 확인
+postSchema.methods.likes_flag = function(liker) {
+    for (let i = 0; i < this.like.length; i++) {
+        if (this.like[i] == liker) {
+            return true
+        }
+    }
+    return false
+}
+
 //좋아요 카운트
 postSchema.virtual('likes_count').get(function() {
-    return this.likes ? this.likes.length : 0
+    return this.like ? this.like.length : 0
 })
+
+//좋아요 생성
+postSchema.methods.likes_create = function(liker) {
+    for (let i = 0; i < this.like.length; i++) {
+        if (this.like[i] == liker) {
+            return
+        }
+    }
+    this.like.push(liker)
+    return this.save()
+}
+
+//좋아요 삭제
+postSchema.methods.likes_delete = function(liker) {
+    for (let i = 0; i < this.like.length; i++) {
+        if (this.like[i] == liker) {
+            this.like.splice(i, 1)
+        }
+    }
+    return this.save()
+}
 
 //댓글 갯수 카운트
 postSchema.virtual('comments_count').get(function() {
