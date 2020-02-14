@@ -10,16 +10,15 @@
         </div> -->
         <v-container grid-list-md>
             <v-row>
-                <v-col></v-col>
-                <v-col></v-col>
-                <v-col class="d-flex justify-center">
+                <v-col cols="2"></v-col>
+                <v-col cols="8" class="d-flex justify-center">
                     <strong class="font-weight-medium display-2">{{
                         board.title
                     }}</strong>
                 </v-col>
-                <v-col></v-col>
-                <v-col>
+                <v-col cols="2">
                     <v-select
+                        class="text-right"
                         v-model="select"
                         :items="viewCount"
                         item-text="state"
