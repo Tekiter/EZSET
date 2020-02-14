@@ -6,7 +6,9 @@ import { param, body } from 'express-validator'
 const router = Router()
 var moment = require('moment')
 
-//사용자가 결석예약 날짜들을 선택하면 프론트에서 list 형태로 백에 전달
+//사용자가 결석예약 날짜들을 선택하면 프론트에서 list 형태로 back에 전달, db에 해당 정보를 날짜별로 각각 저장
+//body : dayList(Array), Reason(String)
+//AttendanceManageMonthUser페이지에서 사용
 router.post(
     '/absenceBook',
     [
@@ -37,7 +39,7 @@ router.post(
     })
 )
 
-//officialAbsences Collection에서 자신의 공결 현황을 전부 가지고 옴
+//officialAbsences Collection에서 자신(로그인한 사용자)의 공결 현황을 전부 가지고 옴
 //AttendanceManagMonthUser 페이지에서 사용
 router.get(
     '/absenceUserData',
@@ -73,7 +75,7 @@ router.get(
 )
 
 //사용자의 공결 신청 내역 삭제
-//body : reason
+//body : reason(String), day(String)
 //AttendanceManagMonth 페이지에서 사용
 router.post(
     '/deleteAbsenceUser',
@@ -119,12 +121,14 @@ router.get(
     })
 )
 
-//공결 승인 내역 저장
+//공결 승인,취소 내역 저장
+//body : name(String), day(String), approval(Boolean)
 //OfficialAbsenceAccept 페이지에서 사용
 router.post(
     '/officialAbsenceAccept',
     [
         perm('absence').can('update'),
+        body('name').isString(),
         body('day').isString(),
         body('approval').isBoolean(),
         validateParams,

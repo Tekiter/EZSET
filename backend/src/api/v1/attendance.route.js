@@ -157,6 +157,9 @@ router.post(
     })
 )
 
+//날짜를 param으로 받아와서 그 날짜에 해당하는 객체를 반환(그 날짜에 출석한 사람들의 정보가 모두 담겨 있음)
+//param : day(String)
+//AttendanceManageDay 페이지에서 사용
 router.get(
     '/attendanceState/:day',
     [param('day').isString(), perm('attendance').can('read'), validateParams],
@@ -169,6 +172,10 @@ router.get(
     })
 )
 
+//AttendanceManageDay 페이지에서 사용자의 출석정보를 변경하면 db에 업데이트 시켜준다.
+//body : state(String), name(String)
+//param : day(String)
+//AttendanceManageDay 페이지에서 사용
 router.post(
     '/attendancestateupdate/:day',
     [
