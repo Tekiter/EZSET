@@ -7,7 +7,9 @@
         <v-app-bar app clipped-left>
             <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
             <v-btn text large @click="$router.push('/')">
-                <v-toolbar-title>EZSET</v-toolbar-title>
+                <v-toolbar-title>{{
+                    $store.state.config.groupName
+                }}</v-toolbar-title>
             </v-btn>
             <v-spacer></v-spacer>
 

@@ -94,7 +94,7 @@ router.get(
 router.put(
     '/:username/role',
     [
-        // role.perm('role', 'user').can('update'),
+        role.perm('role').can('modify'),
         param('username').custom(checkUsername),
         body('roletags').custom(checkRoleTagArray),
         validateParams,
@@ -131,7 +131,7 @@ router.put(
 router.post(
     '/:username/role',
     [
-        role.perm('role', 'user').can('update'),
+        role.perm('role').can('modify'),
         // param('username').isString(),
         param('username').custom(checkUsername),
         body('roletag').custom(checkRoleTag),

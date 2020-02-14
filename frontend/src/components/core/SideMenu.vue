@@ -39,12 +39,17 @@ export default {
                         {
                             title: '역할 관리',
                             to: '/manage/roles',
-                            perm: this.$perm('manageRoles').can('access'),
+                            perm: this.$perm('role').can('modify'),
                         },
                         {
                             title: '게시판 관리',
                             to: '/manage/boards',
                             perm: this.$perm('manageBoards').can('access'),
+                        },
+                        {
+                            title: '서버 설정',
+                            to: '/manage/server',
+                            perm: this.$perm('serverConfig').can('change'),
                         },
                     ],
                 },

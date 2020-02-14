@@ -65,6 +65,7 @@
                                             {{ roles[userrole].name }}
                                         </v-chip>
                                         <v-btn
+                                            v-if="$perm('role').can('modify')"
                                             @click="showRoleDialog(user)"
                                             icon
                                             small
@@ -288,7 +289,7 @@ export default {
         },
     },
     async created() {
-        if (!this.$perm('manageRoles').can('access')) {
+        if (!this.$perm('manageUsers').can('access')) {
             this.$router.push({ name: 'error403' })
             return
         }

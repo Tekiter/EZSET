@@ -1,11 +1,21 @@
 <template>
-    <v-card tile minHeight="95%" :loading="isLoading">
+    <v-card tile minHeight="95%" :loading="isLoading" :disabled="disabled">
         <v-toolbar flat>
             <v-toolbar-title>
                 설정
             </v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn outlined tile color="primary">변경사항 저장</v-btn>
+            <v-fade-transition>
+                <v-btn
+                    v-if="changed"
+                    outlined
+                    tile
+                    color="primary"
+                    @click="savePerms"
+                >
+                    변경사항 저장
+                </v-btn>
+            </v-fade-transition>
         </v-toolbar>
         <v-list>
             <v-subheader>기본 설정</v-subheader>
@@ -16,6 +26,7 @@
                     placeholder="역할 이름"
                     outlined
                     hide-details
+                    @input="changed = true"
                 ></v-text-field>
             </v-list-item>
             <v-list-item>
@@ -26,13 +37,20 @@
                     tile
                     color="error"
                     @click="showRemoveRoleDialog"
-                    :disabled="roletag === 'admin'"
+                    :disabled="disabled"
                     >역할 삭제</v-btn
                 >
             </v-list-item>
         </v-list>
 
         <v-divider></v-divider>
+
+        <setting-select
+            v-model="manageData"
+            :items="manageItems"
+            @change="changed = true"
+            :disabled="permdisabled"
+        ></setting-select>
 
         <v-dialog v-model="removeRoleDialog.show" max-width="500px">
             <v-card :loading="removeRoleDialog.isLoading">
@@ -68,15 +86,28 @@
 </template>
 <script>
 import axios from 'axios'
+import SettingSelect from './SettingSelect.vue'
+
+// import { Role } from '../../utils/role/libs/Role'
+// import { filterAllPerms } from '../../utils/role/role'
+
 export default {
+    components: {
+        SettingSelect,
+    },
     props: {
         roletag: {
             type: String,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
         },
     },
     data() {
         return {
             isLoading: false,
+            changed: false,
             rolename: '',
             removeRoleDialog: {
                 show: false,
@@ -84,16 +115,105 @@ export default {
                 isLoading: false,
                 error: '',
             },
+            manageItems: [],
+            manageData: {},
+            roleObj: null,
         }
     },
-    computed: {},
+    computed: {
+        permdisabled() {
+            return this.roletag === 'admin' || this.disabled
+        },
+    },
     methods: {
         async fetchRole() {
             this.isLoading = true
             const res = await axios.get(`role/${this.roletag}`)
             this.rolename = res.data.name
+            this.manageData = this.createPermData(res.data.perm)
             this.isLoading = false
         },
+        createPermData(permdata) {
+            const checkAction = (arr, action) => {
+                if (arr.indexOf(action) >= 0) {
+                    return true
+                }
+                if (arr.indexOf('!' + action) >= 0) {
+                    return false
+                }
+                return undefined
+            }
+            const res = {}
+            for (let { key } of this.manageItems) {
+                if (!key) {
+                    continue
+                }
+                let { resource, action, range, param } = JSON.parse(key)
+
+                range = range || 'any'
+                if (permdata[resource] && permdata[resource].all) {
+                    let obj = permdata[resource].all
+
+                    let target
+                    if (Array.isArray(obj)) {
+                        target = obj
+                    } else {
+                        target = obj[range]
+                    }
+
+                    res[key] = checkAction(target, action)
+
+                    if (param) {
+                        obj = permdata[resource].params[param]
+                        if (Array.isArray(obj)) {
+                            target = obj
+                        } else {
+                            target = obj[range]
+                        }
+
+                        const po = checkAction(target, action)
+
+                        if (po != undefined) {
+                            res[key] = po
+                        }
+                    }
+                }
+            }
+
+            return res
+        },
+        convertPermItems(items) {
+            return items.map(item => {
+                const res = { ...item }
+                res.key = JSON.stringify(item.target)
+                return res
+            })
+        },
+
+        async savePerms() {
+            this.isLoading = true
+            const perms = []
+            for (let key of Object.keys(this.manageData)) {
+                let { resource, action, range, param } = JSON.parse(key)
+                perms.push({
+                    allow: this.manageData[key] ? true : false,
+                    resource,
+                    action,
+                    param,
+                    range: range || 'any',
+                })
+            }
+
+            await axios.patch(`role/${this.roletag}`, {
+                perms,
+            })
+
+            this.changed = false
+
+            this.isLoading = false
+        },
+
+        // 역할 삭제 Dialog
         showRemoveRoleDialog() {
             this.removeRoleDialog.show = true
             this.removeRoleDialog.name = ''
@@ -119,9 +239,14 @@ export default {
         roletag: {
             immediate: true,
             async handler(newVal) {
+                this.changed = false
                 await this.fetchRole()
             },
         },
+    },
+    async created() {
+        const res = await axios.get('role/managepage')
+        this.manageItems = this.convertPermItems(res.data)
     },
 }
 </script>

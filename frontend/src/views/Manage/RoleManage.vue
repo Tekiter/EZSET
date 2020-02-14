@@ -55,6 +55,7 @@
                             </v-list-item>
                         </v-list-item-group>
                         <v-menu
+                            v-if="$perm('role').can('modify')"
                             v-model="roleAddDialog.show"
                             :close-on-content-click="false"
                         >
@@ -108,6 +109,7 @@
             >
                 <role-perm-edit
                     :roletag="curRole.tag"
+                    :disabled="!$perm('role').can('modify')"
                     @removed="roleRemoved()"
                 ></role-perm-edit>
             </v-col>
@@ -528,7 +530,7 @@ export default {
         },
     },
     async created() {
-        if (!this.$perm('manageUsers').can('access')) {
+        if (!this.$perm('role').can('modify')) {
             this.$router.push({ name: 'error403' })
             return
         }

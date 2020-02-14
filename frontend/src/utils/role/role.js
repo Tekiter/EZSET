@@ -14,6 +14,27 @@ export function checkPerm(resource, param) {
     return new Permission(res, param)
 }
 
+export function filterAllPerms(perms) {
+    console.log(perms)
+    const res = {}
+
+    for (let resource of Object.keys(perms)) {
+        if (perms[resource].all) {
+            res[resource] = { all: perms[resource].all }
+        }
+    }
+    console.log(res)
+    return res
+}
+
+// export function flattenPerms(perms) {
+//     const res = {}
+//     for (let resource of perms) {
+
+//     }
+//     return res
+// }
+
 // export function addPermComponent() {
 //     Vue.component('perm', {
 //         props: ['resource', 'param'],

@@ -27,11 +27,14 @@ export function setAdminRole(roles) {
     roles
         .role('admin')
 
+        .resource('serverConfig')
+        .can('change')
+
         .resource('profile')
         .can(['read', 'update'])
 
         .resource('role')
-        .can(['read', 'create', 'delete', 'update'])
+        .can(['read', 'modify'])
 
         .resource('board')
         .can(['read', 'create', 'delete', 'update'])
