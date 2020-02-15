@@ -26,7 +26,7 @@
                     placeholder="역할 이름"
                     outlined
                     hide-details
-                    :disabled="permdisabled"
+                    :disabled="infodisabled"
                     @input="changed = true"
                 ></v-text-field>
             </v-list-item>
@@ -38,7 +38,7 @@
                     tile
                     color="error"
                     @click="showRemoveRoleDialog"
-                    :disabled="permdisabled"
+                    :disabled="infodisabled"
                     >역할 삭제</v-btn
                 >
             </v-list-item>
@@ -124,6 +124,9 @@ export default {
     computed: {
         permdisabled() {
             return this.roletag === 'admin' || this.disabled
+        },
+        infodisabled() {
+            return ['admin', 'default'].includes(this.roletag) || this.disabled
         },
     },
     methods: {

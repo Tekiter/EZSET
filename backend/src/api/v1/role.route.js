@@ -24,7 +24,7 @@ router.get(
 
         res.json({
             roles: userRoles,
-            perms: [role.roles.getDefault().getPerm(), ...userPerms],
+            perms: [role.roles.export('default').perm, ...userPerms],
         })
     })
 )
@@ -37,8 +37,17 @@ router.get(
         validateParams,
     ],
     asyncRoute(async (req, res) => {
-        const roles = await role.getRoleNames()
-        res.json(roles)
+        let roles = await role.getRoleNames()
+
+        roles = roles
+            .filter(item => !['admin', 'default'].includes(item.tag))
+            .sort((a, b) => a.name.localeCompare(b.name))
+
+        res.json([
+            { tag: 'default', name: '모든 유저' },
+            { tag: 'admin', name: '관리자' },
+            ...roles,
+        ])
     })
 )
 
@@ -165,6 +174,11 @@ router.delete(
     asyncRoute(async (req, res) => {
         if (req.params.role_tag == 'admin') {
             const err = new Error('admin 역할은 삭제할 수 없습니다.')
+            err.status = 400
+            throw err
+        }
+        if (req.params.role_tag == 'default') {
+            const err = new Error('default 역할은 삭제할 수 없습니다.')
             err.status = 400
             throw err
         }
