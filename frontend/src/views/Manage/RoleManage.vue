@@ -27,11 +27,11 @@
                 v-show="!isMobileMode || curTab == 0"
                 class="fill-screen"
             >
-                <v-card tile minHeight="95%">
+                <v-card tile minHeight="95%" :loading="isLoading" outlined>
                     <v-card-title>역할</v-card-title>
                     <v-list>
                         <!-- <v-subheader>역할</v-subheader> -->
-                        <template v-if="isLoading">
+                        <template v-if="isLoading && roles.length == 0">
                             <v-skeleton-loader
                                 v-for="i in 7"
                                 :key="`role-loading-${i}`"
@@ -69,7 +69,7 @@
                                     </v-list-item-title>
                                 </v-list-item>
                             </template>
-                            <v-card :loading="roleAddDialog.isLoading">
+                            <v-card :loading="roleAddDialog.isLoading" outlined>
                                 <v-card-title class="pb-0">
                                     <v-text-field
                                         label="역할 이름"
@@ -111,6 +111,7 @@
                     :roletag="curRole.tag"
                     :disabled="!$perm('role').can('modify')"
                     @removed="roleRemoved()"
+                    @change="fetchRoles()"
                 ></role-perm-edit>
             </v-col>
 
@@ -121,7 +122,12 @@
                 v-show="!isMobileMode || curTab == 2"
                 class="fill-height"
             >
-                <v-card :loading="curUsers.isLoading" tile minHeight="95%">
+                <v-card
+                    :loading="curUsers.isLoading"
+                    tile
+                    minHeight="95%"
+                    outlined
+                >
                     <v-toolbar flat>
                         <v-toolbar-title>
                             소속 유저
