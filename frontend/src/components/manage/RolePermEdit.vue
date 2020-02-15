@@ -1,5 +1,11 @@
 <template>
-    <v-card tile minHeight="95%" :loading="isLoading" :disabled="disabled">
+    <v-card
+        tile
+        minHeight="95%"
+        :loading="isLoading"
+        :disabled="disabled"
+        outlined
+    >
         <v-toolbar flat>
             <v-toolbar-title>
                 설정

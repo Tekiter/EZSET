@@ -18,6 +18,7 @@
                         hide-details
                         dense
                         label="검색하기"
+                        prepend-inner-icon="mdi-magnify"
                     ></v-text-field>
                 </v-toolbar>
             </template>
@@ -45,7 +46,7 @@
                         cols="12"
                         md="6"
                     >
-                        <v-card>
+                        <v-card outlined>
                             <v-card-title>
                                 <p class="subheader">
                                     {{ user.username }}
