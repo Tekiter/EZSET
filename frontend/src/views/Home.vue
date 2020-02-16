@@ -11,12 +11,10 @@ export default {
     components: {},
     methods: {
         async dialogTest() {
-            const res = await this.$action.showConfirmDialog(
-                'hello',
-                'world!',
-                { yesButton: '확인' }
-            )
-            console.log(res)
+            await this.$action.showConfirmDialog('hello', 'world!', {
+                yesButton: '확인',
+            })
+            //
         },
     },
 }

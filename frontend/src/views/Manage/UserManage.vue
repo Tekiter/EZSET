@@ -330,7 +330,7 @@ export default {
                         this.fetchUsers(),
                     ])
                 } catch (err) {
-                    console.log(err)
+                    //
                     await this.$action.showAlertDialog(
                         '오류',
                         '탈퇴에 실패했습니다.'

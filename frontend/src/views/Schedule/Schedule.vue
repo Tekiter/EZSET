@@ -434,7 +434,7 @@ export default {
             const res = await axios.get('schedule/read')
             this.scheduleData = res.data
         } catch (err) {
-            console.log(err)
+            //
         }
         this.updateRange({ start: this.start, end: this.end })
         this.calLoad = true
@@ -565,7 +565,7 @@ export default {
                 await this.init()
                 this.applySnack = true
             } catch (err) {
-                console.log(err)
+                //
             }
         },
         //일정 삭제
@@ -578,9 +578,9 @@ export default {
                     content: selectedEvent.details,
                     color: selectedEvent.color,
                 })
-                console.log(selectedEvent)
+                //
             } catch (err) {
-                console.log(err)
+                //
             }
             this.init()
         },
@@ -590,7 +590,7 @@ export default {
                 const res = await axios.get('schedule/read')
                 this.scheduleData = res.data
             } catch (err) {
-                console.log(err)
+                //
             }
             this.updateRange({ start: this.start, end: this.end })
             this.calLoad = true

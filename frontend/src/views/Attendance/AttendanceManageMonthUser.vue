@@ -416,10 +416,10 @@ export default {
                 const res = await axios.get('absencecheck/absenceUserData')
                 this.absenceUserdata = res.data
             } catch (err) {
-                console.log(err)
+                //
             }
         } catch (err) {
-            console.log(err)
+            //
         }
         this.updateRange({ start: this.start, end: this.end })
         this.calLoad = true
@@ -621,7 +621,7 @@ export default {
                     this.applySnack = true
                 }
             } catch (err) {
-                console.log(err)
+                //
             }
         },
         //공결 신청 취소
@@ -632,7 +632,7 @@ export default {
                     day: selectedEvent.start,
                 })
             } catch (err) {
-                console.log(err)
+                //
             }
             this.cancleSnack = true
             this.init()
@@ -644,13 +644,13 @@ export default {
                 const res = await axios.get('attendance/attendanceUserData')
                 this.attendanceUserdata = res.data[0].status
             } catch (err) {
-                console.log(err)
+                //
             }
             try {
                 const res = await axios.get('absencecheck/absenceUserData')
                 this.absenceUserdata = res.data
             } catch (err) {
-                console.log(err)
+                //
             }
             this.updateRange({ start: this.start, end: this.end })
             this.calLoad = true
