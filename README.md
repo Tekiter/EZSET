@@ -1,30 +1,15 @@
 # EZSET
 
-## Project setup
+EZSET은 소규모 대학 동아리를 위한 그룹웨어입니다.
 
-### frontend
-```
-cd ./frontend
-yarn
-```
+### 주요 기능
+- 출결관리
+- 일정관리
+- 자료실
+- 커뮤니티 (게시판)
 
-### backend
-```
-cd ./backend
-cp .env.example .env
-yarn
-```
+## Documentation
+- [시작하기](docs/getting-started.md)
 
-## Run project
-
-### frontend
-```
-cd ./frontend
-yarn serve
-```
-
-### backend
-```
-cd ./backend
-yarn dev
-```
+## License
+이 소프트웨어는 [MIT](LICENSE) 라이선스에 의해 보호됩니다.
