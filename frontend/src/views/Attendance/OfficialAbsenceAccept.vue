@@ -177,7 +177,7 @@ export default {
                 this.Official_Absence_No = cursor.data.noanswer
                 this.Official_Absence_Yes = cursor.data.yesanswer
             } catch (err) {
-                console.log(err)
+                //
             }
         },
         dayprint(day) {
@@ -189,8 +189,8 @@ export default {
         async Accept() {
             try {
                 for (let ii of this.checkbox_No) {
-                    console.log(ii)
-                    console.log(this.official_absence_No_arr[ii].name)
+                    //
+                    //
                     await axios.post('absencecheck/officialAbsenceAccept', {
                         name: this.official_absence_No_arr[ii].name,
                         day: this.picker_date,
@@ -199,7 +199,7 @@ export default {
                 }
                 this.listprint()
             } catch (err) {
-                console.log(err)
+                //
             }
         },
         async Cancle() {
@@ -213,7 +213,7 @@ export default {
                 }
                 this.listprint()
             } catch (err) {
-                console.log(err)
+                //
             }
         },
     },

@@ -15,7 +15,7 @@ export function checkPerm(resource, param) {
 }
 
 export function filterAllPerms(perms) {
-    console.log(perms)
+    //
     const res = {}
 
     for (let resource of Object.keys(perms)) {
@@ -23,7 +23,7 @@ export function filterAllPerms(perms) {
             res[resource] = { all: perms[resource].all }
         }
     }
-    console.log(res)
+    //
     return res
 }
 
