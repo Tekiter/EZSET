@@ -65,6 +65,27 @@ router.route('/').get(
     })
 )
 
+router.delete(
+    '/:username',
+    [param('username').custom(checkUsername), validateParams],
+    asyncRoute(async (req, res) => {
+        if (
+            !role.perm('manageUsers').can('access') &&
+            req.params.username === req.user.username
+        ) {
+            const err = new Error('권한이 없습니다.')
+            err.status = 403
+            throw err
+        }
+
+        const user = await User.findOne()
+            .where('username')
+            .equals(req.params.username)
+        await user.remove()
+        res.status(200).end()
+    })
+)
+
 router.get(
     '/:username/role',
     [

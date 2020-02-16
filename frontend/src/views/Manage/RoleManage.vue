@@ -47,10 +47,10 @@
                                     curTab = 1
                                 "
                             >
-                                <v-list-item-content
-                                    ><v-list-item-title>{{
-                                        role.name
-                                    }}</v-list-item-title>
+                                <v-list-item-content>
+                                    <v-list-item-title>
+                                        {{ role.name }}
+                                    </v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
                         </v-list-item-group>
@@ -108,6 +108,7 @@
                 class="fill-screen"
             >
                 <role-perm-edit
+                    v-if="curRole.tag"
                     :roletag="curRole.tag"
                     :disabled="!$perm('role').can('modify')"
                     @removed="roleRemoved()"

@@ -11,6 +11,18 @@
                 설정
             </v-toolbar-title>
             <v-spacer></v-spacer>
+
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-fade-transition>
+                        <v-icon v-show="roletag === 'admin'" v-on="on">
+                            mdi-lock-outline
+                        </v-icon>
+                    </v-fade-transition>
+                </template>
+                <span>관리자 역할의 권한은 변경할 수 없습니다.</span>
+            </v-tooltip>
+
             <v-fade-transition>
                 <v-btn
                     v-if="changed"

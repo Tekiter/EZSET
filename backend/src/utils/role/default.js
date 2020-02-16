@@ -34,6 +34,9 @@ export function setAdminRole(roles) {
         .resource('profile')
         .can(['read', 'update'])
 
+        .resource('user')
+        .can(['delete'])
+
         .resource('role')
         .can(['read', 'modify'])
 
