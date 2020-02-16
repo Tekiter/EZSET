@@ -70,7 +70,7 @@ router.delete(
     [param('username').custom(checkUsername), validateParams],
     asyncRoute(async (req, res) => {
         if (
-            !role.perm('user').can('delete') &&
+            !role.perm('manageUsers').can('access') &&
             req.params.username === req.user.username
         ) {
             const err = new Error('권한이 없습니다.')
