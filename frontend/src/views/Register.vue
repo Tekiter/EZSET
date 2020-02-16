@@ -2,8 +2,12 @@
     <v-app>
         <v-app-bar app clipped-left>
             <!-- <v-app-bar-nav-icon @click.stop="drawer = !drawer" /> -->
-            <v-btn text to="/"> <v-toolbar-title>EZSET</v-toolbar-title> </v-btn
-            >회원가입
+            <v-btn text to="/">
+                <v-toolbar-title>
+                    {{ $store.state.config.groupName }}
+                </v-toolbar-title>
+            </v-btn>
+            회원가입
         </v-app-bar>
         <v-content>
             <v-container>

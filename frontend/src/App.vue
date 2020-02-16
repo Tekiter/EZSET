@@ -44,10 +44,10 @@ export default {
     },
     async created() {
         this.isLoading = true
+        await this.$store.dispatch('config/fetchConfig')
 
         if (this.$store.getters['auth/isLoggedIn']) {
             try {
-                await this.$store.dispatch('config/fetchConfig')
                 await this.$store.dispatch('role/fetchPermission')
                 await this.$store.dispatch('board/fetchBoards')
             } catch (error) {
