@@ -1,0 +1,3 @@
+@echo off
+echo Building...
+cd ../frontend&&yarn build&&cd ../backend&&yarn build&&cd ../tools&&echo Build complete.

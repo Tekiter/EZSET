@@ -1,5 +1,4 @@
 //socket io to Attendance
-
 export const io = undefined
 
 export async function initSocket(app, SOCKET_PORT) {
@@ -10,31 +9,33 @@ export async function initSocket(app, SOCKET_PORT) {
     var curState = {
         flag: false,
     }
-
     //connect event
     io.on('connection', function(socket) {
         socket.on('join', function(data) {
             socket.join(data.roomName)
-        })
-        //disconnect event
-        socket.on('disconnect', () => {
-            // console.log('[socket.io] ' + socket.id + 'user disconnected')
+            io.to(socket.id).emit('attendance', curState)
         })
         //attendance event lisner
         socket.on('attendance', function(data) {
             curState.flag = data.flag
-            var rtnMessage = {
+            var msg = {
                 flag: data.flag,
             }
             //broadcast changed state
-            socket.broadcast.to('attendance').emit('attendance', rtnMessage)
+            socket.broadcast.to('attendance').emit('attendance', msg)
         })
-        //connect after attendance start
-        setInterval(function() {
-            if (curState.flag == true) {
-                socket.to('attendance').emit('attendance', curState)
-            }
-        }, 1000)
+        //setTimeout 3m when attendance start
+        socket.on('start', function(data) {
+            setTimeout(function() {
+                if (curState.flag == true) {
+                    var msg = {
+                        flag: false,
+                    }
+                    curState.flag = false
+                    socket.broadcast.to('attendance').emit('attendance', msg)
+                }
+            }, 300000)
+        })
     })
     //start socket.io server
     server.listen(SOCKET_PORT, function() {

@@ -1,6 +1,10 @@
 <template>
     <v-list dense>
-        <side-menu-item v-for="(menu, index) in mainMenus" :options="menu" :key="index" />
+        <side-menu-item
+            v-for="(menu, index) in mainMenus"
+            :options="menu"
+            :key="index"
+        />
     </v-list>
 </template>
 <style scoped></style>
@@ -35,20 +39,52 @@ export default {
                         {
                             title: '역할 관리',
                             to: '/manage/roles',
-                            perm: this.$perm('manageRoles').can('access'),
+                            perm: this.$perm('role').can('modify'),
                         },
                         {
                             title: '게시판 관리',
                             to: '/manage/boards',
                             perm: this.$perm('manageBoards').can('access'),
                         },
+                        {
+                            title: '서버 설정',
+                            to: '/manage/server',
+                            perm: this.$perm('serverConfig').can('change'),
+                        },
                     ],
                 },
                 {
                     type: 'simple',
                     icon: 'mdi-checkbox-marked-circle-outline',
-                    title: '출석체크',
-                    to: '/attendance',
+                    title: '출석',
+
+                    children: [
+                        {
+                            title: '출석체크',
+                            to: '/attendance',
+                            perm: this.$perm('attendance').can('att'),
+                        },
+                        {
+                            title: '월별출석현황',
+                            to: '/AttendanceManageMonth',
+                            perm: this.$perm('attendance').can('read'),
+                        },
+                        {
+                            title: '출석현황',
+                            to: '/AttendanceManageMonthUser',
+                            perm: this.$perm('attendance').canOwn('read'),
+                        },
+                        {
+                            title: '공결승인',
+                            to: '/OfficialAbsenceAccept',
+                            perm: this.$perm('attendance').can('read'),
+                        },
+                        {
+                            title: '출석 설정',
+                            to: '/manage/attendance',
+                            perm: this.$perm('attendance').can('read'),
+                        },
+                    ],
                 },
                 {
                     type: 'simple',
@@ -62,6 +98,12 @@ export default {
                     icon: 'mdi-package-variant-closed',
                     title: '자료실',
                     to: '/filebox',
+                },
+                {
+                    icon: 'mdi-calendar-month ',
+                    title: '일정표',
+                    to: '/Schedule',
+                    perm: this.$perm('schedule').can('read'),
                 },
             ]
         },

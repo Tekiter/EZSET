@@ -4,7 +4,6 @@
             <v-skeleton-loader
                 type="article, list-item-two-line, list-item-three-line, actions"
             ></v-skeleton-loader>
-
             <v-list class="mt-3">
                 <v-skeleton-loader
                     v-for="i in 3"
@@ -17,7 +16,20 @@
             <v-row v-if="!loading">
                 <v-col>
                     <v-card outlined>
-                        <v-card-title>{{ post.title }}</v-card-title>
+                        <v-card-title class="font-weight-black"
+                            >{{ post.title }}
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                class="ma-2"
+                                tile
+                                outlined
+                                color="blue darken-2"
+                                @click="back()"
+                            >
+                                <v-icon left>mdi-arrow-left-circle</v-icon>
+                                목록
+                            </v-btn>
+                        </v-card-title>
                         <!-- <v-subheader class="row">
                             <div class="col" v-if="post.isAnonymous == false">
                                 작성자 {{ post.author }}
@@ -29,11 +41,31 @@
                         </v-subheader> -->
                         <v-card-subtitle class="mt-0">
                             <v-row no-gutters>
-                                <v-col v-if="post.isAnonymous == false"
-                                    >asdf</v-col
+                                <span v-if="post.isAnonymous == false"
+                                    ><span class="font-weight-black"
+                                        >작성자</span
+                                    >
+                                    {{ post.author }}</span
                                 >
-                                <v-col v-else>익명</v-col>
-                                <v-col>작성일 {{ post.created_date }}</v-col>
+                                <span v-else>익명</span>
+                                <v-spacer></v-spacer>
+                                <span
+                                    ><span class="font-weight-black"
+                                        >작성일</span
+                                    >
+                                    {{ post.created_date }}</span
+                                ><v-divider class="mx-4" vertical></v-divider>
+                                <span
+                                    ><span class="font-weight-black"
+                                        >조회수</span
+                                    >
+                                    {{ post.view }}</span
+                                ><v-divider class="mx-4" vertical></v-divider>
+
+                                <span
+                                    ><span class="font-weight-black">추천</span>
+                                    {{ post.like }}</span
+                                >
                             </v-row>
                         </v-card-subtitle>
                         <v-divider></v-divider>
@@ -42,29 +74,59 @@
                             <viewer :value="post.content" />
 
                             <file-download :files="post.files"></file-download>
-
-                            <div class="d-flex flex-row-reverse">
-                                <v-btn
-                                    class="ma-2"
-                                    tile
-                                    outlined
-                                    color="blue darken-3"
-                                    v-if="del_auth(post.author)"
-                                    @click="deletePostDialog.show = true"
-                                >
-                                    <v-icon>mdi-trash-can</v-icon> 삭제하기
-                                </v-btn>
-                                <v-btn
-                                    class="ma-2"
-                                    tile
-                                    outlined
-                                    color="blue darken-3"
-                                    v-if="del_auth(post.author)"
-                                    @click="go_modify()"
-                                >
-                                    <v-icon left>mdi-autorenew</v-icon> 수정하기
-                                </v-btn>
-                            </div>
+                            <v-row class="d-flex flex-row-reverse">
+                                <div>
+                                    <v-btn
+                                        class="ma-2"
+                                        tile
+                                        outlined
+                                        color="green darken-2"
+                                        v-if="del_auth(post.author)"
+                                        @click="go_modify()"
+                                    >
+                                        <v-icon left>mdi-autorenew</v-icon>
+                                        수정하기
+                                    </v-btn>
+                                    <v-btn
+                                        class="ma-2"
+                                        tile
+                                        outlined
+                                        color="black"
+                                        v-if="del_auth(post.author)"
+                                        @click="deletePost"
+                                    >
+                                        <v-icon>mdi-trash-can</v-icon> 삭제하기
+                                    </v-btn>
+                                    <v-btn
+                                        class="ma-2"
+                                        tile
+                                        outlined
+                                        color="red darken-1"
+                                        v-if="!post.isLike"
+                                        @click="clickLike(post.author)"
+                                    >
+                                        <span
+                                            ><v-icon>mdi-heart-multiple</v-icon>
+                                            좋아요
+                                            <span>{{ post.like }}</span></span
+                                        >
+                                    </v-btn>
+                                    <v-btn
+                                        class="ma-2"
+                                        tile
+                                        outlined
+                                        color="purple"
+                                        v-else
+                                        @click="clickDislike(post.author)"
+                                    >
+                                        <span
+                                            ><v-icon>mdi-heart-off</v-icon>
+                                            좋아요
+                                            <span>{{ post.like }}</span></span
+                                        >
+                                    </v-btn>
+                                </div>
+                            </v-row>
                         </v-card-text>
                     </v-card>
                     <v-card class="mt-2" outlined>
@@ -74,6 +136,15 @@
                                     <template v-if="commentIdx != idx">
                                         <v-list-item-content>
                                             <v-list-item-title
+                                                v-if="post.isAnonymous == true"
+                                                class="subtitle-2"
+                                                >{{ '익명'
+                                                }}<span class="ml-3">{{
+                                                    comment.created_date
+                                                }}</span></v-list-item-title
+                                            >
+                                            <v-list-item-title
+                                                v-else
                                                 class="subtitle-2"
                                                 >{{ comment.writer
                                                 }}<span class="ml-3">{{
@@ -122,9 +193,7 @@
                                         <v-btn
                                             icon
                                             small
-                                            @click="
-                                                updateCommentDialog.show = true
-                                            "
+                                            @click="updateComment(comment)"
                                         >
                                             <v-icon>mdi-check-bold</v-icon>
                                         </v-btn>
@@ -165,6 +234,8 @@
                                             outlined
                                             @click="createComment()"
                                             :disabled="writeComment.isLoading"
+                                            ><v-icon left
+                                                >mdi-pencil-outline</v-icon
                                             >댓글 작성</v-btn
                                         >
                                     </div>
@@ -175,97 +246,6 @@
                 </v-col>
             </v-row>
         </v-fade-transition>
-        <v-dialog v-model="deleteDialog.show" max-width="330">
-            <v-card>
-                <v-card-title class="headline"
-                    >댓글을 삭제하시겠습니까?</v-card-title
-                >
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="
-                            del_comment(temp_id)
-                            deleteDialog.show = false
-                        "
-                    >
-                        예
-                    </v-btn>
-
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="deleteDialog.show = false"
-                    >
-                        아니요
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-        <v-dialog v-model="deletePostDialog.show" max-width="330">
-            <v-card>
-                <v-card-title class="headline"
-                    >글을 삭제하시겠습니까?</v-card-title
-                >
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="
-                            delPost()
-                            deletePostDialog.show = false
-                        "
-                    >
-                        예
-                    </v-btn>
-
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="deletePostDialog.show = false"
-                    >
-                        아니요
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-        <v-dialog v-model="updateCommentDialog.show" max-width="330">
-            <v-card>
-                <v-card-title class="headline"
-                    >댓글을 수정하시겠습니까?</v-card-title
-                >
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="
-                            updateComment()
-                            updateCommentDialog.show = false
-                            commentIdx = -1
-                        "
-                    >
-                        예
-                    </v-btn>
-
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="updateCommentDialog.show = false"
-                    >
-                        아니요
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
     </v-container>
 </template>
 
@@ -274,7 +254,7 @@ import axios from 'axios'
 import moment from 'moment'
 import { Viewer } from '@toast-ui/vue-editor'
 import FileDownload from '../../components/file/FileDownload.vue'
-const crypto = require('crypto')
+import crypto from 'crypto'
 
 export default {
     components: {
@@ -293,22 +273,13 @@ export default {
                 created_date: '',
                 comment: '',
                 files: [],
-            },
-            deleteDialog: {
-                show: false,
-                title: '',
-            },
-            deletePostDialog: {
-                show: false,
-                title: '',
+                view: '',
+                like: '',
+                isLike: '',
             },
             writeComment: {
                 content: '',
                 isLoading: false,
-            },
-            updateCommentDialog: {
-                show: false,
-                title: '',
             },
             temp_id: '',
             commentContent: '',
@@ -316,6 +287,7 @@ export default {
             fetchCommentContent: '',
             editContent: '',
             commentIdx: '-1',
+            likeLoading: false,
         }
     },
     mounted() {
@@ -324,7 +296,9 @@ export default {
 
     methods: {
         go_modify() {
-            this.$router.push(`/update/${this.$route.params.post_id}`)
+            this.$router.push(
+                `/update/${this.$route.params.board_id}/${this.$route.params.post_id}`
+            )
         },
         async fetch_data() {
             const res = await axios.get(
@@ -332,7 +306,6 @@ export default {
             )
 
             this.post = res.data
-            console.log(res.data)
             this.post.created_date = moment(res.data.created_date).format(
                 'YYYY/MM/DD HH:MM'
             )
@@ -363,20 +336,34 @@ export default {
                 }
             }
         },
-        showDeleteComment(comment) {
-            this.deleteDialog.show = true
-            this.fetch_id(comment._id)
-        },
-        async del_comment(id) {
-            await axios.delete(
-                '/simple/posts/' + this.post._id + '/comment/' + id
+        async showDeleteComment(comment) {
+            const res = await this.$action.showConfirmDialog(
+                '댓글 삭제',
+                '댓글을 삭제하시겠습니까?'
             )
-            this.fetch_data()
+            if (res) {
+                await axios.delete(
+                    '/simple/posts/' + this.post._id + '/comment/' + comment._id
+                )
+                this.fetch_data()
+            }
+        },
+        async deletePost() {
+            const res = await this.$action.showConfirmDialog(
+                '게시글 삭제',
+                '게시글을 삭제하시겠습니까?'
+            )
+            if (res) {
+                axios.delete('/simple/posts/' + this.post._id)
+                this.$router.push({
+                    path: `/`,
+                })
+            }
         },
         delPost() {
             axios.delete('/simple/posts/' + this.post._id)
             this.$router.push({
-                path: `/`,
+                path: '/board/' + this.$route.params.board_id,
             })
         },
         fetch_id(id) {
@@ -405,23 +392,45 @@ export default {
             this.fetchComment(comment.content)
             this.fetch_id(comment._id)
         },
-        async updateComment() {
-            this.fetchCommentContent = this.editContent
+        async updateComment(comment) {
             await axios.patch(
                 'simple/posts/' +
                     this.$route.params.post_id +
                     '/comment/' +
-                    this.temp_id,
+                    comment._id,
                 {
-                    content: this.fetchCommentContent,
+                    content: this.editContent,
                 }
             )
             this.fetch_data()
-            this.fetchCommentContent = ''
-            this.updateCommentDialog.show = false
+            this.commentIdx = -1
         },
         fetchComment(content) {
             this.editContent = content
+        },
+        back() {
+            this.$router.push({
+                path: '/board/' + this.$route.params.board_id,
+            })
+        },
+        async clickLike(author) {
+            this.likeLoading = true
+            this.post.isLike = !this.post.isLike
+            await axios.post(
+                'simple/posts/' + this.$route.params.post_id + '/like'
+            )
+            this.fetch_data()
+
+            this.likeLoading = false
+        },
+        async clickDislike(author) {
+            this.likeLoading = true
+            this.post.isLike = !this.post.isLike
+            await axios.delete(
+                'simple/posts/' + this.$route.params.post_id + '/like'
+            )
+            this.fetch_data()
+            this.likeLoading = false
         },
     },
 }

@@ -32,12 +32,40 @@ const routes = [
     {
         path: '/attendance',
         name: 'attendance',
-        component: () => import('../views/Attendance.vue'),
+        component: () => import('../views/Attendance/Attendance.vue'),
     },
     {
-        path: '/attendanceManageDay',
+        path: '/attendanceManageDay/:day',
         name: 'attendanceManage',
-        component: () => import('../views/AttendanceManageDay.vue'),
+        component: () => import('../views/Attendance/AttendanceManageDay.vue'),
+    },
+    {
+        path: '/attendanceManageMonth',
+        name: 'attendanceManageMonth',
+        component: () =>
+            import('../views/Attendance/AttendanceManageMonth.vue'),
+    },
+    {
+        path: '/attendanceManageMonthUser',
+        name: 'attendanceManageMonthUser',
+        component: () =>
+            import('../views/Attendance/AttendanceManageMonthUser.vue'),
+    },
+    {
+        path: '/officialAbsenceAccept',
+        name: 'officialAbsenceAccept',
+        component: () =>
+            import('../views/Attendance/OfficialAbsenceAccept.vue'),
+    },
+    {
+        path: '/manage/attendance',
+        name: 'attendanceusermanage',
+        component: () => import('../views/Attendance/AttendanceManage.vue'),
+    },
+    {
+        path: '/Schedule',
+        name: 'Schedule',
+        component: () => import('../views/Schedule/Schedule.vue'),
     },
     {
         path: '/board',
@@ -50,7 +78,7 @@ const routes = [
         component: () => import('../views/Board/Post.vue'),
     },
     {
-        path: '/post/:post_id',
+        path: '/board/:board_id/:post_id',
         name: 'content',
         component: () => import('../views/Board/Content.vue'),
     },
@@ -60,9 +88,14 @@ const routes = [
         component: () => import('../views/Board/WritePost.vue'),
     },
     {
-        path: '/update/:post_id',
+        path: '/update/:board_id/:post_id',
         name: 'update',
         component: () => import('../views/Board/UpdatePost.vue'),
+    },
+    {
+        path: '/searchpost',
+        name: 'serchPost',
+        component: () => import('../views/Board/SearchPost.vue'),
     },
     {
         path: '/manage/users',
@@ -78,6 +111,11 @@ const routes = [
         path: '/manage/boards',
         name: 'manageBoards',
         component: () => import('../views/Manage/BoardManage.vue'),
+    },
+    {
+        path: '/manage/server',
+        name: 'manageServer',
+        component: () => import('../views/Manage/ServerManage.vue'),
     },
     {
         path: '/403',

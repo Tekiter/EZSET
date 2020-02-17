@@ -1,47 +1,84 @@
 <template>
     <div>
-        <div>
+        <!-- <div>
             <v-text-field
                 v-if="loading"
                 color="blue darken-2"
                 loading
                 disabled
             ></v-text-field>
-        </div>
-        <v-container>
-            <div>
-                <v-divider class="mx-4" inset vertical></v-divider>
-
-                <v-toolbar-title class="d-flex justify-center"
-                    ><h1>
-                        <strong class="font-weight-medium">{{
-                            board.title
-                        }}</strong>
-                    </h1></v-toolbar-title
+        </div> -->
+        <v-container grid-list-md>
+            <v-row>
+                <v-col cols="2"></v-col>
+                <v-col cols="8" class="d-flex justify-center">
+                    <strong class="font-weight-medium display-2">{{
+                        board.title
+                    }}</strong>
+                </v-col>
+                <v-col cols="2">
+                    <v-select
+                        class="text-right"
+                        v-model="select"
+                        :items="viewCount"
+                        item-text="state"
+                        item-value="value"
+                        persistent-hint
+                        return-object
+                        style="width: 100px"
+                        @change="clickSelect"
+                    ></v-select
+                ></v-col>
+            </v-row>
+            <v-card outlined>
+                <v-data-table
+                    v-if="$vuetify.breakpoint.mdAndUp"
+                    :headers="headers"
+                    :items="posts"
+                    :page.sync="page"
+                    :loading="loading"
+                    :server-items-length="totalpage"
+                    :options.sync="options"
+                    @update:items-per-page="fetchPostList()"
+                    :items-per-page.sync="select.value"
+                    hide-default-footer
+                    :mobile-breakpoint="NaN"
+                    @page-count="pageCount = $event"
                 >
-                <v-divider class="mx-4" inset vertical></v-divider>
-            </div>
-            <v-data-table
-                :headers="headers"
-                :items="posts"
-                :page.sync="page"
-                :items-per-page="10"
-                hide-default-footer
-                class="elevation-1"
-                @page-count="pageCount = $event"
-            >
-                <template v-slot:item.title="props">
-                    <a @click="read(props.item)">
-                        {{ props.item.title }}
-                    </a>
-                </template>
-            </v-data-table>
+                    <template v-slot:item.title="props">
+                        <a @click="read(props.item)">
+                            {{ props.item.title }}
+                        </a>
+                    </template>
+                </v-data-table>
+                <v-data-table
+                    v-else
+                    :headers="headersTwo"
+                    :items="posts"
+                    :page.sync="page"
+                    :server-items-length="totalpage"
+                    :options.sync="options"
+                    :loading="loading"
+                    @update:items-per-page="fetchPostList()"
+                    :items-per-page.sync="select.value"
+                    hide-default-footer
+                    :mobile-breakpoint="NaN"
+                    @page-count="pageCount = $event"
+                >
+                    <template v-slot:item.title="props">
+                        <a @click="read(props.item)">
+                            {{ props.item.title }}
+                        </a>
+                    </template>
+                </v-data-table>
+            </v-card>
             <div class="row">
                 <div class="col"></div>
                 <div class="col">
                     <v-pagination
                         v-model="page"
                         :length="pageCount"
+                        :items-per-page.sync="page"
                     ></v-pagination>
                 </div>
                 <div class="col">
@@ -50,7 +87,16 @@
                             class="ma-2"
                             tile
                             outlined
-                            color="blue darken-3"
+                            color="black darken-2"
+                            :to="'/searchpost'"
+                        >
+                            <v-icon left>mdi-magnify</v-icon> 검색
+                        </v-btn>
+                        <v-btn
+                            class="ma-2"
+                            tile
+                            outlined
+                            color="black darken-2"
                             :to="'/write/' + curid"
                         >
                             <v-icon left>mdi-pencil</v-icon> 글쓰기
@@ -76,9 +122,16 @@ export default {
             loading: true,
             page: 1,
             pageCount: 0,
-            itemsPerPage: 10,
+            totalpage: 0,
+            options: {},
             board: '',
             posts: [],
+            select: { state: '8개', value: 8 },
+            viewCount: [
+                { state: '8개', value: 8 },
+                { state: '20개', value: 20 },
+                { state: '50개', value: 50 },
+            ],
             headers: [
                 {
                     text: '  번호',
@@ -97,20 +150,64 @@ export default {
                 { text: '추천', value: 'like' },
                 { text: '조회', value: 'view' },
             ],
+            headersTwo: [
+                {
+                    text: '  번호',
+                    align: 'left',
+                    sortable: false,
+                    value: 'number',
+                },
+                {
+                    text: '제목',
+                    value: 'title',
+                    sortable: false,
+                    width: '50%',
+                },
+                { text: '작성자', value: 'author', sortable: false },
+                { text: '추천', value: 'like' },
+                { text: '조회', value: 'view' },
+            ],
         }
     },
+    watch: {
+        'select.value': {
+            async handler() {
+                await this.fetchPostList()
+            },
+        },
+        page: {
+            async handler() {
+                await this.fetchPostList()
+            },
+        },
+        async $route(to, from) {
+            await this.fetchPostList()
+            this.page = 1
+        },
+    },
     methods: {
+        clickSelect() {
+            this.page = 1
+        },
+        changeRowPost() {
+            this.itemsPerPage = 2
+        },
         read(evt) {
-            console.log(evt._id)
-            console.log(evt.title)
             this.$router.push({
-                path: '/post/' + evt._id,
+                path: '/board/' + this.$route.params.board_id + '/' + evt._id,
             })
         },
         async fetchPostList() {
+            this.loading = true
             try {
                 const res = await axios.get(
-                    '/simple/boards/' + this.$route.params.board_id
+                    '/simple/boards/' + this.$route.params.board_id,
+                    {
+                        params: {
+                            page: this.page,
+                            pagesize: this.select.value,
+                        },
+                    }
                 )
                 this.posts = res.data.posts.map(post => {
                     post.created_date = moment(post.created_date).format(
@@ -119,7 +216,7 @@ export default {
                     return post
                 })
                 this.posts = res.data.posts.map(post => {
-                    post.number = post._id + 1
+                    post.number = post._id
                     return post
                 })
                 this.posts = res.data.posts.map(post => {
@@ -129,20 +226,23 @@ export default {
                     return post
                 })
                 this.board = res.data.board
-                //console.log(res.data.posts)
                 this.loading = false
+                this.totalpage = res.data.totalpage
+                this.pageCount =
+                    Math.floor(res.data.totalpage / this.select.value) + 1
             } catch (error) {
                 //
             }
+            this.loading = false
         },
     },
     async created() {
         await this.fetchPostList()
     },
-    watch: {
-        async $route(to, from) {
-            await this.fetchPostList()
-        },
-    },
+    // watch: {
+    //     async $route(to, from) {
+    //         await this.fetchPostList()
+    //     },
+    // },
 }
 </script>

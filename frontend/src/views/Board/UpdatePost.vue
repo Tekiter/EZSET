@@ -3,6 +3,17 @@
         <v-card outlined>
             <v-card-title>
                 게시글 수정
+                <v-spacer></v-spacer>
+                <v-btn
+                    class="ma-2"
+                    tile
+                    outlined
+                    color="black darken-2"
+                    @click="backClick()"
+                >
+                    <v-icon left>mdi-close-circle</v-icon>
+                    수정취소
+                </v-btn>
             </v-card-title>
             <!-- <v-card-subtitle> 게시판: {{ curBoardName }} </v-card-subtitle> -->
             <v-card-text>
@@ -44,6 +55,63 @@
                 </div>
             </v-card-text>
         </v-card>
+        <v-dialog v-model="titleAlert" max-width="290">
+            <v-card>
+                <v-card-title class="headline"
+                    >제목을 입력해주세요.</v-card-title
+                >
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="titleAlert = false"
+                    >
+                        확인
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="contentAlert" max-width="290">
+            <v-card>
+                <v-card-title class="headline"
+                    >내용을 입력해주세요.</v-card-title
+                >
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="contentAlert = false"
+                    >
+                        확인
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="cancelAlert" max-width="290">
+            <v-card>
+                <v-card-title class="title"
+                    >수정을 취소하시겠습니까?</v-card-title
+                >
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn color="red darken-2" text @click="goCancle()">
+                        예
+                    </v-btn>
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="cancelAlert = false"
+                    >
+                        아니오
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 <script>
@@ -52,14 +120,22 @@ import { Editor } from '@toast-ui/vue-editor'
 import fileUpload from '../../components/file/FileUpload.vue'
 
 export default {
+    beforeRouteLeave(to, from, next) {
+        if (this.certification) next()
+        else this.nextConfirm(next)
+    },
     components: {
         Editor,
         fileUpload,
     },
     data() {
         return {
+            certification: false,
             title: '',
+            titleAlert: false,
             content: '',
+            contentAlert: false,
+            cancelAlert: false,
             author: '',
             created_date: '',
             post_id: '',
@@ -82,6 +158,29 @@ export default {
         }
     },
     methods: {
+        async nextConfirm(next) {
+            const res = await this.$action.showConfirmDialog(
+                '게시글 수정 취소',
+                '수정을 취소하시겠습니까?'
+            )
+            if (res) {
+                next()
+            } else {
+                next(false)
+            }
+        },
+        backClick() {
+            this.cancelAlert = true
+        },
+        goCancle() {
+            this.$router.push({
+                path:
+                    '/board/' +
+                    this.$route.params.board_id +
+                    '/' +
+                    this.$route.params.post_id,
+            })
+        },
         async getBoards() {
             const res = await axios.get('simple/boards')
             return res.data
@@ -104,10 +203,19 @@ export default {
         },
         clearClick() {
             this.$router.push({
-                path: `/post/${this.$route.params.post_id}`,
+                path: `/board/${this.$route.params.board_id}/${this.$route.params.post_id}`,
             })
         },
         async updateClick() {
+            if (!this.title) {
+                this.titleAlert = true
+                return
+            }
+            if (!this.getMarkdown()) {
+                this.contentAlert = true
+                return
+            }
+            this.certification = true
             try {
                 this.isLoading = true
 
@@ -123,7 +231,9 @@ export default {
                         files: fileIds,
                     }
                 )
-                this.$router.push(`/post/${this.$route.params.post_id}`)
+                this.$router.push(
+                    `/board/${this.$route.params.board_id}/${this.$route.params.post_id}`
+                )
             } catch (error) {
                 this.isError = true
             } finally {

@@ -1,6 +1,7 @@
 export function setDefaultRole(roles) {
+    roles.setRole({ tag: 'default', name: '모든 유저' })
     roles
-        .default()
+        .role('default')
 
         .resource('profile')
         .canOwn('read')
@@ -12,19 +13,32 @@ export function setDefaultRole(roles) {
         .can('read')
 
         .resource('attendance')
+        .canOwn('read')
         .can('att')
+
+        .resource('absence')
+        .canOwn(['create', 'read', 'delete'])
+
+        .resource('schedule')
+        .can('read')
 }
 
 export function setAdminRole(roles) {
-    roles.setRole({ tag: 'admin', name: 'admin' })
+    roles.setRole({ tag: 'admin', name: '관리자' })
     roles
         .role('admin')
+
+        .resource('serverConfig')
+        .can('change')
 
         .resource('profile')
         .can(['read', 'update'])
 
+        .resource('user')
+        .can(['delete'])
+
         .resource('role')
-        .can(['read', 'create', 'delete', 'update'])
+        .can(['read', 'modify'])
 
         .resource('board')
         .can(['read', 'create', 'delete', 'update'])
@@ -40,5 +54,13 @@ export function setAdminRole(roles) {
         .can('access')
 
         .resource('attendance')
-        .can(['start', 'att'])
+        .canOwn('read')
+        .can(['start', 'att', 'read', 'update'])
+
+        .resource('absence')
+        .canOwn(['create', 'read', 'delete', 'update'])
+        .can(['create', 'read', 'delete', 'update'])
+
+        .resource('schedule')
+        .can(['read', 'create', 'update', 'delete'])
 }
