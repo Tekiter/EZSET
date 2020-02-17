@@ -36,14 +36,20 @@
                                             class="ma-2"
                                             outlined
                                             label
-                                            v-if="plusGroup.selected.length == 0"
+                                            v-if="
+                                                plusGroup.selected.length == 0
+                                            "
                                         >기본 위치</v-chip>
                                         <v-chip
                                             class="ma-2"
                                             outlined
                                             label
                                             v-if="plusGroup.selected.length > 0"
-                                        >{{plusGroup.selected[0].name}}</v-chip>
+                                        >
+                                            {{
+                                            plusGroup.selected[0].name
+                                            }}
+                                        </v-chip>
                                     </v-banner>
                                     <v-banner>
                                         그룹? 폴더?
