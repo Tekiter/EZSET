@@ -401,7 +401,7 @@ export default {
             const res = await axios.get('schedule/read')
             this.scheduleData = res.data
         } catch (err) {
-            console.log(err)
+            //
         }
         this.updateRange({ start: this.start, end: this.end })
         this.calLoad = true
@@ -532,7 +532,7 @@ export default {
                 await this.init()
                 this.openSnackbar('등록되었습니다!', 'success')
             } catch (err) {
-                console.log(err)
+                //
             }
         },
         //일정 삭제
@@ -548,9 +548,9 @@ export default {
                     content: selectedEvent.details,
                     color: selectedEvent.color,
                 })
-                this.openSnackbar('삭제 되었습니다!', 'success')
+                //
             } catch (err) {
-                console.log(err)
+                //
             }
             this.init()
         },
@@ -560,7 +560,7 @@ export default {
                 const res = await axios.get('schedule/read')
                 this.scheduleData = res.data
             } catch (err) {
-                console.log(err)
+                //
             }
             this.updateRange({ start: this.start, end: this.end })
             this.calLoad = true

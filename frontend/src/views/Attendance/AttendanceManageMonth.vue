@@ -151,19 +151,19 @@ export default {
             const res = await axios.get('attendance/attendanceUserList')
             this.userList = res.data
         } catch (err) {
-            //console.log(err)
+            //
         }
         try {
             const res = await axios.get('attendance/attendanceDayList')
             this.attendanceDayData = res.data
         } catch (err) {
-            //console.log(err)
+            //
         }
         try {
             const res = await axios.get('attendance/attendanceUserListData')
             this.attendanceUserData = res.data
         } catch (err) {
-            //console.log(err)
+            //
         }
         this.tabLoad = true
     },

@@ -186,7 +186,7 @@ export default {
                 this.createBoardDialog.show = false
                 await this.fetchBoards()
             } catch (error) {
-                console.log(error.response)
+                //
                 this.createBoardDialog.error = '게시판 생성에 실패했습니다.'
             }
             this.isAnonymous = false

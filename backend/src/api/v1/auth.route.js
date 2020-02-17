@@ -142,7 +142,10 @@ router.route('/edittoken/check').post(
     asyncRoute(async (req, res) => {
         try {
             const decoded = await auth.checkToken(req.body.edittoken)
-            if (decoded.is_edit_token) {
+            if (
+                decoded.is_edit_token &&
+                decoded.username === req.user.username
+            ) {
                 res.status(200).end()
             }
         } catch (err) {

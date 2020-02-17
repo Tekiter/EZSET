@@ -18,6 +18,7 @@
                         hide-details
                         dense
                         label="검색하기"
+                        prepend-inner-icon="mdi-magnify"
                     ></v-text-field>
                 </v-toolbar>
             </template>
@@ -45,7 +46,7 @@
                         cols="12"
                         md="6"
                     >
-                        <v-card>
+                        <v-card outlined>
                             <v-card-title>
                                 <p class="subheader">
                                     {{ user.username }}
@@ -92,7 +93,7 @@
         </v-data-iterator>
 
         <!-- 유저 Action Dialog -->
-        <v-dialog v-model="editDialog.show" persistent max-width="500px">
+        <v-dialog v-model="editDialog.show" persistent max-width="600px">
             <v-card>
                 <v-card-title>
                     <span class="headline">유저 관리</span
@@ -101,11 +102,36 @@
                     }}</v-card-subtitle>
                 </v-card-title>
                 <v-card-text>
-                    <v-container>
+                    <v-divider />
+                    <v-list subheader>
+                        <v-list-item two-line>
+                            <v-list-item-content>
+                                <v-list-item-title>회원탈퇴</v-list-item-title>
+                                <v-list-item-subtitle>
+                                    유저가 작성했던 게시글 등은 삭제되지
+                                    않습니다.
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                            <v-list-item-action>
+                                <v-btn
+                                    @click="
+                                        deleteUser(editDialog.user.username)
+                                    "
+                                    color="error"
+                                    depressed
+                                    >회원탈퇴</v-btn
+                                >
+                            </v-list-item-action>
+                        </v-list-item>
+                    </v-list>
+                    <v-divider />
+                    <!-- <v-container>
                         <v-row no-gutters>
-                            <v-col cols="12"> </v-col>
+                            <v-col cols="12">
+                                <v-btn color="error" depressed>회원탈퇴</v-btn>
+                            </v-col>
                         </v-row>
-                    </v-container>
+                    </v-container> -->
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -286,6 +312,31 @@ export default {
             this.roleDialog.selections = []
             this.roleDialog.errorMessage = ''
             this.roleDialog.show = false
+        },
+        async deleteUser(username) {
+            const reply = await this.$action.showConfirmDialog(
+                '회원 탈퇴',
+                `정말 ${username} 유저를 탈퇴시키겠습니까?`
+            )
+            if (reply) {
+                try {
+                    await axios.delete(`user/${username}`)
+                    this.editDialog.show = false
+                    await Promise.all([
+                        this.$action.showAlertDialog(
+                            '회원 탈퇴',
+                            `${username} 유저가 탈퇴 처리되었습니다.`
+                        ),
+                        this.fetchUsers(),
+                    ])
+                } catch (err) {
+                    //
+                    await this.$action.showAlertDialog(
+                        '오류',
+                        '탈퇴에 실패했습니다.'
+                    )
+                }
+            }
         },
     },
     async created() {

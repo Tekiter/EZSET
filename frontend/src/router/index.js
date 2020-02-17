@@ -78,7 +78,7 @@ const routes = [
         component: () => import('../views/Board/Post.vue'),
     },
     {
-        path: '/post/:post_id',
+        path: '/board/:board_id/:post_id',
         name: 'content',
         component: () => import('../views/Board/Content.vue'),
     },
@@ -88,9 +88,14 @@ const routes = [
         component: () => import('../views/Board/WritePost.vue'),
     },
     {
-        path: '/update/:post_id',
+        path: '/update/:board_id/:post_id',
         name: 'update',
         component: () => import('../views/Board/UpdatePost.vue'),
+    },
+    {
+        path: '/searchpost',
+        name: 'serchPost',
+        component: () => import('../views/Board/SearchPost.vue'),
     },
     {
         path: '/manage/users',

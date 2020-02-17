@@ -352,7 +352,7 @@ export default {
                 }
             } catch (error) {
                 // if (error.response.status == 409)
-                console.log(error.response) // eslint-disable-line no-console
+                // // eslint-disable-line no-console
             }
         },
         async editStart() {
@@ -366,7 +366,7 @@ export default {
                 this.isEditMode = true
             } catch (error) {
                 this.errors.passwordToEdit = '비밀번호가 틀렸습니다'
-                console.log(error.response)
+                //
             } finally {
                 this.password = ''
                 this.isloadingToEdit = false
@@ -376,7 +376,7 @@ export default {
             // this.isloading = true 로딩 시스템 필요
             try {
                 this.isloadingToFinishEdit = true
-                const res = await axios.post('/mypage/edit', {
+                await axios.post('/mypage/edit', {
                     username: this.userinfo.username,
                     password: this.form.password,
                     realname: this.form.realname,
@@ -384,11 +384,11 @@ export default {
                     edittoken: this.$store.state.auth.editToken,
                 })
                 await this.patchUser()
-                console.log(res)
+                //
                 this.isloadingToFinishEdit = false
                 this.isEditMode = false
             } catch (error) {
-                console.log(error.response)
+                //
             }
         },
         async patchUser() {
@@ -400,7 +400,7 @@ export default {
                 this.userinfo.email = res.data.email
             } catch (error) {
                 // if (error.response.status == 409)
-                console.log(error.response) // eslint-disable-line no-console
+                // // eslint-disable-line no-console
             } finally {
                 this.isloading = false
             }
@@ -438,7 +438,7 @@ export default {
                 this.errors.confirmpassword == '' &&
                 this.form.password != ''
             ) {
-                console.log(20000)
+                //
                 this.dialog2 = false
                 this.isSnackbar = true
             }
@@ -454,7 +454,7 @@ export default {
         try {
             await this.patchUser()
         } catch (error) {
-            console.log(error.response)
+            //
         }
     },
 }

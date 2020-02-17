@@ -65,6 +65,27 @@ router.route('/').get(
     })
 )
 
+router.delete(
+    '/:username',
+    [param('username').custom(checkUsername), validateParams],
+    asyncRoute(async (req, res) => {
+        if (
+            !role.perm('manageUsers').can('access') &&
+            req.params.username === req.user.username
+        ) {
+            const err = new Error('권한이 없습니다.')
+            err.status = 403
+            throw err
+        }
+
+        const user = await User.findOne()
+            .where('username')
+            .equals(req.params.username)
+        await user.remove()
+        res.status(200).end()
+    })
+)
+
 router.get(
     '/:username/role',
     [
@@ -120,6 +141,12 @@ router.put(
             }
         }
 
+        if (req.body.roletags.include('default')) {
+            const err = new Error('default 역할은 변경할 수 없습니다.')
+            err.status = 403
+            throw err
+        }
+
         user.roles = req.body.roletags
         await user.save()
         clearCache('USER-ROLE-' + req.user.username)
@@ -148,6 +175,12 @@ router.post(
             throw err
         }
 
+        if (req.body.roletag == 'default') {
+            const err = new Error('default 역할은 변경할 수 없습니다.')
+            err.status = 403
+            throw err
+        }
+
         if (user.roles.indexOf(req.body.roletag) == -1) {
             user.roles.push(req.body.roletag)
             await user.save()
@@ -160,7 +193,7 @@ router.post(
 router.delete(
     '/:username/role/:roletag',
     [
-        role.perm('role', 'user').can('delete'),
+        role.perm('role').can('modify'),
         param('username').custom(checkUsername),
         param('roletag').custom(checkRoleTag),
         validateParams,
