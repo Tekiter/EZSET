@@ -81,7 +81,6 @@
                                 ></group-tree>
                                 <v-card
                                     class="mx-auto"
-                                    max-width="400"
                                     outlined
                                     v-if="plusGroup.selected.length == 0"
                                     color="orange lighten-4"
