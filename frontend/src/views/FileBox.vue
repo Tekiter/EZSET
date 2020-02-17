@@ -107,7 +107,15 @@
                 </v-card>
                 <div class="mr-4">
                     <div class="text-center">
-                        <v-btn class="mx-2" block dark large color="cyan" v-if="showMetarials.show">
+                        <v-btn
+                            class="mx-2"
+                            block
+                            dark
+                            large
+                            color="cyan"
+                            v-if="showMetarials.show"
+                            @click="showCreateMaterial()"
+                        >
                             Upload
                             <v-icon right dark>mdi-cloud-upload</v-icon>
                         </v-btn>
@@ -116,6 +124,11 @@
                         v-if="showMetarials.show"
                         :folderId="this.showMetarials.selected[0].id"
                     ></material-post>
+                    <write-material
+                        v-if="createMaterial.show"
+                        :parent_id="showMetarials.selected[0].id"
+                        @close="closeCreateMaterial()"
+                    ></write-material>
                 </div>
             </v-col>
         </v-row>
@@ -126,11 +139,13 @@
 import axios from 'axios'
 import GroupTree from '../components/filebox/GroupTree.vue'
 import MaterialPost from '../components/filebox/MaterialPost.vue'
+import WriteMaterial from '../components/filebox/WriteMaterial.vue'
 
 export default {
     components: {
         GroupTree,
         MaterialPost,
+        WriteMaterial,
     },
     data() {
         return {
@@ -152,6 +167,9 @@ export default {
                 parent: '',
             },
             isloading: false,
+            createMaterial: {
+                show: false,
+            },
         }
     },
     async created() {
@@ -203,6 +221,15 @@ export default {
             } else {
                 this.showMetarials.show = false
             }
+            this.createMaterial.show = false
+        },
+        showCreateMaterial() {
+            this.createMaterial.show = true
+            this.showMetarials.show = false
+        },
+        closeCreateMaterial() {
+            this.createMaterial.show = false
+            this.showMetarials.show = true
         },
     },
     computed: {

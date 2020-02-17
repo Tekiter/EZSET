@@ -10,7 +10,7 @@
         <template v-slot:default="props">
             <v-row class="mx-2">
                 <v-col v-for="material in props.items" :key="material.id" cols="12" md="6">
-                    <material-post-item></material-post-item>
+                    <material-post-item :options="material"></material-post-item>
                 </v-col>
             </v-row>
         </template>

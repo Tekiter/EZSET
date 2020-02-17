@@ -8,6 +8,7 @@ import {
     checkIsFileOwner,
     checkUnlinkedFile,
     applyFileLink,
+    getFileInfoArray,
     removeFileLink,
     deleteUnlinkedFile,
 } from '../../utils/file'
@@ -119,21 +120,25 @@ router.get(
         const materials = await Material.find()
             .where('parent')
             .equals(req.params.parent_id)
+            .sort('-_id')
 
+        const mat = []
+
+        for (let item of materials) {
+            mat.push({
+                id: item.id,
+                title: item.title,
+                author: item.author,
+                content: item.content,
+                created_date: item.created_date,
+                files: await getFileInfoArray(item.files),
+            })
+        }
         res.json({
             folder: {
                 name: folder.name,
             },
-            materials: materials.map(item => {
-                return {
-                    id: item.id,
-                    title: item.title,
-                    author: item.author,
-                    content: item.content,
-                    created_date: item.created_date,
-                    files: item.files,
-                }
-            }),
+            materials: mat,
         })
     })
 )
