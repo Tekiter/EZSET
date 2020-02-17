@@ -11,8 +11,6 @@ router.loginNotRequired = true
 
 const configNames = ['groupName']
 
-const checkerWrap = key => {}
-
 const changeableConfigs = [
     {
         key: 'groupName',
