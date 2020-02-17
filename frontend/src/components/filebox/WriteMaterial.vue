@@ -3,7 +3,12 @@
         <v-card outlined>
             <v-card-title>게시물 작성</v-card-title>
             <v-card-text>
-                <v-text-field v-model="newMaterial.title" label="제목" hide-details class="mb-4"></v-text-field>
+                <v-text-field
+                    v-model="newMaterial.title"
+                    label="제목"
+                    hide-details
+                    class="mb-4"
+                ></v-text-field>
                 <editor ref="editor" mode="wysiwyg" :options="editor.options" />
                 <file-upload
                     v-model="uploadFile.selected"
@@ -14,7 +19,9 @@
                 ></file-upload>
                 <div class="d-flex align-center mt-3">
                     <v-spacer></v-spacer>
-                    <small class="red--text mr-3" v-if="isError">게시물 작성에 실패했습니다.</small>
+                    <small class="red--text mr-3" v-if="isError"
+                        >게시물 작성에 실패했습니다.</small
+                    >
                     <v-btn
                         class="ma-2"
                         tile

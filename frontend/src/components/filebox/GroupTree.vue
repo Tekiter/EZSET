@@ -12,9 +12,9 @@
         return-object
     >
         <template v-slot:prepend="{ item, open }">
-            <v-icon
-                v-if="!item.isfolder"
-            >{{ open ? 'mdi-package-variant' : 'mdi-package-variant-closed' }}</v-icon>
+            <v-icon v-if="!item.isfolder">{{
+                open ? 'mdi-package-variant' : 'mdi-package-variant-closed'
+            }}</v-icon>
             <v-icon v-else>{{ 'mdi-folder-multiple-outline' }}</v-icon>
         </template>
     </v-treeview>
