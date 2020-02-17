@@ -1,10 +1,28 @@
 <template>
-    <v-card tile minHeight="95%" :loading="isLoading" :disabled="disabled">
+    <v-card
+        tile
+        minHeight="95%"
+        :loading="isLoading"
+        :disabled="disabled"
+        outlined
+    >
         <v-toolbar flat>
             <v-toolbar-title>
                 설정
             </v-toolbar-title>
             <v-spacer></v-spacer>
+
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-fade-transition>
+                        <v-icon v-show="roletag === 'admin'" v-on="on">
+                            mdi-lock-outline
+                        </v-icon>
+                    </v-fade-transition>
+                </template>
+                <span>관리자 역할의 권한은 변경할 수 없습니다.</span>
+            </v-tooltip>
+
             <v-fade-transition>
                 <v-btn
                     v-if="changed"
@@ -26,6 +44,7 @@
                     placeholder="역할 이름"
                     outlined
                     hide-details
+                    :disabled="infodisabled"
                     @input="changed = true"
                 ></v-text-field>
             </v-list-item>
@@ -37,7 +56,7 @@
                     tile
                     color="error"
                     @click="showRemoveRoleDialog"
-                    :disabled="disabled"
+                    :disabled="infodisabled"
                     >역할 삭제</v-btn
                 >
             </v-list-item>
@@ -124,6 +143,9 @@ export default {
         permdisabled() {
             return this.roletag === 'admin' || this.disabled
         },
+        infodisabled() {
+            return ['admin', 'default'].includes(this.roletag) || this.disabled
+        },
     },
     methods: {
         async fetchRole() {
@@ -192,6 +214,8 @@ export default {
 
         async savePerms() {
             this.isLoading = true
+
+            // 권한 수정 목록 구축
             const perms = []
             for (let key of Object.keys(this.manageData)) {
                 let { resource, action, range, param } = JSON.parse(key)
@@ -205,10 +229,13 @@ export default {
             }
 
             await axios.patch(`role/${this.roletag}`, {
+                name: this.rolename,
                 perms,
             })
 
             this.changed = false
+
+            this.$emit('change')
 
             this.isLoading = false
         },

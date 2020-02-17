@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import { body, param } from 'express-validator'
+import { body, param, query } from 'express-validator'
 import Board from '../../models/Board'
 import Post from '../../models/Post'
-import { validateParams, asyncRoute } from '../../utils/api'
+import { validateParams, asyncRoute, isPositive } from '../../utils/api'
 import { perm } from '../../utils/role'
 import {
     checkAttachableFileArray,
@@ -16,6 +16,7 @@ import {
 } from '../../utils/file'
 const router = Router()
 const crypto = require('crypto')
+const viewObj = new Object()
 
 //게시판 생성
 router.post(
@@ -50,9 +51,28 @@ router.delete(
             throw err
         }
 
-        await board.remove()
-        // await Board.remove({ _id: req.params.board_id })
-        res.end()
+        try {
+            const posts = await Post.find()
+                .where('board')
+                .equals(req.params.board_id)
+
+            for (let i = 0; i < posts.length; i++) {
+                await removeFileLink(posts[i].files)
+                await deleteUnlinkedFile(posts[i].files)
+            }
+
+            for (let j = 0; j < posts.length; j++) {
+                await posts[j].remove()
+            }
+
+            await board.remove()
+            // await Board.remove({ _id: req.params.board_id })
+            res.end()
+        } catch (error) {
+            const errr = new Error('database error')
+            errr.status = 500
+            throw errr
+        }
     })
 )
 
@@ -283,6 +303,30 @@ router.get(
             .where('_id')
             .equals(req.params.post_id)
         if (post) {
+            //조회수 증가 viewObj 오브젝트 만들어서 post_id : [username] 형식으로 저장
+            if (!viewObj[req.params.post_id]) {
+                viewObj[req.params.post_id] = []
+            }
+            if (viewObj[req.params.post_id].indexOf(req.user.username) == -1) {
+                //username이 없다면 배열에 추가하고 조회수 증가
+                viewObj[req.params.post_id].push(req.user.username)
+                post.view++
+                setTimeout(() => {
+                    //10분이 지나면 배열에서 삭제해서 다시 조회수가 증가할 수 있게 만듦
+                    viewObj[req.params.post_id].splice(
+                        viewObj[req.params.post_id].indexOf(req.user.username),
+                        1
+                    )
+                }, 600000)
+                for (let i in viewObj) {
+                    //username이 하나도 없으면 해당 오브젝트 삭제
+                    if (i.length == 0) {
+                        delete viewObj.i
+                    }
+                }
+            }
+
+            await post.save()
             res.status(200).json({
                 _id: parseInt(post.id),
                 title: post.title,
@@ -292,6 +336,7 @@ router.get(
                 created_date: post.created_date,
                 view: post.view,
                 like: post.likes_count,
+                isLike: post.likes_flag(req.user.username),
                 comment: post.comments,
                 files: await getFileInfoArray(post.files),
             })
@@ -306,7 +351,12 @@ router.get(
 //게시글 목록 보기
 router.get(
     '/boards/:board_id',
-    [param('board_id').isNumeric(), validateParams],
+    [
+        param('board_id').isNumeric(),
+        query('page').custom(isPositive),
+        query('pagesize').custom(isPositive),
+        validateParams,
+    ],
     asyncRoute(async function(req, res) {
         let boardId = parseInt(req.params.board_id)
 
@@ -317,12 +367,23 @@ router.get(
                 return
             }
 
+            const page = parseInt(req.query.page)
+            const pagesize = parseInt(req.query.pagesize || 8)
+
+            let postcount = await Post.find()
+                .count()
+                .where('board')
+                .equals(boardId)
+
             let posts = await Post.find()
                 .where('board')
                 .equals(boardId)
+                .limit(pagesize)
+                .skip((page - 1) * pagesize)
                 .sort('-_id')
             res.status(200).json({
                 board: board,
+                totalpage: postcount,
                 posts: posts.map(post => {
                     return {
                         _id: parseInt(post.id),
@@ -410,6 +471,7 @@ router.patch(
                     return
                 }
             }
+
             if (post.isAnonymous == true) {
                 await post.updateComment(
                     req.body.content,
@@ -419,8 +481,12 @@ router.patch(
                         .digest('base64')
                 )
             } else {
-                await post.updateComment(req.body.content, req.user.username)
+                await post.updateComment(
+                    req.params.comment_id,
+                    req.body.content
+                )
             }
+
             res.status(201).json({ message: '댓글 수정 완료' })
         } catch (error) {
             const errr = new Error('database error')
@@ -469,6 +535,97 @@ router.delete(
             }
             await post.removeComment(req.params.comment_id)
             res.status(200).json({ message: '삭제 성공' })
+        } catch (error) {
+            const errr = new Error('database error')
+            errr.status = 500
+            throw errr
+        }
+    })
+)
+
+//좋아요 생성
+router.post(
+    '/posts/:post_id/like',
+    [param('post_id').isNumeric(), validateParams],
+    asyncRoute(async function(req, res) {
+        try {
+            let postId = parseInt(req.params.post_id)
+            let post = await Post.findOne({ _id: postId })
+            if (!post) {
+                res.status(404).json({ message: 'no post id ' + postId })
+                return
+            }
+            await post.likes_create(req.user.username)
+            res.status(201).json({ message: '좋아요 생성 완료' })
+        } catch (error) {
+            const errr = new Error('database error')
+            errr.status = 500
+            throw errr
+        }
+    })
+)
+
+//좋아요 삭제
+router.delete(
+    '/posts/:post_id/like',
+    [param('post_id').isNumeric(), validateParams],
+    asyncRoute(async function(req, res) {
+        try {
+            let postId = parseInt(req.params.post_id)
+            let post = await Post.findOne({ _id: postId })
+            if (!post) {
+                res.status(404).json({ message: 'no post id ' + postId })
+                return
+            }
+            await post.likes_delete(req.user.username)
+            res.status(201).json({ message: '좋아요 삭제 완료' })
+        } catch (error) {
+            const errr = new Error('database error')
+            errr.status = 500
+            throw errr
+        }
+    })
+)
+
+//게시물 검색
+router.get(
+    '/searchpost',
+    [query('content'), query('option'), validateParams],
+    asyncRoute(async function(req, res) {
+        let options = []
+        if (req.query.option == 'title') {
+            options = [{ title: new RegExp(req.query.content) }]
+        } else if (req.query.option == 'content') {
+            options = [{ content: new RegExp(req.query.content) }]
+        } else if (req.query.option == 'title+content') {
+            options = [
+                { title: new RegExp(req.query.content) },
+                { content: new RegExp(req.query.content) },
+            ]
+        } else {
+            const err = new Error('검색 옵션이 없습니다.')
+            err.status = 400
+            throw err
+        }
+        try {
+            const posts = await Post.find({ $or: options })
+
+            res.status(200).json({
+                posts: posts.map(post => {
+                    return {
+                        board: post.board,
+                        _id: parseInt(post.id),
+                        title: post.title,
+                        content: post.content,
+                        author: post.author,
+                        isAnonymous: post.isAnonymous,
+                        created_date: post.created_date,
+                        view: post.view,
+                        like: post.likes_count,
+                        comment: post.comments,
+                    }
+                }),
+            })
         } catch (error) {
             const errr = new Error('database error')
             errr.status = 500

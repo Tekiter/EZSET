@@ -42,8 +42,7 @@ export default {
     methods: {
         read(evt) {
             //evt라는 임의의 변수안에 board 정보 들어가있음
-            console.log(evt._id)
-            console.log(evt.title)
+
             this.$router.push({
                 path: '/board/' + evt._id,
             })

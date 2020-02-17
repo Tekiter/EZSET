@@ -106,7 +106,7 @@ export default {
                     await axios.post('auth/edittoken/check', {
                         edittoken: context.state.editToken,
                     })
-                    console.log(10)
+                    //
                     return true
                 } else {
                     return false

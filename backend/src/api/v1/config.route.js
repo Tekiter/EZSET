@@ -1,10 +1,13 @@
 import { Router } from 'express'
 import { asyncRoute, validateParams } from '../../utils/api'
+import { loginRequired } from '../../utils/auth'
+import { getRoleMiddleware } from '../../utils/role'
 import { perm } from '../../utils/role'
 import { body } from 'express-validator'
 import { getConfig, setConfig } from '../../utils/config'
 
 const router = Router()
+router.loginNotRequired = true
 
 const configNames = ['groupName']
 
@@ -36,7 +39,7 @@ router.get(
 // 서버 전체 설정을 가져온다.
 router.get(
     '/admin',
-    [perm('serverConfig').can('change')],
+    [loginRequired, getRoleMiddleware, perm('serverConfig').can('change')],
     asyncRoute(async (req, res) => {
         const configs = {}
 
@@ -53,6 +56,8 @@ router.get(
 router.patch(
     '/admin',
     [
+        loginRequired,
+        getRoleMiddleware,
         perm('serverConfig').can('change'),
         changeableConfigs.map(config => config.check),
         validateParams,

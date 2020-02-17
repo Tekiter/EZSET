@@ -7,7 +7,8 @@ export default {
         {
             type: 'switch',
             title: '유저 관리',
-            content: '유저의 비밀번호를 초기화하거나, 탈퇴시킬 수 있습니다.',
+            content:
+                '유저의 비밀번호를 초기화하거나, 강제 탈퇴시킬 수 있습니다.',
             target: {
                 resource: 'manageUsers',
                 action: 'access',

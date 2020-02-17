@@ -1,6 +1,7 @@
 export function setDefaultRole(roles) {
+    roles.setRole({ tag: 'default', name: '모든 유저' })
     roles
-        .default()
+        .role('default')
 
         .resource('profile')
         .canOwn('read')
@@ -23,7 +24,7 @@ export function setDefaultRole(roles) {
 }
 
 export function setAdminRole(roles) {
-    roles.setRole({ tag: 'admin', name: 'admin' })
+    roles.setRole({ tag: 'admin', name: '관리자' })
     roles
         .role('admin')
 
@@ -32,6 +33,9 @@ export function setAdminRole(roles) {
 
         .resource('profile')
         .can(['read', 'update'])
+
+        .resource('user')
+        .can(['delete'])
 
         .resource('role')
         .can(['read', 'modify'])

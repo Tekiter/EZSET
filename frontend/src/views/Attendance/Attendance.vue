@@ -97,7 +97,7 @@ export default {
             const res = await axios.get('attendance/attendanceCheck')
             this.code = parseInt(res.data)
         } catch (err) {
-            //console.log(err)
+            //
         }
         const res = await axios.get('attendance/attendanceCheckAdmin')
         if (res.data != 0) this.output_attendance_code = parseInt(res.data)
@@ -122,7 +122,7 @@ export default {
                 this.output_attendance_code = res_code.data.code
                 this.code = 1
             } catch (err) {
-                //console.log(err)
+                //
             }
             this.$socket.emit('attendance', {
                 flag: true,
@@ -156,7 +156,7 @@ export default {
                     }, 2000)
                 } else this.snackbar_e = true
             } catch (err) {
-                //console.log(err)
+                //
             }
         },
         close() {

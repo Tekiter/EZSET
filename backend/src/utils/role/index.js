@@ -15,7 +15,7 @@ const role = {
                 .equals(req.user.username)
                 .select('roles')
                 .cache(60, 'USER-ROLE-' + req.user.username)
-            req.user.perm = roles.createPermChecker(user.roles)
+            req.user.perm = roles.createPermChecker(['default', ...user.roles])
             next()
         } else {
             next()
@@ -57,7 +57,6 @@ const role = {
     },
     permOr(callback) {
         return (req, res, next) => {
-            console.log(callback(req.user.perm))
             if (callback(req.user.perm)) {
                 next()
             } else {
@@ -128,14 +127,27 @@ const role = {
     },
     async loadRoles() {
         const roleobjs = await RoleModel.find()
+        let hasDefault = false
         roleobjs.forEach(role => {
+            if (role.tag === 'default') {
+                hasDefault = true
+            }
             roles.setRole({
                 tag: role.tag,
                 name: role.name,
                 perm: role.perm,
             })
         })
-        setDefaultRole(roles)
+        if (!hasDefault) {
+            setDefaultRole(roles)
+            const newrole = roles.export('default')
+            const newroledoc = RoleModel({
+                tag: newrole.tag,
+                name: newrole.name,
+                perm: newrole.perm,
+            })
+            await newroledoc.save()
+        }
         setAdminRole(roles)
     },
     async getUserRoles(username) {
