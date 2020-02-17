@@ -35,6 +35,13 @@ export default {
             },
         },
         {
+            type: 'line',
+        },
+        {
+            type: 'header',
+            title: '출석',
+        },
+        {
             type: 'switch',
             title: '출석 관리',
             content:
@@ -54,6 +61,13 @@ export default {
             },
         },
         {
+            type: 'line',
+        },
+        {
+            type: 'header',
+            title: '일정',
+        },
+        {
             type: 'switch',
             title: '일정 관리',
             content: '새로운 일정을 추가하거나 삭제할 수 있습니다.',
@@ -61,9 +75,6 @@ export default {
                 resource: 'schedule',
                 action: 'update',
             },
-        },
-        {
-            type: 'line',
         },
     ],
 }

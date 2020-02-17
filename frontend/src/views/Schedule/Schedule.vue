@@ -60,7 +60,7 @@
                                                 <v-btn
                                                     v-if="
                                                         $perm('schedule').can(
-                                                            'create'
+                                                            'update'
                                                         )
                                                     "
                                                     color="primary"
@@ -78,78 +78,17 @@
                                                         ></v-date-picker>
                                                     </v-col>
                                                     <v-col cols="6">
-                                                        <v-menu
-                                                            ref="menu"
-                                                            v-model="menu"
-                                                            :close-on-content-click="
-                                                                false
-                                                            "
-                                                            :return-value.sync="
-                                                                dates
-                                                            "
-                                                            transition="scale-transition"
-                                                            offset-y
-                                                            full-width
-                                                            min-width="290px"
-                                                        >
-                                                            <template
-                                                                v-slot:activator="{
-                                                                    on,
-                                                                }"
-                                                            >
-                                                                <v-combobox
-                                                                    v-model="
-                                                                        dates
-                                                                    "
-                                                                    multiple
-                                                                    chips
-                                                                    small-chips
-                                                                    label="Multiple picker in menu"
-                                                                    prepend-icon="mdi-plus"
-                                                                    readonly
-                                                                    v-on="on"
-                                                                ></v-combobox>
-                                                            </template>
-                                                            <v-date-picker
-                                                                v-model="dates"
-                                                                multiple
-                                                                no-title
-                                                                scrollable
-                                                            >
-                                                                <v-spacer></v-spacer>
-                                                                <v-btn
-                                                                    text
-                                                                    color="primary"
-                                                                    @click="
-                                                                        menu = false
-                                                                    "
-                                                                    >Cancel</v-btn
-                                                                >
-                                                                <v-btn
-                                                                    text
-                                                                    color="primary"
-                                                                    @click="
-                                                                        $refs.menu.save(
-                                                                            dates
-                                                                        )
-                                                                    "
-                                                                    >OK</v-btn
-                                                                >
-                                                            </v-date-picker>
-                                                        </v-menu>
                                                         <v-text-field
                                                             label="제목"
                                                             v-model="
                                                                 schedule_title
                                                             "
-                                                            dense
                                                         ></v-text-field>
                                                         <v-text-field
                                                             label="내용"
                                                             v-model="
                                                                 schedule_contents
                                                             "
-                                                            dense
                                                         ></v-text-field>
                                                         <v-color-picker
                                                             v-model="
