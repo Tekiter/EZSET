@@ -6,13 +6,17 @@ export async function getConfig(key, defaultVal = undefined) {
     if (cache[key]) {
         return cache[key]
     }
-    const val = await Config.findOne()
-        .where('key')
-        .equals(key)
+    try {
+        const val = await Config.findOne()
+            .where('key')
+            .equals(key)
 
-    cache[key] = val.value
+        cache[key] = val.value
 
-    return val ? val.value : defaultVal
+        return val ? val.value : defaultVal
+    } catch (__) {
+        return defaultVal
+    }
 }
 export async function setConfig(key, value) {
     let config = await Config.findOne()
