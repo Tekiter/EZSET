@@ -226,8 +226,17 @@ export default {
             this.plusGroup.isfolder = false
         },
         isFolder() {
-            if (this.showMetarials.selected[0].isfolder == true) {
-                this.showMetarials.show = true
+            //선택을 함
+            if (this.showMetarials.selected.length > 0) {
+                //선택한게 폴더 일때
+                if (this.showMetarials.selected[0].isfolder == true) {
+                    this.showMetarials.show = true
+                }
+
+                //선택한게 그룹일때
+                else {
+                    this.showMetarials.show = false
+                }
             } else {
                 this.showMetarials.show = false
             }
