@@ -141,7 +141,7 @@ router.put(
             }
         }
 
-        if (req.body.roletags.include('default')) {
+        if (req.body.roletags.includes('default')) {
             const err = new Error('default 역할은 변경할 수 없습니다.')
             err.status = 403
             throw err
