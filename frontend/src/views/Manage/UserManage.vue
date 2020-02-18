@@ -171,7 +171,7 @@
                             v-model="roleDialog.selections"
                         >
                             <v-list-item
-                                v-for="role in rawRoles"
+                                v-for="role in assignableRoles"
                                 :key="role.tag"
                                 v-show="
                                     searchMatches(role.name, roleDialog.search)
@@ -249,6 +249,9 @@ export default {
                 newrole[role.tag] = role
             })
             return newrole
+        },
+        assignableRoles() {
+            return this.rawRoles.filter(role => role.tag != 'default')
         },
     },
     methods: {
