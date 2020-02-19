@@ -1,24 +1,29 @@
 <template>
     <div>
-        <v-tabs v-model="tab">
+        <v-tabs v-model="tab" v-if="$perm('manageHome').can('update')">
             <v-tab>보기</v-tab>
-            <v-tab v-if="$perm('manageHome').can('update')">수정</v-tab>
+            <v-tab>수정</v-tab>
         </v-tabs>
         <v-tabs-items v-model="tab">
-            <v-tab-item><viewer :value="homeview"/></v-tab-item>
             <v-tab-item>
+                <v-container fluid>
+                    <viewer :value="homeview" />
+                </v-container>
+            </v-tab-item>
+            <v-tab-item v-if="$perm('manageHome').can('update')">
                 <v-card outlined>
                     <v-card-text
                         ><editor
+                            :value="homeview"
                             ref="editor"
                             mode="wysiwyg"
                             :options="editor.options"
                         />
+                        <div class="d-flex mt-3">
+                            <v-spacer></v-spacer>
+                            <v-btn @click="save" outlined>저장</v-btn>
+                        </div>
                     </v-card-text>
-                    <v-card-action class="d-flex">
-                        <v-spacer></v-spacer>
-                        <v-btn @click="save">저장</v-btn>
-                    </v-card-action>
                 </v-card>
             </v-tab-item>
         </v-tabs-items>
@@ -36,7 +41,7 @@ export default {
     },
     data() {
         return {
-            tab: null,
+            tab: 0,
             editor: {
                 options: {
                     language: 'ko',
@@ -46,12 +51,7 @@ export default {
         }
     },
     async created() {
-        try {
-            const cursor = await axios.get('home/simple')
-            this.homeview = cursor.data
-        } catch (err) {
-            //
-        }
+        this.loadhome()
     },
     methods: {
         async save() {
@@ -59,12 +59,22 @@ export default {
                 await axios.patch('home/simple', {
                     content: this.getMarkdown(),
                 })
+                this.loadhome()
+                this.tab = 0
             } catch (err) {
                 //
             }
         },
         getMarkdown() {
             return this.$refs.editor.invoke('getMarkdown')
+        },
+        async loadhome() {
+            try {
+                const cursor = await axios.get('home/simple')
+                this.homeview = cursor.data.content
+            } catch (err) {
+                //
+            }
         },
     },
 }
