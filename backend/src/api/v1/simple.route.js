@@ -394,6 +394,7 @@ router.get(
                         created_date: post.created_date,
                         view: post.view,
                         like: post.likes_count,
+                        comment_count: post.comments.length,
                         comment: post.comments,
                     }
                 }),

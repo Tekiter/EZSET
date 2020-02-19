@@ -47,7 +47,9 @@
                 >
                     <template v-slot:item.title="props">
                         <a @click="read(props.item)">
-                            {{ props.item.title }}
+                            {{ props.item.title }} [{{
+                                props.item.comment_count
+                            }}]
                         </a>
                     </template>
                 </v-data-table>
@@ -67,7 +69,9 @@
                 >
                     <template v-slot:item.title="props">
                         <a @click="read(props.item)">
-                            {{ props.item.title }}
+                            {{ props.item.title }} [{{
+                                props.item.comment_count
+                            }}]
                         </a>
                     </template>
                 </v-data-table>
@@ -146,9 +150,14 @@ export default {
                     width: '50%',
                 },
                 { text: '작성자', value: 'author', sortable: false },
-                { text: '작성일', value: 'created_date', width: '20%' },
-                { text: '추천', value: 'like' },
-                { text: '조회', value: 'view' },
+                {
+                    text: '작성일',
+                    value: 'created_date',
+                    width: '20%',
+                    sortable: false,
+                },
+                { text: '추천', value: 'like', sortable: false },
+                { text: '조회', value: 'view', sortable: false },
             ],
             headersTwo: [
                 {
@@ -164,8 +173,8 @@ export default {
                     width: '50%',
                 },
                 { text: '작성자', value: 'author', sortable: false },
-                { text: '추천', value: 'like' },
-                { text: '조회', value: 'view' },
+                { text: '추천', value: 'like', sortable: false },
+                { text: '조회', value: 'view', sortable: false },
             ],
         }
     },
