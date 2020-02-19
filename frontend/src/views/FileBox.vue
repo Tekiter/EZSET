@@ -17,6 +17,14 @@
                                 >새 그룹 추가</v-list-item-title
                             >
                         </v-list-item>
+                        <v-list-item link @click="showModifyGroup()">
+                            <v-list-item-icon>
+                                <v-icon>mdi-map-search</v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-title class="grey--text"
+                                >그룹 편집</v-list-item-title
+                            >
+                        </v-list-item>
                     </v-list>
                 </v-card>
             </v-col>
@@ -115,6 +123,85 @@
                         >
                     </v-card-actions>
                 </v-card>
+                <v-card v-if="modifyGroup.show" class="fill-height">
+                    <v-toolbar dark short color="primary">
+                        <v-btn icon dark @click="closePlusGroup()">
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                        <v-toolbar-title>그룹 편집</v-toolbar-title>
+                    </v-toolbar>
+                    <div>
+                        <v-row>
+                            <v-col>
+                                <template>
+                                    <v-banner>
+                                        <v-chip
+                                            class="ma-2"
+                                            outlined
+                                            label
+                                            v-if="
+                                                plusGroup.selected.length == 0
+                                            "
+                                            >기본 위치</v-chip
+                                        >
+                                        <v-chip
+                                            class="ma-2"
+                                            outlined
+                                            label
+                                            v-if="plusGroup.selected.length > 0"
+                                        >
+                                            {{ plusGroup.selected[0].name }}
+                                        </v-chip>
+                                    </v-banner>
+                                    <v-banner
+                                        v-if="plusGroup.selected.length > 0"
+                                    >
+                                        수정하기
+                                        <v-text-field
+                                            v-model="modifyNow"
+                                            dense
+                                        ></v-text-field>
+                                        <v-btn small color="blue darken-1" dark
+                                            >수정</v-btn
+                                        >
+                                    </v-banner>
+                                    <v-banner
+                                        v-if="plusGroup.selected.length > 0"
+                                    >
+                                        <div class="my-2">
+                                            <v-btn small color="error"
+                                                >삭제하기</v-btn
+                                            >
+                                        </div>
+                                    </v-banner>
+                                </template>
+                            </v-col>
+                            <v-col>
+                                <group-tree
+                                    :items="groups"
+                                    selectable
+                                    color="warning"
+                                    v-model="plusGroup.selected"
+                                    @change="clickEvent()"
+                                ></group-tree>
+                                <v-card
+                                    class="mx-auto"
+                                    outlined
+                                    v-if="plusGroup.selected.length == 0"
+                                    color="orange lighten-4"
+                                >
+                                    <v-list-item>
+                                        <v-list-item-content>
+                                            <v-list-item-title
+                                                >기본 위치</v-list-item-title
+                                            >
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </div>
+                </v-card>
                 <div class="mr-4">
                     <div class="text-center">
                         <v-btn
@@ -135,6 +222,7 @@
                         :folderId="this.showMetarials.selected[0].id"
                         @editMaterial="showEditMaterial"
                     ></material-post>
+
                     <write-material
                         v-if="createMaterial.show"
                         :parent_id="showMetarials.selected[0].id"
@@ -166,9 +254,18 @@ export default {
     },
     data() {
         return {
+            group_id: '',
+            modifyNow: '',
             fileboxes: [],
             groups: [],
             plusGroup: {
+                show: false,
+                parent: '',
+                name: '',
+                isfolder: false,
+                selected: [],
+            },
+            modifyGroup: {
                 show: false,
                 parent: '',
                 name: '',
@@ -197,12 +294,21 @@ export default {
         this.patch()
     },
     methods: {
+        clickEvent() {
+            this.group_id = this.plusGroup.selected[0].id
+            this.modifyNow = this.plusGroup.selected[0].name
+        },
+        showModifyGroup() {
+            this.plusGroup.show = false
+            this.modifyGroup.show = true
+        },
         async patch() {
             const res = await axios.get('/filebox')
             console.log(res)
             this.groups = res.data.groups
         },
         showPlusGroup() {
+            this.modifyGroup.show = false
             this.plusGroup.show = true
         },
         closePlusGroup() {
@@ -237,17 +343,8 @@ export default {
             this.plusGroup.isfolder = false
         },
         isFolder() {
-            //선택을 함
-            if (this.showMetarials.selected.length > 0) {
-                //선택한게 폴더 일때
-                if (this.showMetarials.selected[0].isfolder == true) {
-                    this.showMetarials.show = true
-                }
-
-                //선택한게 그룹일때
-                else {
-                    this.showMetarials.show = false
-                }
+            if (this.showMetarials.selected[0].isfolder == true) {
+                this.showMetarials.show = true
             } else {
                 this.showMetarials.show = false
             }
@@ -276,6 +373,7 @@ export default {
             this.showMetarials.show = true
         },
     },
+
     computed: {
         isError() {
             //이름이 설정된 경우에만 확인버튼 클릭 가능
