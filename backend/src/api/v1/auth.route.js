@@ -71,7 +71,11 @@ router.route('/register').post(
             .where('username')
             .equals(req.body.username)
 
-        if (exists) {
+        const existsPreuser = await PreUser.count()
+            .where('username')
+            .equals(req.body.username)
+
+        if (exists || existsPreuser) {
             res.status(409).json({
                 message: '이미 사용중인 아이디입니다.',
             })
@@ -109,7 +113,11 @@ router.route('/register/doublecheck/username').post(
             const exits = await User.count()
                 .where('username')
                 .equals(req.body.username)
-            if (exits) {
+            const existsPreuser = await PreUser.count()
+                .where('username')
+                .equals(req.body.username)
+
+            if (exits || existsPreuser) {
                 res.status(409).json({
                     message: '이미 사용중인 아이디입니다.',
                 })

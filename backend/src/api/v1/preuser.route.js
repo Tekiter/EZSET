@@ -9,7 +9,7 @@ const router = Router()
 // 승인 대기중인 유저 목록 가져오기
 router.get(
     '/',
-    [],
+    [perm('managePreusers').can('access')],
     asyncRoute(async (req, res) => {
         const users = await PreUser.find()
 
@@ -17,6 +17,9 @@ router.get(
             users: users.map(user => {
                 return {
                     username: user.username,
+                    timestamp: user.timestamp,
+                    realname: user.info.realname,
+                    email: user.info.email,
                 }
             }),
         })
@@ -26,7 +29,11 @@ router.get(
 // 유저를 정회원으로 승인
 router.post(
     '/:username',
-    [param('username'), validateParams],
+    [
+        perm('managePreusers').can('access'),
+        param('username').isString(),
+        validateParams,
+    ],
     asyncRoute(async (req, res) => {
         const user = await PreUser.findOne()
             .where('username')
@@ -48,7 +55,11 @@ router.post(
 // 유저 승인 거절
 router.delete(
     '/:username',
-    [],
+    [
+        perm('managePreusers').can('access'),
+        param('username').isString(),
+        validateParams,
+    ],
     asyncRoute(async (req, res) => {
         const user = await PreUser.findOne()
             .where('username')
