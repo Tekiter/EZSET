@@ -20,6 +20,8 @@
                 >
                     <material-post-item
                         :options="material"
+                        @delete="patch()"
+                        @editMaterial="editMaterial"
                     ></material-post-item>
                 </v-col>
             </v-row>
@@ -52,6 +54,13 @@ export default {
             const res = await Axios.get('/filebox/folder/' + this.folderId)
             this.items = res.data.materials
             this.isloading = false
+        },
+        async editMaterial(options) {
+            try {
+                this.$emit('editMaterial', options)
+            } catch {
+                //
+            }
         },
     },
     async created() {

@@ -133,11 +133,18 @@
                     <material-post
                         v-if="showMetarials.show"
                         :folderId="this.showMetarials.selected[0].id"
+                        @editMaterial="showEditMaterial"
                     ></material-post>
                     <write-material
                         v-if="createMaterial.show"
                         :parent_id="showMetarials.selected[0].id"
                         @close="closeCreateMaterial()"
+                    ></write-material>
+                    <write-material
+                        v-if="editMaterial.show"
+                        :parent_id="showMetarials.selected[0].id"
+                        :editMaterial="this.editMaterial.material"
+                        @close="closeEditMaterial()"
                     ></write-material>
                 </div>
             </v-col>
@@ -179,6 +186,10 @@ export default {
             isloading: false,
             createMaterial: {
                 show: false,
+            },
+            editMaterial: {
+                show: false,
+                material: undefined,
             },
         }
     },
@@ -248,6 +259,20 @@ export default {
         },
         closeCreateMaterial() {
             this.createMaterial.show = false
+            this.showMetarials.show = true
+        },
+        async showEditMaterial(options) {
+            try {
+                this.editMaterial.show = true
+                this.showMetarials.show = false
+                this.editMaterial.material = options
+                console.log(options)
+            } catch {
+                //
+            }
+        },
+        closeEditMaterial() {
+            this.editMaterial.show = false
             this.showMetarials.show = true
         },
     },

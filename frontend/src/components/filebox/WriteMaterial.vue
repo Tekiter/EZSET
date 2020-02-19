@@ -1,7 +1,8 @@
 <template>
     <v-container>
         <v-card outlined>
-            <v-card-title>게시물 작성</v-card-title>
+            <v-card-title v-if="!editMaterial">게시물 작성</v-card-title>
+            <v-card-title v-if="editMaterial">게시물 수정</v-card-title>
             <v-card-text>
                 <v-text-field
                     v-model="newMaterial.title"
@@ -9,7 +10,12 @@
                     hide-details
                     class="mb-4"
                 ></v-text-field>
-                <editor ref="editor" mode="wysiwyg" :options="editor.options" />
+                <editor
+                    ref="editor"
+                    mode="wysiwyg"
+                    :options="editor.options"
+                    :value="newMaterial.content"
+                />
                 <file-upload
                     v-model="uploadFile.selected"
                     :currentProgress="uploadFile.currentProgress"
@@ -59,6 +65,9 @@ export default {
     },
     props: {
         parent_id: String,
+        editMaterial: {
+            type: Object,
+        },
     },
     data() {
         return {
@@ -146,6 +155,19 @@ export default {
         closeButtonClick() {
             this.$emit('close')
         },
+    },
+    async created() {
+        try {
+            if (this.editMaterial) {
+                this.newMaterial = {
+                    title: this.editMaterial.title,
+                    content: this.editMaterial.content,
+                    parent_id: this.editMaterial.parent_id,
+                }
+            }
+        } catch (error) {
+            //
+        }
     },
 }
 </script>
