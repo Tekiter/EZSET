@@ -36,6 +36,13 @@ export default {
             },
         },
         {
+            type: 'line',
+        },
+        {
+            type: 'header',
+            title: '게시판',
+        },
+        {
             type: 'switch',
             title: '게시판 관리',
             content:
@@ -44,9 +51,6 @@ export default {
                 resource: 'manageBoards',
                 action: 'access',
             },
-        },
-        {
-            type: 'line',
         },
     ],
 }

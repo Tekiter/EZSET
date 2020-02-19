@@ -81,6 +81,10 @@ export default {
                 key: 'groupName',
             },
             {
+                type: 'header',
+                title: '가입',
+            },
+            {
                 type: 'switch',
                 title: '회원승인제',
                 content: '관리자의 승인이 있어야 회원가입이 완료됩니다.',
