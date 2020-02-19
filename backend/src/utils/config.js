@@ -10,9 +10,12 @@ export async function getConfig(key, defaultVal = undefined) {
         .where('key')
         .equals(key)
 
-    cache[key] = val.value
-
-    return val ? val.value : defaultVal
+    if (val) {
+        cache[key] = val.value
+        return val ? val.value : defaultVal
+    } else {
+        return defaultVal
+    }
 }
 export async function setConfig(key, value) {
     let config = await Config.findOne()
