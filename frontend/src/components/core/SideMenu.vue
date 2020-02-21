@@ -37,6 +37,11 @@ export default {
                             perm: this.$perm('manageUsers').can('access'),
                         },
                         {
+                            title: '가입 승인',
+                            to: '/manage/preusers',
+                            perm: this.$perm('managePreusers').can('access'),
+                        },
+                        {
                             title: '역할 관리',
                             to: '/manage/roles',
                             perm: this.$perm('role').can('modify'),

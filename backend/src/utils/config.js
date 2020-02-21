@@ -10,7 +10,6 @@ export async function getConfig(key, defaultVal = undefined) {
         const val = await Config.findOne()
             .where('key')
             .equals(key)
-
         cache[key] = val.value
 
         return val ? val.value : defaultVal

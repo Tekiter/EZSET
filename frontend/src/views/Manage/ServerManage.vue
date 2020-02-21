@@ -80,6 +80,16 @@ export default {
                 content: '유저들에게 노출되는 그룹 이름입니다.',
                 key: 'groupName',
             },
+            {
+                type: 'header',
+                title: '가입',
+            },
+            {
+                type: 'switch',
+                title: '가입승인제',
+                content: '관리자의 승인이 있어야 회원가입이 완료됩니다.',
+                key: 'usePreUser',
+            },
         ],
     },
 }

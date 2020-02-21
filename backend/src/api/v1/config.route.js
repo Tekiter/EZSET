@@ -9,16 +9,18 @@ import { getConfig, setConfig } from '../../utils/config'
 const router = Router()
 router.loginNotRequired = true
 
-const configNames = ['groupName']
-
-const checkerWrap = key => {}
+const configNames = ['groupName', 'usePreUser']
 
 const changeableConfigs = [
     {
         key: 'groupName',
-        check: body('groupName')
-            .isString()
-            .optional(),
+        check: body('groupName').isString(),
+    },
+    {
+        key: 'usePreUser',
+        check: body('usePreUser')
+            .isBoolean()
+            .toBoolean(),
     },
 ]
 
@@ -59,7 +61,7 @@ router.patch(
         loginRequired,
         getRoleMiddleware,
         perm('serverConfig').can('change'),
-        changeableConfigs.map(config => config.check),
+        changeableConfigs.map(config => config.check.optional()),
         validateParams,
     ],
     asyncRoute(async (req, res) => {
