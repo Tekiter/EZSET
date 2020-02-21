@@ -78,6 +78,12 @@ router.delete(
             throw err
         }
 
+        if ((await getConfig('superAdmin')) == req.params.username) {
+            const err = new Error('admin 계정은 탈퇴할 수 없습니다.')
+            err.status = 403
+            throw err
+        }
+
         const user = await User.findOne()
             .where('username')
             .equals(req.params.username)

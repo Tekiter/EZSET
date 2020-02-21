@@ -15,6 +15,16 @@ export default {
                 range: 'any',
             },
         },
+        {
+            type: 'switch',
+            title: '가입 승인',
+            content: '가입 대기중인 유저를 승인할 수 있습니다.',
+            target: {
+                resource: 'managePreusers',
+                action: 'access',
+                range: 'any',
+            },
+        },
 
         {
             type: 'switch',
@@ -26,6 +36,13 @@ export default {
             },
         },
         {
+            type: 'line',
+        },
+        {
+            type: 'header',
+            title: '게시판',
+        },
+        {
             type: 'switch',
             title: '게시판 관리',
             content:
@@ -34,9 +51,6 @@ export default {
                 resource: 'manageBoards',
                 action: 'access',
             },
-        },
-        {
-            type: 'line',
         },
     ],
 }

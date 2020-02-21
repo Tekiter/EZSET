@@ -103,6 +103,11 @@ const routes = [
         component: () => import('../views/Manage/UserManage.vue'),
     },
     {
+        path: '/manage/preusers',
+        name: 'managePreusers',
+        component: () => import('../views/Manage/PreuserManage.vue'),
+    },
+    {
         path: '/manage/roles',
         name: 'manageRoles',
         component: () => import('../views/Manage/RoleManage.vue'),
