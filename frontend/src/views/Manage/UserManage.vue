@@ -308,8 +308,8 @@ export default {
             this.roleDialog.show = true
             this.roleDialog.user = user
             const selections = []
-            for (let i in this.rawRoles) {
-                if (user.roles.indexOf(this.rawRoles[i].tag) >= 0) {
+            for (let i in this.assignableRoles) {
+                if (user.roles.indexOf(this.assignableRoles[i].tag) >= 0) {
                     selections.push(parseInt(i))
                 }
             }
@@ -317,7 +317,7 @@ export default {
         },
         async applyRoleDialog() {
             const newroles = this.roleDialog.selections.map(i => {
-                return this.rawRoles[i].tag
+                return this.assignableRoles[i].tag
             })
             this.roleDialog.isLoading = true
             try {
