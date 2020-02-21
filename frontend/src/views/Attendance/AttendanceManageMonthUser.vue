@@ -270,57 +270,9 @@
                                                         '공결(승인대기)'
                                                 "
                                             >
-                                                <v-dialog
-                                                    v-model="dialog"
-                                                    persistent
-                                                    max-width="290"
+                                                <v-btn @click="dialog = true"
+                                                    >신청 취소</v-btn
                                                 >
-                                                    <template
-                                                        v-slot:activator="{
-                                                            on,
-                                                        }"
-                                                    >
-                                                        <v-btn v-on="on"
-                                                            >신청 취소</v-btn
-                                                        >
-                                                    </template>
-                                                    <v-card>
-                                                        <v-card-title
-                                                            class="headline"
-                                                            >공결 신청
-                                                            취소</v-card-title
-                                                        >
-                                                        <v-card-text>
-                                                            {{
-                                                                selectedEvent.reson
-                                                            }}신청하신 공결을
-                                                            취소하시겠습니까?</v-card-text
-                                                        >
-                                                        <v-card-actions>
-                                                            <v-spacer></v-spacer>
-                                                            <v-btn
-                                                                color="green darken-1"
-                                                                text
-                                                                @click="
-                                                                    dialog = false
-                                                                "
-                                                                >아니요</v-btn
-                                                            >
-                                                            <v-btn
-                                                                color="green darken-1"
-                                                                text
-                                                                @click="
-                                                                    cancleAbsence(
-                                                                        selectedEvent
-                                                                    )
-                                                                    dialog = false
-                                                                    selectedOpen = false
-                                                                "
-                                                                >예</v-btn
-                                                            >
-                                                        </v-card-actions>
-                                                    </v-card>
-                                                </v-dialog>
                                             </v-row>
                                         </v-card-text>
                                     </v-card>
@@ -338,25 +290,40 @@
                     권한이 없습니다.
                 </v-alert>
             </div>
-            <v-snackbar v-model="cancleSnack" :timeout="2000" color="success">
-                취소되었습니다!
-                <v-btn dark text @click="snackbar = false">
-                    Close
-                </v-btn>
-            </v-snackbar>
-            <v-snackbar v-model="applySnack" :timeout="2000" color="success">
-                신청되었습니다!
-                <v-btn dark text @click="snackbar = false">
-                    Close
-                </v-btn>
-            </v-snackbar>
-            <v-snackbar v-model="snackbar.show" :timeout="2000" color="success">
+            <v-snackbar
+                v-model="snackbar.show"
+                :timeout="2000"
+                :color="snackbar.color"
+            >
                 {{ snackbar.text }}
                 <v-btn text @click="snackbar = false">
                     닫기
                 </v-btn>
             </v-snackbar>
         </v-card>
+        <v-dialog v-model="dialog" max-width="290">
+            <v-card>
+                <v-card-title class="headline">공결 신청 취소</v-card-title>
+                <v-card-text> {{ selectedEvent.reson }}</v-card-text>
+                <v-card-text>신청하신 공결을 취소하시겠습니까?</v-card-text>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn color="green darken-1" text @click="dialog = false">
+                        아니요
+                    </v-btn>
+
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="cancleAbsence(selectedEvent)"
+                    >
+                        예
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 <script>
@@ -401,11 +368,10 @@ export default {
         absence_reason: '',
         dialog: false,
         calLoad: false,
-        cancleSnack: false,
-        applySnack: false,
         snackbar: {
             show: false,
             text: '',
+            color: '',
         },
     }),
     async created() {
@@ -604,7 +570,8 @@ export default {
                         if (item == moment(ii.day).format('YYYY-MM-DD')) {
                             check_date = false
                             return this.openSnackbar(
-                                '같은 날짜에 이미 공결 예약을 하셨습니다.'
+                                '같은 날짜에 이미 공결 예약을 하셨습니다.',
+                                'error'
                             )
                         }
                     })
@@ -618,7 +585,7 @@ export default {
                     this.absence_reason = ''
                     this.absenceResDialog.show = false
                     await this.init()
-                    this.applySnack = true
+                    this.openSnackbar('신청되었습니다!', 'success')
                 }
             } catch (err) {
                 //
@@ -626,6 +593,9 @@ export default {
         },
         //공결 신청 취소
         async cancleAbsence(selectedEvent) {
+            this.selectedOpen = false
+            this.dialog = false
+            this.calLoad = false
             try {
                 await axios.post('absencecheck/deleteAbsenceUser', {
                     reason: selectedEvent.reason,
@@ -634,7 +604,8 @@ export default {
             } catch (err) {
                 //
             }
-            this.cancleSnack = true
+            this.openSnackbar('취소되었습니다!', 'success')
+            this.calLoad = true
             this.init()
         },
         //페이지 사용에 필요한 데이터 로드 및 표시
@@ -655,8 +626,9 @@ export default {
             this.updateRange({ start: this.start, end: this.end })
             this.calLoad = true
         },
-        openSnackbar(text) {
+        openSnackbar(text, color) {
             this.snackbar.text = text
+            this.snackbar.color = color
             this.snackbar.show = true
         },
     },

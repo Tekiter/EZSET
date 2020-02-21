@@ -4,7 +4,7 @@
             class="mx-auto"
             max-width="500"
             max-height="500"
-            v-if="flag == true && code == 0"
+            v-if="flag == true && code == 0 && output_attendance_code == ''"
         >
             <v-card-title>
                 <v-text-field v-model="input_attendance_code"></v-text-field>
@@ -20,7 +20,7 @@
             class="mx-auto"
             max-width="500"
             max-height="500"
-            v-if="flag && this.$perm('attendance').can('start')"
+            v-if="flag && this.$perm('attendance').can('update')"
         >
             <v-card-text>
                 <div class="d-flex justify-center">
@@ -44,7 +44,7 @@
             max-width="500"
             max-height="500"
             text
-            v-if="!flag && this.$perm('attendance').can('start')"
+            v-if="!flag && this.$perm('attendance').can('update')"
         >
             <v-card-actions>
                 <v-btn color="purple" text @click="startAttendance" large
@@ -55,14 +55,14 @@
         <div>
             <v-alert
                 type="warning"
-                v-if="!this.$perm('attendance').can('start') && flag == false"
+                v-if="!this.$perm('attendance').can('update') && flag == false"
             >
                 출석중이 아닙니다.
             </v-alert>
             <v-alert
                 type="success"
                 v-if="
-                    !this.$perm('attendance').can('start') &&
+                    !this.$perm('attendance').can('update') &&
                         flag == true &&
                         code == 1
                 "
@@ -87,10 +87,6 @@ import axios from 'axios'
 export default {
     name: 'attendance',
     async created() {
-        if (!this.$perm('manageRoles').can('access')) {
-            this.$router.push({ name: 'error403' })
-            return
-        }
         await this.$socket.emit('join', {
             roomName: 'attendance',
         })

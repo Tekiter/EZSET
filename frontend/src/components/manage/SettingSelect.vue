@@ -18,9 +18,9 @@
                     <v-list-item-title>
                         {{ item.title }}
                     </v-list-item-title>
-                    <v-list-item-subtitle>
+                    <div class="subtitle-2 grey--text text--darken-1">
                         {{ item.content }}
-                    </v-list-item-subtitle>
+                    </div>
                 </v-list-item-content>
                 <v-list-item-action>
                     <v-switch

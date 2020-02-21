@@ -72,7 +72,7 @@ export default {
                         {
                             title: '월별출석현황',
                             to: '/AttendanceManageMonth',
-                            perm: this.$perm('attendance').can('read'),
+                            perm: this.$perm('attendance').can('update'),
                         },
                         {
                             title: '출석현황',
@@ -82,12 +82,12 @@ export default {
                         {
                             title: '공결승인',
                             to: '/OfficialAbsenceAccept',
-                            perm: this.$perm('attendance').can('read'),
+                            perm: this.$perm('absence').can('update'),
                         },
                         {
                             title: '출석 설정',
                             to: '/manage/attendance',
-                            perm: this.$perm('attendance').can('read'),
+                            perm: this.$perm('attendance').can('update'),
                         },
                     ],
                 },
