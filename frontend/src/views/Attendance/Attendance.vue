@@ -20,7 +20,11 @@
             class="mx-auto"
             max-width="500"
             max-height="500"
-            v-if="flag && this.$perm('attendance').can('update')"
+            v-if="
+                flag &&
+                    this.$perm('attendance').can('update') &&
+                    this.output_attendance_code != ''
+            "
         >
             <v-card-text>
                 <div class="d-flex justify-center">
@@ -101,6 +105,7 @@ export default {
         }
         const res = await axios.get('attendance/attendanceCheckAdmin')
         if (res.data != 0) this.output_attendance_code = parseInt(res.data)
+        else this.output_attendance_code = 0
     },
 
     data() {
