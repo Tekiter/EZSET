@@ -86,7 +86,7 @@ export default {
             },
             {
                 type: 'switch',
-                title: '회원승인제',
+                title: '가입승인제',
                 content: '관리자의 승인이 있어야 회원가입이 완료됩니다.',
                 key: 'usePreUser',
             },
