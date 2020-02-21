@@ -16,11 +16,24 @@
             <v-col cols="12" md="7">
                 <v-card outlined :loading="isLoading">
                     <v-card-title>서버 설정</v-card-title>
-                    <setting-select
-                        v-model="settingData"
-                        :items="settingItems"
-                        @change="settingChanged = true"
-                    ></setting-select>
+                    <v-tabs v-model="curTab">
+                        <v-tab key="tab-general">일반</v-tab>
+                        <v-tab key="tab-theme">테마</v-tab>
+                    </v-tabs>
+                    <v-tabs-items v-model="curTab">
+                        <v-tab-item key="tab-general">
+                            <setting-select
+                                v-model="settingData"
+                                :items="settingItems"
+                                @change="settingChanged = true"
+                            ></setting-select>
+                        </v-tab-item>
+                        <v-tab-item key="tab-theme">
+                            <theme-manage
+                                @change="settingChanged = true"
+                            ></theme-manage>
+                        </v-tab-item>
+                    </v-tabs-items>
                 </v-card>
             </v-col>
         </v-row>
@@ -30,11 +43,13 @@
 <script>
 import axios from 'axios'
 import SettingSelect from '../../components/manage/SettingSelect.vue'
+import ThemeManage from '../../components/manage/ThemeBuilder.vue'
 
 export default {
-    components: { SettingSelect },
+    components: { SettingSelect, ThemeManage },
 
     data: () => ({
+        curTab: 0,
         isLoading: false,
         originalSettings: {},
         settingData: {},
@@ -70,10 +85,6 @@ export default {
     },
     computed: {
         settingItems: () => [
-            {
-                type: 'header',
-                title: '일반',
-            },
             {
                 type: 'text',
                 title: '그룹 이름',
