@@ -489,7 +489,11 @@ export default {
             })
             //공결내역삽입
             this.absenceUserdata.map(item => {
-                if (item.approval == false) {
+                if (
+                    item.approval == false &&
+                    moment(item.day).format('YYYYMMDD') >=
+                        moment().format('YYYYMMDD')
+                ) {
                     events.push({
                         name: '공결(승인대기)',
                         start: moment(item.day).format('YYYY-MM-DD'),
@@ -502,7 +506,11 @@ export default {
                     })
                 }
                 //승인된 공결
-                if (item.approval == true) {
+                if (
+                    item.approval == true &&
+                    moment(item.day).format('YYYYMMDD') >=
+                        moment().format('YYYYMMDD')
+                ) {
                     events.push({
                         name: '공결(승인완료)',
                         start: moment(item.day).format('YYYY-MM-DD'),
