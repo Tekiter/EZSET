@@ -10,15 +10,14 @@
         </div> -->
         <v-container grid-list-md>
             <v-row>
-                <v-col cols="2"></v-col>
-                <v-col cols="8" class="d-flex justify-center">
+                <v-col cols="12" sm="2"></v-col>
+                <v-col cols="12" sm="8" class="d-flex justify-center">
                     <strong class="font-weight-medium display-2">{{
                         board.title
                     }}</strong>
                 </v-col>
-                <v-col cols="2">
+                <v-col cols="12" sm="2">
                     <v-select
-                        class="text-right"
                         v-model="select"
                         :items="viewCount"
                         item-text="state"
@@ -76,16 +75,16 @@
                     </template>
                 </v-data-table>
             </v-card>
-            <div class="row">
-                <div class="col"></div>
-                <div class="col">
+            <v-row v-if="$vuetify.breakpoint.mdAndUp">
+                <v-col cols="2"></v-col>
+                <v-col cols="8">
                     <v-pagination
                         v-model="page"
                         :length="pageCount"
                         :items-per-page.sync="page"
                     ></v-pagination>
-                </div>
-                <div class="col">
+                </v-col>
+                <v-col cols="2">
                     <div class="d-flex flex-row-reverse">
                         <v-btn
                             class="ma-2"
@@ -106,7 +105,42 @@
                             <v-icon left>mdi-pencil</v-icon> 글쓰기
                         </v-btn>
                     </div>
-                </div>
+                </v-col>
+            </v-row>
+            <div v-else>
+                <v-row>
+                    <v-col>
+                        <v-pagination
+                            v-model="page"
+                            :length="pageCount"
+                            :items-per-page.sync="page"
+                        ></v-pagination>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <div class="d-flex flex-row-reverse">
+                            <v-btn
+                                class="ma-2"
+                                tile
+                                outlined
+                                color="black darken-2"
+                                :to="'/searchpost'"
+                            >
+                                <v-icon left>mdi-magnify</v-icon> 검색
+                            </v-btn>
+                            <v-btn
+                                class="ma-2"
+                                tile
+                                outlined
+                                color="black darken-2"
+                                :to="'/write/' + curid"
+                            >
+                                <v-icon left>mdi-pencil</v-icon> 글쓰기
+                            </v-btn>
+                        </div>
+                    </v-col>
+                </v-row>
             </div>
         </v-container>
     </div>
@@ -237,8 +271,9 @@ export default {
                 this.board = res.data.board
                 this.loading = false
                 this.totalpage = res.data.totalpage
-                this.pageCount =
-                    Math.floor(res.data.totalpage / this.select.value) + 1
+                this.pageCount = Math.ceil(
+                    res.data.totalpage / this.select.value
+                )
             } catch (error) {
                 //
             }
