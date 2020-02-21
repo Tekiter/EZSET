@@ -30,12 +30,22 @@ router.route('/login').post(
                     accessToken,
                 })
             } else {
-                res.status(403).json({
-                    message: '로그인 실패',
-                })
+                const user = await PreUser.findOne()
+                    .where('username')
+                    .equals(req.body.username)
+
+                if (user) {
+                    res.status(403).json({ message: '가입 승인 대기중입니다.' })
+                } else {
+                    res.status(403).json({
+                        message: '올바르지 않은 아이디 또는 비밀번호입니다.',
+                    })
+                }
             }
         } catch (error) {
-            databaseError(res, error)
+            const err = new Error('알 수 없는 오류가 발생했습니다.')
+            err.status = 500
+            throw err
         }
     })
 )
