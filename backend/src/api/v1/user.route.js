@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import random from 'random-number-csprng'
 import {
     asyncRoute,
     checkRoleTag,
@@ -15,12 +16,7 @@ import role from '../../utils/role'
 
 const router = Router()
 
-// router.get('/', [], (req, res) => {
-//     if (req.perm('board', '1234').can('write', 'own')) {
-//         res.json({ message: req.permission })
-//     }
-// })
-
+// 유저의 전체 목록을 가져옴
 router.route('/').get(
     [
         role.perm('manageUsers').can('access'),
@@ -65,6 +61,7 @@ router.route('/').get(
     })
 )
 
+// 유저 회원탈퇴
 router.delete(
     '/:username',
     [param('username').custom(checkUsername), validateParams],
@@ -92,6 +89,30 @@ router.delete(
     })
 )
 
+// 비밀번호 초기화
+router.post(
+    '/:username/resetpassword',
+    [
+        role.perm('manageUsers').can('access'),
+        param('username').custom(checkUsername),
+        validateParams,
+    ],
+    asyncRoute(async (req, res) => {
+        const user = await User.findOne()
+            .where('username')
+            .equals(req.params.username)
+        const newpasswd =
+            (await random(11, 35)).toString(36) +
+            (await random(36 ** 7, 36 ** 8)).toString(36)
+        user.password = newpasswd
+
+        await user.save()
+
+        res.json({ new_password: newpasswd })
+    })
+)
+
+// 유저의 역할 가져오기
 router.get(
     '/:username/role',
     [
@@ -118,6 +139,7 @@ router.get(
     })
 )
 
+// 유저의 역할 변경
 router.put(
     '/:username/role',
     [
@@ -161,6 +183,7 @@ router.put(
     })
 )
 
+// 유저의 역할 추가
 router.post(
     '/:username/role',
     [
@@ -196,6 +219,7 @@ router.post(
     })
 )
 
+// 유저의 역할 삭제
 router.delete(
     '/:username/role/:roletag',
     [
