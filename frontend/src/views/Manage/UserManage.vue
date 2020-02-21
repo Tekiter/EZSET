@@ -102,8 +102,8 @@
                     }}</v-card-subtitle>
                 </v-card-title>
                 <v-card-text>
-                    <v-divider />
                     <v-list subheader>
+                        <v-divider />
                         <v-list-item two-line>
                             <v-list-item-content>
                                 <v-list-item-title>회원탈퇴</v-list-item-title>
@@ -117,21 +117,42 @@
                                     @click="
                                         deleteUser(editDialog.user.username)
                                     "
+                                    :disabled="
+                                        editDialog.user.username === 'admin'
+                                    "
                                     color="error"
                                     depressed
                                     >회원탈퇴</v-btn
                                 >
                             </v-list-item-action>
                         </v-list-item>
+                        <v-divider />
+                        <v-list-item two-line>
+                            <v-list-item-content>
+                                <v-list-item-title
+                                    >비밀번호 초기화</v-list-item-title
+                                >
+                                <v-list-item-subtitle>
+                                    비밀번호를 초기화하고, 임시 비밀번호를
+                                    발급합니다.
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                            <v-list-item-action>
+                                <v-btn
+                                    @click="
+                                        resetPassword(editDialog.user.username)
+                                    "
+                                    :disabled="
+                                        editDialog.user.username === 'admin'
+                                    "
+                                    color="info"
+                                    depressed
+                                    >비밀번호 초기화</v-btn
+                                >
+                            </v-list-item-action>
+                        </v-list-item>
+                        <v-divider />
                     </v-list>
-                    <v-divider />
-                    <!-- <v-container>
-                        <v-row no-gutters>
-                            <v-col cols="12">
-                                <v-btn color="error" depressed>회원탈퇴</v-btn>
-                            </v-col>
-                        </v-row>
-                    </v-container> -->
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -287,8 +308,8 @@ export default {
             this.roleDialog.show = true
             this.roleDialog.user = user
             const selections = []
-            for (let i in this.rawRoles) {
-                if (user.roles.indexOf(this.rawRoles[i].tag) >= 0) {
+            for (let i in this.assignableRoles) {
+                if (user.roles.indexOf(this.assignableRoles[i].tag) >= 0) {
                     selections.push(parseInt(i))
                 }
             }
@@ -296,7 +317,7 @@ export default {
         },
         async applyRoleDialog() {
             const newroles = this.roleDialog.selections.map(i => {
-                return this.rawRoles[i].tag
+                return this.assignableRoles[i].tag
             })
             this.roleDialog.isLoading = true
             try {
@@ -337,6 +358,29 @@ export default {
                     await this.$action.showAlertDialog(
                         '오류',
                         '탈퇴에 실패했습니다.'
+                    )
+                }
+            }
+        },
+        async resetPassword(username) {
+            const reply = await this.$action.showConfirmDialog(
+                '비밀번호 초기화',
+                `정말 ${username} 유저의 비밀번호를 초기화하겠습니까?`
+            )
+            if (reply) {
+                try {
+                    const res = await axios.post(
+                        `user/${username}/resetpassword`
+                    )
+                    await this.$action.showAlertDialog(
+                        '비밀번호 초기화',
+                        `${username}의 임시 비밀번호는 ${res.data.new_password} 입니다.`
+                    )
+                } catch (err) {
+                    //
+                    await this.$action.showAlertDialog(
+                        '오류',
+                        '비밀번호 초기화에 실패했습니다.'
                     )
                 }
             }
