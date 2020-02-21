@@ -58,7 +58,7 @@
                                         <v-dialog
                                             v-model="absenceResDialog.show"
                                             persistent
-                                            max-width="650"
+                                            max-width="600"
                                         >
                                             <template v-slot:activator="{ on }">
                                                 <v-btn
@@ -70,13 +70,14 @@
                                             </template>
                                             <v-card>
                                                 <v-row no-gutters>
-                                                    <v-col cols="6">
+                                                    <v-col cols="12" sm="6">
                                                         <v-date-picker
                                                             v-model="dates"
                                                             multiple
+                                                            full-width
                                                         ></v-date-picker>
                                                     </v-col>
-                                                    <v-col cols="6">
+                                                    <v-col cols="12" sm="6">
                                                         <v-menu
                                                             ref="menu"
                                                             v-model="menu"
@@ -93,7 +94,7 @@
                                                         >
                                                             <template
                                                                 v-slot:activator="{
-                                                                    on,
+                                                                    //on,
                                                                 }"
                                                             >
                                                                 <v-combobox
