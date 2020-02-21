@@ -48,6 +48,13 @@
                 </template>
             </v-data-table>
         </v-card>
+        <v-snackbar v-model="snackbar.show" :timeout="2000">
+            {{ snackbar.content }}
+
+            <v-btn dark text @click="snackbar = false">
+                닫기
+            </v-btn>
+        </v-snackbar>
     </v-container>
 </template>
 <script>
@@ -73,6 +80,10 @@ export default {
         search: '',
         selected: [],
         loading: false,
+        snackbar: {
+            show: false,
+            content: '',
+        },
     }),
     methods: {
         async fetchPreusers() {
@@ -85,25 +96,47 @@ export default {
         },
         async acceptUsers() {
             this.loading = true
+            try {
+                for (let user of this.selected) {
+                    await axios.post(`preuser/${user.username}`)
+                }
 
-            for (let user of this.selected) {
-                await axios.post(`preuser/${user.username}`)
+                this.showSnack(
+                    `${this.selected.length}명의 가입을 승인했습니다.`
+                )
+
+                this.selected = []
+
+                await this.fetchPreusers()
+            } catch (error) {
+                this.showSnack('오류가 발생했습니다.')
             }
 
-            this.selected = []
-
-            await this.fetchPreusers()
+            this.loading = false
         },
         async denyUsers() {
             this.loading = true
 
-            for (let user of this.selected) {
-                await axios.delete(`preuser/${user.username}`)
+            try {
+                for (let user of this.selected) {
+                    await axios.delete(`preuser/${user.username}`)
+                }
+
+                this.showSnack(
+                    `${this.selected.length}명의 가입을 거절했습니다.`
+                )
+
+                this.selected = []
+
+                await this.fetchPreusers()
+            } catch (__) {
+                this.showSnack('오류가 발생했습니다.')
             }
-
-            this.selected = []
-
-            await this.fetchPreusers()
+            this.loading = false
+        },
+        showSnack(content) {
+            this.snackbar.content = content
+            this.snackbar.show = true
         },
     },
     async created() {
