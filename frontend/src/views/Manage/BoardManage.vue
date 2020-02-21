@@ -3,10 +3,10 @@
         <v-col v-show="isMobileMode" cols="12">
             <v-tabs v-model="curTab" class="mt-3">
                 <v-tab>
-                    출석 설정
+                    게시판
                 </v-tab>
                 <v-tab>
-                    출석 대상 유저
+                    게시판 설정
                 </v-tab>
             </v-tabs>
         </v-col>
@@ -32,7 +32,7 @@
                         <v-icon left>mdi-pencil</v-icon> 게시판 생성
                     </v-btn>
                 </v-toolbar>
-                <v-list>
+                <v-list subheader>
                     <v-list-item v-for="board in boards" :key="board._id">
                         <v-list-item-title>{{ board.title }}</v-list-item-title>
                         <v-list-item-action>
@@ -52,8 +52,12 @@
             class="fill-height"
         >
             <v-card outlined>
-                <v-card-title>게시판 설정</v-card-title>
-                <v-list>
+                <v-toolbar flat>
+                    <v-toolbar-title>
+                        게시판 설정
+                    </v-toolbar-title>
+                </v-toolbar>
+                <v-list subheader>
                     <v-list-item v-for="board in boards" :key="board._id">
                         <v-list-item-title>{{ board.title }}</v-list-item-title>
                         <v-list-item-action>
