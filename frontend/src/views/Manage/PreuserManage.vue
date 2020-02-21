@@ -4,6 +4,9 @@
             <v-toolbar flat :disabled="loading">
                 <v-toolbar-title>
                     승인 대기 유저
+                    <v-btn @click="fetchPreusers" fab icon :disabled="loading">
+                        <v-icon>mdi-refresh</v-icon>
+                    </v-btn>
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-text-field
@@ -42,9 +45,13 @@
                 :loading="loading"
                 show-select
                 item-key="username"
+                locale="ko-KR"
             >
                 <template v-slot:no-data>
-                    <p>승인 대기중인 유저가 없습니다.</p>
+                    <p class="mt-3">승인 대기중인 유저가 없습니다.</p>
+                </template>
+                <template v-slot:loading>
+                    <p class="mt-3">불러오는중..</p>
                 </template>
             </v-data-table>
         </v-card>
