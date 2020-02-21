@@ -58,7 +58,7 @@
                                         <v-dialog
                                             v-model="absenceResDialog.show"
                                             persistent
-                                            max-width="600"
+                                            max-width="650"
                                         >
                                             <template v-slot:activator="{ on }">
                                                 <v-btn
@@ -78,44 +78,46 @@
                                                         ></v-date-picker>
                                                     </v-col>
                                                     <v-col cols="12" sm="6">
-                                                        <v-menu
-                                                            ref="menu"
-                                                            v-model="menu"
-                                                            :close-on-content-click="
-                                                                false
-                                                            "
-                                                            :return-value.sync="
-                                                                dates
-                                                            "
-                                                            transition="scale-transition"
-                                                            offset-y
-                                                            full-width
-                                                            min-width="290px"
-                                                        >
-                                                            <template
-                                                                v-slot:activator="{
-                                                                    //on,
-                                                                }"
+                                                        <v-container>
+                                                            <v-menu
+                                                                ref="menu"
+                                                                v-model="menu"
+                                                                :close-on-content-click="
+                                                                    false
+                                                                "
+                                                                :return-value.sync="
+                                                                    dates
+                                                                "
+                                                                transition="scale-transition"
+                                                                offset-y
+                                                                full-width
+                                                                min-width="290px"
                                                             >
-                                                                <v-combobox
-                                                                    v-model="
-                                                                        dates
-                                                                    "
-                                                                    multiple
-                                                                    chips
-                                                                    small-chips
-                                                                    label="Multiple picker in menu"
-                                                                    prepend-icon="mdi-plus"
-                                                                    readonly
-                                                                ></v-combobox>
-                                                            </template>
-                                                        </v-menu>
-                                                        <v-text-field
-                                                            label="결석사유"
-                                                            v-model="
-                                                                absence_reason
-                                                            "
-                                                        ></v-text-field>
+                                                                <template
+                                                                    v-slot:activator="{
+                                                                        //on,
+                                                                    }"
+                                                                >
+                                                                    <v-combobox
+                                                                        v-model="
+                                                                            dates
+                                                                        "
+                                                                        multiple
+                                                                        chips
+                                                                        small-chips
+                                                                        label="Multiple picker in menu"
+                                                                        prepend-icon="mdi-plus"
+                                                                        readonly
+                                                                    ></v-combobox>
+                                                                </template>
+                                                            </v-menu>
+                                                            <v-text-field
+                                                                label="결석사유"
+                                                                v-model="
+                                                                    absence_reason
+                                                                "
+                                                            ></v-text-field
+                                                        ></v-container>
                                                         <v-card-actions>
                                                             <v-spacer></v-spacer>
                                                             <v-btn

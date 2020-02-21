@@ -71,25 +71,28 @@
                                             </template>
                                             <v-card>
                                                 <v-row no-gutters>
-                                                    <v-col cols="6">
+                                                    <v-col cols="12" sm="6">
                                                         <v-date-picker
                                                             v-model="dates"
                                                             multiple
+                                                            full-width
                                                         ></v-date-picker>
                                                     </v-col>
-                                                    <v-col cols="6">
-                                                        <v-text-field
-                                                            label="제목"
-                                                            v-model="
-                                                                schedule_title
-                                                            "
-                                                        ></v-text-field>
-                                                        <v-text-field
-                                                            label="내용"
-                                                            v-model="
-                                                                schedule_contents
-                                                            "
-                                                        ></v-text-field>
+                                                    <v-col cols="12" sm="6">
+                                                        <v-container>
+                                                            <v-text-field
+                                                                label="제목"
+                                                                v-model="
+                                                                    schedule_title
+                                                                "
+                                                            ></v-text-field>
+                                                            <v-text-field
+                                                                label="내용"
+                                                                v-model="
+                                                                    schedule_contents
+                                                                "
+                                                            ></v-text-field>
+                                                        </v-container>
                                                         <v-color-picker
                                                             v-model="
                                                                 schedule_color
@@ -213,7 +216,7 @@
                                                     @click="dialog = true"
                                                     v-if="
                                                         $perm('schedule').can(
-                                                            'delete'
+                                                            'update'
                                                         )
                                                     "
                                                 >
