@@ -8,8 +8,8 @@
             app
             clipped-left
             elevation="2"
-            color="primary"
-            :dark="isDarkColor('primary')"
+            color="theme-appbar"
+            :dark="isDarkColor('theme-appbar')"
         >
             <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
             <v-btn text large @click="$router.push('/')">

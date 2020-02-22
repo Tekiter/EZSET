@@ -1,8 +1,8 @@
 <template>
     <v-row>
-        <v-col>
+        <v-col cols="12" md="6">
             <v-list subheader>
-                <v-subheader>옵션</v-subheader>
+                <v-subheader>색상</v-subheader>
                 <v-list-item-group v-model="selectedIndex" mandatory>
                     <v-list-item
                         v-for="option of options"
@@ -28,7 +28,7 @@
                 </v-list-item-group>
             </v-list>
         </v-col>
-        <v-col>
+        <v-col cols="12" md="6" class="d-flex justify-center">
             <v-color-picker
                 v-model="theme.themes[targetTheme][options[selectedIndex].key]"
                 @update:color="valueChanged"
@@ -101,6 +101,11 @@ export default {
                     name: '서브 색상',
                     key: 'secondary',
                     content: '서브 색상입니다.',
+                },
+                {
+                    name: '상단바',
+                    key: 'theme-appbar',
+                    content: '화면 위쪽 상단바 색상입니다.',
                 },
             ]
         },
