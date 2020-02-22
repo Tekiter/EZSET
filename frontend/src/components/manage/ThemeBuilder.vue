@@ -15,6 +15,8 @@
                 v-model="theme.themes[targetTheme][options[selectedIndex].key]"
                 @update:color="valueChanged"
                 mode="rgba"
+                show-swatches
+                swatches-max-height="300px"
             ></v-color-picker>
         </v-col>
     </v-row>
