@@ -30,6 +30,7 @@
                         </v-tab-item>
                         <v-tab-item key="tab-theme">
                             <theme-manage
+                                v-model="settingData.theme"
                                 @change="settingChanged = true"
                             ></theme-manage>
                         </v-tab-item>

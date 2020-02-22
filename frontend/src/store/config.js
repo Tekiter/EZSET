@@ -23,7 +23,7 @@ export default {
                 context.commit('SET_CONFIGS', res.data)
 
                 document.title = context.state.groupName
-                applyTheme(context.state.theme.themes)
+                applyTheme(context.state.theme)
             } catch (error) {
                 throw error
             }

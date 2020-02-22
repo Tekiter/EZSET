@@ -1,14 +1,17 @@
 import Vuetify from '../plugins/vuetify'
 import { isDark } from './color'
 
-export function applyTheme(themes) {
-    try {
-        Object.keys(themes).forEach(i => {
-            Vuetify.framework.theme.themes[i] = themes[i]
-        })
-    } catch (error) {
-        //
-    }
+export function applyTheme(theme) {
+    console.log(theme)
+    //     try {
+    const themes = theme.themes
+    Object.keys(themes).forEach(i => {
+        Vuetify.framework.theme.themes[i] = themes[i]
+    })
+    console.log(Vuetify.framework.theme)
+    // } catch (error) {
+    //     //
+    // }
 }
 
 export const themeHelper = {
