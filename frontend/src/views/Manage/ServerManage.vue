@@ -1,21 +1,35 @@
 <template>
     <div>
-        <v-banner v-model="settingChanged" single-line sticky tile>
-            변경된 설정이 있습니다.
-
-            <template v-slot:actions>
-                <v-btn text color="deep-purple accent-4" @click="resetChanges()"
-                    >되돌리기</v-btn
-                >
-                <v-btn text color="deep-purple accent-4" @click="saveChanges()"
-                    >변경사항 저장</v-btn
-                >
-            </template>
-        </v-banner>
         <v-row no-gutters justify="center" class="mt-4">
             <v-col cols="12" md="7">
                 <v-card outlined :loading="isLoading">
-                    <v-card-title>서버 설정</v-card-title>
+                    <v-toolbar flat>
+                        <v-toolbar-title>
+                            서버 설정
+                        </v-toolbar-title>
+                        <v-spacer></v-spacer>
+                        <v-fade-transition>
+                            <v-btn
+                                text
+                                color="primary accent-4"
+                                @click="resetChanges()"
+                                v-show="settingChanged"
+                            >
+                                되돌리기
+                            </v-btn>
+                        </v-fade-transition>
+                        <v-fade-transition>
+                            <v-btn
+                                outlined
+                                color="primary accent-4"
+                                @click="saveChanges()"
+                                v-show="settingChanged"
+                            >
+                                변경사항 저장
+                            </v-btn>
+                        </v-fade-transition>
+                    </v-toolbar>
+
                     <v-tabs v-model="curTab">
                         <v-tab key="tab-general">일반</v-tab>
                         <v-tab key="tab-theme">테마</v-tab>

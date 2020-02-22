@@ -4,8 +4,26 @@
             <v-list subheader>
                 <v-subheader>옵션</v-subheader>
                 <v-list-item-group v-model="selectedIndex" mandatory>
-                    <v-list-item v-for="option of options" :key="option.key">
-                        {{ option.name }}
+                    <v-list-item
+                        v-for="option of options"
+                        :key="`theme-builder-${option.key}`"
+                        two-line
+                        :color="theme.themes[targetTheme][option.key]"
+                    >
+                        <v-list-item-content>
+                            <v-list-item-title>
+                                {{ option.name }}
+                            </v-list-item-title>
+                            <div class="subtitle-2 grey--text text--darken-1">
+                                {{ option.content }}
+                            </div>
+                        </v-list-item-content>
+                        <v-list-item-action>
+                            <v-chip
+                                :color="theme.themes[targetTheme][option.key]"
+                            >
+                            </v-chip>
+                        </v-list-item-action>
                     </v-list-item>
                 </v-list-item-group>
             </v-list>
@@ -64,11 +82,11 @@ export default {
     created() {
         this.theme = _.cloneDeep(this.value)
         this.fillTheme(this.theme.themes)
-        console.log(this.theme)
     },
     watch: {
         value(newval, oldval) {
             this.theme = _.cloneDeep(this.value)
+            this.fillTheme(this.theme.themes)
         },
     },
     computed: {
@@ -77,10 +95,12 @@ export default {
                 {
                     name: '메인 색상',
                     key: 'primary',
+                    content: '주요 색상입니다.',
                 },
                 {
                     name: '서브 색상',
                     key: 'secondary',
+                    content: '서브 색상입니다.',
                 },
             ]
         },
