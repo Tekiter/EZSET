@@ -4,7 +4,13 @@
             <side-menu></side-menu>
         </v-navigation-drawer>
 
-        <v-app-bar app clipped-left elevation="2">
+        <v-app-bar
+            app
+            clipped-left
+            elevation="2"
+            color="primary"
+            :dark="isDarkColor('primary')"
+        >
             <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
             <v-btn text large @click="$router.push('/')">
                 <v-toolbar-title>{{
