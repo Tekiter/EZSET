@@ -23,7 +23,7 @@
                                 class="ma-2"
                                 tile
                                 outlined
-                                color="blue darken-2"
+                                color="primary darken-2"
                                 @click="back()"
                             >
                                 <v-icon left>mdi-arrow-left-circle</v-icon>
@@ -80,7 +80,7 @@
                                         class="ma-2"
                                         tile
                                         outlined
-                                        color="green darken-2"
+                                        color="success darken-2"
                                         v-if="del_auth(post.author)"
                                         @click="go_modify()"
                                     >
@@ -91,7 +91,7 @@
                                         class="ma-2"
                                         tile
                                         outlined
-                                        color="black"
+                                        color="error"
                                         v-if="del_auth(post.author)"
                                         @click="deletePost"
                                     >
@@ -101,7 +101,7 @@
                                         class="ma-2"
                                         tile
                                         outlined
-                                        color="red darken-1"
+                                        color="primary lighten-1"
                                         v-if="!post.isLike"
                                         @click="clickLike(post.author)"
                                     >
@@ -115,7 +115,7 @@
                                         class="ma-2"
                                         tile
                                         outlined
-                                        color="purple"
+                                        color="warning"
                                         v-else
                                         @click="clickDislike(post.author)"
                                     >
