@@ -20,6 +20,22 @@
             class="mx-auto"
             max-width="500"
             max-height="500"
+            v-if="flag == true && code == 0 && output_attendance_code == ''"
+        >
+            <v-card-title>
+                <v-text-field v-model="input_attendance_code"></v-text-field>
+            </v-card-title>
+
+            <v-card-actions>
+                <v-btn color="purple" text @click="attendanceCheck"
+                    >출석하기</v-btn
+                >
+            </v-card-actions>
+        </v-card>
+        <v-card
+            class="mx-auto"
+            max-width="500"
+            max-height="500"
             v-if="
                 flag &&
                     this.$perm('attendance').can('update') &&
