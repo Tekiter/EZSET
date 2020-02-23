@@ -21,7 +21,7 @@
                     @click="denyUsers()"
                     :disabled="selected.length == 0"
                     outlined
-                    color="gray"
+                    color="warning darken-2"
                     class="ml-2"
                 >
                     가입 거절
@@ -30,7 +30,7 @@
                     @click="acceptUsers()"
                     :disabled="selected.length == 0"
                     outlined
-                    color="green"
+                    color="success darken-2"
                     class="ml-2"
                 >
                     가입 승인

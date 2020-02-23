@@ -11,6 +11,7 @@ export default {
                 info: '#2196F3',
                 success: '#4CAF50',
                 warning: '#FB8C00',
+                'theme-appbar': '#4464A5',
             },
             dark: {
                 primary: '#2196F3',
@@ -20,6 +21,7 @@ export default {
                 info: '#2196F3',
                 success: '#4CAF50',
                 warning: '#FB8C00',
+                'theme-appbar': '#4464A5',
             },
         },
     },

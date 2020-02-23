@@ -69,8 +69,14 @@
                                                     v-slot:activator="{ on }"
                                                 >
                                                     <v-btn
+                                                        class="mr-1"
                                                         color="primary"
-                                                        dark
+                                                        depressed
+                                                        :dark="
+                                                            isDarkColor(
+                                                                'primary'
+                                                            )
+                                                        "
                                                         v-on="on"
                                                         >결석예약</v-btn
                                                     >
@@ -308,12 +314,12 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
 
-                    <v-btn color="green darken-1" text @click="dialog = false">
+                    <v-btn color="grey darken-1" text @click="dialog = false">
                         아니요
                     </v-btn>
 
                     <v-btn
-                        color="green darken-1"
+                        color="primary darken-1"
                         text
                         @click="cancleAbsence(selectedEvent)"
                     >

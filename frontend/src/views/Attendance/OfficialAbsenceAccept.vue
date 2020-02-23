@@ -28,7 +28,7 @@
                         <v-spacer></v-spacer>
                         <v-btn
                             text
-                            color="deep-purple accent-4"
+                            color="primary accent-4"
                             small
                             class="d-flex flex-row-reverse"
                             @click="Accept"
@@ -74,7 +74,7 @@
                         <v-spacer></v-spacer>
                         <v-btn
                             text
-                            color="deep-purple accent-4"
+                            color="primary accent-4"
                             small
                             class="d-flex flex-row-reverse"
                             @click="Cancle"

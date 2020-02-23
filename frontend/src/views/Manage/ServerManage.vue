@@ -136,6 +136,7 @@ export default {
                                 '서버 설정 초기화',
                                 '서버 설정이 초기화 되었습니다.'
                             )
+                            location.reload()
                         }
                     },
                 },

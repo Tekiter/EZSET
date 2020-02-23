@@ -99,22 +99,22 @@
                             </template>
                             <template v-else>
                                 <v-icon
-                                    color="green"
+                                    color="success"
                                     v-if="item[header.value] == 'attendance'"
                                     >mdi-checkbox-blank-circle-outline</v-icon
                                 >
                                 <v-icon
-                                    color="orange"
+                                    color="warning"
                                     v-else-if="item[header.value] == 'late'"
                                     >mdi-triangle-outline</v-icon
                                 >
                                 <v-icon
-                                    color="red"
+                                    color="error"
                                     v-else-if="item[header.value] == 'absence'"
                                     >mdi-close</v-icon
                                 >
                                 <v-icon
-                                    color="green"
+                                    color="success"
                                     v-else-if="
                                         item[header.value] == 'official_absence'
                                     "
