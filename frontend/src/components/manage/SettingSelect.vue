@@ -58,6 +58,31 @@
                 </v-list-item-content>
             </v-list-item>
 
+            <!-- action 타입 -->
+            <v-list-item
+                v-else-if="item.type == 'action'"
+                :key="`setiing-select-item-${idx}`"
+            >
+                <v-list-item-content>
+                    <v-list-item-title>
+                        {{ item.title }}
+                    </v-list-item-title>
+                    <div class="subtitle-2 grey--text text--darken-1">
+                        {{ item.content }}
+                    </div>
+                </v-list-item-content>
+                <v-list-item-action>
+                    <v-btn
+                        v-if="item.action"
+                        color="primary"
+                        @click="item.action"
+                        depressed
+                    >
+                        {{ item.caption }}
+                    </v-btn>
+                </v-list-item-action>
+            </v-list-item>
+
             <!-- line 타입 -->
             <v-divider
                 v-else-if="item.type == 'line'"

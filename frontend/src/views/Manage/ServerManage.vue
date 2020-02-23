@@ -99,24 +99,48 @@ export default {
         await this.fetchSettings()
     },
     computed: {
-        settingItems: () => [
-            {
-                type: 'text',
-                title: '그룹 이름',
-                content: '유저들에게 노출되는 그룹 이름입니다.',
-                key: 'groupName',
-            },
-            {
-                type: 'header',
-                title: '가입',
-            },
-            {
-                type: 'switch',
-                title: '가입승인제',
-                content: '관리자의 승인이 있어야 회원가입이 완료됩니다.',
-                key: 'usePreUser',
-            },
-        ],
+        settingItems() {
+            return [
+                {
+                    type: 'text',
+                    title: '그룹 이름',
+                    content: '유저들에게 노출되는 그룹 이름입니다.',
+                    key: 'groupName',
+                },
+                {
+                    type: 'line',
+                },
+                {
+                    type: 'header',
+                    title: '가입',
+                },
+                {
+                    type: 'switch',
+                    title: '가입승인제',
+                    content: '관리자의 승인이 있어야 회원가입이 완료됩니다.',
+                    key: 'usePreUser',
+                },
+                {
+                    type: 'action',
+                    title: '서버 설정 초기화',
+                    content: '서버 설정을 초기화합니다.',
+                    caption: '초기화',
+                    action: async () => {
+                        const res = await this.$action.showConfirmDialog(
+                            '서버 설정 초기화',
+                            '정말 서버 설정을 초기화 하시겠습니까?. 서버 설정 외의 데이터는 변경되지 않습니다.'
+                        )
+                        if (res) {
+                            await axios.post('config/reset')
+                            await this.$action.showAlertDialog(
+                                '서버 설정 초기화',
+                                '서버 설정이 초기화 되었습니다.'
+                            )
+                        }
+                    },
+                },
+            ]
+        },
     },
 }
 </script>
