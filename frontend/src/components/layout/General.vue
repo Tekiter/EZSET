@@ -51,7 +51,9 @@
         </v-app-bar>
 
         <v-content>
-            <router-view></router-view>
+            <v-fade-transition hide-on-leave>
+                <router-view></router-view>
+            </v-fade-transition>
         </v-content>
 
         <!-- <v-footer app>&copy; EZSET</v-footer> -->
