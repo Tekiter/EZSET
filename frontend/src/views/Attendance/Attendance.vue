@@ -11,7 +11,7 @@
             </v-card-title>
 
             <v-card-actions>
-                <v-btn color="purple" text @click="attendanceCheck"
+                <v-btn color="primary" text @click="attendanceCheck"
                     >출석하기</v-btn
                 >
             </v-card-actions>
@@ -32,7 +32,7 @@
                 </div>
                 <div class="d-flex justify-center">
                     <v-btn
-                        color="purple"
+                        color="primary"
                         text
                         v-if="flag"
                         @click="endAttendance"
@@ -51,7 +51,7 @@
             v-if="!flag && this.$perm('attendance').can('update')"
         >
             <v-card-actions>
-                <v-btn color="purple" text @click="startAttendance" large
+                <v-btn color="primary" text @click="startAttendance" large
                     >시작</v-btn
                 >
             </v-card-actions>

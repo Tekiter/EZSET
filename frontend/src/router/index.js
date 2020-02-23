@@ -123,6 +123,11 @@ const routes = [
         component: () => import('../views/Manage/ServerManage.vue'),
     },
     {
+        path: '/manage/theme',
+        name: 'manageTheme',
+        component: () => import('../views/Manage/ThemeManage.vue'),
+    },
+    {
         path: '/403',
         name: 'error403',
         component: () => import('../views/Error/403.vue'),

@@ -6,9 +6,11 @@
         </v-tabs>
         <v-tabs-items v-model="tab">
             <v-tab-item>
-                <v-container fluid>
-                    <viewer :value="homeview" />
-                </v-container>
+                <v-fade-transition>
+                    <v-container fluid v-show="!homeloading">
+                        <viewer :value="homeview" />
+                    </v-container>
+                </v-fade-transition>
             </v-tab-item>
             <v-tab-item v-if="$perm('manageHome').can('update')">
                 <v-card outlined>
@@ -21,7 +23,9 @@
                         />
                         <div class="d-flex mt-3">
                             <v-spacer></v-spacer>
-                            <v-btn @click="save" outlined>저장</v-btn>
+                            <v-btn @click="save" outlined color="primary">
+                                저장
+                            </v-btn>
                         </div>
                     </v-card-text>
                 </v-card>
@@ -48,6 +52,7 @@ export default {
                 },
             },
             homeview: '',
+            homeloading: false,
         }
     },
     async created() {
@@ -69,12 +74,14 @@ export default {
             return this.$refs.editor.invoke('getMarkdown')
         },
         async loadhome() {
+            this.homeloading = true
             try {
                 const cursor = await axios.get('home/simple')
                 this.homeview = cursor.data.content
             } catch (err) {
                 //
             }
+            this.homeloading = false
         },
     },
 }
