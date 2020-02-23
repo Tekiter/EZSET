@@ -34,7 +34,7 @@
                         <v-tab key="tab-general">일반</v-tab>
                         <v-tab key="tab-theme">테마</v-tab>
                     </v-tabs>
-                    <v-tabs-items v-model="curTab">
+                    <v-tabs-items v-model="curTab" touchless>
                         <v-tab-item key="tab-general">
                             <setting-select
                                 v-model="settingData"
@@ -81,9 +81,8 @@ export default {
 
             this.isLoading = false
         },
-        resetChanges() {
-            this.settingChanged = false
-            this.settingData = this.originalSettings
+        async resetChanges() {
+            await this.fetchSettings()
         },
         async saveChanges() {
             this.isLoading = true
@@ -142,6 +141,21 @@ export default {
                 },
             ]
         },
+    },
+    async beforeRouteLeave(to, from, next) {
+        if (this.settingChanged) {
+            const res = await this.$action.showConfirmDialog(
+                '서버 설정',
+                '저장하지 않은 설정이 있습니다. 정말 나가시겠습니까?'
+            )
+            if (res) {
+                next()
+            } else {
+                next(false)
+            }
+        } else {
+            next()
+        }
     },
 }
 </script>

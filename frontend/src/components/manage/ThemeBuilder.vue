@@ -93,19 +93,39 @@ export default {
         options() {
             return [
                 {
-                    name: '메인 색상',
+                    name: 'Primary',
                     key: 'primary',
-                    content: '주요 색상입니다.',
+                    content: '전체적으로 적용되는 메인 색상입니다.',
                 },
                 {
-                    name: '서브 색상',
+                    name: 'Secondary',
                     key: 'secondary',
                     content: '서브 색상입니다.',
                 },
                 {
-                    name: '상단바',
+                    name: 'Appbar',
                     key: 'theme-appbar',
                     content: '화면 위쪽 상단바 색상입니다.',
+                },
+                {
+                    name: 'Success',
+                    key: 'success',
+                    content: '',
+                },
+                {
+                    name: 'Warning',
+                    key: 'warning',
+                    content: '',
+                },
+                {
+                    name: 'Error',
+                    key: 'error',
+                    content: '',
+                },
+                {
+                    name: 'Info',
+                    key: 'info',
+                    content: '',
                 },
             ]
         },
