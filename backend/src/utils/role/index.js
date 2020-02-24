@@ -15,7 +15,7 @@ const role = {
                 .equals(req.user.username)
                 .select('roles')
                 .cache(60, 'USER-ROLE-' + req.user.username)
-            req.user.perm = roles.createPermChecker(user.roles)
+            req.user.perm = roles.createPermChecker(['default', ...user.roles])
             next()
         } else {
             next()
@@ -53,6 +53,17 @@ const role = {
             cannotOwn(action, type) {
                 return middleware('cannotOwn', action, type)
             },
+        }
+    },
+    permOr(callback) {
+        return (req, res, next) => {
+            if (callback(req.user.perm)) {
+                next()
+            } else {
+                const err = new Error('권한이 없습니다.')
+                err.status = 403
+                throw err
+            }
         }
     },
     async getRoleNames() {
@@ -103,16 +114,40 @@ const role = {
         // 메모리의 role 제거
         roles.removeRole(roletag)
     },
+    async updateRole(roletag) {
+        const dbrole = await RoleModel.findOne()
+            .where('tag')
+            .equals(roletag)
+
+        const newrole = roles.export(roletag)
+        dbrole.name = newrole.name
+        dbrole.perm = newrole.perm
+
+        await dbrole.save()
+    },
     async loadRoles() {
         const roleobjs = await RoleModel.find()
+        let hasDefault = false
         roleobjs.forEach(role => {
+            if (role.tag === 'default') {
+                hasDefault = true
+            }
             roles.setRole({
                 tag: role.tag,
                 name: role.name,
                 perm: role.perm,
             })
         })
-        setDefaultRole(roles)
+        if (!hasDefault) {
+            setDefaultRole(roles)
+            const newrole = roles.export('default')
+            const newroledoc = RoleModel({
+                tag: newrole.tag,
+                name: newrole.name,
+                perm: newrole.perm,
+            })
+            await newroledoc.save()
+        }
         setAdminRole(roles)
     },
     async getUserRoles(username) {

@@ -90,7 +90,7 @@
                             class="ma-2"
                             tile
                             outlined
-                            color="black darken-2"
+                            color="primary darken-2"
                             :to="'/searchpost'"
                         >
                             <v-icon left>mdi-magnify</v-icon> 검색
@@ -99,7 +99,7 @@
                             class="ma-2"
                             tile
                             outlined
-                            color="black darken-2"
+                            color="primary darken-2"
                             :to="'/write/' + curid"
                         >
                             <v-icon left>mdi-pencil</v-icon> 글쓰기

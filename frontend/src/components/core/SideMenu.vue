@@ -37,22 +37,59 @@ export default {
                             perm: this.$perm('manageUsers').can('access'),
                         },
                         {
+                            title: '가입 승인',
+                            to: '/manage/preusers',
+                            perm: this.$perm('managePreusers').can('access'),
+                        },
+                        {
                             title: '역할 관리',
                             to: '/manage/roles',
-                            perm: this.$perm('manageRoles').can('access'),
+                            perm: this.$perm('role').can('modify'),
                         },
                         {
                             title: '게시판 관리',
                             to: '/manage/boards',
                             perm: this.$perm('manageBoards').can('access'),
                         },
+                        {
+                            title: '서버 설정',
+                            to: '/manage/server',
+                            perm: this.$perm('serverConfig').can('change'),
+                        },
                     ],
                 },
                 {
                     type: 'simple',
                     icon: 'mdi-checkbox-marked-circle-outline',
-                    title: '출석체크',
-                    to: '/attendance',
+                    title: '출석',
+
+                    children: [
+                        {
+                            title: '출석체크',
+                            to: '/attendance',
+                            perm: this.$perm('attendance').can('att'),
+                        },
+                        {
+                            title: '월별출석현황',
+                            to: '/AttendanceManageMonth',
+                            perm: this.$perm('attendance').can('update'),
+                        },
+                        {
+                            title: '출석현황',
+                            to: '/AttendanceManageMonthUser',
+                            perm: this.$perm('attendance').canOwn('read'),
+                        },
+                        {
+                            title: '공결승인',
+                            to: '/OfficialAbsenceAccept',
+                            perm: this.$perm('absence').can('update'),
+                        },
+                        {
+                            title: '출석 설정',
+                            to: '/manage/attendance',
+                            perm: this.$perm('attendance').can('update'),
+                        },
+                    ],
                 },
                 {
                     type: 'simple',
@@ -60,6 +97,13 @@ export default {
                     title: '게시판',
                     to: '/board',
                     children: this.$store.getters['board/boardList'],
+                },
+                {
+                    type: 'simple',
+                    icon: 'mdi-calendar-month ',
+                    title: '일정표',
+                    to: '/Schedule',
+                    perm: this.$perm('schedule').can('read'),
                 },
             ]
         },

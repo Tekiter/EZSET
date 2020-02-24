@@ -1,10 +1,14 @@
 <template>
     <div v-if="!isLoading">
-        <general-layout v-if="!$route.meta.layout"></general-layout>
+        <v-fade-transition hide-on-leave>
+            <general-layout v-if="!$route.meta.layout"></general-layout>
 
-        <empty-layout v-else-if="$route.meta.layout == 'empty'"></empty-layout>
+            <empty-layout
+                v-else-if="$route.meta.layout == 'empty'"
+            ></empty-layout>
 
-        <router-view v-else></router-view>
+            <router-view v-else></router-view>
+        </v-fade-transition>
 
         <common-dialogs></common-dialogs>
     </div>
@@ -44,6 +48,7 @@ export default {
     },
     async created() {
         this.isLoading = true
+        await this.$store.dispatch('config/fetchConfig')
 
         if (this.$store.getters['auth/isLoggedIn']) {
             try {

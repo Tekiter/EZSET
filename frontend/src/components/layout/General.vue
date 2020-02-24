@@ -4,10 +4,18 @@
             <side-menu></side-menu>
         </v-navigation-drawer>
 
-        <v-app-bar app clipped-left>
+        <v-app-bar
+            app
+            clipped-left
+            elevation="2"
+            color="theme-appbar"
+            :dark="isDarkColor('theme-appbar')"
+        >
             <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
             <v-btn text large @click="$router.push('/')">
-                <v-toolbar-title>EZSET</v-toolbar-title>
+                <v-toolbar-title>{{
+                    $store.state.config.groupName
+                }}</v-toolbar-title>
             </v-btn>
             <v-spacer></v-spacer>
 
@@ -43,7 +51,9 @@
         </v-app-bar>
 
         <v-content>
-            <router-view></router-view>
+            <v-fade-transition hide-on-leave>
+                <router-view></router-view>
+            </v-fade-transition>
         </v-content>
 
         <!-- <v-footer app>&copy; EZSET</v-footer> -->

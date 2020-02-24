@@ -1,5 +1,4 @@
 //socket io to Attendance
-
 export const io = undefined
 
 export async function initSocket(app, SOCKET_PORT) {
@@ -9,32 +8,44 @@ export async function initSocket(app, SOCKET_PORT) {
     //Attendance State
     var curState = {
         flag: false,
+        time: 180000,
     }
-
     //connect event
     io.on('connection', function(socket) {
         socket.on('join', function(data) {
             socket.join(data.roomName)
-        })
-        //disconnect event
-        socket.on('disconnect', () => {
-            // console.log('[socket.io] ' + socket.id + 'user disconnected')
+            io.to(socket.id).emit('attendance', curState)
         })
         //attendance event lisner
         socket.on('attendance', function(data) {
             curState.flag = data.flag
-            var rtnMessage = {
+            var msg = {
                 flag: data.flag,
+                time: curState.time,
             }
             //broadcast changed state
-            socket.broadcast.to('attendance').emit('attendance', rtnMessage)
+            // socket.broadcast.to('attendance').emit('attendance', msg)
+            io.to('attendance').emit('attendance', msg)
         })
-        //connect after attendance start
-        setInterval(function() {
-            if (curState.flag == true) {
-                socket.to('attendance').emit('attendance', curState)
-            }
-        }, 1000)
+        //setTimeout 3m when attendance start
+
+        socket.on('start', function(data) {
+            curState.time = 184000
+            var timerID = setInterval(function() {
+                if (curState.flag == false) clearInterval(timerID)
+                curState.time -= 1000
+                if (curState.time == 0) {
+                    clearInterval(timerID)
+                    if (curState.flag == true) {
+                        var msg = {
+                            flag: false,
+                        }
+                        curState.flag = false
+                        io.to('attendance').emit('attendance', msg)
+                    }
+                }
+            }, 1000)
+        })
     })
     //start socket.io server
     server.listen(SOCKET_PORT, function() {

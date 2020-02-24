@@ -1,7 +1,9 @@
 <template>
     <v-app>
         <v-content>
-            <router-view></router-view>
+            <v-fade-transition hide-on-leave>
+                <router-view></router-view>
+            </v-fade-transition>
         </v-content>
     </v-app>
 </template>

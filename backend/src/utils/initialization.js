@@ -1,5 +1,5 @@
 import random from 'random-number-csprng'
-import config from '../utils/config'
+import { configAvailable, setConfig, setDefaultConfigs } from '../utils/config'
 import User from '../models/User'
 import role from '../utils/role'
 
@@ -20,17 +20,17 @@ const initialization = {
             roles: ['admin'],
         })
         const result = await admin.save()
-        config.setConfig('superAdmin', result.username)
+        await setConfig('superAdmin', result.username)
 
         console.log(`Superadmin created (admin/admin_${rndNum})`) // eslint-disable-line no-console
     },
     async initialize() {
-        const isFirstStart = !(await config.configAvailable())
+        const isFirstStart = !(await configAvailable())
         if (isFirstStart) {
             console.log('Initialization detected.') // eslint-disable-line no-console
             await initialization.createSuperAdmin()
 
-            config.setConfig('groupName', 'EZSET')
+            await setDefaultConfigs()
         }
 
         await role.loadRoles()

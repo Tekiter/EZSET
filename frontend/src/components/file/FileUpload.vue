@@ -27,7 +27,8 @@
                 :key="idx"
                 @click:close="removeFile(idx)"
                 close
-                :color="fileinfo.uploaded ? 'green' : ''"
+                :color="fileinfo.uploaded ? 'success' : ''"
+                :dark="fileinfo.uploaded ? isDarkColor('success') : undefined"
                 class="mr-2 mt-1"
                 >{{ fileinfo.filename }}</v-chip
             >

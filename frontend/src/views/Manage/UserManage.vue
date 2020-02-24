@@ -18,6 +18,7 @@
                         hide-details
                         dense
                         label="검색하기"
+                        prepend-inner-icon="mdi-magnify"
                     ></v-text-field>
                 </v-toolbar>
             </template>
@@ -45,7 +46,7 @@
                         cols="12"
                         md="6"
                     >
-                        <v-card>
+                        <v-card outlined>
                             <v-card-title>
                                 <p class="subheader">
                                     {{ user.username }}
@@ -65,6 +66,7 @@
                                             {{ roles[userrole].name }}
                                         </v-chip>
                                         <v-btn
+                                            v-if="$perm('role').can('modify')"
                                             @click="showRoleDialog(user)"
                                             icon
                                             small
@@ -91,7 +93,7 @@
         </v-data-iterator>
 
         <!-- 유저 Action Dialog -->
-        <v-dialog v-model="editDialog.show" persistent max-width="500px">
+        <v-dialog v-model="editDialog.show" persistent max-width="600px">
             <v-card>
                 <v-card-title>
                     <span class="headline">유저 관리</span
@@ -100,11 +102,57 @@
                     }}</v-card-subtitle>
                 </v-card-title>
                 <v-card-text>
-                    <v-container>
-                        <v-row no-gutters>
-                            <v-col cols="12"> </v-col>
-                        </v-row>
-                    </v-container>
+                    <v-list subheader>
+                        <v-divider />
+                        <v-list-item two-line>
+                            <v-list-item-content>
+                                <v-list-item-title>회원탈퇴</v-list-item-title>
+                                <v-list-item-subtitle>
+                                    유저가 작성했던 게시글 등은 삭제되지
+                                    않습니다.
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                            <v-list-item-action>
+                                <v-btn
+                                    @click="
+                                        deleteUser(editDialog.user.username)
+                                    "
+                                    :disabled="
+                                        editDialog.user.username === 'admin'
+                                    "
+                                    color="error"
+                                    depressed
+                                    >회원탈퇴</v-btn
+                                >
+                            </v-list-item-action>
+                        </v-list-item>
+                        <v-divider />
+                        <v-list-item two-line>
+                            <v-list-item-content>
+                                <v-list-item-title
+                                    >비밀번호 초기화</v-list-item-title
+                                >
+                                <v-list-item-subtitle>
+                                    비밀번호를 초기화하고, 임시 비밀번호를
+                                    발급합니다.
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                            <v-list-item-action>
+                                <v-btn
+                                    @click="
+                                        resetPassword(editDialog.user.username)
+                                    "
+                                    :disabled="
+                                        editDialog.user.username === 'admin'
+                                    "
+                                    color="info"
+                                    depressed
+                                    >비밀번호 초기화</v-btn
+                                >
+                            </v-list-item-action>
+                        </v-list-item>
+                        <v-divider />
+                    </v-list>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -144,7 +192,7 @@
                             v-model="roleDialog.selections"
                         >
                             <v-list-item
-                                v-for="role in rawRoles"
+                                v-for="role in assignableRoles"
                                 :key="role.tag"
                                 v-show="
                                     searchMatches(role.name, roleDialog.search)
@@ -223,6 +271,9 @@ export default {
             })
             return newrole
         },
+        assignableRoles() {
+            return this.rawRoles.filter(role => role.tag != 'default')
+        },
     },
     methods: {
         async fetchUsers() {
@@ -257,8 +308,8 @@ export default {
             this.roleDialog.show = true
             this.roleDialog.user = user
             const selections = []
-            for (let i in this.rawRoles) {
-                if (user.roles.indexOf(this.rawRoles[i].tag) >= 0) {
+            for (let i in this.assignableRoles) {
+                if (user.roles.indexOf(this.assignableRoles[i].tag) >= 0) {
                     selections.push(parseInt(i))
                 }
             }
@@ -266,7 +317,7 @@ export default {
         },
         async applyRoleDialog() {
             const newroles = this.roleDialog.selections.map(i => {
-                return this.rawRoles[i].tag
+                return this.assignableRoles[i].tag
             })
             this.roleDialog.isLoading = true
             try {
@@ -286,9 +337,57 @@ export default {
             this.roleDialog.errorMessage = ''
             this.roleDialog.show = false
         },
+        async deleteUser(username) {
+            const reply = await this.$action.showConfirmDialog(
+                '회원 탈퇴',
+                `정말 ${username} 유저를 탈퇴시키겠습니까?`
+            )
+            if (reply) {
+                try {
+                    await axios.delete(`user/${username}`)
+                    this.editDialog.show = false
+                    await Promise.all([
+                        this.$action.showAlertDialog(
+                            '회원 탈퇴',
+                            `${username} 유저가 탈퇴 처리되었습니다.`
+                        ),
+                        this.fetchUsers(),
+                    ])
+                } catch (err) {
+                    //
+                    await this.$action.showAlertDialog(
+                        '오류',
+                        '탈퇴에 실패했습니다.'
+                    )
+                }
+            }
+        },
+        async resetPassword(username) {
+            const reply = await this.$action.showConfirmDialog(
+                '비밀번호 초기화',
+                `정말 ${username} 유저의 비밀번호를 초기화하겠습니까?`
+            )
+            if (reply) {
+                try {
+                    const res = await axios.post(
+                        `user/${username}/resetpassword`
+                    )
+                    await this.$action.showAlertDialog(
+                        '비밀번호 초기화',
+                        `${username}의 임시 비밀번호는 ${res.data.new_password} 입니다.`
+                    )
+                } catch (err) {
+                    //
+                    await this.$action.showAlertDialog(
+                        '오류',
+                        '비밀번호 초기화에 실패했습니다.'
+                    )
+                }
+            }
+        },
     },
     async created() {
-        if (!this.$perm('manageRoles').can('access')) {
+        if (!this.$perm('manageUsers').can('access')) {
             this.$router.push({ name: 'error403' })
             return
         }
