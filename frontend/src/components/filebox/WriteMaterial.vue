@@ -18,6 +18,7 @@
                 />
                 <file-upload
                     v-model="uploadFile.selected"
+                    :uploaded="uploadFile.uploaded"
                     :currentProgress="uploadFile.currentProgress"
                     :fileProgress="uploadFile.fileProgress"
                     :uploading="uploadFile.isUploading"
@@ -79,6 +80,7 @@ export default {
             },
             uploadFile: {
                 selected: [],
+                uploaded: [],
                 isUploading: false,
                 currentProgress: 0,
                 fileProgress: 0,
@@ -129,11 +131,14 @@ export default {
 
                 for (let file of this.uploadFile.selected) {
                     if (file.uploaded) {
+                        fileIds.push(file.id)
+                        // this.uploadFile.fileProgress += 1
                         continue
                     }
                     let form = new FormData()
                     form.append('file', file.file)
                     this.uploadFile.currentProgress = 0
+
                     const res = await axios.post('file/upload', form, {
                         headers: { 'Content-Type': 'multipart/form-data' },
                         // 진행상황 반영
@@ -146,7 +151,6 @@ export default {
                     this.uploadFile.fileProgress += 1
                     fileIds.push(res.data.id)
                 }
-
                 this.uploadFile.isUploading = true
             }
 
@@ -164,6 +168,12 @@ export default {
                     content: this.editMaterial.content,
                     parent_id: this.editMaterial.parent_id,
                 }
+                this.uploadFile.uploaded = this.editMaterial.files.map(file => {
+                    return {
+                        filename: file.filename,
+                        id: file.id,
+                    }
+                })
             }
         } catch (error) {
             //
