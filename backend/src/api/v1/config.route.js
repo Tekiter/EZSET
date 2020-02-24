@@ -4,19 +4,32 @@ import { loginRequired } from '../../utils/auth'
 import { getRoleMiddleware } from '../../utils/role'
 import { perm } from '../../utils/role'
 import { body } from 'express-validator'
-import { getConfig, setConfig } from '../../utils/config'
+import { getConfig, setConfig, setDefaultConfigs } from '../../utils/config'
 
 const router = Router()
 router.loginNotRequired = true
 
-const configNames = ['groupName']
+const configNames = ['groupName', 'usePreUser', 'theme']
 
 const changeableConfigs = [
     {
         key: 'groupName',
-        check: body('groupName')
-            .isString()
-            .optional(),
+        check: body('groupName').isString(),
+    },
+    {
+        key: 'usePreUser',
+        check: body('usePreUser')
+            .isBoolean()
+            .toBoolean(),
+    },
+    {
+        key: 'theme',
+        check: body('theme').custom(value => {
+            if (!value) {
+                return false
+            }
+            return true
+        }),
     },
 ]
 
@@ -57,15 +70,31 @@ router.patch(
         loginRequired,
         getRoleMiddleware,
         perm('serverConfig').can('change'),
-        changeableConfigs.map(config => config.check),
+        changeableConfigs.map(config => config.check.optional()),
         validateParams,
     ],
     asyncRoute(async (req, res) => {
         for (let { key } of changeableConfigs) {
-            await setConfig(key, req.body[key])
+            if (req.body[key]) {
+                await setConfig(key, req.body[key])
+            }
         }
 
         res.status(200).end()
+    })
+)
+
+router.post(
+    '/reset',
+    [
+        loginRequired,
+        getRoleMiddleware,
+        perm('serverConfig').can('change'),
+        validateParams,
+    ],
+    asyncRoute(async (req, res) => {
+        await setDefaultConfigs()
+        res.end()
     })
 )
 

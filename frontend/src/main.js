@@ -13,10 +13,13 @@ import 'highlight.js/styles/github.css'
 
 import { checkPerm } from './utils/role/role'
 import { actionHelper } from './utils/action'
+import { themeHelper } from './utils/theme'
 
 Vue.config.productionTip = false
 
 Vue.use(require('vue-moment'))
+
+Vue.use(themeHelper)
 
 Vue.prototype.$perm = checkPerm
 Vue.prototype.$action = actionHelper

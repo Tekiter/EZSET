@@ -5,14 +5,21 @@
                 <v-tab>회원정보</v-tab>
                 <v-tab-item>
                     <v-container fluid class="pa-0">
-                        <div class="light-blue darken-2 text-center">
+                        <div class="primary darken-2 text-center">
                             <v-row class="d-flex justify-center">
                                 <v-col>
                                     <div class="d-flex justify-center">
-                                        <v-avatar size="100" color="white">
+                                        <v-avatar
+                                            size="100"
+                                            :color="
+                                                isDarkColor('primary')
+                                                    ? 'white'
+                                                    : 'black'
+                                            "
+                                        >
                                             <v-icon
                                                 size="110"
-                                                color="light-blue darken-4"
+                                                color="primary darken-4"
                                                 >mdi-account-circle</v-icon
                                             >
                                         </v-avatar>
@@ -74,7 +81,7 @@
                                         fab
                                         battom
                                         right
-                                        color="blue darken-3"
+                                        color="primary darken-3"
                                         @click="hasEditToken"
                                     >
                                         <v-icon
@@ -94,10 +101,9 @@
                                                 >
                                                     <v-icon>mdi-close</v-icon>
                                                 </v-btn>
-                                                <v-toolbar-title
-                                                    >비밀번호
-                                                    확인</v-toolbar-title
-                                                >
+                                                <v-toolbar-title>
+                                                    비밀번호 확인
+                                                </v-toolbar-title>
                                             </v-toolbar>
                                             <v-text-field
                                                 v-model="password"
@@ -121,7 +127,7 @@
                                             <v-card-actions>
                                                 <v-spacer></v-spacer>
                                                 <v-btn
-                                                    color="blue darken-4"
+                                                    color="primary darken-4"
                                                     type="submit"
                                                     text
                                                     large
@@ -178,7 +184,7 @@
                                 <v-list-item-content class="align-end">
                                     <v-btn
                                         text
-                                        color="blue darken-3"
+                                        color="primary darken-3"
                                         @click="changePassword()"
                                     >
                                         change password
@@ -195,10 +201,9 @@
                                                 >
                                                     <v-icon>mdi-close</v-icon>
                                                 </v-btn>
-                                                <v-toolbar-title
-                                                    >비밀번호
-                                                    변경</v-toolbar-title
-                                                >
+                                                <v-toolbar-title>
+                                                    비밀번호 변경
+                                                </v-toolbar-title>
                                             </v-toolbar>
                                             <v-text-field
                                                 v-model="form.password"
@@ -242,7 +247,7 @@
                                             <v-card-actions>
                                                 <v-spacer></v-spacer>
                                                 <v-btn
-                                                    color="blue darken-4"
+                                                    color="primary darken-4"
                                                     type="submit"
                                                     text
                                                     large
@@ -281,7 +286,7 @@
                                         absolute
                                         battom
                                         right
-                                        color="blue"
+                                        color="primary"
                                         @click="editFinish"
                                     >
                                         FINISH

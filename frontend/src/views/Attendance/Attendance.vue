@@ -4,14 +4,30 @@
             class="mx-auto"
             max-width="500"
             max-height="500"
-            v-if="flag == true && code == 0"
+            v-if="
+                flag &&
+                    this.$perm('attendance').can('update') &&
+                    this.output_attendance_code != ''
+            "
+        >
+            <v-card-text>
+                <div class="d-flex justify-center">
+                    <span class="display-3">{{ timer }}</span>
+                </div>
+            </v-card-text>
+        </v-card>
+        <v-card
+            class="mx-auto"
+            max-width="500"
+            max-height="500"
+            v-if="flag == true && code == 0 && output_attendance_code == ''"
         >
             <v-card-title>
                 <v-text-field v-model="input_attendance_code"></v-text-field>
             </v-card-title>
 
             <v-card-actions>
-                <v-btn color="purple" text @click="attendanceCheck"
+                <v-btn color="primary" text @click="attendanceCheck"
                     >출석하기</v-btn
                 >
             </v-card-actions>
@@ -20,7 +36,11 @@
             class="mx-auto"
             max-width="500"
             max-height="500"
-            v-if="flag && this.$perm('attendance').can('start')"
+            v-if="
+                flag &&
+                    this.$perm('attendance').can('update') &&
+                    this.output_attendance_code != ''
+            "
         >
             <v-card-text>
                 <div class="d-flex justify-center">
@@ -28,7 +48,7 @@
                 </div>
                 <div class="d-flex justify-center">
                     <v-btn
-                        color="purple"
+                        color="primary"
                         text
                         v-if="flag"
                         @click="endAttendance"
@@ -44,10 +64,10 @@
             max-width="500"
             max-height="500"
             text
-            v-if="!flag && this.$perm('attendance').can('start')"
+            v-if="!flag && this.$perm('attendance').can('update')"
         >
             <v-card-actions>
-                <v-btn color="purple" text @click="startAttendance" large
+                <v-btn color="primary" text @click="startAttendance" large
                     >시작</v-btn
                 >
             </v-card-actions>
@@ -55,14 +75,14 @@
         <div>
             <v-alert
                 type="warning"
-                v-if="!this.$perm('attendance').can('start') && flag == false"
+                v-if="!this.$perm('attendance').can('update') && flag == false"
             >
                 출석중이 아닙니다.
             </v-alert>
             <v-alert
                 type="success"
                 v-if="
-                    !this.$perm('attendance').can('start') &&
+                    !this.$perm('attendance').can('update') &&
                         flag == true &&
                         code == 1
                 "
@@ -87,15 +107,13 @@ import axios from 'axios'
 export default {
     name: 'attendance',
     async created() {
-        if (!this.$perm('manageRoles').can('access')) {
-            this.$router.push({ name: 'error403' })
-            return
-        }
         await this.$socket.emit('join', {
             roomName: 'attendance',
         })
         await this.$socket.on('attendance', data => {
             this.flag = data.flag
+            this.remainTime = data.time
+            // console.log(this.remainTime)
         })
         try {
             const res = await axios.get('attendance/attendanceCheck')
@@ -105,6 +123,9 @@ export default {
         }
         const res = await axios.get('attendance/attendanceCheckAdmin')
         if (res.data != 0) this.output_attendance_code = parseInt(res.data)
+        else this.output_attendance_code = 0
+
+        if (this.flag == true) this.tick()
     },
 
     data() {
@@ -117,17 +138,15 @@ export default {
             snackbar_e: false,
             attendanceCard: true,
             code: 0,
+            remainTime: 0,
+            interval: '',
         }
     },
     methods: {
         async startAttendance() {
-            try {
-                const res_code = await axios.post('attendance/startAttendance')
-                this.output_attendance_code = res_code.data.code
-                this.code = 1
-            } catch (err) {
-                //
-            }
+            const res_code = await axios.post('attendance/startAttendance')
+            this.output_attendance_code = res_code.data.code
+            this.code = 1
             this.$socket.emit('attendance', {
                 flag: true,
             })
@@ -135,6 +154,7 @@ export default {
                 flag: true,
             })
             this.flag = true
+            this.tick()
         },
         async endAttendance() {
             this.$socket.emit('attendance', {
@@ -146,6 +166,7 @@ export default {
             this.$router.push(
                 `/AttendanceManageDay/${moment().format('YYYYMMDD')}`
             )
+            clearInterval(this.interval)
         },
         async attendanceCheck() {
             try {
@@ -170,6 +191,20 @@ export default {
         closeSnack() {
             this.snackbar_e = false
             this.input_attendance_code = ''
+        },
+        tick() {
+            this.interval = setInterval(() => {
+                this.remainTime -= 1000
+                // console.log(this.remainTime)
+                if (this.flag == false) clearInterval(this.interval)
+            }, 1000)
+        },
+    },
+    computed: {
+        timer() {
+            var tmp = parseInt(this.remainTime / 1000 / 60) + ' : '
+            if (parseInt((this.remainTime / 1000) % 60) == 0) return tmp + '00'
+            else return tmp + ((this.remainTime / 1000) % 60)
         },
     },
 }

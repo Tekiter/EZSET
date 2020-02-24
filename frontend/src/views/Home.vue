@@ -1,14 +1,15 @@
 <template>
     <div class="home">
-        <img alt="Vue logo" src="../assets/logo.png" />
-        <v-btn @click="dialogTest">test</v-btn>
+        <DefaultMainPage></DefaultMainPage>
     </div>
 </template>
 
 <script>
+import DefaultMainPage from '../components/manage/DefaultMainPage.vue'
+
 export default {
     name: 'home',
-    components: {},
+    components: { DefaultMainPage },
     methods: {
         async dialogTest() {
             await this.$action.showConfirmDialog('hello', 'world!', {

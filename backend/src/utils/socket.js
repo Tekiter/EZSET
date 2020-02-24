@@ -8,6 +8,7 @@ export async function initSocket(app, SOCKET_PORT) {
     //Attendance State
     var curState = {
         flag: false,
+        time: 180000,
     }
     //connect event
     io.on('connection', function(socket) {
@@ -20,21 +21,30 @@ export async function initSocket(app, SOCKET_PORT) {
             curState.flag = data.flag
             var msg = {
                 flag: data.flag,
+                time: curState.time,
             }
             //broadcast changed state
-            socket.broadcast.to('attendance').emit('attendance', msg)
+            // socket.broadcast.to('attendance').emit('attendance', msg)
+            io.to('attendance').emit('attendance', msg)
         })
         //setTimeout 3m when attendance start
+
         socket.on('start', function(data) {
-            setTimeout(function() {
-                if (curState.flag == true) {
-                    var msg = {
-                        flag: false,
+            curState.time = 184000
+            var timerID = setInterval(function() {
+                if (curState.flag == false) clearInterval(timerID)
+                curState.time -= 1000
+                if (curState.time == 0) {
+                    clearInterval(timerID)
+                    if (curState.flag == true) {
+                        var msg = {
+                            flag: false,
+                        }
+                        curState.flag = false
+                        io.to('attendance').emit('attendance', msg)
                     }
-                    curState.flag = false
-                    socket.broadcast.to('attendance').emit('attendance', msg)
                 }
-            }, 300000)
+            }, 1000)
         })
     })
     //start socket.io server
