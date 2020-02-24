@@ -3,10 +3,10 @@
         <v-col v-show="isMobileMode" cols="12">
             <v-tabs v-model="curTab" class="mt-3">
                 <v-tab>
-                    출석 설정
+                    게시판
                 </v-tab>
                 <v-tab>
-                    출석 대상 유저
+                    게시판 설정
                 </v-tab>
             </v-tabs>
         </v-col>
