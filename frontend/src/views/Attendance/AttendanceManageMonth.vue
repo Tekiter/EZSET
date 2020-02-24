@@ -3,71 +3,72 @@
         <v-skeleton-loader
             class="mx-auto"
             type="table"
-            v-if="!tabLoad && this.$perm('attendance').can('read')"
+            v-if="!tabLoad && this.$perm('attendance').can('update')"
         ></v-skeleton-loader>
-        <div
-            v-if="tabLoad && this.$perm('attendance').can('read')"
-            class="fill-height"
-        >
-            <v-card tile minHeight="95%">
-                <v-container>
-                    <v-row>
-                        <v-col cols="12" lg="5">
-                            <v-menu
-                                v-model="menu1"
-                                :close-on-content-click="false"
-                                max-width="290"
-                            >
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        :value="computedDateStart"
-                                        clearable
-                                        label="Start date"
-                                        readonly
-                                        v-on="on"
-                                        @click:clear="date = null"
-                                    ></v-text-field>
-                                </template>
-                                <v-date-picker
-                                    v-model="Sdate"
-                                    @change="menu1 = false"
-                                    locale="ko"
-                                ></v-date-picker>
-                            </v-menu>
-                        </v-col>
-                        <v-col cols="12" lg="2" class="text-center">
-                            <v-icon>
-                                mdi-arrow-right-circle
-                            </v-icon>
-                        </v-col>
-                        <v-col cols="12" lg="5">
-                            <v-menu
-                                v-model="menu2"
-                                :close-on-content-click="false"
-                                max-width="290"
-                            >
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        :value="computedDateEnd"
-                                        clearable
-                                        label="End date"
-                                        readonly
-                                        v-on="on"
-                                        @click:clear="date = null"
-                                    ></v-text-field>
-                                </template>
-                                <v-date-picker
-                                    v-model="Edate"
-                                    @change="menu2 = false"
-                                    locale="ko"
-                                ></v-date-picker>
-                            </v-menu>
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-card>
-        </div>
-
+        <v-fade-transition>
+            <div
+                v-if="tabLoad && this.$perm('attendance').can('update')"
+                class="fill-height"
+            >
+                <v-card tile minHeight="95%">
+                    <v-container>
+                        <v-row>
+                            <v-col cols="12" lg="5">
+                                <v-menu
+                                    v-model="menu1"
+                                    :close-on-content-click="false"
+                                    max-width="290"
+                                >
+                                    <template v-slot:activator="{ on }">
+                                        <v-text-field
+                                            :value="computedDateStart"
+                                            clearable
+                                            label="Start date"
+                                            readonly
+                                            v-on="on"
+                                            @click:clear="date = null"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-date-picker
+                                        v-model="Sdate"
+                                        @change="menu1 = false"
+                                        locale="ko"
+                                    ></v-date-picker>
+                                </v-menu>
+                            </v-col>
+                            <v-col cols="12" lg="2" class="text-center">
+                                <v-icon>
+                                    mdi-arrow-right-circle
+                                </v-icon>
+                            </v-col>
+                            <v-col cols="12" lg="5">
+                                <v-menu
+                                    v-model="menu2"
+                                    :close-on-content-click="false"
+                                    max-width="290"
+                                >
+                                    <template v-slot:activator="{ on }">
+                                        <v-text-field
+                                            :value="computedDateEnd"
+                                            clearable
+                                            label="End date"
+                                            readonly
+                                            v-on="on"
+                                            @click:clear="date = null"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-date-picker
+                                        v-model="Edate"
+                                        @change="menu2 = false"
+                                        locale="ko"
+                                    ></v-date-picker>
+                                </v-menu>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-card>
+            </div>
+        </v-fade-transition>
         <div>
             <v-data-table
                 :headers="headers"
@@ -76,7 +77,7 @@
                 class="elevation-1 font-weight-medium headline"
                 :search="search"
                 :custom-filter="filterOnlyCapsText"
-                v-if="tabLoad && this.$perm('attendance').can('read')"
+                v-if="tabLoad && this.$perm('attendance').can('update')"
             >
                 <template v-slot:item="{ item, headers }">
                     <tr>
@@ -98,22 +99,22 @@
                             </template>
                             <template v-else>
                                 <v-icon
-                                    color="green"
+                                    color="success"
                                     v-if="item[header.value] == 'attendance'"
                                     >mdi-checkbox-blank-circle-outline</v-icon
                                 >
                                 <v-icon
-                                    color="orange"
+                                    color="warning"
                                     v-else-if="item[header.value] == 'late'"
                                     >mdi-triangle-outline</v-icon
                                 >
                                 <v-icon
-                                    color="red"
+                                    color="error"
                                     v-else-if="item[header.value] == 'absence'"
                                     >mdi-close</v-icon
                                 >
                                 <v-icon
-                                    color="green"
+                                    color="success"
                                     v-else-if="
                                         item[header.value] == 'official_absence'
                                     "
@@ -136,7 +137,7 @@
             </v-data-table>
         </div>
         <div>
-            <v-alert type="error" v-if="!$perm('attendance').can('read')">
+            <v-alert type="error" v-if="!$perm('attendance').can('update')">
                 권한이 없습니다.
             </v-alert>
         </div>

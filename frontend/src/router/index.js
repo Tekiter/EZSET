@@ -103,6 +103,11 @@ const routes = [
         component: () => import('../views/Manage/UserManage.vue'),
     },
     {
+        path: '/manage/preusers',
+        name: 'managePreusers',
+        component: () => import('../views/Manage/PreuserManage.vue'),
+    },
+    {
         path: '/manage/roles',
         name: 'manageRoles',
         component: () => import('../views/Manage/RoleManage.vue'),
@@ -116,6 +121,11 @@ const routes = [
         path: '/manage/server',
         name: 'manageServer',
         component: () => import('../views/Manage/ServerManage.vue'),
+    },
+    {
+        path: '/manage/theme',
+        name: 'manageTheme',
+        component: () => import('../views/Manage/ThemeManage.vue'),
     },
     {
         path: '/403',

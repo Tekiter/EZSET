@@ -1,92 +1,77 @@
 <template>
-    <div>
+    <v-container grid-list-md>
         <div>
-            <v-text-field
-                v-if="loading"
-                color="blue darken-2"
-                loading
-                disabled
-            ></v-text-field>
+            <v-toolbar-title class="d-flex justify-center"
+                ><h1>
+                    <strong>게시글 검색</strong>
+                </h1></v-toolbar-title
+            >
         </div>
-        <v-container grid-list-md>
-            <div>
-                <v-toolbar-title class="d-flex justify-center"
-                    ><h1>
-                        <strong>게시글 검색</strong>
-                    </h1></v-toolbar-title
-                >
-            </div>
-            <div>
-                <v-row class="d-flex justify-center">
-                    <v-col cols="5" sm="2">
-                        <v-select
-                            v-model="select"
-                            :items="item"
-                            item-text="state"
-                            item-value="value"
-                            outlined
-                            persistent-hint
-                            return-object
-                        ></v-select>
-                    </v-col>
-                    <v-col cols="5" sm="5">
-                        <v-text-field
-                            v-model="searchObject"
-                            color="blue darken-2"
-                            label="Search"
-                            counter
-                            @change="clickSearch()"
-                            :rules="[rules.min]"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="2" sm="1">
-                        <div class="my-2">
-                            <v-btn
-                                depressed
-                                color="primary"
-                                @click="clickSearch()"
-                                >검색</v-btn
-                            >
-                        </div>
-                    </v-col>
-                </v-row>
-            </div>
-            <v-card outlined v-if="showData">
-                <v-data-table
-                    v-if="$vuetify.breakpoint.mdAndUp"
-                    :headers="headers"
-                    :items="posts"
-                    :page.sync="page"
-                    :items-per-page="8"
-                    hide-default-footer
-                    :mobile-breakpoint="NaN"
-                    @page-count="pageCount = $event"
-                >
-                    <template v-slot:item.title="props">
-                        <a @click="read(props.item)">
-                            {{ props.item.title }}
-                        </a>
-                    </template>
-                </v-data-table>
-                <v-data-table
-                    v-else
-                    :headers="headersTwo"
-                    :items="posts"
-                    :page.sync="page"
-                    :items-per-page="8"
-                    hide-default-footer
-                    :mobile-breakpoint="NaN"
-                    @page-count="pageCount = $event"
-                >
-                    <template v-slot:item.title="props">
-                        <a @click="read(props.item)">
-                            {{ props.item.title }}
-                        </a>
-                    </template>
-                </v-data-table>
-            </v-card>
-        </v-container>
-    </div>
+        <div>
+            <v-row class="d-flex justify-center">
+                <v-col cols="5" sm="2">
+                    <v-select
+                        v-model="select"
+                        :items="item"
+                        item-text="state"
+                        item-value="value"
+                        outlined
+                        persistent-hint
+                        return-object
+                    ></v-select>
+                </v-col>
+                <v-col cols="5" sm="5">
+                    <v-text-field
+                        v-model="searchObject"
+                        color="primary darken-2"
+                        label="Search"
+                        prepend-inner-icon="mdi-magnify"
+                        counter
+                        outlined
+                        solo
+                        flat
+                        @change="clickSearch()"
+                        :rules="[rules.min]"
+                    ></v-text-field>
+                </v-col>
+                <v-col cols="2" sm="1">
+                    <div class="my-2">
+                        <v-btn
+                            depressed
+                            color="primary"
+                            :dark="isDarkColor('primary')"
+                            @click="clickSearch()"
+                            >검색</v-btn
+                        >
+                    </div>
+                </v-col>
+            </v-row>
+        </div>
+        <v-card outlined v-if="showData">
+            <v-data-table
+                :headers="$vuetify.breakpoint.mdAndUp ? headers : headersTwo"
+                :items="posts"
+                :page.sync="page"
+                :items-per-page="8"
+                hide-default-footer
+                :mobile-breakpoint="NaN"
+                :loading="loading"
+                @page-count="pageCount = $event"
+            >
+                <template v-slot:no-data>
+                    <p class="mt-3">검색된 내용이 없습니다.</p>
+                </template>
+                <template v-slot:loading>
+                    <p class="mt-3">검색중..</p>
+                </template>
+                <template v-slot:item.title="props">
+                    <a @click="read(props.item)">
+                        {{ props.item.title }}
+                    </a>
+                </template>
+            </v-data-table>
+        </v-card>
+    </v-container>
 </template>
 
 <script>
@@ -163,6 +148,7 @@ export default {
             this.showData = true
         },
         async getData() {
+            this.loading = true
             const res = await axios.get('/simple/searchpost', {
                 params: {
                     option: this.select.value,
