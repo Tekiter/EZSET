@@ -51,7 +51,8 @@
             v-show="!isMobileMode || curTab == 1"
             class="fill-height"
         >
-            <v-card outlined>
+            <board-role-edit> </board-role-edit>
+            <!-- <v-card outlined>
                 <v-card-title>게시판 설정</v-card-title>
                 <v-list>
                     <v-list-item v-for="board in boards" :key="board._id">
@@ -63,7 +64,7 @@
                         </v-list-item-action>
                     </v-list-item>
                 </v-list>
-            </v-card>
+            </v-card> -->
         </v-col>
 
         <v-dialog v-model="createBoardDialog.show" max-width="300">
@@ -137,7 +138,11 @@
 
 <script>
 import axios from 'axios'
+import BoardRoleEdit from '../../components/manage/BoardRoleEdit.vue'
 export default {
+    components: {
+        BoardRoleEdit,
+    },
     data() {
         return {
             curTab: 0,
