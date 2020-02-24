@@ -30,7 +30,7 @@ export async function initSocket(app, SOCKET_PORT) {
         //setTimeout 3m when attendance start
 
         socket.on('start', function(data) {
-            curState.time = 184000
+            curState.time = 180000
             var timerID = setInterval(function() {
                 if (curState.flag == false) clearInterval(timerID)
                 curState.time -= 1000
