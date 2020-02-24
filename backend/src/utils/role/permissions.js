@@ -36,6 +36,15 @@ export default {
             },
         },
         {
+            type: 'switch',
+            title: '홈화면 관리',
+            content: '홈 화면의 디자인을 수정,적용할 수 있습니다.',
+            target: {
+                resource: 'manageHome',
+                action: 'update',
+            },
+        },
+        {
             type: 'line',
         },
         {
