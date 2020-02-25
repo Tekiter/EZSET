@@ -71,7 +71,6 @@ export default {
             this.isloading = false
         },
         async editMaterial(options) {
-            console.log(options)
             try {
                 this.$router.push({
                     name: 'fileBoxEditMaterial',

@@ -193,7 +193,6 @@ export default {
         },
         async fetchGroups() {
             const res = await axios.get('/filebox')
-            console.log(res)
             this.groups = res.data.groups
         },
         showPlusGroup() {
@@ -244,7 +243,6 @@ export default {
                 this.editMaterial.show = true
                 this.showMetarials.show = false
                 this.editMaterial.material = options
-                console.log(options)
             } catch {
                 //
             }
