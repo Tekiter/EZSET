@@ -2,6 +2,8 @@
 #!/bin/bash
 echo "====PULL EZSET===="
 cd ./../
+git fetch --all
+git reset --hard origin/master
 git pull
 echo "====ENV SETTING===="
 export DATABASE_URI=mongodb://localhost:27017/ezset
