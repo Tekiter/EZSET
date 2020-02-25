@@ -4,9 +4,9 @@
             <v-col class="fill-height" :cols="3" xl="2">
                 <v-card tile outlined class="fill-height">
                     <group-tree
-                        v-model="showMetarials.selected"
+                        v-model="selectedGroups"
                         :items="groups"
-                        @change="isFolder()"
+                        @change="groupChanged()"
                     ></group-tree>
                     <v-list>
                         <v-list-item link @click="showPlusGroup()">
@@ -185,6 +185,7 @@ export default {
             modifyNow: '',
             fileboxes: [],
             groups: [],
+            selectedGroups: [],
             plusGroup: {
                 show: false,
             },
@@ -246,13 +247,24 @@ export default {
         isFolderFalse() {
             this.plusGroup.isfolder = false
         },
-        isFolder() {
-            if (this.showMetarials.selected[0].isfolder == true) {
-                this.showMetarials.show = true
+        groupChanged() {
+            // if (this.showMetarials.selected[0].isfolder == true) {
+            //     this.showMetarials.show = true
+            // } else {
+            //     this.showMetarials.show = false
+            // }
+            // this.createMaterial.show = false
+            if (
+                this.selectedGroups.length > 0 &&
+                this.selectedGroups[0].isfolder
+            ) {
+                this.$router.push({
+                    name: 'fileBoxMaterials',
+                    params: { folder_id: this.selectedGroups[0].id },
+                })
             } else {
-                this.showMetarials.show = false
+                this.$router.push({ name: 'fileBoxEmpty' })
             }
-            this.createMaterial.show = false
         },
         showCreateMaterial() {
             this.createMaterial.show = true

@@ -148,6 +148,7 @@ const routes = [
         children: [
             {
                 path: '',
+                name: 'fileBoxEmpty',
             },
             {
                 path: 'create',
@@ -155,8 +156,10 @@ const routes = [
             },
             {
                 path: 'folder/:folder_id',
+                name: 'fileBoxMaterials',
                 component: () =>
                     import('../components/filebox/MaterialPost.vue'),
+                props: route => ({ folderId: route.params.folder_id }),
             },
         ],
     },
