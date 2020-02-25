@@ -144,8 +144,21 @@ const routes = [
     },
     {
         path: '/filebox',
-        name: 'filebox',
-        component: () => import('../views/FileBox.vue'),
+        component: () => import('../views/FileBox/FileBox.vue'),
+        children: [
+            {
+                path: '',
+            },
+            {
+                path: 'create',
+                component: () => import('../components/filebox/CreateGroup'),
+            },
+            {
+                path: 'folder/:folder_id',
+                component: () =>
+                    import('../components/filebox/MaterialPost.vue'),
+            },
+        ],
     },
 ]
 
