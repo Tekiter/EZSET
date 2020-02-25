@@ -128,6 +128,7 @@
                                                                 </v-menu>
                                                                 <v-text-field
                                                                     label="결석사유"
+                                                                    outlined
                                                                     v-model="
                                                                         absence_reason
                                                                     "
