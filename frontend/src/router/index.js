@@ -161,6 +161,22 @@ const routes = [
                     import('../components/filebox/MaterialPost.vue'),
                 props: route => ({ folderId: route.params.folder_id }),
             },
+            {
+                path: 'folder/:folder_id/write',
+                name: 'fileBoxWriteMaterial',
+                component: () =>
+                    import('../components/filebox/WriteMaterial.vue'),
+                props: route => ({ parent_id: route.params.folder_id }),
+            },
+            {
+                path: 'edit/:material_id',
+                name: 'fileBoxEditMaterial',
+                component: () =>
+                    import('../components/filebox/WriteMaterial.vue'),
+                props: route => ({
+                    edit: route.params.material_id,
+                }),
+            },
         ],
     },
 ]

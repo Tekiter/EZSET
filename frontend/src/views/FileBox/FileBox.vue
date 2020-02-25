@@ -29,7 +29,7 @@
                 </v-card>
             </v-col>
             <v-col class="fill-height">
-                <router-view></router-view>
+                <router-view v-if="!plusGroup.show"></router-view>
                 <v-fade-transition hide-on-leave>
                     <create-group
                         v-if="plusGroup.show"

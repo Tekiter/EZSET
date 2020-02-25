@@ -11,6 +11,7 @@ import {
     getFileInfoArray,
     removeFileLink,
     deleteUnlinkedFile,
+    getFileLinks,
 } from '../../utils/file'
 
 const router = Router()
@@ -220,6 +221,30 @@ router.post(
     })
 )
 
+router.get(
+    '/material/:material_id',
+    [param('material_id').isMongoId(), validateParams],
+    asyncRoute(async (req, res) => {
+        const material = await Material.findById(req.params.material_id)
+
+        if (!material) {
+            const err = new Error('존재하지 않는 자료입니다.')
+            err.status = 404
+            throw err
+        }
+
+        res.status(200).json({
+            id: material.id,
+            folder_id: material.parent,
+            title: material.title,
+            author: material.author,
+            content: material.content,
+            created_date: material.created_date,
+            files: await getFileInfoArray(material.files),
+        })
+    })
+)
+
 // material 삭제
 router.delete(
     '/material/:material_id',
@@ -250,7 +275,6 @@ router.patch(
         body('title').isString(),
         body('content').isString(),
         body('files').custom(checkAttachableFileArray),
-        param('parent_id').isMongoId(),
         validateParams,
     ],
     asyncRoute(async (req, res) => {
@@ -261,32 +285,37 @@ router.patch(
             err.status = 404
             throw err
         }
-        if (
-            !checkIsFileOwner(req.body.files) ||
-            !checkUnlinkedFile(req.body.files)
-        ) {
+        if (!checkIsFileOwner(req.body.files)) {
             const err = new Error('올바르지 않은 첨부파일입니다.')
             err.status = 400
             throw err
         }
-        await removeFileLink(material.files)
-        await deleteUnlinkedFile(material.files)
 
-        const newMaterial = new Material({
-            title: req.body.title,
-            author: req.user.username,
-            content: req.body.content,
-            created_date: Date.now(),
-            files: req.body.files,
-            parent: req.params.parent_id,
-        })
-        await newMaterial.save()
+        // 이미 첨부된 파일을 첨부하는지 검사
+        const links = await getFileLinks(req.body.files)
+        for (let link of links) {
+            if (link.target !== 'filebox' || link.ref !== material.id) {
+                const err = new Error('올바르지 않은 첨부파일입니다.')
+                err.status = 400
+                throw err
+            }
+        }
+
+        material.title = req.body.title
+        material.content = req.body.content
+
+        const newMaterial = await material.save()
+        const prevFiles = newMaterial.files
+
+        await removeFileLink(prevFiles)
 
         // DB 파일 객체에 역참조 등록
         await applyFileLink(req.body.files, 'filebox', newMaterial.id)
         newMaterial.files = req.body.files
 
         await newMaterial.save()
+
+        await deleteUnlinkedFile(prevFiles)
 
         res.status(200).json({ message: '자료가 수정되었습니다.' })
     })

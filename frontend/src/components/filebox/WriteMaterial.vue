@@ -1,8 +1,8 @@
 <template>
     <v-container>
-        <v-card outlined>
-            <v-card-title v-if="!editMaterial">게시물 작성</v-card-title>
-            <v-card-title v-if="editMaterial">게시물 수정</v-card-title>
+        <v-card outlined :loading="isLoading">
+            <v-card-title v-if="!edit">게시물 작성</v-card-title>
+            <v-card-title v-else>게시물 수정</v-card-title>
             <v-card-text>
                 <v-text-field
                     v-model="newMaterial.title"
@@ -21,6 +21,7 @@
                     :currentProgress="uploadFile.currentProgress"
                     :fileProgress="uploadFile.fileProgress"
                     :uploading="uploadFile.isUploading"
+                    :uploaded="uploadFile.uploaded"
                     class="mt-3"
                 ></file-upload>
                 <div class="d-flex align-center mt-3">
@@ -65,6 +66,10 @@ export default {
     },
     props: {
         parent_id: String,
+        edit: {
+            type: String,
+            default: undefined,
+        },
         editMaterial: {
             type: Object,
         },
@@ -77,8 +82,10 @@ export default {
                 author: '',
                 created_date: '',
             },
+            folderId: '',
             uploadFile: {
                 selected: [],
+                uploaded: [],
                 isUploading: false,
                 currentProgress: 0,
                 fileProgress: 0,
@@ -94,6 +101,13 @@ export default {
     },
     methods: {
         async submitClick() {
+            if (this.edit) {
+                await this.applyEdit()
+            } else {
+                await this.applyWrite()
+            }
+        },
+        async applyWrite() {
             try {
                 this.isLoading = true
 
@@ -102,13 +116,43 @@ export default {
                 // 첨부파일 업로드
                 const fileIds = await this.uploadFiles()
 
-                await axios.post('/filebox/folder/' + this.parent_id, {
+                await axios.post(
+                    '/filebox/folder/' + this.$route.params.folder_id,
+                    {
+                        title: this.newMaterial.title,
+                        content: content,
+                        files: fileIds,
+                        parent_id: this.$route.params.folder_id,
+                    }
+                )
+                this.$router.push({
+                    name: 'fileBoxMaterials',
+                    params: { folder_id: this.$route.params.folder_id },
+                })
+            } catch (error) {
+                this.isError = true
+            } finally {
+                this.isLoading = false
+            }
+        },
+        async applyEdit() {
+            try {
+                this.isLoading = true
+
+                const content = this.getMarkdown()
+
+                // 첨부파일 업로드
+                const fileIds = await this.uploadFiles()
+
+                await axios.patch('filebox/material/' + this.edit, {
                     title: this.newMaterial.title,
                     content: content,
                     files: fileIds,
-                    parent_id: this.parent_id,
                 })
-                this.$emit('close')
+                this.$router.push({
+                    name: 'fileBoxMaterials',
+                    params: { folder_id: this.folderId },
+                })
             } catch (error) {
                 this.isError = true
             } finally {
@@ -129,6 +173,7 @@ export default {
 
                 for (let file of this.uploadFile.selected) {
                     if (file.uploaded) {
+                        fileIds.push(file.id)
                         continue
                     }
                     let form = new FormData()
@@ -137,7 +182,7 @@ export default {
                     const res = await axios.post('file/upload', form, {
                         headers: { 'Content-Type': 'multipart/form-data' },
                         // 진행상황 반영
-                        onUploadProgress(e) {
+                        onUploadProgress: e => {
                             this.uploadFile.currentProgress += Math.floor(
                                 (e.loaded * 100) / e.total
                             )
@@ -152,18 +197,34 @@ export default {
 
             return fileIds
         },
+        async fetchMaterial() {
+            this.isLoading = true
+            const res = await axios.get(`filebox/material/${this.edit}`)
+            this.newMaterial = {
+                title: res.data.title,
+                content: res.data.content,
+            }
+            this.folderId = res.data.folder_id
+            this.uploadFile.uploaded = res.data.files.map(file => {
+                return {
+                    filename: file.filename,
+                    id: file.id,
+                }
+            })
+            this.isLoading = false
+        },
         closeButtonClick() {
-            this.$emit('close')
+            // this.$emit('close')
+            this.$router.push({
+                name: 'fileBoxMaterials',
+                params: { folder_id: this.$route.params.folder_id },
+            })
         },
     },
     async created() {
         try {
-            if (this.editMaterial) {
-                this.newMaterial = {
-                    title: this.editMaterial.title,
-                    content: this.editMaterial.content,
-                    parent_id: this.editMaterial.parent_id,
-                }
+            if (this.edit) {
+                await this.fetchMaterial()
             }
         } catch (error) {
             //
