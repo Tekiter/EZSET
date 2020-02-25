@@ -178,10 +178,10 @@ export default {
             this.flag = false
             this.input_attendance_code = ''
             await axios.post('attendance/attendanceCheckEnd')
+            clearInterval(this.interval)
             this.$router.push(
                 `/AttendanceManageDay/${moment().format('YYYYMMDD')}`
             )
-            clearInterval(this.interval)
         },
         async attendanceCheck() {
             try {
@@ -210,7 +210,14 @@ export default {
         tick() {
             this.interval = setInterval(() => {
                 this.remainTime -= 1000
-                // console.log(this.remainTime)
+                if (this.remainTime == 0) {
+                    this.$socket.emit('attendance', {
+                        flag: false,
+                    })
+                    this.$router.push(
+                        `/AttendanceManageDay/${moment().format('YYYYMMDD')}`
+                    )
+                }
                 if (this.flag == false) clearInterval(this.interval)
             }, 1000)
         },
@@ -219,7 +226,12 @@ export default {
         timer() {
             var tmp = parseInt(this.remainTime / 1000 / 60) + ' : '
             if (parseInt((this.remainTime / 1000) % 60) == 0) return tmp + '00'
-            else return tmp + ((this.remainTime / 1000) % 60)
+            // else return tmp + ((this.remainTime / 1000) % 60)
+            else {
+                if (parseInt((this.remainTime / 1000) % 60) < 10)
+                    return tmp + '0' + ((this.remainTime / 1000) % 60)
+                else return tmp + ((this.remainTime / 1000) % 60)
+            }
         },
     },
 }
