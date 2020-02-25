@@ -38,6 +38,8 @@
                         @change="fetchGroups"
                     ></create-group>
                 </v-fade-transition>
+
+                <!-- 밑에거 안보임 (지울예정) -->
                 <div v-if="false">
                     <v-card v-if="modifyGroup.show" class="fill-height">
                         <v-toolbar dark short color="primary">
@@ -126,39 +128,6 @@
                             </v-row>
                         </div>
                     </v-card>
-                    <div class="mr-4">
-                        <div class="text-center">
-                            <v-btn
-                                class="mx-2"
-                                block
-                                dark
-                                large
-                                color="cyan"
-                                v-if="showMetarials.show"
-                                @click="showCreateMaterial()"
-                            >
-                                Upload
-                                <v-icon right dark>mdi-cloud-upload</v-icon>
-                            </v-btn>
-                        </div>
-                        <material-post
-                            v-if="showMetarials.show"
-                            :folderId="this.showMetarials.selected[0].id"
-                            @editMaterial="showEditMaterial"
-                        ></material-post>
-
-                        <write-material
-                            v-if="createMaterial.show"
-                            :parent_id="showMetarials.selected[0].id"
-                            @close="closeCreateMaterial()"
-                        ></write-material>
-                        <write-material
-                            v-if="editMaterial.show"
-                            :parent_id="showMetarials.selected[0].id"
-                            :editMaterial="this.editMaterial.material"
-                            @close="closeEditMaterial()"
-                        ></write-material>
-                    </div>
                 </div>
             </v-col>
         </v-row>
@@ -168,15 +137,11 @@
 <script>
 import axios from 'axios'
 import GroupTree from '../../components/filebox/GroupTree.vue'
-import MaterialPost from '../../components/filebox/MaterialPost.vue'
-import WriteMaterial from '../../components/filebox/WriteMaterial.vue'
 import CreateGroup from '../../components/filebox/CreateGroup.vue'
 
 export default {
     components: {
         GroupTree,
-        MaterialPost,
-        WriteMaterial,
         CreateGroup,
     },
     data() {
