@@ -119,6 +119,7 @@ router.get(
                 return {
                     _id: board._id,
                     title: board.title,
+                    isAnonymous: board.isAnonymous,
                 }
             })
         )
