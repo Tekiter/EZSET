@@ -37,6 +37,7 @@
                 <v-col cols="2" sm="1">
                     <div class="my-2">
                         <v-btn
+                            large
                             depressed
                             color="primary"
                             :dark="isDarkColor('primary')"
