@@ -31,6 +31,40 @@ router.post(
     })
 )
 
+//게시판 수정
+router.patch(
+    '/boards/:board_id',
+    [param('board_id').isNumeric(), validateParams],
+    asyncRoute(async (req, res) => {
+        if (!req.user.perm('board', req.params.board_id).canOwn('update')) {
+            res.status(403).end()
+            return
+        }
+
+        const board = await Board.findOne()
+            .where('_id')
+            .equals(req.params.board_id)
+
+        if (!board) {
+            const err = new Error('존재하지 않는 게시판입니다.')
+            err.status = 404
+            throw err
+        }
+        try {
+            board.title = req.body.title
+            await board.save()
+            res.status(200).json({
+                message: '수정 완료',
+                target: post,
+            })
+        } catch (error) {
+            const errr = new Error('database error')
+            errr.status = 500
+            throw errr
+        }
+    })
+)
+
 //게시판 삭제
 router.delete(
     '/boards/:board_id',
