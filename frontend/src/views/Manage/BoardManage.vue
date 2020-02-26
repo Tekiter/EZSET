@@ -34,7 +34,23 @@
                 </v-toolbar>
                 <v-list>
                     <v-list-item v-for="board in boards" :key="board._id">
-                        <v-list-item-title>{{ board.title }}</v-list-item-title>
+                        <v-list-item-title
+                            >{{ board.title }}
+                            <v-chip
+                                v-if="board.isAnonymous"
+                                class="ma-2"
+                                color="deep-purple accent-4"
+                                outlined
+                                x-small
+                            >
+                                익명
+                            </v-chip></v-list-item-title
+                        >
+                        <v-list-item-action>
+                            <v-btn icon @click="showModifyDialog(board)">
+                                <v-icon>mdi-pencil-outline</v-icon>
+                            </v-btn>
+                        </v-list-item-action>
                         <v-list-item-action>
                             <v-btn icon @click="showDeleteBoardDialog(board)">
                                 <v-icon>mdi-trash-can-outline</v-icon>
@@ -44,7 +60,6 @@
                 </v-list>
             </v-card>
         </v-col>
-
         <v-col
             cols="12"
             md="7"
@@ -132,6 +147,41 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-row justify="center">
+            <v-dialog v-model="modifyDialog" persistent max-width="290">
+                <template v-slot:activator="{ on }">
+                    <v-btn color="primary" dark v-on="on">Open Dialog</v-btn>
+                </template>
+                <v-card>
+                    <v-card-title class="headline"
+                        >게시물 이름 수정</v-card-title
+                    >
+                    <v-container>
+                        <v-text-field
+                            v-model="modifyTitle"
+                            label="Title"
+                        ></v-text-field>
+                    </v-container>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            color="red darken-1"
+                            text
+                            @click="modifyDialog = false"
+                            >취소</v-btn
+                        >
+                        <v-btn
+                            v-if="modifyTitle"
+                            color="green darken-1"
+                            text
+                            @click="successPostTitle()"
+                            >수정</v-btn
+                        >
+                        <v-btn v-else color="black darken-1" text>수정</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+        </v-row>
     </v-row>
 </template>
 
@@ -144,6 +194,9 @@ export default {
     // },
     data() {
         return {
+            modifyBoardCurId: '',
+            modifyDialog: false,
+            modifyTitle: '',
             curTab: 0,
             boards: [],
             createBoardDialog: {
@@ -168,8 +221,20 @@ export default {
         },
     },
     methods: {
+        successPostTitle() {
+            axios.patch('simple/boards/' + this.modifyBoardCurId, {
+                title: this.modifyTitle,
+            })
+            this.modifyDialog = false
+            this.fetchBoards()
+        },
         fetch_id(id) {
             this.temp_id = id
+        },
+        showModifyDialog(board) {
+            this.modifyTitle = board.title
+            this.modifyBoardCurId = board._id
+            this.modifyDialog = true
         },
         showDeleteBoardDialog(board) {
             this.deleteBoardDialog.curId = board._id
@@ -202,6 +267,7 @@ export default {
             const res = await axios.get('simple/boards')
             this.boards = res.data
             this.isLoading = false
+            console.log(res.data)
         },
         showCreateBoardDialog() {
             this.createBoardDialog.title = ''
