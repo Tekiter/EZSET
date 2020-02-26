@@ -94,7 +94,7 @@
                 </template>
                 <template v-slot:footer>
                     <v-divider></v-divider>
-                    <pagenation-footer
+                    <Pagination-footer
                         v-model="page"
                         :item-count="users.length"
                         :items-per-page.sync="itemsPerPage"
@@ -113,11 +113,11 @@
 </template>
 <script>
 import axios from 'axios'
-import PagenationFooter from '../../components/misc/PagenationFooter.vue'
+import PaginationFooter from '../../components/misc/PaginationFooter.vue'
 
 export default {
     components: {
-        PagenationFooter,
+        PaginationFooter,
     },
     data: () => ({
         headers: [
