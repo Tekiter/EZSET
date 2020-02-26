@@ -32,7 +32,7 @@
                         <v-icon left>mdi-pencil</v-icon> 게시판 생성
                     </v-btn>
                 </v-toolbar>
-                <v-list>
+                <v-list subheader>
                     <v-list-item v-for="board in boards" :key="board._id">
                         <v-list-item-title>{{ board.title }}</v-list-item-title>
                         <v-list-item-action>
@@ -52,8 +52,12 @@
             class="fill-height"
         >
             <v-card outlined>
-                <v-card-title>게시판 설정</v-card-title>
-                <v-list>
+                <v-toolbar flat>
+                    <v-toolbar-title>
+                        게시판 설정
+                    </v-toolbar-title>
+                </v-toolbar>
+                <v-list subheader>
                     <v-list-item v-for="board in boards" :key="board._id">
                         <v-list-item-title>{{ board.title }}</v-list-item-title>
                         <v-list-item-action>

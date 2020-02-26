@@ -13,7 +13,7 @@
         >
             <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
             <v-btn text large @click="$router.push('/')">
-                <v-toolbar-title>{{
+                <v-toolbar-title class="text-none">{{
                     $store.state.config.groupName
                 }}</v-toolbar-title>
             </v-btn>
