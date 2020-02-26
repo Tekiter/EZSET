@@ -9,33 +9,69 @@
                     </v-btn>
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-text-field
-                    v-model="search"
-                    append-icon="mdi-magnify"
-                    label="검색"
-                    single-line
-                    hide-details
-                ></v-text-field>
-                <v-spacer></v-spacer>
-                <v-btn
-                    @click="denyUsers()"
-                    :disabled="selected.length == 0"
-                    outlined
-                    color="warning darken-2"
-                    class="ml-2"
-                >
-                    가입 거절
-                </v-btn>
-                <v-btn
-                    @click="acceptUsers()"
-                    :disabled="selected.length == 0"
-                    outlined
-                    color="success darken-2"
-                    class="ml-2"
-                >
-                    가입 승인
-                </v-btn>
+                <template v-if="$vuetify.breakpoint.mdAndUp">
+                    <v-text-field
+                        v-model="search"
+                        append-icon="mdi-magnify"
+                        label="검색"
+                        single-line
+                        hide-details
+                    ></v-text-field>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        @click="denyUsers()"
+                        :disabled="selected.length == 0"
+                        outlined
+                        color="warning darken-2"
+                        class="ml-2"
+                    >
+                        가입 거절
+                    </v-btn>
+                    <v-btn
+                        @click="acceptUsers()"
+                        :disabled="selected.length == 0"
+                        outlined
+                        color="success darken-2"
+                        class="ml-2"
+                    >
+                        가입 승인
+                    </v-btn>
+                </template>
             </v-toolbar>
+            <template v-if="!$vuetify.breakpoint.mdAndUp">
+                <v-list subheader>
+                    <v-list-item>
+                        <v-text-field
+                            v-model="search"
+                            append-icon="mdi-magnify"
+                            label="검색"
+                            single-line
+                            hide-details
+                        ></v-text-field>
+                    </v-list-item>
+                </v-list>
+                <v-list-item class="d-flex">
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        @click="denyUsers()"
+                        :disabled="selected.length == 0"
+                        outlined
+                        color="warning darken-2"
+                        class="ml-2"
+                    >
+                        가입 거절
+                    </v-btn>
+                    <v-btn
+                        @click="acceptUsers()"
+                        :disabled="selected.length == 0"
+                        outlined
+                        color="success darken-2"
+                        class="ml-2"
+                    >
+                        가입 승인
+                    </v-btn>
+                </v-list-item>
+            </template>
 
             <v-data-table
                 v-model="selected"
@@ -46,6 +82,8 @@
                 show-select
                 item-key="username"
                 locale="ko-KR"
+                disable-filtering
+                disable-sort
             >
                 <template v-slot:no-data>
                     <p class="mt-3">승인 대기중인 유저가 없습니다.</p>
