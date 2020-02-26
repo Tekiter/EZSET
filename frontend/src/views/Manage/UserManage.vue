@@ -1,13 +1,18 @@
 <template>
     <div class="">
-        <!-- <h2 class="display-1">유저</h2> -->
         <v-data-iterator
             :items="users"
             :search="toolbar.search"
             :loading="true"
+            :items-per-page="itemsPerPage"
+            :page="page"
+            hide-default-footer
         >
             <template v-slot:header>
-                <v-toolbar class="mb-1" flat>
+                <v-toolbar flat>
+                    <v-toolbar-title>
+                        유저 관리
+                    </v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-text-field
                         v-model="toolbar.search"
@@ -17,18 +22,12 @@
                         flat
                         hide-details
                         dense
-                        label="검색하기"
+                        label="검색"
                         prepend-inner-icon="mdi-magnify"
                     ></v-text-field>
                 </v-toolbar>
             </template>
             <template v-slot:loading>
-                <!-- <div class="text-center py-10">
-                    <v-progress-circular
-                        indeterminate
-                        color="purple"
-                    ></v-progress-circular>
-                </div> -->
                 <v-row class="mx-2">
                     <v-col v-for="i in 6" :key="i" cols="12" md="6"
                         ><v-skeleton-loader
@@ -78,6 +77,7 @@
                                         <v-btn
                                             @click="showEditDialog(user)"
                                             icon
+                                            color="primary"
                                         >
                                             <v-icon
                                                 >mdi-account-edit-outline</v-icon
@@ -89,6 +89,13 @@
                         </v-card>
                     </v-col>
                 </v-row>
+            </template>
+            <template v-slot:footer>
+                <pagenation-footer
+                    v-model="page"
+                    :item-count="users.length"
+                    :items-per-page.sync="itemsPerPage"
+                />
             </template>
         </v-data-iterator>
 
@@ -234,14 +241,22 @@
 </template>
 <script>
 import axios from 'axios'
+import PagenationFooter from '../../components/misc/PagenationFooter.vue'
 
 export default {
+    components: {
+        PagenationFooter,
+    },
     data() {
         return {
             users: [],
             rawRoles: [], // 배열로 된 role 목록
             fetchingCount: 0,
             totalCount: 0,
+
+            itemsPerPage: 8,
+            page: 1,
+
             toolbar: {
                 search: '',
             },

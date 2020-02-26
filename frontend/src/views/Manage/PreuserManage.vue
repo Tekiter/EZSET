@@ -84,12 +84,21 @@
                 locale="ko-KR"
                 disable-filtering
                 disable-sort
+                hide-default-footer
             >
                 <template v-slot:no-data>
                     <p class="mt-3">승인 대기중인 유저가 없습니다.</p>
                 </template>
                 <template v-slot:loading>
                     <p class="mt-3">불러오는중..</p>
+                </template>
+                <template v-slot:footer>
+                    <v-divider></v-divider>
+                    <pagenation-footer
+                        v-model="page"
+                        :item-count="users.length"
+                        :items-per-page.sync="itemsPerPage"
+                    />
                 </template>
             </v-data-table>
         </v-card>
@@ -104,7 +113,12 @@
 </template>
 <script>
 import axios from 'axios'
+import PagenationFooter from '../../components/misc/PagenationFooter.vue'
+
 export default {
+    components: {
+        PagenationFooter,
+    },
     data: () => ({
         headers: [
             {
@@ -124,6 +138,10 @@ export default {
         users: [],
         search: '',
         selected: [],
+
+        itemsPerPage: 8,
+        page: 1,
+
         loading: false,
         snackbar: {
             show: false,
