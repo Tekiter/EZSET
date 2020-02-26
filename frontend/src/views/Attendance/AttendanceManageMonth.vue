@@ -73,6 +73,7 @@
             <v-data-table
                 :headers="headers"
                 :items="dataItems"
+                :items-per-page="100"
                 item-key="day"
                 class="elevation-1 font-weight-medium headline"
                 :search="search"
@@ -167,11 +168,11 @@ export default {
             //
         }
         this.tabLoad = true
+        await this.getUserName()
     },
     data() {
         return {
             search: '',
-            calories: '',
             attendanceDayData: [],
             attendanceUserData: [],
             userList: [],
@@ -185,12 +186,20 @@ export default {
             menu1: false,
             menu2: false,
             tabLoad: false,
+            userName: '',
         }
     },
     computed: {
         headers() {
             const cols = this.userList.map(user => {
-                return { text: user.username, value: user.username }
+                return {
+                    text:
+                        this.findUserRealname(user.username) +
+                        ' (' +
+                        user.username +
+                        ')',
+                    value: user.username,
+                }
             })
             return [
                 {
@@ -267,6 +276,22 @@ export default {
         },
     },
     methods: {
+        async getUserName() {
+            const res = await axios.get('user/')
+            const tmp = res.data.users
+            this.userName = tmp.map(user => {
+                return { username: user.username, realname: user.realname }
+            })
+        },
+        findUserRealname(username) {
+            for (var k in this.userName) {
+                if (this.userName[k].username == username) {
+                    return this.userName[k].realname
+                }
+            }
+            // return this.userName
+            return ''
+        },
         filterOnlyCapsText(value, search, item) {
             return (
                 value != null &&
