@@ -55,7 +55,6 @@ router.patch(
             await board.save()
             res.status(200).json({
                 message: '수정 완료',
-                target: post,
             })
         } catch (error) {
             const errr = new Error('database error')
