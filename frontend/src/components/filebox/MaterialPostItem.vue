@@ -67,11 +67,14 @@ export default {
             }
         },
         async deleteClick() {
-            try {
+            const res = await this.$action.showConfirmDialog(
+                '게시물 삭제',
+                '게시물을 삭제하시겠습니까?'
+            )
+            if (res) {
                 await axios.delete('/filebox/material/' + this.options.id)
                 this.$emit('delete')
-            } catch (error) {
-                //
+                console.log('확인버튼누름')
             }
         },
     },

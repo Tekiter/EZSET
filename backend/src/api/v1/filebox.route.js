@@ -112,7 +112,7 @@ router.post(
 router.patch(
     '/group/:group_id',
     [
-        param('group_id').isNumeric(),
+        param('group_id').isMongoId(),
         body('name').isString(),
         body('isfolder').isBoolean(),
         body('parent_id')
@@ -120,10 +120,12 @@ router.patch(
             .optional(),
         validateParams,
     ],
-    asyncRoute(async function(res, req) {
+    asyncRoute(async function(req, res) {
         let group = await Group.findById(req.params.group_id)
         if (group) {
             group.name = req.body.name
+            await group.save()
+            res.end()
         } else {
             res.status(404).json({
                 message: 'no group id' + req.params.group_id,
