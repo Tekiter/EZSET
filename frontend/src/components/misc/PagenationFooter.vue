@@ -1,5 +1,6 @@
 <template>
-    <div class="d-flex align-center ma-3">
+    <!-- Desktop UI -->
+    <div class="d-flex align-center ma-3" v-if="$vuetify.breakpoint.mdAndUp">
         <div class="side"></div>
         <div class="flex-grow-1">
             <v-pagination
@@ -22,6 +23,28 @@
             >
             </v-select>
         </div>
+    </div>
+
+    <!-- Mobile UI -->
+    <div class="ma-5" v-else>
+        <v-select
+            class="mt-0 pt-0"
+            :value="itemsPerPage"
+            @input="$emit('update:items-per-page', $event)"
+            :items="ippExample"
+            item-text="state"
+            item-value="value"
+            hide-details
+            outlined
+            dense
+        >
+        </v-select>
+        <v-pagination
+            class="mt-3"
+            :value="value"
+            @input="$emit('input', $event)"
+            :length="length"
+        />
     </div>
 </template>
 <style scoped>
