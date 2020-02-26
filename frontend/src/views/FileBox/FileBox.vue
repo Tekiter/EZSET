@@ -3,8 +3,23 @@
         <v-row no-gutters class="fill-height">
             <v-col class="fill-height" :cols="3" xl="2">
                 <v-card tile outlined class="fill-height">
+                    <v-sheet class="pa-4 primary lighten-2" tile>
+                        <v-text-field
+                            v-model="groupSearch"
+                            label="검색"
+                            :dark="isDarkColor('primary')"
+                            solo-inverted
+                            hide-details
+                            clearable
+                            flat
+                            prepend-inner-icon="mdi-magnify"
+                            clear-icon="mdi-close-circle-outline"
+                        >
+                        </v-text-field>
+                    </v-sheet>
                     <group-tree
                         v-model="selectedGroups"
+                        :search="groupSearch"
                         :items="groups"
                         @change="groupChanged()"
                     ></group-tree>
@@ -151,6 +166,7 @@ export default {
             fileboxes: [],
             groups: [],
             selectedGroups: [],
+            groupSearch: '',
             plusGroup: {
                 show: false,
             },

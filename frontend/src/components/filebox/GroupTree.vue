@@ -10,6 +10,7 @@
         :value="value"
         @update:active="onChange"
         return-object
+        :search="search"
     >
         <template v-slot:prepend="{ item, open }">
             <v-icon v-if="!item.isfolder">{{
@@ -37,6 +38,10 @@ export default {
         value: {
             type: Array,
             default: () => [],
+        },
+        search: {
+            type: String,
+            default: '',
         },
     },
     data: () => ({
