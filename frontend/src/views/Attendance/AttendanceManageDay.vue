@@ -453,13 +453,10 @@ export default {
             this.userName = tmp.map(user => {
                 return { username: user.username, realname: user.realname }
             })
-            console.log(this.userName)
         },
         findUserRealname(username) {
             for (var k in this.userName) {
-                console.log(k)
                 if (this.userName[k].username == username) {
-                    console.log(this.userName[k].username)
                     return this.userName[k].realname
                 }
             }
