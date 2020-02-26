@@ -1,5 +1,5 @@
 import random from 'random-number-csprng'
-import { configAvailable, setConfig } from '../utils/config'
+import { configAvailable, setConfig, setDefaultConfigs } from '../utils/config'
 import User from '../models/User'
 import role from '../utils/role'
 
@@ -30,7 +30,7 @@ const initialization = {
             console.log('Initialization detected.') // eslint-disable-line no-console
             await initialization.createSuperAdmin()
 
-            await setConfig('groupName', 'EZSET')
+            await setDefaultConfigs()
         }
 
         await role.loadRoles()

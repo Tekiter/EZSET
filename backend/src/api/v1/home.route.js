@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { asyncRoute, validateParams } from '../../utils/api'
 import { getConfig, setConfig } from '../../utils/config'
-import { perm } from '../../utils/role'
+// import { perm } from '../../utils/role'
 import { body } from 'express-validator'
 
 const router = Router()

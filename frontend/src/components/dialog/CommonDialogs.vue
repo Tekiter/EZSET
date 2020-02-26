@@ -16,7 +16,9 @@
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn text @click="closeAlertDialog()">확인</v-btn>
+                    <v-btn text @click="closeAlertDialog()" color="primary">
+                        확인
+                    </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -45,7 +47,7 @@
                     >
                     <v-btn
                         text
-                        color="secondary"
+                        color="grey darken-1"
                         @click="closeConfirmDialog(false)"
                         >{{ confirmDialog.noButton }}</v-btn
                     >

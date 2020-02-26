@@ -52,7 +52,7 @@
                                         v-if="item.state == 'attendance'"
                                         class="flex-grow-0"
                                     >
-                                        <v-btn text icon color="green" dark>
+                                        <v-btn text icon color="success" dark>
                                             <v-icon>
                                                 mdi-checkbox-blank-circle-outline
                                             </v-icon>
@@ -65,7 +65,7 @@
                                         <v-btn
                                             text
                                             icon
-                                            color="gray"
+                                            color="grey darken-1"
                                             @click="
                                                 changeAttendanceState(
                                                     item,
@@ -83,7 +83,7 @@
                                         v-if="item.state == 'late'"
                                         class="flex-grow-0"
                                     >
-                                        <v-btn text icon color="orange" dark>
+                                        <v-btn text icon color="warning" dark>
                                             <v-icon>
                                                 mdi-triangle-outline
                                             </v-icon>
@@ -96,7 +96,7 @@
                                         <v-btn
                                             text
                                             icon
-                                            color="gray"
+                                            color="grey darken-1"
                                             @click="
                                                 changeAttendanceState(
                                                     item,
@@ -113,7 +113,7 @@
                                         v-if="item.state == 'absence'"
                                         class="flex-grow-0"
                                     >
-                                        <v-btn text icon color="red" dark>
+                                        <v-btn text icon color="error" dark>
                                             <v-icon> mdi-close </v-icon>
                                         </v-btn>
                                     </td>
@@ -124,7 +124,7 @@
                                         <v-btn
                                             text
                                             icon
-                                            color="gray"
+                                            color="grey darken-1"
                                             @click="
                                                 changeAttendanceState(
                                                     item,
@@ -139,7 +139,7 @@
                                         v-if="item.state == 'official_absence'"
                                         class="flex-grow-0"
                                     >
-                                        <v-btn text icon color="green" dark>
+                                        <v-btn text icon color="success" dark>
                                             <v-icon>
                                                 mdi-close-circle-outline
                                             </v-icon>
@@ -152,7 +152,7 @@
                                         <v-btn
                                             text
                                             icon
-                                            color="gray lighten-2"
+                                            color="grey lighten-2"
                                             @click="
                                                 changeAttendanceState(
                                                     item,
@@ -221,7 +221,7 @@
                                         v-if="item.approval == true"
                                         class="flex-grow-0"
                                     >
-                                        <v-btn text icon color="green">
+                                        <v-btn text icon color="success">
                                             <v-icon>
                                                 mdi-checkbox-blank-circle-outline
                                             </v-icon>
@@ -247,7 +247,7 @@
                                                 mdi-checkbox-blank-circle-outline
                                             </v-icon>
                                         </v-btn>
-                                        <v-btn text icon color="red">
+                                        <v-btn text icon color="error">
                                             <v-icon> mdi-close </v-icon>
                                         </v-btn>
                                     </td>
@@ -337,7 +337,7 @@
                         <v-spacer></v-spacer>
 
                         <v-btn
-                            color="green darken-1"
+                            color="success darken-1"
                             text
                             @click="cancelUserAdd()"
                         >
@@ -345,7 +345,7 @@
                         </v-btn>
 
                         <v-btn
-                            color="green darken-1"
+                            color="success darken-1"
                             text
                             @click="applyUserAdd()"
                         >

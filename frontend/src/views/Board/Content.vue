@@ -23,7 +23,7 @@
                                 class="ma-2"
                                 tile
                                 outlined
-                                color="blue darken-2"
+                                color="primary darken-2"
                                 @click="back()"
                             >
                                 <v-icon left>mdi-arrow-left-circle</v-icon>
@@ -80,8 +80,14 @@
                                         class="ma-2"
                                         tile
                                         outlined
-                                        color="green darken-2"
-                                        v-if="del_auth(post.author)"
+                                        color="success darken-2"
+                                        v-if="
+                                            del_auth(
+                                                post.author,
+                                                post._id,
+                                                false
+                                            )
+                                        "
                                         @click="go_modify()"
                                     >
                                         <v-icon left>mdi-autorenew</v-icon>
@@ -91,8 +97,14 @@
                                         class="ma-2"
                                         tile
                                         outlined
-                                        color="black"
-                                        v-if="del_auth(post.author)"
+                                        color="error"
+                                        v-if="
+                                            del_auth(
+                                                post.author,
+                                                post._id,
+                                                true
+                                            )
+                                        "
                                         @click="deletePost"
                                     >
                                         <v-icon>mdi-trash-can</v-icon> 삭제하기
@@ -101,7 +113,7 @@
                                         class="ma-2"
                                         tile
                                         outlined
-                                        color="red darken-1"
+                                        color="primary lighten-1"
                                         v-if="!post.isLike"
                                         @click="clickLike(post.author)"
                                     >
@@ -115,7 +127,7 @@
                                         class="ma-2"
                                         tile
                                         outlined
-                                        color="purple"
+                                        color="warning"
                                         v-else
                                         @click="clickDislike(post.author)"
                                     >
@@ -157,7 +169,13 @@
                                         <v-btn
                                             icon
                                             small
-                                            v-if="del_auth(comment.writer)"
+                                            v-if="
+                                                del_auth(
+                                                    comment.writer,
+                                                    comment._id,
+                                                    false
+                                                )
+                                            "
                                             @click="
                                                 showUpdateComment(comment, idx)
                                             "
@@ -170,7 +188,13 @@
                                             class="ml-2"
                                             icon
                                             small
-                                            v-if="del_auth(comment.writer)"
+                                            v-if="
+                                                del_auth(
+                                                    comment.writer,
+                                                    comment._id,
+                                                    true
+                                                )
+                                            "
                                             @click="showDeleteComment(comment)"
                                         >
                                             <v-icon
@@ -316,20 +340,24 @@ export default {
             })
             this.loading = false
         },
-        del_auth(writer) {
+        del_auth(writer, id, isDelete) {
             if (this.post.isAnonymous == true) {
                 if (
                     crypto
                         .createHash('sha512')
                         .update(this.$store.state.auth.user.username)
-                        .digest('base64') == writer
+                        .digest('base64') == writer ||
+                    (this.$perm('board', id).can('delete') && isDelete)
                 ) {
                     return true
                 } else {
                     return false
                 }
             } else {
-                if (this.$store.state.auth.user.username == writer) {
+                if (
+                    this.$store.state.auth.user.username == writer ||
+                    (this.$perm('board', id).can('delete') && isDelete)
+                ) {
                     return true
                 } else {
                     return false
@@ -356,15 +384,9 @@ export default {
             if (res) {
                 axios.delete('/simple/posts/' + this.post._id)
                 this.$router.push({
-                    path: `/`,
+                    path: '/board/' + this.$route.params.board_id,
                 })
             }
-        },
-        delPost() {
-            axios.delete('/simple/posts/' + this.post._id)
-            this.$router.push({
-                path: '/board/' + this.$route.params.board_id,
-            })
         },
         fetch_id(id) {
             this.temp_id = id

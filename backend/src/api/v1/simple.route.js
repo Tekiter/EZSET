@@ -176,17 +176,25 @@ router.delete(
             let post = await Post.findById(req.params.post_id)
             if (post) {
                 if (post.isAnonymous == false) {
-                    if (post.author != req.user.username) {
+                    if (
+                        post.author != req.user.username &&
+                        !req.user
+                            .perm('board', req.params.board_id)
+                            .can('delete')
+                    ) {
                         res.status(403).end()
                         return
                     }
                 } else {
                     if (
                         post.author !=
-                        crypto
-                            .createHash('sha512')
-                            .update(req.user.username)
-                            .digest('base64')
+                            crypto
+                                .createHash('sha512')
+                                .update(req.user.username)
+                                .digest('base64') &&
+                        !req.user
+                            .perm('board', req.params.board_id)
+                            .can('delete')
                     ) {
                         res.status(403).end()
                         return
@@ -394,6 +402,7 @@ router.get(
                         created_date: post.created_date,
                         view: post.view,
                         like: post.likes_count,
+                        comment_count: post.comments.length,
                         comment: post.comments,
                     }
                 }),
@@ -517,17 +526,21 @@ router.delete(
                 return
             }
             if (post.isAnonymous == false) {
-                if (post.author != req.user.username) {
+                if (
+                    post.author != req.user.username &&
+                    !req.user.perm('board', req.params.comment_id).can('delete')
+                ) {
                     res.status(403).end()
                     return
                 }
             } else {
                 if (
                     post.author !=
-                    crypto
-                        .createHash('sha512')
-                        .update(req.user.username)
-                        .digest('base64')
+                        crypto
+                            .createHash('sha512')
+                            .update(req.user.username)
+                            .digest('base64') &&
+                    !req.user.perm('board', req.params.comment_id).can('delete')
                 ) {
                     res.status(403).end()
                     return
