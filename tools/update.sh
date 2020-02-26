@@ -6,6 +6,7 @@ git fetch --all
 git reset --hard origin/master
 git pull
 echo "====ENV SETTING===="
+sudo iptables -I INPUT -p tcp --dport 5050 -j ACCEPT
 export DATABASE_URI=mongodb://localhost:27017/ezset
 export PORT=5000
 export SOCKET_PORT=5050
@@ -22,4 +23,7 @@ cd ./../backend
 yarn install
 yarn build
 yarn start
+echo "====================="
+echo "Server will reboot every 7days"
+sleep 7d
 echo "====================="
