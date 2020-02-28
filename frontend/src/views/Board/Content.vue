@@ -256,6 +256,7 @@
                                         >
                                         <v-btn
                                             outlined
+                                            color="primary darken-2"
                                             @click="createComment()"
                                             :disabled="writeComment.isLoading"
                                             ><v-icon left

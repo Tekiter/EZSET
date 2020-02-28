@@ -28,7 +28,7 @@
                         tile
                         outlined
                         :disabled="isLoading"
-                        color="black"
+                        color="primary darken-2"
                         @click="submitClick"
                     >
                         <v-icon left>mdi-pencil</v-icon> 작성
