@@ -267,7 +267,6 @@ export default {
             const res = await axios.get('simple/boards')
             this.boards = res.data
             this.isLoading = false
-            console.log(res.data)
         },
         showCreateBoardDialog() {
             this.createBoardDialog.title = ''
