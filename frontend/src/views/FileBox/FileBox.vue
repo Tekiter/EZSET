@@ -44,7 +44,7 @@
                 </v-card>
             </v-col>
             <v-col class="fill-height">
-                <router-view v-if="!plusGroup.show"></router-view>
+                <router-view v-show="!plusGroup.show"></router-view>
                 <v-fade-transition hide-on-leave>
                     <create-group
                         v-if="plusGroup.show"
@@ -53,97 +53,15 @@
                         @change="fetchGroups"
                     ></create-group>
                 </v-fade-transition>
-
-                <!-- 밑에거 안보임 (지울예정) -->
-                <div v-if="false">
-                    <v-card v-if="modifyGroup.show" class="fill-height">
-                        <v-toolbar dark short color="primary">
-                            <v-btn icon dark @click="closePlusGroup()">
-                                <v-icon>mdi-close</v-icon>
-                            </v-btn>
-                            <v-toolbar-title>그룹 편집</v-toolbar-title>
-                        </v-toolbar>
-                        <div>
-                            <v-row>
-                                <v-col>
-                                    <template>
-                                        <v-banner>
-                                            <v-chip
-                                                class="ma-2"
-                                                outlined
-                                                label
-                                                v-if="
-                                                    plusGroup.selected.length ==
-                                                        0
-                                                "
-                                                >기본 위치</v-chip
-                                            >
-                                            <v-chip
-                                                class="ma-2"
-                                                outlined
-                                                label
-                                                v-if="
-                                                    plusGroup.selected.length >
-                                                        0
-                                                "
-                                            >
-                                                {{ plusGroup.selected[0].name }}
-                                            </v-chip>
-                                        </v-banner>
-                                        <v-banner
-                                            v-if="plusGroup.selected.length > 0"
-                                        >
-                                            수정하기
-                                            <v-text-field
-                                                v-model="modifyNow"
-                                                dense
-                                            ></v-text-field>
-                                            <v-btn
-                                                small
-                                                color="blue darken-1"
-                                                dark
-                                                >수정</v-btn
-                                            >
-                                        </v-banner>
-                                        <v-banner
-                                            v-if="plusGroup.selected.length > 0"
-                                        >
-                                            <div class="my-2">
-                                                <v-btn small color="error"
-                                                    >삭제하기</v-btn
-                                                >
-                                            </div>
-                                        </v-banner>
-                                    </template>
-                                </v-col>
-                                <v-col>
-                                    <group-tree
-                                        :items="groups"
-                                        selectable
-                                        color="warning"
-                                        v-model="plusGroup.selected"
-                                        @change="clickEvent()"
-                                    ></group-tree>
-                                    <v-card
-                                        class="mx-auto"
-                                        outlined
-                                        v-if="plusGroup.selected.length == 0"
-                                        color="orange lighten-4"
-                                    >
-                                        <v-list-item>
-                                            <v-list-item-content>
-                                                <v-list-item-title
-                                                    >기본
-                                                    위치</v-list-item-title
-                                                >
-                                            </v-list-item-content>
-                                        </v-list-item>
-                                    </v-card>
-                                </v-col>
-                            </v-row>
-                        </div>
-                    </v-card>
-                </div>
+                <!-- editgroup도 위에 처럼 수정하기 -->
+                <!-- <v-fade-transition hide-on-leave>
+                    <create-group
+                        v-if="plusGroup.show"
+                        :groups="groups"
+                        @close="closePlusGroup"
+                        @change="fetchGroups"
+                    ></create-group>
+                </v-fade-transition> -->
             </v-col>
         </v-row>
     </div>
@@ -196,16 +114,25 @@ export default {
         }
     },
     async created() {
-        this.fetchGroups()
+        await this.fetchGroups()
     },
     methods: {
         clickEvent() {
             this.group_id = this.plusGroup.selected[0].id
             this.modifyNow = this.plusGroup.selected[0].name
         },
-        showModifyGroup() {
-            this.plusGroup.show = false
-            this.modifyGroup.show = true
+        async showModifyGroup() {
+            try {
+                this.$router.push({
+                    name: 'fileboxEditGroup',
+                    params: {
+                        groups: this.groups,
+                    },
+                })
+                await this.fetchGroups()
+            } catch {
+                //
+            }
         },
         async fetchGroups() {
             const res = await axios.get('/filebox')

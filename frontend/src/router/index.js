@@ -155,6 +155,12 @@ const routes = [
                 component: () => import('../components/filebox/CreateGroup'),
             },
             {
+                path: 'edit',
+                name: 'fileboxEditGroup',
+                component: () => import('../components/filebox/EditGroup'),
+                props: route => ({ groups: route.params.groups }),
+            },
+            {
                 path: 'folder/:folder_id',
                 name: 'fileBoxMaterials',
                 component: () =>
