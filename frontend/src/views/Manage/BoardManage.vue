@@ -154,7 +154,7 @@
                 </template>
                 <v-card>
                     <v-card-title class="headline"
-                        >게시물 이름 수정</v-card-title
+                        >게시판 이름 수정</v-card-title
                     >
                     <v-container>
                         <v-text-field
