@@ -10,8 +10,7 @@ const router = Router()
 //schedule Collection 에서 모든 일정을 가져옴
 // schedule 페이지에서 사용
 router.get(
-    '/read',
-    [perm('schedule').can('update')],
+    '/read', [perm('schedule').can('read')],
     asyncRoute(async function(req, res) {
         const schedule = await Schedule.find()
         res.json(schedule)
@@ -22,8 +21,7 @@ router.get(
 //body : daylist(array), type(string), title(string), content(string), color(string)
 // schedule 페이지에서 사용
 router.post(
-    '/write',
-    [
+    '/write', [
         perm('schedule').can('update'),
         body('dayList').isArray(),
         body('title').isString(),
@@ -33,7 +31,7 @@ router.post(
     ],
     asyncRoute(async function(req, res) {
         var dayArray = req.body.dayList.sort()
-        //날짜 배열을 기준으로 순회하면서 저장
+            //날짜 배열을 기준으로 순회하면서 저장
         var schedule = new Schedule()
         for (var k in dayArray) {
             if (k == 0) {
@@ -47,8 +45,8 @@ router.post(
             }
             if (
                 moment(schedule.end)
-                    .add(1, 'days')
-                    .format('YYYY-MM-DD') ==
+                .add(1, 'days')
+                .format('YYYY-MM-DD') ==
                 moment(req.body.dayList[k]).format('YYYY-MM-DD')
             ) {
                 schedule.end = dayArray[k]
@@ -73,8 +71,7 @@ router.post(
 //body : day(String), type(string), title(string), content(string), color(string)
 // schedule 페이지에서 사용
 router.post(
-    '/delete',
-    [
+    '/delete', [
         perm('schedule').can('update'),
         body('start').isString(),
         body('end').isString(),
