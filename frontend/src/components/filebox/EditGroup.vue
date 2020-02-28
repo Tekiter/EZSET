@@ -86,7 +86,7 @@ export default {
     }),
     methods: {
         closeEditGroup() {
-            this.$router.push({ name: 'fileBoxEmpty' })
+            this.$emit('close')
         },
         async ChangeGroupName() {
             try {
