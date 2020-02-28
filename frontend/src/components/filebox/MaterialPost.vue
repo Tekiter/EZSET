@@ -40,6 +40,31 @@
                     </v-col>
                 </v-row>
             </template>
+            <template v-slot:no-data>
+                <v-row>
+                    <v-col>
+                        <v-container class="text-center">
+                            게시글이 존재하지 않습니다
+                        </v-container>
+                    </v-col>
+                </v-row>
+            </template>
+            <!--
+            <template v-slot:footer="changePagenation">
+                <v-row>
+                    <v-col>
+                    </v-col>
+                    <v-col>
+                <div class="text-center">
+                    <v-pagination
+                    v-model="page"
+                    :length="4"
+                    circle
+                    ></v-pagination>
+                </div>
+                </v-row>
+            </template>
+            -->
         </v-data-iterator>
     </div>
 </template>
