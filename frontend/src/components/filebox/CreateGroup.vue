@@ -62,7 +62,7 @@
                 <v-col>
                     <group-tree
                         :items="groups"
-                        selectable
+                        selectable="add"
                         color="warning"
                         v-model="selected"
                     ></group-tree>

@@ -32,7 +32,7 @@
                                 >새 그룹 추가</v-list-item-title
                             >
                         </v-list-item>
-                        <v-list-item link @click="showModifyGroup()">
+                        <v-list-item link @click="showEditGroup()">
                             <v-list-item-icon>
                                 <v-icon>mdi-map-search</v-icon>
                             </v-list-item-icon>
@@ -44,24 +44,23 @@
                 </v-card>
             </v-col>
             <v-col class="fill-height">
-                <router-view v-show="!plusGroup.show"></router-view>
+                <router-view v-show="overlayMode == 'none'"></router-view>
                 <v-fade-transition hide-on-leave>
                     <create-group
-                        v-if="plusGroup.show"
+                        v-if="overlayMode == 'add'"
                         :groups="groups"
                         @close="closePlusGroup"
                         @change="fetchGroups"
                     ></create-group>
                 </v-fade-transition>
-                <!-- editgroup도 위에 처럼 수정하기 -->
-                <!-- <v-fade-transition hide-on-leave>
-                    <create-group
-                        v-if="plusGroup.show"
+                <v-fade-transition hide-on-leave>
+                    <edit-group
+                        v-if="overlayMode == 'edit'"
                         :groups="groups"
-                        @close="closePlusGroup"
+                        @close="closeEditGroup"
                         @change="fetchGroups"
-                    ></create-group>
-                </v-fade-transition> -->
+                    ></edit-group>
+                </v-fade-transition>
             </v-col>
         </v-row>
     </div>
@@ -71,30 +70,21 @@
 import axios from 'axios'
 import GroupTree from '../../components/filebox/GroupTree.vue'
 import CreateGroup from '../../components/filebox/CreateGroup.vue'
+import EditGroup from '../../components/filebox/EditGroup.vue'
 
 export default {
     components: {
         GroupTree,
         CreateGroup,
+        EditGroup,
     },
     data() {
         return {
             group_id: '',
-            modifyNow: '',
             fileboxes: [],
             groups: [],
             selectedGroups: [],
-            groupSearch: '',
-            plusGroup: {
-                show: false,
-            },
-            modifyGroup: {
-                show: false,
-                parent: '',
-                name: '',
-                isfolder: false,
-                selected: [],
-            },
+            overlayMode: 'none',
             showMetarials: {
                 show: false,
                 selected: [],
@@ -117,36 +107,22 @@ export default {
         await this.fetchGroups()
     },
     methods: {
-        clickEvent() {
-            this.group_id = this.plusGroup.selected[0].id
-            this.modifyNow = this.plusGroup.selected[0].name
+        showEditGroup() {
+            this.overlayMode = 'edit'
         },
-        async showModifyGroup() {
-            try {
-                this.$router.push({
-                    name: 'fileboxEditGroup',
-                    params: {
-                        groups: this.groups,
-                    },
-                })
-                await this.fetchGroups()
-            } catch {
-                //
-            }
+        closeEditGroup() {
+            this.overlayMode = 'none'
+            this.fetchGroups()
         },
         async fetchGroups() {
             const res = await axios.get('/filebox')
             this.groups = res.data.groups
         },
         showPlusGroup() {
-            this.modifyGroup.show = false
-            this.plusGroup.show = true
+            this.overlayMode = 'add'
         },
         closePlusGroup() {
-            this.plusGroup.show = false
-            this.plusGroup.name = ''
-            this.plusGroup.isfolder = false
-            this.plusGroup.selected = []
+            this.overlayMode = 'none'
         },
         isFolderTrue() {
             this.plusGroup.isfolder = true

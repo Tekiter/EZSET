@@ -56,7 +56,7 @@
                 <v-col>
                     <group-tree
                         :items="groups"
-                        selectable
+                        selectable="edit"
                         color="warning"
                         v-model="selected"
                     ></group-tree>
@@ -86,7 +86,7 @@ export default {
     }),
     methods: {
         closeEditGroup() {
-            this.$router.push({ name: 'fileBoxEmpty' })
+            this.$emit('close')
         },
         async ChangeGroupName() {
             try {
@@ -100,7 +100,7 @@ export default {
                     body.parent_id = this.selected[0].id
                 }
                 await axios.patch('/filebox/group/' + this.selected[0].id, body)
-                this.$router.push({ name: 'fileBoxEmpty' })
+                this.$emit('close')
             } catch {
                 //
             }

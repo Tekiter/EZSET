@@ -134,6 +134,45 @@ router.patch(
     })
 )
 
+router.delete(
+    '/group/:group_id',
+    [],
+    asyncRoute(async (req, res) => {
+        const loops = async group_id => {
+            const group = await Group.findById(group_id)
+            if (!group) {
+                const err = new Error(
+                    '해당 그룹 또는 폴더가 존재하지 않습니다.'
+                )
+                err.status = 404
+                throw err
+            }
+
+            if (group.isfolder) {
+                const materials = await Material.find()
+                    .where('parent')
+                    .equals(group_id)
+
+                for (let material of materials) {
+                    await removeFileLink(material.files)
+                    await deleteUnlinkedFile(material.files)
+                    await material.remove()
+                }
+                await group.remove()
+            } else {
+                for (let children of group.children) {
+                    await loops(children)
+                }
+                await group.remove()
+            }
+        }
+
+        await loops(req.params.group_id)
+
+        res.end()
+    })
+)
+
 //material 조회
 router.get(
     '/folder/:parent_id',
