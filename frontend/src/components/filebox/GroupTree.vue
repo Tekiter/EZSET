@@ -5,7 +5,7 @@
         activatable
         item-key="id"
         :open-on-click="!selectable"
-        :item-disabled="selectable ? 'isfolder' : null"
+        :item-disabled="selectable == 'add' ? 'isfolder' : null"
         :color="color"
         :value="value"
         @update:active="onChange"
@@ -27,8 +27,8 @@ export default {
             default: () => [],
         },
         selectable: {
-            type: Boolean,
-            default: false,
+            type: String,
+            default: '',
         },
         color: {
             type: String,

@@ -29,19 +29,18 @@
                 </v-card>
             </v-col>
             <v-col class="fill-height">
-                <router-view v-show="!plusGroup.show"></router-view>
+                <router-view v-show="overlayMode == 'none'"></router-view>
                 <v-fade-transition hide-on-leave>
                     <create-group
-                        v-if="plusGroup.show"
+                        v-if="overlayMode == 'add'"
                         :groups="groups"
                         @close="closePlusGroup"
                         @change="fetchGroups"
                     ></create-group>
                 </v-fade-transition>
-                <router-view v-show="!editGroup.show"></router-view>
                 <v-fade-transition hide-on-leave>
                     <edit-group
-                        v-if="editGroup.show"
+                        v-if="overlayMode == 'edit'"
                         :groups="groups"
                         @close="closeEditGroup"
                         @change="fetchGroups"
@@ -67,23 +66,10 @@ export default {
     data() {
         return {
             group_id: '',
-            modifyNow: '',
             fileboxes: [],
             groups: [],
             selectedGroups: [],
-            plusGroup: {
-                show: false,
-            },
-            editGroup: {
-                show: false,
-            },
-            modifyGroup: {
-                show: false,
-                parent: '',
-                name: '',
-                isfolder: false,
-                selected: [],
-            },
+            overlayMode: 'none',
             showMetarials: {
                 show: false,
                 selected: [],
@@ -106,17 +92,11 @@ export default {
         await this.fetchGroups()
     },
     methods: {
-        clickEvent() {
-            this.group_id = this.plusGroup.selected[0].id
-            this.modifyNow = this.plusGroup.selected[0].name
-        },
         showEditGroup() {
-            this.modifyGroup.show = false
-            this.editGroup.show = true
+            this.overlayMode = 'edit'
         },
         closeEditGroup() {
-            this.modifyGroup.show = true
-            this.editGroup.show = false
+            this.overlayMode = 'none'
             this.fetchGroups()
         },
         async fetchGroups() {
@@ -124,14 +104,10 @@ export default {
             this.groups = res.data.groups
         },
         showPlusGroup() {
-            this.modifyGroup.show = false
-            this.plusGroup.show = true
+            this.overlayMode = 'add'
         },
         closePlusGroup() {
-            this.plusGroup.show = false
-            this.plusGroup.name = ''
-            this.plusGroup.isfolder = false
-            this.plusGroup.selected = []
+            this.overlayMode = 'none'
         },
         isFolderTrue() {
             this.plusGroup.isfolder = true
