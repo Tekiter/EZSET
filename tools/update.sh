@@ -25,5 +25,6 @@ yarn build
 yarn start
 echo "====================="
 echo "Server will reboot every 7days"
-sleep 7d
 echo "====================="
+sleep 7d
+exit()
