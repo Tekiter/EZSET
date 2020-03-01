@@ -1,91 +1,61 @@
 <template>
-    <div>
-        <v-card class="mx-auto" max-width="400" tile>
-            <v-list flat>
-                <v-subheader>
-                    <v-col></v-col>
-                    <v-divider class="mx-4" vertical></v-divider>
-                    <v-col class="title black--text">보기</v-col>
-                    <v-divider class="mx-4" vertical></v-divider>
-                    <v-col class="title black--text">쓰기</v-col>
-                    <v-divider class="mx-4" vertical></v-divider>
-                    <v-col class="title black--text">삭제</v-col>
-                </v-subheader>
-
-                <v-list-item v-for="(item, i) in items" :key="i">
-                    <v-list-item-content>
-                        <v-list-item-title
-                            class="text-center subtitle-1"
-                            v-text="item.status"
-                        ></v-list-item-title>
-                    </v-list-item-content>
-                    <v-divider class="mx-4" vertical></v-divider>
-                    <v-list-item-content class="d-flex justify-center">
-                        <v-switch v-model="item.read"></v-switch>
-                    </v-list-item-content>
-                    <v-divider class="mx-4" vertical></v-divider>
-                    <v-list-item-content class="d-flex justify-center">
-                        <v-switch
-                            class="d-flex justify-center"
-                            v-model="item.write"
-                        ></v-switch>
-                    </v-list-item-content>
-                    <v-divider class="mx-4" vertical></v-divider>
-                    <v-list-item-content class="d-flex justify-center">
-                        <v-switch
-                            class="d-flex justify-center"
-                            v-model="item.delete"
-                        ></v-switch>
-                    </v-list-item-content>
-                </v-list-item>
-            </v-list>
-        </v-card>
-    </div>
+    <v-card outlined>
+        <v-toolbar flat>
+            <v-toolbar-title>
+                게시판 권한
+            </v-toolbar-title>
+        </v-toolbar>
+        <v-list subheader>
+            <board-perm-edit
+                v-for="board in boards"
+                :key="`board-${board._id}`"
+                :roles="roles"
+                :board="board"
+            ></board-perm-edit>
+        </v-list>
+    </v-card>
 </template>
 
 <script>
+import axios from 'axios'
+import BoardPermEdit from './BoardPermEdit.vue'
+
 export default {
-    data() {
-        return {
-            items: [
-                {
-                    status: '시니어',
-                    read: true,
-                    write: true,
-                    delete: false,
-                },
-                {
-                    status: '시니어',
-                    read: true,
-                    write: true,
-                    delete: false,
-                },
-                {
-                    status: '시니어',
-                    read: true,
-                    write: true,
-                    delete: false,
-                },
-                {
-                    status: '시니어',
-                    read: true,
-                    write: true,
-                    delete: false,
-                },
-                {
-                    status: '시니어',
-                    read: true,
-                    write: true,
-                    delete: false,
-                },
-                {
-                    status: '시니어',
-                    read: true,
-                    write: true,
-                    delete: false,
-                },
-            ],
-        }
+    components: {
+        BoardPermEdit,
+    },
+    data: () => ({
+        boards: [],
+        roles: [],
+        loading: false,
+    }),
+    methods: {
+        async fetchBoards() {
+            this.loading = true
+            const res = await axios.get('simple/boards')
+            this.boards = res.data
+            this.loading = false
+        },
+        async fetchRoles() {
+            this.loading = true
+            let res = await axios.get('role')
+            const roleNames = res.data
+            this.roles = []
+            for (let role of roleNames) {
+                res = await axios.get(`role/${role.tag}`)
+                this.roles.push({
+                    name: role.name,
+                    tag: role.tag,
+                    perm: res.data.perm,
+                })
+            }
+
+            this.loading = false
+        },
+    },
+    async created() {
+        await this.fetchRoles()
+        await this.fetchBoards()
     },
 }
 </script>
