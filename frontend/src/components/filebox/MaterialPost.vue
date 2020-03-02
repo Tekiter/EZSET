@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="text-center" v-if="canEditDelete()">
+        <div class="text-center" v-if="canUpload()">
             <v-btn
                 class="mx-2"
                 block
@@ -13,7 +13,13 @@
                 <v-icon right dark>mdi-cloud-upload</v-icon>
             </v-btn>
         </div>
-        <v-data-iterator :items="items" :loading="isloading">
+        <v-data-iterator
+            :items="items"
+            :loading="isloading"
+            :page="page"
+            :items-per-page="itemsPerPage"
+            hide-default-footer
+        >
             <template v-slot:loading>
                 <v-row class="mx-2">
                     <v-col v-for="i in 6" :key="i" cols="12" md="6">
@@ -49,32 +55,26 @@
                     </v-col>
                 </v-row>
             </template>
-            <!--
-            <template v-slot:footer="changePagenation">
-                <v-row>
-                    <v-col>
-                    </v-col>
-                    <v-col>
-                <div class="text-center">
-                    <v-pagination
+            <template v-slot:footer>
+                <pagination-footer
                     v-model="page"
-                    :length="4"
-                    circle
-                    ></v-pagination>
-                </div>
-                </v-row>
+                    :item-count="items.length"
+                    :items-per-page.sync="itemsPerPage"
+                    :itemsPerPageExample="[6, 20, 60, 100]"
+                />
             </template>
-            -->
         </v-data-iterator>
     </div>
 </template>
 <script>
 import MaterialPostItem from '../../components/filebox/MaterialPostItem.vue'
+import PaginationFooter from '../../components/misc/PaginationFooter.vue'
 import Axios from 'axios'
 export default {
     name: 'MaterialPost',
     components: {
         MaterialPostItem,
+        PaginationFooter,
     },
     props: {
         folderId: {
@@ -86,6 +86,8 @@ export default {
         return {
             items: [],
             isloading: true,
+            page: 1,
+            itemsPerPage: 6,
         }
     },
     methods: {
@@ -116,11 +118,10 @@ export default {
                 },
             })
         },
-        canEditDelete() {
+        canUpload() {
             if (
                 this.$perm('fileBox').can('manage') ||
-                (this.$perm('fileBox').can('upload') &&
-                    this.options.author == this.$store.state.auth.user.username)
+                this.$perm('fileBox').can('upload')
             )
                 return true
             else return false

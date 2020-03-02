@@ -5,17 +5,16 @@ import { loginGuard } from './guard'
 
 Vue.use(VueRouter)
 
-const routes = [{
+const routes = [
+    {
         path: '/',
         name: 'home',
-        component: () =>
-            import ('../views/Home.vue'),
+        component: () => import('../views/Home.vue'),
     },
     {
         path: '/login',
         name: 'login',
-        component: () =>
-            import ('../views/Login.vue'),
+        component: () => import('../views/Login.vue'),
         meta: {
             layout: 'empty',
             noLoginRequired: true,
@@ -24,8 +23,7 @@ const routes = [{
     {
         path: '/register',
         name: 'register',
-        component: () =>
-            import ('../views/Register.vue'),
+        component: () => import('../views/Register.vue'),
         meta: {
             layout: 'null',
             noLoginRequired: true,
@@ -34,140 +32,121 @@ const routes = [{
     {
         path: '/attendance',
         name: 'attendance',
-        component: () =>
-            import ('../views/Attendance/Attendance.vue'),
+        component: () => import('../views/Attendance/Attendance.vue'),
     },
     {
         path: '/attendanceManageDay/:day',
         name: 'attendanceManage',
-        component: () =>
-            import ('../views/Attendance/AttendanceManageDay.vue'),
+        component: () => import('../views/Attendance/AttendanceManageDay.vue'),
     },
     {
         path: '/attendanceManageMonth',
         name: 'attendanceManageMonth',
         component: () =>
-            import ('../views/Attendance/AttendanceManageMonth.vue'),
+            import('../views/Attendance/AttendanceManageMonth.vue'),
     },
     {
         path: '/attendanceManageMonthOld',
         name: 'attendanceManageMonthOld',
         component: () =>
-            import ('../views/Attendance/AttendanceManageMonthOld.vue'),
+            import('../views/Attendance/AttendanceManageMonthOld.vue'),
     },
     {
         path: '/attendanceManageMonthUser',
         name: 'attendanceManageMonthUser',
         component: () =>
-            import ('../views/Attendance/AttendanceManageMonthUser.vue'),
+            import('../views/Attendance/AttendanceManageMonthUser.vue'),
     },
     {
         path: '/officialAbsenceAccept',
         name: 'officialAbsenceAccept',
         component: () =>
-            import ('../views/Attendance/OfficialAbsenceAccept.vue'),
+            import('../views/Attendance/OfficialAbsenceAccept.vue'),
     },
     {
         path: '/manage/attendance',
         name: 'attendanceusermanage',
-        component: () =>
-            import ('../views/Attendance/AttendanceManage.vue'),
+        component: () => import('../views/Attendance/AttendanceManage.vue'),
     },
     {
         path: '/Schedule',
         name: 'Schedule',
-        component: () =>
-            import ('../views/Schedule/Schedule.vue'),
+        component: () => import('../views/Schedule/Schedule.vue'),
     },
     {
         path: '/board',
         name: 'board',
-        component: () =>
-            import ('../views/Board/Board.vue'),
+        component: () => import('../views/Board/Board.vue'),
     },
     {
         path: '/board/:board_id',
         name: 'post',
-        component: () =>
-            import ('../views/Board/Post.vue'),
+        component: () => import('../views/Board/Post.vue'),
     },
     {
         path: '/board/:board_id/:post_id',
         name: 'content',
-        component: () =>
-            import ('../views/Board/Content.vue'),
+        component: () => import('../views/Board/Content.vue'),
     },
     {
         path: '/write/:board_id',
         name: 'write',
-        component: () =>
-            import ('../views/Board/WritePost.vue'),
+        component: () => import('../views/Board/WritePost.vue'),
     },
     {
         path: '/update/:board_id/:post_id',
         name: 'update',
-        component: () =>
-            import ('../views/Board/UpdatePost.vue'),
+        component: () => import('../views/Board/UpdatePost.vue'),
     },
     {
         path: '/searchpost',
         name: 'serchPost',
-        component: () =>
-            import ('../views/Board/SearchPost.vue'),
+        component: () => import('../views/Board/SearchPost.vue'),
     },
     {
         path: '/manage/users',
         name: 'manageUsers',
-        component: () =>
-            import ('../views/Manage/UserManage.vue'),
+        component: () => import('../views/Manage/UserManage.vue'),
     },
     {
         path: '/manage/preusers',
         name: 'managePreusers',
-        component: () =>
-            import ('../views/Manage/PreuserManage.vue'),
+        component: () => import('../views/Manage/PreuserManage.vue'),
     },
     {
         path: '/manage/roles',
         name: 'manageRoles',
-        component: () =>
-            import ('../views/Manage/RoleManage.vue'),
+        component: () => import('../views/Manage/RoleManage.vue'),
     },
     {
         path: '/manage/boards',
         name: 'manageBoards',
-        component: () =>
-            import ('../views/Manage/BoardManage.vue'),
+        component: () => import('../views/Manage/BoardManage.vue'),
     },
     {
         path: '/manage/server',
         name: 'manageServer',
-        component: () =>
-            import ('../views/Manage/ServerManage.vue'),
+        component: () => import('../views/Manage/ServerManage.vue'),
     },
     {
         path: '/manage/theme',
         name: 'manageTheme',
-        component: () =>
-            import ('../views/Manage/ThemeManage.vue'),
+        component: () => import('../views/Manage/ThemeManage.vue'),
     },
     {
         path: '/403',
         name: 'error403',
-        component: () =>
-            import ('../views/Error/403.vue'),
+        component: () => import('../views/Error/403.vue'),
     },
     {
         path: '*',
         name: 'error404',
-        component: () =>
-            import ('../views/Error/404.vue'),
+        component: () => import('../views/Error/404.vue'),
     },
     {
         path: '/mypage',
         name: 'mypage',
-        component: () =>
-            import ('../views/Mypage.vue'),
+        component: () => import('../views/Mypage.vue'),
     },
     {
         path: '/filebox',
