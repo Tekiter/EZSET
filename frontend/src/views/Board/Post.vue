@@ -17,7 +17,7 @@
                         class="font-weight-medium display-2"
                         >{{ board.title }}</strong
                     >
-                    <strong v-else class="font-weight-medium title">{{
+                    <strong v-else class="font-weight-medium headline">{{
                         board.title
                     }}</strong>
                 </v-col>
