@@ -139,7 +139,11 @@ router.patch(
 
 router.delete(
     '/group/:group_id',
-    [perm('fileBox').can('manage')],
+    [
+        perm('fileBox').can('manage'),
+        param('group_id').isMongoId(),
+        validateParams,
+    ],
     asyncRoute(async (req, res) => {
         const loops = async group_id => {
             const group = await Group.findById(group_id)
