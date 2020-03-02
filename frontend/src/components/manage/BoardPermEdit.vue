@@ -1,5 +1,5 @@
 <template>
-    <v-card v-if="board" class="px-4" elevation="0">
+    <v-card v-if="board" class="px-4" elevation="0" dark>
         <v-card-title>
             {{ board.title }}
         </v-card-title>
@@ -11,7 +11,7 @@
                 :key="action.key"
             >
                 <v-autocomplete
-                    v-model="action.selections"
+                    v-model="selectedRole[action.key]"
                     @change="handleChange"
                     :items="roles"
                     item-text="name"
@@ -22,7 +22,6 @@
                     multiple
                     hide-details
                     disable-lookup
-                    background-color="primary lighten-5"
                     class="mt-2"
                 >
                     <template v-slot:selection="data">
@@ -30,7 +29,6 @@
                             v-bind="data.attrs"
                             :input-value="data.selected"
                             @click="data.select"
-                            color="white"
                         >
                             {{ data.item.name }}
                         </v-chip>
@@ -52,50 +50,55 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        actions: {
+            type: Array,
+            default: () => [],
+        },
         value: {
             type: Array,
             default: () => [],
         },
     },
     data: () => ({
-        actions: [
-            {
-                name: '글 보기',
-                key: 'read',
-                selections: [],
-            },
-            {
-                name: '글 작성',
-                key: 'write',
-                selections: [],
-            },
-            {
-                name: '다른 유저의 글 삭제',
-                key: 'delete',
-                selections: [],
-            },
-        ],
+        // actions: [
+        //     {
+        //         name: '글 보기',
+        //         key: 'read',
+        //         selections: [],
+        //     },
+        //     {
+        //         name: '글 작성',
+        //         key: 'write',
+        //         selections: [],
+        //     },
+        //     {
+        //         name: '다른 유저의 글 삭제',
+        //         key: 'delete',
+        //         selections: [],
+        //     },
+        // ],
+        selectedRole: {},
     }),
     methods: {
         // v-model 에 형태 변환해 외부로 전송
         handleChange() {
-            this.$emit(
-                'input',
-                this.actions.map(action => {
-                    return {
-                        action: action.key,
-                        roles: action.selections,
-                    }
-                })
-            )
+            const newvalue = this.actions.map(action => {
+                return {
+                    action: action.key,
+                    roles: this.selectedRole[action.key],
+                }
+            })
+            this.$emit('input', newvalue)
+            this.$emit('change', newvalue)
         },
         // 외부의 v-model 값을 내부 값으로 변환
         applyInput(val) {
             val.forEach(action => {
-                const obj = this.actions.find(item => item.key == action.action)
-                if (obj) {
-                    obj.selections = action.roles
-                }
+                // const obj = this.actions.find(item => item.key == action.action)
+                // if (obj) {
+                //     obj.selections = action.roles
+                // }
+                this.selectedRole[action.key] = action.roles
             })
         },
     },
