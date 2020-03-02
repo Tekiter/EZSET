@@ -220,10 +220,10 @@ export default {
             // return [{ text: '날짜', value: 'day' }].concat(cols)
         },
         total() {
-            const cols = this.userList.map(user => {
+            const res = this.userList.map(user => {
                 return { name: user.username, v1: 0, v2: 0, v3: 0, v4: 0 }
             })
-            cols.forEach(user => {
+            res.forEach(user => {
                 this.attendanceDayData
                     .filter(val => {
                         return (
@@ -243,7 +243,7 @@ export default {
                         })
                     })
             })
-            return cols
+            return res
         },
         dataItems() {
             return this.attendanceDayData.map(item => {

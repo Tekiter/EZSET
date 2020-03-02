@@ -1,5 +1,6 @@
 <template>
     <div class="">
+        <!-- date picker -->
         <div
             class="ma-3 pa-3 fill-width fill-height"
             v-if="this.$perm('attendance').can('update')"
@@ -25,7 +26,9 @@
                                 </template>
                                 <v-date-picker
                                     v-model="Sdate"
-                                    @change="startDayPicker = false"
+                                    @change="
+                                        ;(startDayPicker = false), fetchAll()
+                                    "
                                     locale="ko"
                                 ></v-date-picker>
                             </v-menu>
@@ -53,7 +56,9 @@
                                 </template>
                                 <v-date-picker
                                     v-model="Edate"
-                                    @change="endDayPicker = false"
+                                    @change="
+                                        ;(endDayPicker = false), fetchAll()
+                                    "
                                     locale="ko"
                                 ></v-date-picker>
                             </v-menu>
@@ -62,8 +67,10 @@
                 </v-container>
             </v-card>
         </div>
+
+        <!-- 출석 정보 카드 출력 -->
         <v-data-iterator
-            :items="users"
+            :items="infoAddedUsers"
             :search="toolbar.search"
             :loading="true"
             :items-per-page="itemsPerPage"
@@ -77,7 +84,7 @@
                         clearable
                         solo
                         outlined
-                        flat
+                        flatS
                         hide-details
                         dense
                         label="검색"
@@ -87,7 +94,7 @@
             </template>
             <template v-slot:loading>
                 <v-row class="mx-2">
-                    <v-col v-for="i in 6" :key="i" cols="12" md="6"
+                    <v-col v-for="i in 9" :key="i" cols="12" md="4"
                         ><v-skeleton-loader
                             type="article"
                             class="mx-auto"
@@ -113,7 +120,7 @@
                                 </p>
                                 <v-spacer></v-spacer>
                                 <v-btn
-                                    v-if="$perm('role').can('modify')"
+                                    v-if="$perm('attendance').can('update')"
                                     @click="showAttendanceUserDialog(user)"
                                     icon
                                     small
@@ -131,12 +138,22 @@
                                             >
                                         </v-btn>
                                     </div>
+                                    <div
+                                        class="d-flex flex-wrap flex-grow-1 headline"
+                                    >
+                                        {{ user.v1 }}
+                                    </div>
                                     <div class="d-flex flex-wrap flex-grow-1">
                                         <v-btn icon small>
                                             <v-icon color="warning"
                                                 >mdi-triangle-outline</v-icon
                                             >
                                         </v-btn>
+                                    </div>
+                                    <div
+                                        class="d-flex flex-wrap flex-grow-1 headline"
+                                    >
+                                        {{ user.v2 }}
                                     </div>
                                     <div class="d-flex flex-wrap flex-grow-1">
                                         <v-btn icon small>
@@ -145,12 +162,22 @@
                                             >
                                         </v-btn>
                                     </div>
+                                    <div
+                                        class="d-flex flex-wrap flex-grow-1 headline"
+                                    >
+                                        {{ user.v3 }}
+                                    </div>
                                     <div class="d-flex flex-wrap flex-grow-1">
                                         <v-btn icon small>
                                             <v-icon color="success"
                                                 >mdi-close-circle-outline</v-icon
                                             >
                                         </v-btn>
+                                    </div>
+                                    <div
+                                        class="d-flex flex-wrap flex-grow-1 headline"
+                                    >
+                                        {{ user.v4 }}
                                     </div>
                                 </div>
                             </v-card-text>
@@ -161,7 +188,7 @@
             <template v-slot:footer>
                 <Pagination-footer
                     v-model="page"
-                    :item-count="users.length"
+                    :item-count="infoAddedUsers.length"
                     :items-per-page.sync="itemsPerPage"
                 />
             </template>
@@ -279,7 +306,8 @@ export default {
     data() {
         return {
             users: [],
-            rawRoles: [], // 배열로 된 role 목록
+            infoAddedUsers: [],
+            attendanceDayData: [],
             fetchingCount: 0,
             totalCount: 0,
 
@@ -306,22 +334,12 @@ export default {
                 .format('YYYY-MM-DD'),
             startDayPicker: false,
             endDayPicker: false,
+            dataLoading: false,
         }
     },
     computed: {
         isFetching() {
             return this.fetchingCount > 0
-        },
-        roles() {
-            // Object 형태로 가공된 role 목록
-            const newrole = {}
-            this.rawRoles.forEach(role => {
-                newrole[role.tag] = role
-            })
-            return newrole
-        },
-        assignableRoles() {
-            return this.rawRoles.filter(role => role.tag != 'default')
         },
         computedDateStart() {
             return this.Sdate
@@ -335,6 +353,16 @@ export default {
         },
     },
     methods: {
+        async fetchAll() {
+            this.infoAddedUsers = []
+            this.fetchingCount += 1
+            const res = await axios.get('attendance/attendanceDayList')
+            this.attendanceDayData = res.data
+
+            await this.fetchUsers()
+            await this.addInfoInUsers()
+            this.fetchingCount -= 1
+        },
         async fetchUsers() {
             this.fetchingCount += 1
             try {
@@ -346,23 +374,50 @@ export default {
                 this.fetchingCount -= 1
             }
         },
-        // async fetchRoles() {
-        //     this.fetchingCount += 1
-        //     try {
-        //         const roles = await axios.get('role')
-
-        //         this.rawRoles = roles.data
-        //     } finally {
-        //         this.fetchingCount -= 1
-        //     }
-        // },
+        async addInfoInUsers() {
+            const res = this.users.map(user => {
+                return {
+                    username: user.username,
+                    realname: user.realname,
+                    v1: 0,
+                    v2: 0,
+                    v3: 0,
+                    v4: 0,
+                }
+            })
+            res.forEach(user => {
+                this.attendanceDayData
+                    .filter(val => {
+                        return (
+                            parseInt(val.day) >=
+                                parseInt(
+                                    moment(this.Sdate).format('YYYYMMDD')
+                                ) &&
+                            parseInt(val.day) <=
+                                parseInt(moment(this.Edate).format('YYYYMMDD'))
+                        )
+                    })
+                    .map(item => {
+                        item.status.forEach(st => {
+                            if (st.name == user.username) {
+                                if (st.state == 'attendance') user.v1 += 1
+                                else if (st.state == 'late') user.v2 += 1
+                                else if (st.state == 'absence') user.v3 += 1
+                                else if (st.state == 'official_absence')
+                                    user.v4 += 1
+                            }
+                        })
+                    })
+            })
+            this.infoAddedUsers = res
+        },
         searchMatches(haystack, niddle) {
             return haystack.includes(niddle)
         },
         async showAttendanceUserDialog(user) {
+            this.attendanceUserDialog.isLoading = true
             this.attendanceUserDialog.show = true
             this.attendanceUserDialog.user = user
-
             const res = await axios.post('attendance/attendanceUser', {
                 name: user.username,
             })
@@ -379,6 +434,7 @@ export default {
             }
 
             this.attendanceUserDialog.records = tmp
+            this.attendanceUserDialog.isLoading = false
         },
         closeattendanceUserDialog() {
             this.attendanceUserDialog.records = []
@@ -390,15 +446,11 @@ export default {
         },
     },
     async created() {
-        if (!this.$perm('manageUsers').can('access')) {
+        if (!this.$perm('attendance').can('update')) {
             this.$router.push({ name: 'error403' })
             return
         }
-
-        this.fetchingCount += 1
-        // await this.fetchRoles()
-        await this.fetchUsers()
-        this.fetchingCount -= 1
+        this.fetchAll()
     },
 }
 </script>

@@ -128,7 +128,6 @@ export default {
         await this.$socket.on('attendance', data => {
             this.flag = data.flag
             this.remainTime = data.time
-            // console.log(this.remainTime)
         })
         try {
             const res = await axios.get('attendance/attendanceCheck')
