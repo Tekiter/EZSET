@@ -46,6 +46,12 @@ const routes = [
             import('../views/Attendance/AttendanceManageMonth.vue'),
     },
     {
+        path: '/attendanceManageMonthOld',
+        name: 'attendanceManageMonthOld',
+        component: () =>
+            import('../views/Attendance/AttendanceManageMonthOld.vue'),
+    },
+    {
         path: '/attendanceManageMonthUser',
         name: 'attendanceManageMonthUser',
         component: () =>
