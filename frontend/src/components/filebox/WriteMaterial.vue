@@ -29,6 +29,9 @@
                     <small class="red--text mr-3" v-if="isError"
                         >게시물 작성에 실패했습니다.</small
                     >
+                    <small class="red--text mr-3" v-if="isLengthError"
+                        >제목과 본문의 길이는 100자를 넘을 수 없습니다.</small
+                    >
                     <v-btn
                         class="ma-2"
                         tile
@@ -92,6 +95,7 @@ export default {
             },
             isLoading: false,
             isError: false,
+            isLengthError: false,
             editor: {
                 options: {
                     language: 'ko',
@@ -100,7 +104,23 @@ export default {
         }
     },
     methods: {
+        contentLength() {
+            if (
+                this.getMarkdown().length > 100 ||
+                this.newMaterial.title.length > 100
+            ) {
+                this.isLengthError = true
+                return true
+            } else {
+                this.isLengthError = false
+                return false
+            }
+        },
         async submitClick() {
+            console.log(this.contentLength())
+            if (this.contentLength() == true) {
+                return
+            }
             if (this.edit) {
                 await this.applyEdit()
             } else {
