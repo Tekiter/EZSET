@@ -107,13 +107,13 @@
                         md="4"
                     >
                         <v-card outlined>
-                            <v-card-title>
-                                <p class="subheader">
+                            <div class="d-flex align-center mx-4 my-6">
+                                <span class="headline">
                                     {{ user.realname }}
-                                </p>
-                                <p class="caption ml-2">
+                                </span>
+                                <span class="subtitle-1 ml-2">
                                     {{ user.username }}
-                                </p>
+                                </span>
                                 <v-spacer></v-spacer>
                                 <v-btn
                                     v-if="$perm('attendance').can('update')"
@@ -123,7 +123,7 @@
                                 >
                                     <v-icon>mdi-plus</v-icon>
                                 </v-btn>
-                            </v-card-title>
+                            </div>
                             <v-divider></v-divider>
                             <v-card-text>
                                 <div class="d-flex">
