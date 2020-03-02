@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="text-center">
+        <div class="text-center" v-if="canEditDelete()">
             <v-btn
                 class="mx-2"
                 block
@@ -115,6 +115,15 @@ export default {
                     folder_id: this.$route.params.folder_id,
                 },
             })
+        },
+        canEditDelete() {
+            if (
+                this.$perm('fileBox').can('manage') ||
+                (this.$perm('fileBox').can('upload') &&
+                    this.options.author == this.$store.state.auth.user.username)
+            )
+                return true
+            else return false
         },
     },
     async created() {
