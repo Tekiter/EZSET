@@ -52,28 +52,24 @@
                         </a>
                     </template>
                 </v-data-table>
-                <v-data-table
-                    v-else
-                    :headers="headersTwo"
-                    :items="posts"
-                    :page.sync="page"
-                    :server-items-length="totalpage"
-                    :options.sync="options"
-                    :loading="loading"
-                    @update:items-per-page="fetchPostList()"
-                    :items-per-page.sync="select.value"
-                    hide-default-footer
-                    :mobile-breakpoint="NaN"
-                    @page-count="pageCount = $event"
-                >
-                    <template v-slot:item.title="props">
-                        <a @click="read(props.item)">
-                            {{ props.item.title }} [{{
-                                props.item.comment_count
-                            }}]
-                        </a>
-                    </template>
-                </v-data-table>
+                <v-list v-else>
+                    <v-list-item v-for="post in posts" :key="post.title">
+                        <v-list-item-content>
+                            <v-list-item-title
+                                ><a @click="read(post)" class="title">{{
+                                    post.title
+                                }}</a></v-list-item-title
+                            >
+                            {{ post.author
+                            }}<v-divider class="mx-4" vertical></v-divider>
+                            {{ post.created_date
+                            }}<v-divider class="mx-4" vertical></v-divider> 조회
+                            {{ post.view }}
+                            <v-divider class="mx-4" vertical></v-divider>
+                            좋아요 {{ post.like }}
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list>
             </v-card>
             <v-row v-if="$vuetify.breakpoint.mdAndUp">
                 <v-col cols="2"></v-col>
