@@ -95,6 +95,7 @@ export default {
             groups: [],
             selectedGroups: [],
             overlayMode: 'none',
+            groupSearch: '',
             showMetarials: {
                 show: false,
                 selected: [],
