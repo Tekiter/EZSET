@@ -143,7 +143,11 @@
                                 </div>
                             </v-row>
                             <!-- 모바일버전 버튼 -->
-                            <v-row v-else class="d-flex flex-row-reverse">
+                            <v-row
+                                v-else
+                                class="d-flex flex-row-reverse"
+                                no-gutters
+                            >
                                 <div>
                                     <v-btn
                                         class="ma-2"
@@ -158,7 +162,7 @@
                                         "
                                         @click="go_modify()"
                                     >
-                                        <v-icon left>mdi-cached</v-icon>
+                                        <v-icon>mdi-cached</v-icon>
                                     </v-btn>
                                     <v-btn
                                         class="ma-2"
