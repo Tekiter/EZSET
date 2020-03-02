@@ -152,7 +152,7 @@ router.patch(
         // 수정할 데이터를 Role 에 반영
         const context = roles.role(req.params.role_tag)
         for (let item of req.body.perms) {
-            const resource = context.resource(item.resource, item.param)
+            const resource = context.resource(item.resource, item.param + '')
             if (item.allow) {
                 resource.can(item.action, item.range)
             } else {

@@ -23,6 +23,7 @@
                     hide-details
                     disable-lookup
                     class="mt-2"
+                    :disabled="disabled"
                 >
                     <template v-slot:selection="data">
                         <v-chip
@@ -40,6 +41,8 @@
     </v-card>
 </template>
 <script>
+import _ from 'lodash'
+
 export default {
     props: {
         roles: {
@@ -58,31 +61,20 @@ export default {
             type: Array,
             default: () => [],
         },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     data: () => ({
-        // actions: [
-        //     {
-        //         name: '글 보기',
-        //         key: 'read',
-        //         selections: [],
-        //     },
-        //     {
-        //         name: '글 작성',
-        //         key: 'write',
-        //         selections: [],
-        //     },
-        //     {
-        //         name: '다른 유저의 글 삭제',
-        //         key: 'delete',
-        //         selections: [],
-        //     },
-        // ],
         selectedRole: {},
     }),
     methods: {
         // v-model 에 형태 변환해 외부로 전송
         handleChange() {
+            console.log(this.actions)
             const newvalue = this.actions.map(action => {
+                console.log(action)
                 return {
                     action: action.key,
                     roles: this.selectedRole[action.key],
@@ -94,16 +86,14 @@ export default {
         // 외부의 v-model 값을 내부 값으로 변환
         applyInput(val) {
             val.forEach(action => {
-                // const obj = this.actions.find(item => item.key == action.action)
-                // if (obj) {
-                //     obj.selections = action.roles
-                // }
-                this.selectedRole[action.key] = action.roles
+                this.selectedRole[action.action] = _.cloneDeep(action.roles)
             })
+            this.$forceUpdate()
         },
     },
     watch: {
         value(val) {
+            console.log(val)
             this.applyInput(val)
         },
     },
