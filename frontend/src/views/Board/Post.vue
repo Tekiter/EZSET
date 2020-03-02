@@ -12,7 +12,12 @@
             <v-row>
                 <v-col cols="12" sm="2"></v-col>
                 <v-col cols="12" sm="8" class="d-flex justify-center">
-                    <strong class="font-weight-medium display-2">{{
+                    <strong
+                        v-if="$vuetify.breakpoint.mdAndUp"
+                        class="font-weight-medium display-2"
+                        >{{ board.title }}</strong
+                    >
+                    <strong v-else class="font-weight-medium display-2">{{
                         board.title
                     }}</strong>
                 </v-col>
@@ -56,17 +61,22 @@
                     <v-list-item v-for="post in posts" :key="post.title">
                         <v-list-item-content>
                             <v-list-item-title
-                                ><a @click="read(post)" class="title">{{
-                                    post.title
-                                }}</a></v-list-item-title
-                            >
+                                ><a @click="read(post)" class="title"
+                                    >{{ post.title }} [{{
+                                        post.comment_count
+                                    }}]</a
+                                >
+                                <v-spacer></v-spacer>
+                                <v-icon x-small color="red darken-3"
+                                    >mdi-heart-multiple</v-icon
+                                >
+                                {{ post.like }}
+                            </v-list-item-title>
                             {{ post.author
                             }}<v-divider class="mx-4" vertical></v-divider>
                             {{ post.created_date
                             }}<v-divider class="mx-4" vertical></v-divider> 조회
                             {{ post.view }}
-                            <v-divider class="mx-4" vertical></v-divider>
-                            좋아요 {{ post.like }}
                         </v-list-item-content>
                     </v-list-item>
                 </v-list>

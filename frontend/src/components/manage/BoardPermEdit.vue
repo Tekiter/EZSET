@@ -1,5 +1,5 @@
 <template>
-    <v-card v-if="board" class="px-4" elevation="0" dark>
+    <v-card v-if="board" class="px-4" elevation="0">
         <v-card-title>
             {{ board.title }}
         </v-card-title>
@@ -18,18 +18,20 @@
                     item-value="tag"
                     :label="`${action.name} 가능`"
                     chips
-                    filled
+                    small-chips
                     multiple
                     hide-details
                     disable-lookup
                     class="mt-2"
                     :disabled="disabled"
+                    outlined
                 >
                     <template v-slot:selection="data">
                         <v-chip
                             v-bind="data.attrs"
                             :input-value="data.selected"
                             @click="data.select"
+                            color="primary"
                         >
                             {{ data.item.name }}
                         </v-chip>
