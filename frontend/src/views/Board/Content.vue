@@ -74,7 +74,10 @@
                             <viewer :value="post.content" />
 
                             <file-download :files="post.files"></file-download>
-                            <v-row class="d-flex flex-row-reverse">
+                            <v-row
+                                v-if="$vuetify.breakpoint.mdAndUp"
+                                class="d-flex flex-row-reverse"
+                            >
                                 <div>
                                     <v-btn
                                         class="ma-2"
@@ -136,6 +139,67 @@
                                             좋아요
                                             <span>{{ post.like }}</span></span
                                         >
+                                    </v-btn>
+                                </div>
+                            </v-row>
+                            <!-- 모바일버전 버튼 -->
+                            <v-row
+                                v-else
+                                class="d-flex flex-row-reverse"
+                                no-gutters
+                            >
+                                <div>
+                                    <v-btn
+                                        class="ma-2"
+                                        icon
+                                        color="success darken-2"
+                                        v-if="
+                                            del_auth(
+                                                post.author,
+                                                post._id,
+                                                false
+                                            )
+                                        "
+                                        @click="go_modify()"
+                                    >
+                                        <v-icon>mdi-cached</v-icon>
+                                    </v-btn>
+                                    <v-btn
+                                        class="ma-2"
+                                        icon
+                                        color="error"
+                                        v-if="
+                                            del_auth(
+                                                post.author,
+                                                post._id,
+                                                true
+                                            )
+                                        "
+                                        @click="deletePost"
+                                    >
+                                        <v-icon>mdi-trash-can</v-icon>
+                                    </v-btn>
+                                    <v-btn
+                                        class="ma-2"
+                                        icon
+                                        color="primary lighten-1"
+                                        v-if="!post.isLike"
+                                        @click="clickLike(post.author)"
+                                    >
+                                        <span
+                                            ><v-icon>mdi-heart-multiple</v-icon>
+                                        </span>
+                                    </v-btn>
+                                    <v-btn
+                                        class="ma-2"
+                                        icon
+                                        color="warning"
+                                        v-else
+                                        @click="clickDislike(post.author)"
+                                    >
+                                        <span
+                                            ><v-icon>mdi-heart-off</v-icon>
+                                        </span>
                                     </v-btn>
                                 </div>
                             </v-row>

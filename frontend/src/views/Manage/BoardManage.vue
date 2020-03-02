@@ -206,12 +206,13 @@ export default {
         },
     },
     methods: {
-        successPostTitle() {
+        async successPostTitle() {
             axios.patch('simple/boards/' + this.modifyBoardCurId, {
                 title: this.modifyTitle,
             })
             this.modifyDialog = false
             this.fetchBoards()
+            await this.$store.dispatch('board/fetchBoards')
         },
         fetch_id(id) {
             this.temp_id = id
