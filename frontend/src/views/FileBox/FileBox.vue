@@ -23,7 +23,7 @@
                         :items="groups"
                         @change="groupChanged()"
                     ></group-tree>
-                    <v-list>
+                    <v-list v-if="checkManagePerm()">
                         <v-list-item link @click="showPlusGroup()">
                             <v-list-item-icon>
                                 <v-icon>mdi-plus</v-icon>
@@ -45,6 +45,16 @@
             </v-col>
             <v-col class="fill-height">
                 <router-view v-show="overlayMode == 'none'"></router-view>
+                <v-container
+                    v-show="
+                        overlayMode == 'none' &&
+                            selectedGroups[0] &&
+                            !selectedGroups[0].isfolder
+                    "
+                    class="text-center"
+                >
+                    빈 그룹입니다.
+                </v-container>
                 <v-fade-transition hide-on-leave>
                     <create-group
                         v-if="overlayMode == 'add'"
@@ -169,6 +179,9 @@ export default {
         closeEditMaterial() {
             this.editMaterial.show = false
             this.showMetarials.show = true
+        },
+        checkManagePerm() {
+            return this.$perm('fileBox').can('manage')
         },
     },
 

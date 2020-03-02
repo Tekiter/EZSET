@@ -3,6 +3,7 @@ import { validateParams, asyncRoute } from '../../utils/api'
 import { body, param } from 'express-validator'
 import Group from '../../models/filebox/Group'
 import Material from '../../models/filebox/Material'
+import { perm } from '../../utils/role'
 import {
     checkAttachableFileArray,
     checkIsFileOwner,
@@ -74,6 +75,7 @@ router.post(
         body('parent_id')
             .isMongoId()
             .optional(),
+        perm('fileBox').can('manage'),
         validateParams,
     ],
     asyncRoute(async (req, res) => {
@@ -118,6 +120,7 @@ router.patch(
         body('parent_id')
             .isMongoId()
             .optional(),
+        perm('fileBox').can('manage'),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
@@ -136,7 +139,7 @@ router.patch(
 
 router.delete(
     '/group/:group_id',
-    [],
+    [perm('fileBox').can('manage')],
     asyncRoute(async (req, res) => {
         const loops = async group_id => {
             const group = await Group.findById(group_id)
@@ -222,6 +225,15 @@ router.post(
         validateParams,
     ],
     asyncRoute(async (req, res) => {
+        if (
+            !req.user.perm('fileBox').can('upload') &&
+            !req.user.perm('fileBox').can('manage')
+        ) {
+            const err = new Error('권한이 없습니다.')
+            err.status = 403
+            throw err
+        }
+
         const parent = await Group.findById(req.params.parent_id)
         if (!parent) {
             const err = new Error('올바르지 않은 parent id 입니다.')
@@ -291,7 +303,25 @@ router.delete(
     '/material/:material_id',
     [param('material_id').isMongoId(), validateParams],
     asyncRoute(async (req, res) => {
+        if (
+            !req.user.perm('fileBox').can('upload') &&
+            !req.user.perm('fileBox').can('manage')
+        ) {
+            const err = new Error('권한이 없습니다.')
+            err.status = 403
+            throw err
+        }
         const material = await Material.findById(req.params.material_id)
+
+        //파일을 올린 본인이 아니라면 삭제할 수 없도록함
+        if (
+            req.user.perm('fileBox').can('upload') &&
+            material.author != req.user.username
+        ) {
+            const err = new Error('본인이 아닌경우 파일을 지울 수 없습니다.')
+            err.status = 403
+            throw err
+        }
 
         if (!material) {
             const err = new Error('존재하지 않는 자료입니다.')
@@ -319,6 +349,14 @@ router.patch(
         validateParams,
     ],
     asyncRoute(async (req, res) => {
+        if (
+            !req.user.perm('fileBox').can('upload') &&
+            !req.user.perm('fileBox').can('manage')
+        ) {
+            const err = new Error('권한이 없습니다.')
+            err.status = 403
+            throw err
+        }
         const material = await Material.findById(req.params.material_id)
 
         if (!material) {
@@ -340,6 +378,16 @@ router.patch(
                 err.status = 400
                 throw err
             }
+        }
+
+        //파일을 올린 본인이 아니라면 수정할 수 없도록함
+        if (
+            req.user.perm('fileBox').can('upload') &&
+            material.author != req.user.username
+        ) {
+            const err = new Error('본인이 아닌경우 파일을 수정할 수 없습니다.')
+            err.status = 403
+            throw err
         }
 
         material.title = req.body.title

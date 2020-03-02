@@ -11,12 +11,24 @@
                         }}
                     </div>
 
-                    <v-btn text small color="orange" @click="editClick()">
+                    <v-btn
+                        text
+                        small
+                        color="orange"
+                        @click="editClick()"
+                        v-if="canEditDelete()"
+                    >
                         <v-icon>
                             mdi-pencil-outline
                         </v-icon>
                     </v-btn>
-                    <v-btn text small color="red" @click="deleteClick()">
+                    <v-btn
+                        text
+                        small
+                        color="red"
+                        @click="deleteClick()"
+                        v-if="canEditDelete()"
+                    >
                         <v-icon>
                             mdi-trash-can-outline
                         </v-icon>
@@ -76,6 +88,15 @@ export default {
                 this.$emit('delete')
                 console.log('확인버튼누름')
             }
+        },
+        canEditDelete() {
+            if (
+                this.$perm('fileBox').can('manage') ||
+                (this.$perm('fileBox').can('upload') &&
+                    this.options.author == this.$store.state.auth.user.username)
+            )
+                return true
+            else return false
         },
     },
 }
