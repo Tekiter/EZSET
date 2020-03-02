@@ -1,7 +1,23 @@
 <template>
     <div class="fill-height">
         <v-row no-gutters class="fill-height">
-            <v-col class="fill-height" :cols="3" xl="2">
+            <v-col v-show="isMobileMode" cols="12">
+                <v-tabs v-model="curTab" class="mt-3" grow>
+                    <v-tab>
+                        자료 목록
+                    </v-tab>
+                    <v-tab>
+                        자료
+                    </v-tab>
+                </v-tabs>
+            </v-col>
+
+            <v-col
+                v-show="!isMobileMode || curTab == 0"
+                class="fill-height"
+                cols="12"
+                md="3"
+            >
                 <v-card tile outlined class="fill-height">
                     <v-sheet class="pa-4 primary lighten-2" tile>
                         <v-text-field
@@ -43,7 +59,7 @@
                     </v-list>
                 </v-card>
             </v-col>
-            <v-col class="fill-height">
+            <v-col v-show="!isMobileMode || curTab == 1" class="fill-height">
                 <router-view v-show="overlayMode == 'none'"></router-view>
                 <v-container
                     v-show="
@@ -112,6 +128,7 @@ export default {
                 show: false,
                 material: undefined,
             },
+            curTab: 0,
         }
     },
     async created() {
@@ -120,10 +137,12 @@ export default {
     methods: {
         showEditGroup() {
             this.overlayMode = 'edit'
+            this.curTab = 1
         },
         closeEditGroup() {
             this.overlayMode = 'none'
             this.fetchGroups()
+            this.curTab = 0
         },
         async fetchGroups() {
             const res = await axios.get('/filebox')
@@ -131,9 +150,11 @@ export default {
         },
         showPlusGroup() {
             this.overlayMode = 'add'
+            this.curTab = 1
         },
         closePlusGroup() {
             this.overlayMode = 'none'
+            this.curTab = 0
         },
         isFolderTrue() {
             this.plusGroup.isfolder = true
@@ -160,27 +181,6 @@ export default {
                 this.$router.push({ name: 'fileBoxEmpty' })
             }
         },
-        showCreateMaterial() {
-            this.createMaterial.show = true
-            this.showMetarials.show = false
-        },
-        closeCreateMaterial() {
-            this.createMaterial.show = false
-            this.showMetarials.show = true
-        },
-        async showEditMaterial(options) {
-            try {
-                this.editMaterial.show = true
-                this.showMetarials.show = false
-                this.editMaterial.material = options
-            } catch {
-                //
-            }
-        },
-        closeEditMaterial() {
-            this.editMaterial.show = false
-            this.showMetarials.show = true
-        },
         checkManagePerm() {
             return this.$perm('fileBox').can('manage')
         },
@@ -193,6 +193,9 @@ export default {
                 return false
             }
             return true
+        },
+        isMobileMode() {
+            return this.$vuetify.breakpoint.smAndDown
         },
     },
 }
