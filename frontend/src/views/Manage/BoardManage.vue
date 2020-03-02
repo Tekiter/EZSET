@@ -66,19 +66,7 @@
             v-show="!isMobileMode || curTab == 1"
             class="fill-height"
         >
-            <v-card outlined>
-                <v-card-title>게시판 설정</v-card-title>
-                <v-list>
-                    <v-list-item v-for="board in boards" :key="board._id">
-                        <v-list-item-title>{{ board.title }}</v-list-item-title>
-                        <v-list-item-action>
-                            <v-btn icon>
-                                <v-icon>mdi-file-edit-outline</v-icon>
-                            </v-btn>
-                        </v-list-item-action>
-                    </v-list-item>
-                </v-list>
-            </v-card>
+            <board-role-edit></board-role-edit>
         </v-col>
 
         <v-dialog v-model="createBoardDialog.show" max-width="300">
@@ -149,9 +137,6 @@
         </v-dialog>
         <v-row justify="center">
             <v-dialog v-model="modifyDialog" persistent max-width="290">
-                <template v-slot:activator="{ on }">
-                    <v-btn color="primary" dark v-on="on">Open Dialog</v-btn>
-                </template>
                 <v-card>
                     <v-card-title class="headline"
                         >게시판 이름 수정</v-card-title
@@ -187,11 +172,11 @@
 
 <script>
 import axios from 'axios'
-// import BoardRoleEdit from '../../components/manage/BoardRoleEdit.vue'
+import BoardRoleEdit from '../../components/manage/BoardRoleEdit.vue'
 export default {
-    // components: {
-    //     BoardRoleEdit,
-    // },
+    components: {
+        BoardRoleEdit,
+    },
     data() {
         return {
             modifyBoardCurId: '',
