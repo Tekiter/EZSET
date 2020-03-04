@@ -12,7 +12,8 @@
         "clean": "rimraf dist",
         "build": "npm run clean && mkdir -p dist && babel src -s -D -d dist",
         "test": "jest --watch",
-        "lint": "esw -w src test"
+        "lint": "esw -w src test",
+        "api": "apidoc -o apidoc/ -i src/api/v1"
     },
     "husky": {
         "hooks": {
