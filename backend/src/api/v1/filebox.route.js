@@ -22,6 +22,7 @@ router.get(
     '/',
     [],
     asyncRoute(async (req, res) => {
+        // 그룹 트리 순회하는 재귀함수
         const loops = async item => {
             const res = await Group.find()
                 .where('parent')
@@ -145,6 +146,7 @@ router.delete(
         validateParams,
     ],
     asyncRoute(async (req, res) => {
+        // 트리 재귀적 삭제 루프
         const loops = async group_id => {
             const group = await Group.findById(group_id)
             if (!group) {
@@ -153,6 +155,17 @@ router.delete(
                 )
                 err.status = 404
                 throw err
+            }
+
+            if (group.parent) {
+                const parent = await Group.findById(group.parent)
+                if (parent) {
+                    const idx = parent.children.indexOf(group_id)
+                    if (idx >= 0) {
+                        parent.children.splice(idx, 1)
+                    }
+                    await parent.save()
+                }
             }
 
             if (group.isfolder) {
