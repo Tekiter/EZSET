@@ -103,5 +103,30 @@ export default {
                 action: 'update',
             },
         },
+        {
+            type: 'line',
+        },
+        {
+            type: 'header',
+            title: '자료실',
+        },
+        {
+            type: 'switch',
+            title: '자료실 관리',
+            content: '그룹과 폴더를 추가, 편집할 수 있습니다.',
+            target: {
+                resource: 'fileBox',
+                action: 'manage',
+            },
+        },
+        {
+            type: 'switch',
+            title: '파일 업로드 & 삭제 관리',
+            content: '파일을 업로드하고 삭제할 수 있습니다.',
+            target: {
+                resource: 'fileBox',
+                action: 'upload',
+            },
+        },
     ],
 }

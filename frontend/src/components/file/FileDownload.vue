@@ -1,6 +1,6 @@
 <template>
     <div v-if="files.length > 0">
-        <div class="d-flex justify-center justify-sm-end">
+        <div class="d-flex justify-center justify-sm-end" v-if="!hideLabel">
             <v-subheader>첨부</v-subheader>
         </div>
         <div class="d-flex flex-wrap flex-sm-row-reverse flex-column">
@@ -59,6 +59,10 @@ export default {
             default() {
                 return []
             },
+        },
+        hideLabel: {
+            type: Boolean,
+            default: false,
         },
     },
     methods: {
