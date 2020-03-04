@@ -13,6 +13,19 @@ import User from '../../models/User'
 const router = Router()
 router.loginNotRequired = true
 
+/**
+ * @api {post} /auth/login 유저 로그인
+ * @apiNmae 유저 로그인
+ * @apiGroup Auth
+ *
+ * @apiParam {String} username 유저 아이디
+ * @apiParam {String} password 유저 비밀번호
+ *
+ * @apiSuccess {JWT} accessToken 인증 토큰
+ *
+ * @apiSuccessExample Success-Response:
+ *  HTTP/1.1 200 OK
+ */
 router.route('/login').post(
     [body('username').isString(), body('password').isString(), validateParams],
     asyncRoute(async (req, res) => {

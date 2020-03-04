@@ -59,6 +59,7 @@
         "socket.io": "^2.3.0"
     },
     "devDependencies": {
+        "apidoc": "^0.20.0",
         "babel-eslint": "^10.0.1",
         "babel-jest": "^24.5.0",
         "babel-register": "^6.26.0",
