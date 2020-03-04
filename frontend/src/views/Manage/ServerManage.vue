@@ -57,6 +57,7 @@
 
 <script>
 import axios from 'axios'
+import _ from 'lodash'
 import SettingSelect from '../../components/manage/SettingSelect.vue'
 import ThemeManage from '../../components/manage/ThemeBuilder.vue'
 
@@ -75,8 +76,8 @@ export default {
             this.isLoading = true
 
             const res = await axios.get('config/admin')
-            this.originalSettings = res.data
-            this.settingData = res.data
+            this.originalSettings = _.cloneDeep(res.data)
+            this.settingData = _.cloneDeep(res.data)
             this.settingChanged = false
 
             this.isLoading = false
@@ -87,7 +88,9 @@ export default {
         async saveChanges() {
             this.isLoading = true
 
-            await axios.patch('config/admin', this.settingData)
+            console.log(this.settingData)
+
+            await axios.patch('config/admin', _.cloneDeep(this.settingData))
             await this.$store.dispatch('config/fetchConfig')
             await this.fetchSettings()
 

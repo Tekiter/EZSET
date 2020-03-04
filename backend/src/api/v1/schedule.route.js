@@ -11,7 +11,7 @@ const router = Router()
 // schedule 페이지에서 사용
 router.get(
     '/read',
-    [perm('schedule').can('update')],
+    [perm('schedule').can('read')],
     asyncRoute(async function(req, res) {
         const schedule = await Schedule.find()
         res.json(schedule)

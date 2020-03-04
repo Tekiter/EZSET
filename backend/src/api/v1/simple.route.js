@@ -637,7 +637,13 @@ router.delete(
 //게시물 검색
 router.get(
     '/searchpost',
-    [query('content'), query('option'), validateParams],
+    [
+        query('content'),
+        query('option'),
+        query('page').custom(isPositive),
+        query('pagesize').custom(isPositive),
+        validateParams,
+    ],
     asyncRoute(async function(req, res) {
         let options = []
         if (req.query.option == 'title') {
@@ -655,9 +661,17 @@ router.get(
             throw err
         }
         try {
+            const page = parseInt(req.query.page)
+            const pagesize = parseInt(req.query.pagesize || 8)
+
+            let postcount = await Post.find({ $or: options }).count()
+
             const posts = await Post.find({ $or: options })
+                .limit(pagesize)
+                .skip((page - 1) * pagesize)
 
             res.status(200).json({
+                totalpage: postcount,
                 posts: posts.map(post => {
                     return {
                         board: post.board,
@@ -669,6 +683,7 @@ router.get(
                         created_date: post.created_date,
                         view: post.view,
                         like: post.likes_count,
+                        comment_count: post.comments.length,
                         comment: post.comments,
                     }
                 }),

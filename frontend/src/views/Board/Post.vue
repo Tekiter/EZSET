@@ -52,7 +52,7 @@
                     </template>
                 </v-data-table>
                 <v-list v-else>
-                    <v-list-item v-for="post in posts" :key="post.title">
+                    <v-list-item v-for="post in posts" :key="post._id">
                         <v-list-item-content>
                             <v-list-item-title
                                 ><a @click="read(post)" class="title"
@@ -255,7 +255,7 @@ export default {
                 )
                 this.posts = res.data.posts.map(post => {
                     post.created_date = moment(post.created_date).format(
-                        'YYYY/MM/DD HH:MM'
+                        'YYYY/MM/DD HH:mm'
                     )
                     return post
                 })

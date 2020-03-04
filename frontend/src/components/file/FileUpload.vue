@@ -166,6 +166,18 @@ export default {
             this.dragCount -= 1
         },
     },
+    created() {
+        if (Array.isArray(this.uploaded)) {
+            this.selectedFiles = this.uploaded.map(file => {
+                return {
+                    filename: file.filename,
+                    uploaded: true,
+                    id: file.id,
+                }
+            })
+            this.$emit('input', this.selectedFiles)
+        }
+    },
     watch: {
         uploaded(val) {
             this.selectedFiles = val.map(file => {

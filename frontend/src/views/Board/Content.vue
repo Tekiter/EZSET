@@ -396,11 +396,11 @@ export default {
 
             this.post = res.data
             this.post.created_date = moment(res.data.created_date).format(
-                'YYYY/MM/DD HH:MM'
+                'YYYY/MM/DD HH:mm'
             )
             this.comment = res.data.comment.map(comment => {
                 comment.created_date = moment(comment.created_date).format(
-                    'YYYY/MM/DD HH:MM'
+                    'YYYY/MM/DD HH:mm'
                 )
             })
             this.loading = false

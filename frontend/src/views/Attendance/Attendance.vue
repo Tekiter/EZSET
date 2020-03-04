@@ -1,77 +1,91 @@
 <template>
     <v-container>
+        <!--출석 시작 카드-->
         <v-card
             class="mx-auto"
             max-width="500"
             max-height="500"
-            v-if="
-                flag &&
-                    this.$perm('attendance').can('update') &&
-                    this.output_attendance_code != ''
-            "
-        >
-            <v-card-text>
-                <div class="d-flex justify-center">
-                    <span class="display-3">{{ timer }}</span>
-                </div>
-            </v-card-text>
-        </v-card>
-        <v-card
-            class="mx-auto"
-            max-width="500"
-            max-height="500"
-            v-if="flag == true && code == 0 && output_attendance_code == ''"
-        >
-            <v-card-title>
-                <v-text-field v-model="input_attendance_code"></v-text-field>
-            </v-card-title>
-
-            <v-card-actions>
-                <v-btn color="primary" text @click="attendanceCheck"
-                    >출석하기</v-btn
-                >
-            </v-card-actions>
-        </v-card>
-        <v-card
-            class="mx-auto"
-            max-width="500"
-            max-height="500"
-            v-if="
-                flag &&
-                    this.$perm('attendance').can('update') &&
-                    this.output_attendance_code != ''
-            "
-        >
-            <v-card-text>
-                <div class="d-flex justify-center">
-                    <span class="display-3">{{ output_attendance_code }}</span>
-                </div>
-                <div class="d-flex justify-center">
-                    <v-btn
-                        color="primary"
-                        text
-                        v-if="flag"
-                        @click="endAttendance"
-                        large
-                        >종료</v-btn
-                    >
-                </div>
-            </v-card-text>
-        </v-card>
-
-        <v-card
-            class="mx-auto"
-            max-width="500"
-            max-height="500"
-            text
+            color="primary lighten-1"
+            :dark="isDarkColor('primary')"
             v-if="!flag && this.$perm('attendance').can('update')"
         >
-            <v-card-actions>
-                <v-btn color="primary" text @click="startAttendance" large
-                    >시작</v-btn
+            <v-toolbar flat color="primary">
+                <v-icon class="mr-2">mdi-clipboard-check-outline</v-icon>
+                <v-toolbar-title class="font-weight-light">
+                    출석</v-toolbar-title
                 >
-            </v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text small @click="startAttendance">start</v-btn>
+            </v-toolbar>
+            <v-card-text>
+                우측 상단의 버튼을 누르면 출석을 시작합니다.
+            </v-card-text>
         </v-card>
+        <!-- 출석 끝내는 카드 -->
+        <v-card
+            class="mx-auto"
+            max-width="500"
+            max-height="500"
+            color="primary lighten-1"
+            :dark="isDarkColor('primary')"
+            v-if="
+                flag &&
+                    this.$perm('attendance').can('update') &&
+                    this.output_attendance_code != ''
+            "
+        >
+            <v-toolbar flat color="primary">
+                <v-icon>mdi-clipboard-check-outline</v-icon>
+                <v-toolbar-title class="font-weight-light">
+                    출석</v-toolbar-title
+                >
+                <v-spacer></v-spacer>
+                <v-btn text small @click="endAttendance"> end</v-btn>
+            </v-toolbar>
+            <v-card-text>
+                <div class="text-center">
+                    남은시간
+                    <div class="display-3">{{ timer }}</div>
+
+                    <v-divider></v-divider>
+                    출석 번호
+                    <div class="display-3">
+                        {{ output_attendance_code }}
+                    </div>
+                </div>
+            </v-card-text>
+        </v-card>
+
+        <!-- 사용자들이 출석하는 카드 -->
+        <v-card
+            class="mx-auto"
+            max-width="500"
+            max-height="500"
+            color="primary lighten-1"
+            :dark="isDarkColor('primary')"
+            v-if="flag == true && code == 0 && output_attendance_code == ''"
+        >
+            <v-toolbar flat color="primary">
+                <v-icon>mdi-clipboard-check-outline</v-icon>
+                <v-toolbar-title class="font-weight-light">
+                    출석</v-toolbar-title
+                >
+                <v-spacer></v-spacer>
+                <v-btn color="white" text small @click="endAttendance"> </v-btn>
+            </v-toolbar>
+            <div class="d-flex justify-center">
+                <v-col cols="12" sm="6">
+                    <v-text-field
+                        v-model="input_attendance_code"
+                        autofocus
+                    ></v-text-field>
+                </v-col>
+            </div>
+            <div class="d-flex justify-center">
+                <v-btn text large @click="attendanceCheck">출석하기</v-btn>
+            </div>
+        </v-card>
+
         <div>
             <v-alert
                 type="warning"
@@ -91,6 +105,7 @@
             </v-alert>
         </div>
 
+        <!-- 출석 된 것을 확인 -->
         <v-snackbar v-model="snackbar_c" color="success">
             출석되었습니다.
             <v-btn dark text @click="close">Close</v-btn>
@@ -113,7 +128,6 @@ export default {
         await this.$socket.on('attendance', data => {
             this.flag = data.flag
             this.remainTime = data.time
-            // console.log(this.remainTime)
         })
         try {
             const res = await axios.get('attendance/attendanceCheck')
@@ -163,10 +177,10 @@ export default {
             this.flag = false
             this.input_attendance_code = ''
             await axios.post('attendance/attendanceCheckEnd')
+            clearInterval(this.interval)
             this.$router.push(
                 `/AttendanceManageDay/${moment().format('YYYYMMDD')}`
             )
-            clearInterval(this.interval)
         },
         async attendanceCheck() {
             try {
@@ -195,7 +209,14 @@ export default {
         tick() {
             this.interval = setInterval(() => {
                 this.remainTime -= 1000
-                // console.log(this.remainTime)
+                if (this.remainTime == 0) {
+                    this.$socket.emit('attendance', {
+                        flag: false,
+                    })
+                    this.$router.push(
+                        `/AttendanceManageDay/${moment().format('YYYYMMDD')}`
+                    )
+                }
                 if (this.flag == false) clearInterval(this.interval)
             }, 1000)
         },
@@ -204,7 +225,12 @@ export default {
         timer() {
             var tmp = parseInt(this.remainTime / 1000 / 60) + ' : '
             if (parseInt((this.remainTime / 1000) % 60) == 0) return tmp + '00'
-            else return tmp + ((this.remainTime / 1000) % 60)
+            // else return tmp + ((this.remainTime / 1000) % 60)
+            else {
+                if (parseInt((this.remainTime / 1000) % 60) < 10)
+                    return tmp + '0' + ((this.remainTime / 1000) % 60)
+                else return tmp + ((this.remainTime / 1000) % 60)
+            }
         },
     },
 }

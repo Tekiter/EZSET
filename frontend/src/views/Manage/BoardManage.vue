@@ -32,7 +32,7 @@
                         <v-icon left>mdi-pencil</v-icon> 게시판 생성
                     </v-btn>
                 </v-toolbar>
-                <v-list>
+                <v-list subheader>
                     <v-list-item v-for="board in boards" :key="board._id">
                         <v-list-item-title
                             >{{ board.title }}
