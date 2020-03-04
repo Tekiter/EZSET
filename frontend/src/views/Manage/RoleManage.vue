@@ -125,6 +125,7 @@
             >
                 <v-card
                     :loading="curUsers.isLoading"
+                    :disabled="curRole.tag === 'default'"
                     tile
                     minHeight="95%"
                     outlined

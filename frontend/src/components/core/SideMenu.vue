@@ -37,6 +37,11 @@ export default {
                             perm: this.$perm('manageUsers').can('access'),
                         },
                         {
+                            title: '가입 승인',
+                            to: '/manage/preusers',
+                            perm: this.$perm('managePreusers').can('access'),
+                        },
+                        {
                             title: '역할 관리',
                             to: '/manage/roles',
                             perm: this.$perm('role').can('modify'),
@@ -67,7 +72,12 @@ export default {
                         {
                             title: '월별출석현황',
                             to: '/AttendanceManageMonth',
-                            perm: this.$perm('attendance').can('read'),
+                            perm: this.$perm('attendance').can('update'),
+                        },
+                        {
+                            title: '월별출석현황(Old)',
+                            to: '/AttendanceManageMonthOld',
+                            perm: this.$perm('attendance').can('update'),
                         },
                         {
                             title: '출석현황',
@@ -77,12 +87,12 @@ export default {
                         {
                             title: '공결승인',
                             to: '/OfficialAbsenceAccept',
-                            perm: this.$perm('attendance').can('read'),
+                            perm: this.$perm('absence').can('update'),
                         },
                         {
                             title: '출석 설정',
                             to: '/manage/attendance',
-                            perm: this.$perm('attendance').can('read'),
+                            perm: this.$perm('attendance').can('update'),
                         },
                     ],
                 },
@@ -95,6 +105,11 @@ export default {
                 },
                 {
                     type: 'simple',
+                    icon: 'mdi-package-variant-closed',
+                    title: '자료실',
+                    to: '/filebox',
+                },
+                {
                     icon: 'mdi-calendar-month ',
                     title: '일정표',
                     to: '/Schedule',

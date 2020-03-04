@@ -46,6 +46,12 @@ const routes = [
             import('../views/Attendance/AttendanceManageMonth.vue'),
     },
     {
+        path: '/attendanceManageMonthOld',
+        name: 'attendanceManageMonthOld',
+        component: () =>
+            import('../views/Attendance/AttendanceManageMonthOld.vue'),
+    },
+    {
         path: '/attendanceManageMonthUser',
         name: 'attendanceManageMonthUser',
         component: () =>
@@ -103,6 +109,11 @@ const routes = [
         component: () => import('../views/Manage/UserManage.vue'),
     },
     {
+        path: '/manage/preusers',
+        name: 'managePreusers',
+        component: () => import('../views/Manage/PreuserManage.vue'),
+    },
+    {
         path: '/manage/roles',
         name: 'manageRoles',
         component: () => import('../views/Manage/RoleManage.vue'),
@@ -118,6 +129,11 @@ const routes = [
         component: () => import('../views/Manage/ServerManage.vue'),
     },
     {
+        path: '/manage/theme',
+        name: 'manageTheme',
+        component: () => import('../views/Manage/ThemeManage.vue'),
+    },
+    {
         path: '/403',
         name: 'error403',
         component: () => import('../views/Error/403.vue'),
@@ -131,6 +147,49 @@ const routes = [
         path: '/mypage',
         name: 'mypage',
         component: () => import('../views/Mypage.vue'),
+    },
+    {
+        path: '/filebox',
+        component: () => import('../views/FileBox/FileBox.vue'),
+        children: [
+            {
+                path: '',
+                name: 'fileBoxEmpty',
+            },
+            {
+                path: 'create',
+                component: () => import('../components/filebox/CreateGroup'),
+            },
+            {
+                path: 'edit',
+                name: 'fileboxEditGroup',
+                component: () => import('../components/filebox/EditGroup'),
+                props: route => ({ groups: route.params.groups }),
+            },
+            {
+                path: 'folder/:folder_id',
+                name: 'fileBoxMaterials',
+                component: () =>
+                    import('../components/filebox/MaterialPost.vue'),
+                props: route => ({ folderId: route.params.folder_id }),
+            },
+            {
+                path: 'folder/:folder_id/write',
+                name: 'fileBoxWriteMaterial',
+                component: () =>
+                    import('../components/filebox/WriteMaterial.vue'),
+                props: route => ({ parent_id: route.params.folder_id }),
+            },
+            {
+                path: 'edit/:material_id',
+                name: 'fileBoxEditMaterial',
+                component: () =>
+                    import('../components/filebox/WriteMaterial.vue'),
+                props: route => ({
+                    edit: route.params.material_id,
+                }),
+            },
+        ],
     },
 ]
 

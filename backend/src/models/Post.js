@@ -94,11 +94,6 @@ postSchema.methods.likes_delete = function(liker) {
     return this.save()
 }
 
-//댓글 갯수 카운트
-postSchema.virtual('comments_count').get(function() {
-    return this.comments ? this.comments.length : 0
-})
-
 //댓글 작성
 postSchema.methods.addComment = function(content, writer) {
     this.comments.push(new Comment({ content, writer }))

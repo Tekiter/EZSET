@@ -167,10 +167,10 @@ export default {
                     email: this.form.email,
                 })
                 this.$router.push({ path: '/' })
-                // console.log(res) // eslint-disable-line no-console
+                // // // eslint-disable-line no-console
             } catch (error) {
                 // if (error.response.status == 409)
-                // console.log(error.response) // eslint-disable-line no-console
+                // // // eslint-disable-line no-console
             } finally {
                 this.isloading = false
             }
@@ -217,10 +217,10 @@ export default {
                     username: this.form.username,
                 })
                 this.success.username = '사용할 수 있는 아이디입니다.'
-                // console.log(res)
+                // //
             } catch (error) {
                 this.errors.username = '중복된 아이디입니다.'
-                // console.log(error)
+                // //
             }
         },
         async checkPassword() {

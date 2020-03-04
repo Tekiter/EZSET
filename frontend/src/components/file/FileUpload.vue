@@ -27,7 +27,8 @@
                 :key="idx"
                 @click:close="removeFile(idx)"
                 close
-                :color="fileinfo.uploaded ? 'green' : ''"
+                :color="fileinfo.uploaded ? 'success' : ''"
+                :dark="fileinfo.uploaded ? isDarkColor('success') : undefined"
                 class="mr-2 mt-1"
                 >{{ fileinfo.filename }}</v-chip
             >
@@ -161,6 +162,18 @@ export default {
         hideDroppable() {
             this.dragCount -= 1
         },
+    },
+    created() {
+        if (Array.isArray(this.uploaded)) {
+            this.selectedFiles = this.uploaded.map(file => {
+                return {
+                    filename: file.filename,
+                    uploaded: true,
+                    id: file.id,
+                }
+            })
+            this.$emit('input', this.selectedFiles)
+        }
     },
     watch: {
         uploaded(val) {

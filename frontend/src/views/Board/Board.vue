@@ -3,7 +3,7 @@
         <div>
             <v-text-field
                 v-if="loading"
-                color="blue darken-2"
+                color="primary darken-2"
                 loading
                 disabled
             ></v-text-field>

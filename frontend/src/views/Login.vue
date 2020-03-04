@@ -2,10 +2,16 @@
     <v-container class="fill-height" fluid>
         <v-row align="center" justify="center">
             <v-col cols="12" sm="8" md="4">
-                <v-card class="elevation-12" :loading="loading">
-                    <v-form @submit="onLogin">
-                        <v-toolbar color="primary" dark flat>
-                            <v-toolbar-title>로그인</v-toolbar-title>
+                <v-form @submit="onLogin">
+                    <v-card class="elevation-12" :loading="loading">
+                        <v-toolbar
+                            color="theme-appbar"
+                            :dark="isDarkColor('theme-appbar')"
+                            flat
+                        >
+                            <v-toolbar-title>
+                                {{ $store.state.config.groupName }} 로그인
+                            </v-toolbar-title>
                         </v-toolbar>
                         <v-card-text>
                             <v-text-field
@@ -15,6 +21,8 @@
                                 type="text"
                                 v-model="user.username"
                                 :error="!!errorMsg"
+                                :loading="loading"
+                                :disabled="loading"
                             />
 
                             <v-text-field
@@ -26,6 +34,8 @@
                                 v-model="user.password"
                                 :error="!!errorMsg"
                                 :error-messages="errorMsg"
+                                :loading="loading"
+                                :disabled="loading"
                             />
                         </v-card-text>
                         <v-card-actions>
@@ -34,12 +44,19 @@
                                 type="submit"
                                 color="primary"
                                 :to="'/register'"
+                                :disabled="loading"
                                 >Sign up</v-btn
                             >
-                            <v-btn type="submit" color="primary">Login</v-btn>
+                            <v-btn
+                                type="submit"
+                                color="primary"
+                                :loading="loading"
+                            >
+                                Login
+                            </v-btn>
                         </v-card-actions>
-                    </v-form>
-                </v-card>
+                    </v-card>
+                </v-form>
             </v-col>
         </v-row>
     </v-container>
@@ -85,7 +102,7 @@ export default {
                 this.$router.push({ path: to })
                 return
             } catch (error) {
-                // console.log(error.data.message)
+                // //
                 this.errorMsg = error.data.message
             }
             this.loading = false

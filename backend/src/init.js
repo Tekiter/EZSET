@@ -6,6 +6,12 @@ import { initSocket } from './utils/socket'
 
 export default async function initApp({ PORT, DATABASE_URI, SOCKET_PORT }) {
     try {
+        if (!DATABASE_URI) {
+            const err = new Error(
+                'Environment Variable "DATABASE_URL" has not been set.'
+            )
+            throw err
+        }
         await database.initialize(DATABASE_URI)
         console.log('Successfully connected to database')
 
