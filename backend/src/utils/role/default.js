@@ -55,9 +55,11 @@ export function setAdminRole(roles) {
         .can('access')
         .resource('manageHome')
         .can('update')
-
         .resource('manageBoards')
         .can('access')
+
+        .resource('fileBox')
+        .can(['manage', 'upload'])
 
         .resource('attendance')
         .can('update')

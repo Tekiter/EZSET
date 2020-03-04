@@ -214,7 +214,7 @@ export async function deleteUnlinkedFile(files) {
     for (let fileId of files) {
         const file = await File.findById(fileId)
 
-        if (!file.hasLink()) {
+        if (file && !file.hasLink()) {
             await deleteFile(fileId)
         }
     }

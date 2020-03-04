@@ -105,6 +105,11 @@ export default {
                 },
                 {
                     type: 'simple',
+                    icon: 'mdi-package-variant-closed',
+                    title: '자료실',
+                    to: '/filebox',
+                },
+                {
                     icon: 'mdi-calendar-month ',
                     title: '일정표',
                     to: '/Schedule',
