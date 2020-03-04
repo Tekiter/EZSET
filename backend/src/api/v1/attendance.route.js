@@ -11,7 +11,6 @@ var moment = require('moment')
 var ranNum = random(100, 999)
 var startUser = ''
 
-<<<<<<< HEAD
 /**
  * @api {post} /attendance/attendanceWrite/ 출석 요청
  * @apiDescription 사용자가 자신이 입력한 코드로 출석요청을 보냄. 서버에서 생성한 출석코드와 일치한다면 출석 처리
@@ -45,11 +44,6 @@ var startUser = ''
  *          "error": "제목오류"
  *        }
  */
-=======
-//사용자가 출석코드를 입력했을 경우 서버에서 생성한 코드와 사용자 입력코드가 일치한다면 db에 출석상태로 업데이트
-//body : code
-//Attendance 페이지에서 사용
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
 router.post(
     '/attendanceWrite', [perm('attendance').can('att')],
     asyncRoute(async function(req, res) {
@@ -144,7 +138,6 @@ router.get(
  */
 
 router.get(
-<<<<<<< HEAD
     '/attendanceCheckAdmin', [perm('attendance').can('att')],
     asyncRoute(async function(req, res) {
         if (startUser == req.user.username) res.json(ranNum)
@@ -167,18 +160,6 @@ router.get(
  */
 router.post(
     '/attendanceCheckEnd', [perm('attendance').can('att')],
-=======
-        '/attendanceCheckAdmin', [perm('attendance').can('update')],
-        asyncRoute(async function(req, res) {
-            if (startUser == req.user.username) res.json(ranNum)
-            else res.json(0)
-        })
-    )
-    //출석 종료 후 초기화
-    //Attendance 페이지에서 사용
-router.post(
-    '/attendanceCheckEnd', [perm('attendance').can('update')],
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
     asyncRoute(async function(req, res) {
         startUser = ''
         ranNum = -1
@@ -191,7 +172,7 @@ router.post(
  * @apiName startAttendance
  * @apiDescription 출석시작버튼을 눌렀을경우 관리자는 출석상태로 다른 모든 유저는 결석상태로 업데이트함
  * @apiGroup AttendanceCheck
- * @apiPermission can.start
+ * @apiPermission can.update
  *
  * @apiSuccess {Number} ranNum 서버에서 생성한 3자리 출석코드 반환
  *
@@ -203,11 +184,7 @@ router.post(
  *
  */
 router.post(
-<<<<<<< HEAD
-    '/startAttendance', [perm('attendance').can('start')],
-=======
     '/startAttendance', [perm('attendance').can('update')],
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
     asyncRoute(async function(req, res) {
         var Date = moment().format('YYYYMMDD')
             //get Userlist in User collection
@@ -265,13 +242,12 @@ router.post(
     })
 )
 
-<<<<<<< HEAD
 /**
  * @api {get} /attendanceState/:day 일별 출석현황 반환
  * @apiDescription 특정 일자의 출석현황을 반환
  * @apiName attendanceState
  * @apiGroup AttendanceCheck
- * @apiPermission can.read
+ * @apiPermission can.update
  *
  * @apiParam {String} day 반환하고 싶은 날짜, YYYYMMDD 형태
  * @apiParamExample {get} Request-Example:
@@ -306,14 +282,7 @@ router.post(
  *       HTTP/1.1 404 Not Found
  */
 router.get(
-    '/attendanceState/:day', [param('day').isString(), perm('attendance').can('read'), validateParams],
-=======
-//날짜를 param으로 받아와서 그 날짜에 해당하는 객체를 반환(그 날짜에 출석한 사람들의 정보가 모두 담겨 있음)
-//param : day(String)
-//AttendanceManageDay 페이지에서 사용
-router.get(
     '/attendanceState/:day', [param('day').isString(), perm('attendance').can('update'), validateParams],
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
     asyncRoute(async function(req, res) {
         const cur = await AttendanceDay.findOne({
             day: req.params.day,
@@ -323,13 +292,12 @@ router.get(
     })
 )
 
-<<<<<<< HEAD
 /**
  * @api {post} /attendancestateupdate/:day 출석 상태 업데이트
  * @apiDescription <code>day</code>날짜에 <code>name</code>이라는 아이디를 가진 사용자의 출석 상태를 <code>state</code>로 업데이트
  * @apiName attendancestateupdate
  * @apiGroup AttendanceCheck
- * @apiPermission can.read
+ * @apiPermission can.update
  *
  * @apiParam {String} day 업데이트할 날짜, YYYYMMDD 형태
  * @apiParam {String} state 업데이트할 상태 (<code>attendance</code>,<code>absence</code>,<code>late</code>,<code>offical_absence</code>)중 하나
@@ -350,16 +318,7 @@ router.get(
  */
 router.post(
     '/attendancestateupdate/:day', [
-        perm('attendance').can('read'),
-=======
-//AttendanceManageDay 페이지에서 사용자의 출석정보를 변경하면 db에 업데이트 시켜준다.
-//body : state(String), name(String)
-//param : day(String)
-//AttendanceManageDay 페이지에서 사용
-router.post(
-    '/attendancestateupdate/:day', [
         perm('attendance').can('update'),
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
         param('day').isString(),
         body('state').isString(),
         body('name').isString(),
@@ -368,23 +327,14 @@ router.post(
     asyncRoute(async function(req, res) {
         var Day = req.params.day
 
-<<<<<<< HEAD
-        const cur = await AttendanceDay.findOneAndUpdate({
-=======
         await AttendanceDay.findOneAndUpdate({
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
                 day: Day,
                 'status.name': req.body.name,
             }, { 'status.$.state': req.body.state },
             function(err, doc) {}
         )
-<<<<<<< HEAD
-        res.json(cur)
-        const cur_user = await AttendanceUser.findOneAndUpdate({
-=======
 
         await AttendanceUser.findOneAndUpdate({
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
                 name: req.body.name,
                 'status.date': Day,
             }, { 'status.$.state': req.body.state },
@@ -399,7 +349,7 @@ router.post(
  * @apiDescription 전체 사용자 리스트를 반환
  * @apiName attendanceUserList
  * @apiGroup AttendanceCheck
- * @apiPermission can.read
+ * @apiPermission can.update
  *
  * @apiSuccess {Array} data 전체 사용자정보 객체 배열
  *
@@ -423,11 +373,7 @@ router.post(
  *          }
  */
 router.get(
-<<<<<<< HEAD
-    '/attendanceUserList', [perm('attendance').can('read')],
-=======
     '/attendanceUserList', [perm('attendance').can('update')],
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
     asyncRoute(async function(req, res) {
         const userList = await User.find().select('username')
         res.json(userList)
@@ -500,11 +446,7 @@ router.get(
  *}
  */
 router.get(
-<<<<<<< HEAD
-    '/attendanceDayList', [perm('attendance').can('read')],
-=======
     '/attendanceDayList', [perm('attendance').can('update')],
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
     asyncRoute(async function(req, res) {
         const attendnaceDayList = await AttendanceDay.find()
         res.json(attendnaceDayList)
@@ -560,11 +502,7 @@ router.get(
  *]
  */
 router.get(
-<<<<<<< HEAD
-    '/attendanceUserListData', [perm('attendance').can('read')],
-=======
     '/attendanceUserListData', [perm('attendance').can('update')],
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
     asyncRoute(async function(req, res) {
         const attendnaceUser = await AttendanceUser.find()
         res.json(attendnaceUser)
@@ -586,11 +524,7 @@ router.get(
 //attendanceDay Collection에서 출석 정보가 없는 유저를 가져옴
 // AttendanceManageDay 페이지에서사용
 router.post(
-<<<<<<< HEAD
-    '/attendanceNUserData', [perm('attendance').can('read'), body('day').isString(), validateParams],
-=======
     '/attendanceNUserData', [perm('attendance').can('update'), body('day').isString(), validateParams],
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
     asyncRoute(async function(req, res) {
         const result = []
         const Users = await User.find().select('username')
@@ -615,11 +549,7 @@ router.post(
 // manage/user
 // 출석 대상인 유저들을 가져옴
 router.get(
-<<<<<<< HEAD
-    '/manage/user', [validateParams],
-=======
     '/manage/user', [perm('attendance').can('update'), validateParams],
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
     asyncRoute(async function(req, res) {
         const users = await User.find()
             .where('attable')
@@ -653,11 +583,7 @@ router.get(
 // manage/user
 // 출석 대상인 유저들을 추가 등록
 router.put(
-<<<<<<< HEAD
-    '/manage/user', [body('users').isArray(), validateParams],
-=======
     '/manage/user', [perm('attendance').can('update'), body('users').isArray(), validateParams],
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
     asyncRoute(async(req, res) => {
         try {
             for (let user of req.body.users) {
@@ -684,15 +610,11 @@ router.put(
 // manage/user/:username
 // 출석 대상인 유저 삭제
 router.delete(
-<<<<<<< HEAD
-    '/manage/user/:username', [param('username').custom(checkUsername), validateParams],
-=======
     '/manage/user/:username', [
         perm('attendance').can('update'),
         param('username').custom(checkUsername),
         validateParams,
     ],
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
     asyncRoute(async(req, res) => {
         const user = await User.findOne()
             .where('username')
@@ -746,8 +668,6 @@ router.put(
         res.end()
     })
 )
-<<<<<<< HEAD
-=======
 
 //attendanceDay Collection에서 출석 정보가 없는 유저를 가져옴
 // AttendanceManageDay 페이지에서사용
@@ -760,5 +680,4 @@ router.post(
         res.json(attendanceUser)
     })
 )
->>>>>>> fc668cc48c05b52e440506649da667145daad1c0
 export default router
