@@ -1,6 +1,22 @@
 <template>
-    <v-row class="ma-3 fill-height">
-        <v-col cols="5">
+    <v-row class="ma-3 fill-height" :no-gutters="isMobileMode">
+        <v-col v-show="isMobileMode" cols="12">
+            <v-tabs v-model="curTab" class="mt-3">
+                <v-tab>
+                    게시판
+                </v-tab>
+                <v-tab>
+                    게시판 설정
+                </v-tab>
+            </v-tabs>
+        </v-col>
+
+        <v-col
+            cols="12"
+            md="5"
+            v-show="!isMobileMode || curTab == 0"
+            class="fill-height"
+        >
             <v-card outlined :loading="isLoading">
                 <v-toolbar flat>
                     <v-toolbar-title>
@@ -16,7 +32,7 @@
                         <v-icon left>mdi-pencil</v-icon> 게시판 생성
                     </v-btn>
                 </v-toolbar>
-                <v-list>
+                <v-list subheader>
                     <v-list-item v-for="board in boards" :key="board._id">
                         <v-list-item-title>{{ board.title }}</v-list-item-title>
                         <v-list-item-action>
@@ -28,10 +44,20 @@
                 </v-list>
             </v-card>
         </v-col>
-        <v-col cols="7">
+
+        <v-col
+            cols="12"
+            md="7"
+            v-show="!isMobileMode || curTab == 1"
+            class="fill-height"
+        >
             <v-card outlined>
-                <v-card-title>게시판 설정</v-card-title>
-                <v-list>
+                <v-toolbar flat>
+                    <v-toolbar-title>
+                        게시판 설정
+                    </v-toolbar-title>
+                </v-toolbar>
+                <v-list subheader>
                     <v-list-item v-for="board in boards" :key="board._id">
                         <v-list-item-title>{{ board.title }}</v-list-item-title>
                         <v-list-item-action>
@@ -118,6 +144,7 @@ import axios from 'axios'
 export default {
     data() {
         return {
+            curTab: 0,
             boards: [],
             createBoardDialog: {
                 show: false,
@@ -134,6 +161,11 @@ export default {
             },
             isAnonymous: false,
         }
+    },
+    computed: {
+        isMobileMode() {
+            return this.$vuetify.breakpoint.smAndDown
+        },
     },
     methods: {
         fetch_id(id) {
@@ -186,7 +218,7 @@ export default {
                 this.createBoardDialog.show = false
                 await this.fetchBoards()
             } catch (error) {
-                console.log(error.response)
+                //
                 this.createBoardDialog.error = '게시판 생성에 실패했습니다.'
             }
             this.isAnonymous = false

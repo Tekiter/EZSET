@@ -1,7 +1,12 @@
 <template>
     <div v-if="options.perm != false">
         <!-- {{ hasChildren }} -->
-        <v-list-item v-if="!options.children" :to="options.to" link>
+        <v-list-item
+            v-if="!options.children"
+            :to="options.to"
+            link
+            color="primary"
+        >
             <v-list-item-action>
                 <v-icon v-if="!isChildren">{{ options.icon }}</v-icon>
             </v-list-item-action>
