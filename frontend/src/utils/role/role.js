@@ -11,7 +11,7 @@ export function checkPerm(resource, param) {
         }
     })
 
-    return new Permission(res, param)
+    return new Permission(res, param + '')
 }
 
 export function filterAllPerms(perms) {

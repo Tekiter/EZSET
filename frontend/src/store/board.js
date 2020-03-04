@@ -1,5 +1,6 @@
 // import role from '../utils/role'
 import axios from 'axios'
+import { checkPerm } from '../utils/role/role'
 
 export default {
     namespaced: true,
@@ -23,12 +24,14 @@ export default {
     },
     getters: {
         boardList(state) {
-            return state.boards.map(board => {
-                return {
-                    title: board.title,
-                    to: `/board/${board._id}`,
-                }
-            })
+            return state.boards
+                .filter(board => checkPerm('board', board._id + '').can('read'))
+                .map(board => {
+                    return {
+                        title: board.title,
+                        to: `/board/${board._id}`,
+                    }
+                })
         },
     },
 }

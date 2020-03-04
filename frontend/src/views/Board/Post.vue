@@ -96,6 +96,7 @@
                             <v-icon left>mdi-magnify</v-icon> 검색
                         </v-btn>
                         <v-btn
+                            v-if="canWrite()"
                             class="ma-2"
                             tile
                             outlined
@@ -130,6 +131,7 @@
                                 <v-icon left>mdi-magnify</v-icon> 검색
                             </v-btn>
                             <v-btn
+                                v-if="canWrite()"
                                 class="ma-2"
                                 tile
                                 outlined
@@ -279,6 +281,9 @@ export default {
                 //
             }
             this.loading = false
+        },
+        canWrite() {
+            return this.$perm('board', this.$route.params.board_id).can('write')
         },
     },
     async created() {

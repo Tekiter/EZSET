@@ -84,13 +84,7 @@
                                         tile
                                         outlined
                                         color="success darken-2"
-                                        v-if="
-                                            del_auth(
-                                                post.author,
-                                                post._id,
-                                                false
-                                            )
-                                        "
+                                        v-if="canEdit(post.author)"
                                         @click="go_modify()"
                                     >
                                         <v-icon left>mdi-autorenew</v-icon>
@@ -101,13 +95,7 @@
                                         tile
                                         outlined
                                         color="error"
-                                        v-if="
-                                            del_auth(
-                                                post.author,
-                                                post._id,
-                                                true
-                                            )
-                                        "
+                                        v-if="canDelete(post.author)"
                                         @click="deletePost"
                                     >
                                         <v-icon>mdi-trash-can</v-icon> 삭제하기
@@ -153,13 +141,7 @@
                                         class="ma-2"
                                         icon
                                         color="success darken-2"
-                                        v-if="
-                                            del_auth(
-                                                post.author,
-                                                post._id,
-                                                false
-                                            )
-                                        "
+                                        v-if="canEdit(post.author)"
                                         @click="go_modify()"
                                     >
                                         <v-icon>mdi-cached</v-icon>
@@ -168,13 +150,7 @@
                                         class="ma-2"
                                         icon
                                         color="error"
-                                        v-if="
-                                            del_auth(
-                                                post.author,
-                                                post._id,
-                                                true
-                                            )
-                                        "
+                                        v-if="canDelete(post.author)"
                                         @click="deletePost"
                                     >
                                         <v-icon>mdi-trash-can</v-icon>
@@ -233,13 +209,7 @@
                                         <v-btn
                                             icon
                                             small
-                                            v-if="
-                                                del_auth(
-                                                    comment.writer,
-                                                    comment._id,
-                                                    false
-                                                )
-                                            "
+                                            v-if="canEdit(comment.writer)"
                                             @click="
                                                 showUpdateComment(comment, idx)
                                             "
@@ -252,13 +222,7 @@
                                             class="ml-2"
                                             icon
                                             small
-                                            v-if="
-                                                del_auth(
-                                                    comment.writer,
-                                                    comment._id,
-                                                    true
-                                                )
-                                            "
+                                            v-if="canDelete(comment.writer)"
                                             @click="showDeleteComment(comment)"
                                         >
                                             <v-icon
@@ -379,7 +343,7 @@ export default {
             likeLoading: false,
         }
     },
-    mounted() {
+    created() {
         this.fetch_data()
     },
 
@@ -405,30 +369,7 @@ export default {
             })
             this.loading = false
         },
-        del_auth(writer, id, isDelete) {
-            if (this.post.isAnonymous == true) {
-                if (
-                    crypto
-                        .createHash('sha512')
-                        .update(this.$store.state.auth.user.username)
-                        .digest('base64') == writer ||
-                    (this.$perm('board', id).can('delete') && isDelete)
-                ) {
-                    return true
-                } else {
-                    return false
-                }
-            } else {
-                if (
-                    this.$store.state.auth.user.username == writer ||
-                    (this.$perm('board', id).can('delete') && isDelete)
-                ) {
-                    return true
-                } else {
-                    return false
-                }
-            }
-        },
+
         async showDeleteComment(comment) {
             const res = await this.$action.showConfirmDialog(
                 '댓글 삭제',
@@ -518,6 +459,28 @@ export default {
             )
             this.fetch_data()
             this.likeLoading = false
+        },
+        isOwner(author) {
+            if (this.post.isAnonymous) {
+                return (
+                    crypto
+                        .createHash('sha512')
+                        .update(this.$store.state.auth.user.username)
+                        .digest('base64') == author
+                )
+            } else {
+                return this.$store.state.auth.user.username == author
+            }
+        },
+
+        canDelete(author) {
+            return (
+                this.isOwner(author) ||
+                this.$perm('board', this.$route.params.board_id).can('delete')
+            )
+        },
+        canEdit(author) {
+            return this.isOwner(author)
         },
     },
 }
