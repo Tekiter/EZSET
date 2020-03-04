@@ -58,7 +58,7 @@
                     </template>
                 </v-data-table>
                 <v-list v-else>
-                    <v-list-item v-for="post in posts" :key="post.title">
+                    <v-list-item v-for="post in posts" :key="post._id">
                         <v-list-item-content>
                             <v-list-item-title
                                 ><a @click="read(post)" class="title"
