@@ -16,17 +16,20 @@ const router = Router()
 router.loginNotRequired = true
 
 /**
- * @api {post} /auth/login 유저 로그인
- * @apiNmae 유저 로그인
+ * @api {post} /auth/login 로그인
+ * @apiName 로그인
  * @apiGroup Auth
  *
- * @apiParam {String} username 유저 아이디
- * @apiParam {String} password 유저 비밀번호
+ * @apiParam {String} username 로그인 할 아이디
+ * @apiParam {String} password 로그인 할 비밀번호
  *
- * @apiSuccess {JWT} accessToken 인증 토큰
+ * @apiSuccess {JWT} accessToken 로그인 인증 토큰
  *
  * @apiSuccessExample Success-Response:
  *  HTTP/1.1 200 OK
+ *  {
+ *    "accessToken": "<JWT-LOGIN-TOKEN>"
+ *  }
  */
 router.route('/login').post(
     [body('username').isString(), body('password').isString(), validateParams],
