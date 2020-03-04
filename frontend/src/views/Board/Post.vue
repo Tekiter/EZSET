@@ -1,13 +1,5 @@
 <template>
     <div>
-        <!-- <div>
-            <v-text-field
-                v-if="loading"
-                color="blue darken-2"
-                loading
-                disabled
-            ></v-text-field>
-        </div> -->
         <v-container grid-list-md>
             <v-row>
                 <v-col cols="12" sm="2"></v-col>
@@ -48,6 +40,8 @@
                     hide-default-footer
                     :mobile-breakpoint="NaN"
                     @page-count="pageCount = $event"
+                    no-data-text="게시글이 없습니다."
+                    loading-text="불러오는중..."
                 >
                     <template v-slot:item.title="props">
                         <a @click="read(props.item)">
@@ -230,6 +224,7 @@ export default {
             },
         },
         async $route(to, from) {
+            this.posts = []
             await this.fetchPostList()
             this.page = 1
         },
@@ -289,10 +284,5 @@ export default {
     async created() {
         await this.fetchPostList()
     },
-    // watch: {
-    //     async $route(to, from) {
-    //         await this.fetchPostList()
-    //     },
-    // },
 }
 </script>
