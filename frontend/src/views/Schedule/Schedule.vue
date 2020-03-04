@@ -245,10 +245,7 @@
                 </v-container>
             </div>
             <div>
-                <v-alert
-                    type="error"
-                    v-if="!$perm('attendance').canOwn('read')"
-                >
+                <v-alert type="error" v-if="!$perm('schedule').can('read')">
                     권한이 없습니다.
                 </v-alert>
             </div>

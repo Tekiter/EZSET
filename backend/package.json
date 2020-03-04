@@ -41,7 +41,6 @@
     "dependencies": {
         "babel-cli": "^6.26.0",
         "babel-plugin-transform-class-properties": "^6.24.1",
-        "babel-plugin-transform-object-rest-spread": "^7.0.0",
         "babel-preset-env": "^1.7.0",
         "bcrypt-nodejs": "^0.0.3",
         "body-parser": "^1.18.2",
@@ -62,6 +61,7 @@
     "devDependencies": {
         "babel-eslint": "^10.0.1",
         "babel-jest": "^24.5.0",
+        "babel-plugin-transform-object-rest-spread": "^6.26.0",
         "babel-register": "^6.26.0",
         "dotenv": "^7.0.0",
         "eslint": "^6.6.0",

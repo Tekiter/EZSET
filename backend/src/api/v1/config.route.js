@@ -75,7 +75,7 @@ router.patch(
     ],
     asyncRoute(async (req, res) => {
         for (let { key } of changeableConfigs) {
-            if (req.body[key]) {
+            if (req.body[key] != undefined) {
                 await setConfig(key, req.body[key])
             }
         }

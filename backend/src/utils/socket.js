@@ -19,6 +19,7 @@ export async function initSocket(app, SOCKET_PORT) {
         //attendance event lisner
         socket.on('attendance', function(data) {
             curState.flag = data.flag
+            if (!data.flag) curState.time = 18000
             var msg = {
                 flag: data.flag,
                 time: curState.time,
@@ -30,9 +31,12 @@ export async function initSocket(app, SOCKET_PORT) {
         //setTimeout 3m when attendance start
 
         socket.on('start', function(data) {
-            curState.time = 184000
+            curState.time = 180000
             var timerID = setInterval(function() {
-                if (curState.flag == false) clearInterval(timerID)
+                if (curState.flag == false) {
+                    clearInterval(timerID)
+                    curState.time = 180000
+                }
                 curState.time -= 1000
                 if (curState.time == 0) {
                     clearInterval(timerID)

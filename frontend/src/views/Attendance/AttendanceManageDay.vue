@@ -47,7 +47,14 @@
                                     :key="item.name"
                                     class="d-flex"
                                 >
-                                    <td class="flex-grow-1">{{ item.name }}</td>
+                                    <td class="flex-grow-1">
+                                        {{ findUserRealname(item.name) }}
+                                        <span
+                                            class="caption font-weight-light ml-3"
+                                        >
+                                            {{ item.name }}
+                                        </span>
+                                    </td>
                                     <td
                                         v-if="item.state == 'attendance'"
                                         class="flex-grow-0"
@@ -213,7 +220,14 @@
                                     :key="item.name"
                                     class="d-flex"
                                 >
-                                    <td class="flex-grow-1">{{ item.name }}</td>
+                                    <td class="flex-grow-1">
+                                        {{ findUserRealname(item.name) }}
+                                        <span
+                                            class="caption font-weight-light ml-3"
+                                        >
+                                            {{ item.name }}
+                                        </span>
+                                    </td>
                                     <td class="flex-grow-0">
                                         {{ item.reason }}
                                     </td>
@@ -320,7 +334,8 @@
                                         v-model="userAddDialog.selections"
                                         :value="user"
                                         hide-details
-                                    ></v-checkbox>
+                                    >
+                                    </v-checkbox>
                                 </v-col>
                                 <v-col
                                     cols="12"
@@ -377,6 +392,7 @@ export default {
             return
         }
         await this.fetchAttUsers()
+        await this.getUserName()
     },
     data() {
         return {
@@ -399,6 +415,7 @@ export default {
                 color: '',
             },
             state: '',
+            userName: '',
         }
     },
     computed: {
@@ -430,6 +447,22 @@ export default {
         },
     },
     methods: {
+        async getUserName() {
+            const res = await axios.get('user/')
+            const tmp = res.data.users
+            this.userName = tmp.map(user => {
+                return { username: user.username, realname: user.realname }
+            })
+        },
+        findUserRealname(username) {
+            for (var k in this.userName) {
+                if (this.userName[k].username == username) {
+                    return this.userName[k].realname
+                }
+            }
+            // return this.userName
+            return ''
+        },
         async fetchAttUsers() {
             this.attLoad = false
             this.absenLoad = false

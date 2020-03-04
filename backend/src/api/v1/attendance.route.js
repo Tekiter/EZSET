@@ -10,6 +10,7 @@ const router = Router()
 var moment = require('moment')
 var ranNum = random(100, 999)
 var startUser = ''
+
 //사용자가 출석코드를 입력했을 경우 서버에서 생성한 코드와 사용자 입력코드가 일치한다면 db에 출석상태로 업데이트
 //body : code
 //Attendance 페이지에서 사용
@@ -405,6 +406,19 @@ router.put(
             }
         }
         res.end()
+    })
+)
+
+//attendanceDay Collection에서 출석 정보가 없는 유저를 가져옴
+// AttendanceManageDay 페이지에서사용
+router.post(
+    '/attendanceUser',
+    [perm('attendance').can('update'), validateParams],
+    asyncRoute(async function(req, res) {
+        const attendanceUser = await AttendanceUser.findOne({
+            name: req.body.name,
+        }).select({ _id: 0, __v: 0 })
+        res.json(attendanceUser)
     })
 )
 export default router

@@ -75,6 +75,11 @@ export default {
                             perm: this.$perm('attendance').can('update'),
                         },
                         {
+                            title: '월별출석현황(Old)',
+                            to: '/AttendanceManageMonthOld',
+                            perm: this.$perm('attendance').can('update'),
+                        },
+                        {
                             title: '출석현황',
                             to: '/AttendanceManageMonthUser',
                             perm: this.$perm('attendance').canOwn('read'),
@@ -100,6 +105,11 @@ export default {
                 },
                 {
                     type: 'simple',
+                    icon: 'mdi-package-variant-closed',
+                    title: '자료실',
+                    to: '/filebox',
+                },
+                {
                     icon: 'mdi-calendar-month ',
                     title: '일정표',
                     to: '/Schedule',
