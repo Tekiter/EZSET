@@ -59,6 +59,12 @@
                         @change="groupChanged()"
                     ></group-tree>
                 </v-card>
+                <v-snackbar v-model="newGroupSnackbar">
+                    그룹이 생성되었습니다
+                    <v-btn color="pink" text @click="newGroupSnackbar = false">
+                        Close
+                    </v-btn>
+                </v-snackbar>
             </v-col>
             <v-col v-show="!isMobileMode || curTab == 1" class="fill-height">
                 <router-view v-show="overlayMode == 'none'"></router-view>
@@ -77,7 +83,7 @@
                         v-if="overlayMode == 'add'"
                         :groups="groups"
                         @close="closePlusGroup"
-                        @change="fetchGroups"
+                        @change="fetchNewGroups"
                     ></create-group>
                 </v-fade-transition>
                 <v-fade-transition hide-on-leave>
@@ -130,6 +136,7 @@ export default {
                 material: undefined,
             },
             curTab: 0,
+            newGroupSnackbar: false,
         }
     },
     async created() {
@@ -146,6 +153,11 @@ export default {
             this.curTab = 0
         },
         async fetchGroups() {
+            const res = await axios.get('/filebox')
+            this.groups = res.data.groups
+        },
+        async fetchNewGroups() {
+            this.newGroupSnackbar = true
             const res = await axios.get('/filebox')
             this.groups = res.data.groups
         },
@@ -179,7 +191,9 @@ export default {
                     params: { folder_id: this.selectedGroups[0].id },
                 })
             } else {
-                this.$router.push({ name: 'fileBoxEmpty' })
+                if (this.$route.name !== 'fileBoxEmpty') {
+                    this.$router.push({ name: 'fileBoxEmpty' })
+                }
             }
         },
         checkManagePerm() {
