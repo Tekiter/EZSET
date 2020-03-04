@@ -33,12 +33,7 @@
                         >
                         </v-text-field>
                     </v-sheet>
-                    <group-tree
-                        v-model="selectedGroups"
-                        :search="groupSearch"
-                        :items="groups"
-                        @change="groupChanged()"
-                    ></group-tree>
+
                     <v-list v-if="checkManagePerm()">
                         <v-list-item link @click="showPlusGroup()">
                             <v-list-item-icon>
@@ -57,6 +52,12 @@
                             >
                         </v-list-item>
                     </v-list>
+                    <group-tree
+                        v-model="selectedGroups"
+                        :search="groupSearch"
+                        :items="groups"
+                        @change="groupChanged()"
+                    ></group-tree>
                 </v-card>
             </v-col>
             <v-col v-show="!isMobileMode || curTab == 1" class="fill-height">
