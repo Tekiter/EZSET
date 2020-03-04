@@ -70,7 +70,7 @@ export default {
                 key: 'write',
             },
             {
-                name: '다른 유저의 글 삭제',
+                name: '다른 유저의 글과 댓글 삭제',
                 key: 'delete',
             },
         ],
