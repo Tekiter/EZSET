@@ -63,6 +63,19 @@ router.route('/login').post(
     })
 )
 
+/**
+ * @api {post} /auth/register 유저 회원가입
+ * @apiNmae 유저 회원가입
+ * @apiGroup Auth
+ *
+ * @apiParam {String} username 유저 아이디
+ * @apiParam {String} password 유저 비밀번호
+ * @apiParam {String} realname 유저 실명
+ * @apiParam {Email} email 유저 이메일
+ *
+ * @apiSuccessExample Success-Response:
+ *  HTTP/1.1 200
+ */
 router.route('/register').post(
     [
         body('username').isString(),
