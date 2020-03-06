@@ -1,12 +1,12 @@
 <template>
-    <v-row class="ma-3 fill-height" :no-gutters="isMobileMode">
+    <v-row class="mt-3 ma-md-3 fill-height" :no-gutters="isMobileMode">
         <v-col v-show="isMobileMode" cols="12">
             <v-tabs v-model="curTab" class="mt-3">
                 <v-tab>
                     게시판
                 </v-tab>
                 <v-tab>
-                    게시판 설정
+                    게시판 권한
                 </v-tab>
             </v-tabs>
         </v-col>
@@ -66,7 +66,7 @@
             v-show="!isMobileMode || curTab == 1"
             class="fill-height"
         >
-            <board-role-edit></board-role-edit>
+            <board-role-edit ref="roleEdit"></board-role-edit>
         </v-col>
 
         <v-dialog v-model="createBoardDialog.show" max-width="300">
@@ -135,38 +135,35 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-row justify="center">
-            <v-dialog v-model="modifyDialog" persistent max-width="290">
-                <v-card>
-                    <v-card-title class="headline"
-                        >게시판 이름 수정</v-card-title
+        <v-dialog v-model="modifyDialog" persistent max-width="290">
+            <v-card>
+                <v-card-title class="headline">게시판 이름 수정</v-card-title>
+                <v-card-text>
+                    <v-text-field
+                        v-model="modifyTitle"
+                        label="새 이름"
+                        hide-details
+                    ></v-text-field>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        v-if="modifyTitle"
+                        color="green darken-1"
+                        text
+                        @click="successPostTitle()"
+                        >수정</v-btn
                     >
-                    <v-container>
-                        <v-text-field
-                            v-model="modifyTitle"
-                            label="Title"
-                        ></v-text-field>
-                    </v-container>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn
-                            color="red darken-1"
-                            text
-                            @click="modifyDialog = false"
-                            >취소</v-btn
-                        >
-                        <v-btn
-                            v-if="modifyTitle"
-                            color="green darken-1"
-                            text
-                            @click="successPostTitle()"
-                            >수정</v-btn
-                        >
-                        <v-btn v-else color="black darken-1" text>수정</v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
-        </v-row>
+                    <v-btn v-else color="black darken-1" text>수정</v-btn>
+                    <v-btn
+                        color="red darken-1"
+                        text
+                        @click="modifyDialog = false"
+                        >취소</v-btn
+                    >
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-row>
 </template>
 
@@ -213,6 +210,7 @@ export default {
             this.modifyDialog = false
             this.fetchBoards()
             await this.$store.dispatch('board/fetchBoards')
+            await this.$refs.roleEdit.resetChanges()
         },
         fetch_id(id) {
             this.temp_id = id
