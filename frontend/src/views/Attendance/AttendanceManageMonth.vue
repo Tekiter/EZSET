@@ -1,72 +1,68 @@
 <template>
-    <div class="">
+    <div class="ma-3 pa-3 ">
         <!-- date picker -->
-        <div
-            class="ma-3 pa-3 fill-width fill-height"
-            v-if="this.$perm('attendance').can('update')"
+
+        <v-card
+            class="ma-3 pa-3 fill-width font-weight-light"
+            flat
+            minHeight="95%"
+            color="primary lighten-1"
+            :dark="isDarkColor('primary')"
         >
-            <v-card tile minHeight="95%">
-                <v-container>
-                    <v-row>
-                        <v-col cols="12" lg="5">
-                            <v-menu
-                                v-model="startDayPicker"
-                                :close-on-content-click="false"
-                                max-width="290"
-                            >
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        :value="computedDateStart"
-                                        clearable
-                                        label="Start date"
-                                        readonly
-                                        v-on="on"
-                                        @click:clear="date = null"
-                                    ></v-text-field>
-                                </template>
-                                <v-date-picker
-                                    v-model="Sdate"
-                                    @change="
-                                        ;(startDayPicker = false), fetchAll()
-                                    "
-                                    locale="ko"
-                                ></v-date-picker>
-                            </v-menu>
-                        </v-col>
-                        <v-col cols="12" lg="2" class="text-center">
-                            <v-icon>
-                                mdi-arrow-right-circle
-                            </v-icon>
-                        </v-col>
-                        <v-col cols="12" lg="5">
-                            <v-menu
-                                v-model="endDayPicker"
-                                :close-on-content-click="false"
-                                max-width="290"
-                            >
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        :value="computedDateEnd"
-                                        clearable
-                                        label="End date"
-                                        readonly
-                                        v-on="on"
-                                        @click:clear="date = null"
-                                    ></v-text-field>
-                                </template>
-                                <v-date-picker
-                                    v-model="Edate"
-                                    @change="
-                                        ;(endDayPicker = false), fetchAll()
-                                    "
-                                    locale="ko"
-                                ></v-date-picker>
-                            </v-menu>
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-card>
-        </div>
+            <v-row align="center">
+                <v-col cols="12" lg="5">
+                    <v-menu
+                        v-model="startDayPicker"
+                        :close-on-content-click="false"
+                        max-width="290"
+                    >
+                        <template v-slot:activator="{ on }">
+                            <v-text-field
+                                :value="computedDateStart"
+                                clearable
+                                label="Start date"
+                                readonly
+                                v-on="on"
+                                @click:clear="date = null"
+                            ></v-text-field>
+                        </template>
+                        <v-date-picker
+                            v-model="Sdate"
+                            @change=";(startDayPicker = false), fetchAll()"
+                            locale="ko"
+                        ></v-date-picker>
+                    </v-menu>
+                </v-col>
+                <v-col cols="12" lg="2" class="text-center">
+                    <v-icon x-large>
+                        mdi-arrow-right-circle
+                    </v-icon>
+                </v-col>
+                <v-col cols="12" lg="5">
+                    <v-menu
+                        v-model="endDayPicker"
+                        :close-on-content-click="false"
+                        max-width="290"
+                    >
+                        <template v-slot:activator="{ on }">
+                            <v-text-field
+                                :value="computedDateEnd"
+                                clearable
+                                label="End date"
+                                readonly
+                                v-on="on"
+                                @click:clear="date = null"
+                            ></v-text-field>
+                        </template>
+                        <v-date-picker
+                            v-model="Edate"
+                            @change=";(endDayPicker = false), fetchAll()"
+                            locale="ko"
+                        ></v-date-picker>
+                    </v-menu>
+                </v-col>
+            </v-row>
+        </v-card>
 
         <!-- 출석 정보 카드 출력 -->
         <v-data-iterator
@@ -111,13 +107,13 @@
                         md="4"
                     >
                         <v-card outlined>
-                            <v-card-title>
-                                <p class="subheader">
+                            <div class="d-flex align-center mx-4 my-6">
+                                <span class="headline">
                                     {{ user.realname }}
-                                </p>
-                                <p class="caption ml-2">
+                                </span>
+                                <span class="subtitle-1 ml-2">
                                     {{ user.username }}
-                                </p>
+                                </span>
                                 <v-spacer></v-spacer>
                                 <v-btn
                                     v-if="$perm('attendance').can('update')"
@@ -127,7 +123,7 @@
                                 >
                                     <v-icon>mdi-plus</v-icon>
                                 </v-btn>
-                            </v-card-title>
+                            </div>
                             <v-divider></v-divider>
                             <v-card-text>
                                 <div class="d-flex">
