@@ -74,7 +74,7 @@ router.route('/login').post(
  * @apiParam {Email} email 유저 이메일
  *
  * @apiSuccessExample Success-Response:
- *  HTTP/1.1 200
+ *  HTTP/1.1 201 OK
  */
 router.route('/register').post(
     [
@@ -142,6 +142,23 @@ router.route('/register').post(
     })
 )
 
+/**
+ * @api {post} /auth/register/doublecheck/username 유저 중복 아이디 체크
+ * @apiNmae 유저 중복 아이디 체크
+ * @apiGroup Auth
+ * @apiDescription 유저가 화원가입 할 시 username을 중복 체크
+ *
+ * @apiParam {String} username 유저 아이디
+ *
+ * @apiError {Number} 200 사용할 수 있는 아이디
+ *
+ * @apiError {Number} 409 username 중복 에러
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 409
+ *       {
+ *          message: '이미 사용중인 아이디입니다.',
+ *        }
+ */
 router.route('/register/doublecheck/username').post(
     [body('username').isString(), validateParams],
     asyncRoute(async (req, res) => {
@@ -165,6 +182,26 @@ router.route('/register/doublecheck/username').post(
         }
     })
 )
+
+/**
+ * @api {post} /auth/edittoken/issue 유저 회원정보 보안 토큰 발급
+ * @apiNmae 유저 회원정보 보안 토큰 발급
+ * @apiGroup Auth
+ *
+ * @apiParam {String} username 유저 아이디
+ * @apiParam {String} password 유저 비밀번호
+ *
+ * @apiSuccess {JWT} editToken 회원정보 보안 토큰
+ * @apiSuccessExample Success-Response:
+ *  HTTP/1.1 200 OK
+ *
+ * @apiError {Number} 403 회원정보 보안 토큰 발급 실패 에러
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 403
+ *       {
+ *          message: '토큰 발급 실패',
+ *        }
+ */
 router.route('/edittoken/issue').post(
     [body('username').isString(), body('password').isString(), validateParams],
     asyncRoute(async (req, res) => {
@@ -187,6 +224,18 @@ router.route('/edittoken/issue').post(
         }
     })
 )
+
+/**
+ * @api {post} /auth/edittoken/check 유저 회원정보 보안 토큰 유효성 검사
+ * @apiNmae 유저 회원정보 보안 토큰 유효성 검사
+ * @apiGroup Auth
+ *
+ * @apiParam {JWT} editToken 회원정보 보안 토큰
+ *
+ * @apiSuccess {Number} 200 회원정보 보안 토큰이 유효함
+ *
+ * @apiError {Number} 403 회원정보 보안 토큰이 유효하지 않음
+ */
 router.route('/edittoken/check').post(
     [body('edittoken').isString(), validateParams],
     asyncRoute(async (req, res) => {
