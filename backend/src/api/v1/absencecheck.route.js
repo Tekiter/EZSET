@@ -2,6 +2,7 @@ import Router from 'express'
 import { asyncRoute, validateParams } from '../../utils/api'
 import OfficialAbsence from '../../models/officialAbsenceReason'
 import { perm } from '../../utils/role'
+import { getRealname } from '../../utils/user'
 import { param, body } from 'express-validator'
 const router = Router()
 var moment = require('moment')
@@ -114,7 +115,25 @@ router.get(
                 day: { $gte: moment().format('YYYY-MM-DD') },
                 approval: true,
             }).sort({ name: 1 })
-            res.json({ noanswer: cursor_No, yesanswer: cursor_Yes })
+
+            const convertAb = async curlist => {
+                const newlist = []
+                for (let cur of curlist) {
+                    newlist.push({
+                        name: cur.name,
+                        realname: await getRealname(cur.name),
+                        day: cur.day,
+                        reason: cur.reason,
+                        approval: cur.approval,
+                    })
+                }
+                return newlist
+            }
+
+            res.json({
+                noanswer: await convertAb(cursor_No),
+                yesanswer: await convertAb(cursor_Yes),
+            })
         } catch (err) {
             res.status(501).json()
         }
