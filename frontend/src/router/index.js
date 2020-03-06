@@ -134,16 +134,6 @@ const routes = [
         component: () => import('../views/Manage/ThemeManage.vue'),
     },
     {
-        path: '/403',
-        name: 'error403',
-        component: () => import('../views/Error/403.vue'),
-    },
-    {
-        path: '*',
-        name: 'error404',
-        component: () => import('../views/Error/404.vue'),
-    },
-    {
         path: '/mypage',
         name: 'mypage',
         component: () => import('../views/Mypage.vue'),
@@ -190,6 +180,16 @@ const routes = [
                 }),
             },
         ],
+    },
+    {
+        path: '/403',
+        name: 'error403',
+        component: () => import('../views/Error/403.vue'),
+    },
+    {
+        path: '*',
+        name: 'error404',
+        component: () => import('../views/Error/404.vue'),
     },
 ]
 

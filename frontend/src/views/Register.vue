@@ -1,6 +1,12 @@
 <template>
     <v-app>
-        <v-app-bar app clipped-left>
+        <v-app-bar
+            app
+            clipped-left
+            elevation="2"
+            color="theme-appbar"
+            :dark="isDarkColor('theme-appbar')"
+        >
             <!-- <v-app-bar-nav-icon @click.stop="drawer = !drawer" /> -->
             <v-btn text to="/">
                 <v-toolbar-title>
@@ -29,14 +35,14 @@
                                 <v-stepper-content step="1">
                                     <v-text-field
                                         v-model="form.realname"
-                                        label="name"
+                                        label="이름"
                                         @input="removeError('realname')"
                                         :error-messages="errors.realname"
                                         required
                                     ></v-text-field>
                                     <v-text-field
                                         v-model="form.username"
-                                        label="ID"
+                                        label="아이디"
                                         @input="removeError('username')"
                                         @change="checkUsername()"
                                         :error-messages="errors.username"
@@ -45,7 +51,7 @@
                                     ></v-text-field>
                                     <v-text-field
                                         v-model="form.password"
-                                        label="password"
+                                        label="비밀번호"
                                         @input="removeError('password')"
                                         @change="checkPassword()"
                                         :error-messages="errors.password"
@@ -54,7 +60,7 @@
                                     ></v-text-field>
                                     <v-text-field
                                         v-model="form.confirmpassword"
-                                        label="confirm password"
+                                        label="비밀번호 확인"
                                         @input="removeError('confirmpassword')"
                                         @change="checkConfirmPassword()"
                                         :error-messages="errors.confirmpassword"
@@ -224,10 +230,10 @@ export default {
             }
         },
         async checkPassword() {
-            let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,16}$/
+            let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,32}$/
             if (!pwreg.test(this.form.password)) {
                 this.errors.password =
-                    '비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요'
+                    '비밀번호는 8자 이상의 영문자와 숫자를 필수로 사용해야 합니다.'
                 return
             }
         },

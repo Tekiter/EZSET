@@ -55,7 +55,9 @@ router.route('/register').post(
         body('username').isString(),
         body('password').isString(),
         body('realname').isString(),
-        body('email').isEmail(),
+        body('email')
+            .isEmail()
+            .optional({ checkFalsy: true }),
         validateParams,
     ],
     asyncRoute(async (req, res) => {
@@ -68,11 +70,11 @@ router.route('/register').post(
             return
         }
 
-        let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,16}$/
+        let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,32}$/
         if (!pwreg.test(req.body.password)) {
             res.status(400).json({
                 message:
-                    '비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요',
+                    '비밀번호는 8자 이상의 영문자와 숫자를 필수로 사용해야 합니다.',
             })
             return
         }
