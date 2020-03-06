@@ -2,7 +2,8 @@
     <v-card outlined :loading="loading">
         <v-toolbar flat>
             <v-toolbar-title>
-                게시판 권한
+                <span v-show="$vuetify.breakpoint.mdAndUp">게시판</span>
+                권한
             </v-toolbar-title>
             <v-spacer></v-spacer>
             <v-fade-transition>
@@ -28,7 +29,7 @@
                 </v-btn>
             </v-fade-transition>
         </v-toolbar>
-        <v-list subheader>
+        <v-list subheader v-show="!loading">
             <board-perm-edit
                 v-model="board.roles"
                 v-for="board in boards"
@@ -87,9 +88,9 @@ export default {
         },
         async fetchRoles() {
             this.loading = true
+            this.roles = []
             const res = await axios.get('role')
             const roleNames = res.data
-            this.roles = []
             for (let role of roleNames) {
                 if (role.tag === 'admin') {
                     continue
@@ -140,6 +141,7 @@ export default {
             await this.fetchRoles()
             await this.fetchBoards()
             await this.setInitBoardPerms()
+            this.settingChanged = false
         },
         async saveChanges() {
             // const perms = []
