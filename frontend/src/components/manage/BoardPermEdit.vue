@@ -74,9 +74,9 @@ export default {
     methods: {
         // v-model 에 형태 변환해 외부로 전송
         handleChange() {
-            console.log(this.actions)
+            // console.log(this.actions)
             const newvalue = this.actions.map(action => {
-                console.log(action)
+                // console.log(action)
                 return {
                     action: action.key,
                     roles: this.selectedRole[action.key],
@@ -95,7 +95,7 @@ export default {
     },
     watch: {
         value(val) {
-            console.log(val)
+            // console.log(val)
             this.applyInput(val)
         },
     },
