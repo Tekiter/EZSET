@@ -282,6 +282,11 @@
                                             >댓글 작성에 오류가
                                             발생했습니다.</small
                                         >
+                                        <small
+                                            class="red--text mr-2"
+                                            v-if="writeComment.lengthError"
+                                            >댓글 내용이 없습니다.</small
+                                        >
                                         <v-btn
                                             outlined
                                             color="primary darken-2"
@@ -400,6 +405,11 @@ export default {
 
         async createComment() {
             this.writeComment.isLoading = true
+            if (this.writeComment.content.length == 0) {
+                this.writeComment.lengthError = true
+                this.writeComment.isLoading = false
+                return
+            }
             try {
                 await axios.post(
                     '/simple/posts/' + this.$route.params.post_id + '/comment',
@@ -413,6 +423,7 @@ export default {
                 this.writeComment.isError = true
             } finally {
                 this.writeComment.isLoading = false
+                this.writeComment.lengthError = false
             }
         },
         showUpdateComment(comment, idx) {
