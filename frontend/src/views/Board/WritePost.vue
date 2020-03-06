@@ -1,7 +1,20 @@
 <template>
     <v-container>
         <v-card outlined>
-            <v-card-title> 게시글 작성</v-card-title>
+            <v-card-title>
+                게시글 작성
+                <v-spacer></v-spacer>
+                <v-btn
+                    class="ma-2"
+                    tile
+                    outlined
+                    color="primary darken-2"
+                    @click="back()"
+                >
+                    <v-icon left>mdi-arrow-left-circle</v-icon>
+                    목록
+                </v-btn>
+            </v-card-title>
             <v-card-subtitle> 게시판: {{ curBoardName }}</v-card-subtitle>
             <v-card-text>
                 <v-text-field
@@ -28,7 +41,7 @@
                         tile
                         outlined
                         :disabled="isLoading"
-                        color="black"
+                        color="primary darken-2"
                         @click="submitClick"
                     >
                         <v-icon left>mdi-pencil</v-icon> 작성
@@ -153,6 +166,11 @@ export default {
             } else {
                 next(false)
             }
+        },
+        back() {
+            this.$router.push({
+                path: '/board/' + this.$route.params.board_id,
+            })
         },
         async getBoards() {
             const res = await axios.get('simple/boards')

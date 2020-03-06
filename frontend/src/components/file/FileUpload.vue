@@ -35,9 +35,12 @@
             <v-btn small icon @click="showFileUploadDialog" class="mt-1">
                 <v-icon>mdi-plus</v-icon>
             </v-btn>
-            <span class="ml-3 mt-1" v-if="selectedFiles.length == 0"
-                >또는 파일을 끌어다 넣으세요...</span
-            >
+            <span class="ml-3 mt-1" v-if="selectedFiles.length == 0">
+                <span v-if="$vuetify.breakpoint.mdAndUp"
+                    >또는 파일을 끌어다 넣으세요...</span
+                >
+                <span v-else>버튼을 눌러 파일을 첨부하세요.</span>
+            </span>
         </v-card-text>
         <!-- <p v-if="dragOver">
             gogo
