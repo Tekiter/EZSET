@@ -18,7 +18,20 @@ const router = Router()
 const crypto = require('crypto')
 const viewObj = new Object()
 
-//게시판 생성
+/**
+ * @api {post} /simple/boards/ 게시판 생성
+ * @apiDescription 새로운 게시판을 생성한다
+ * @apiName 게시판 생성
+ * @apiGroup Board
+ * @apiPermission can.create
+ *
+ * @apiParam {String} title 게시판 이름
+ * @apiParam {Boolean} isAnonymous 익명게시판 판단
+ *
+ * @apiSuccess {Number} 201 게시판 생성 성공
+ *
+ * @apiError {Number} 500 게시판 생성 에러
+ */
 router.post(
     '/boards',
     [perm('board').can('create'), body('title').isString(), validateParams],
@@ -26,12 +39,42 @@ router.post(
         let board = new Board()
         board.title = req.body.title
         board.isAnonymous = req.body.isAnonymous
-        await board.save()
-        res.status(201).end()
+
+        try {
+            await board.save()
+            res.status(201).end()
+        } catch (error) {
+            const errr = new Error('database error')
+            errr.status = 500
+            throw errr
+        }
     })
 )
 
-//게시판 삭제
+/**
+ * @api {delete} /simple/boards/:board_id 게시판 삭제
+ * @apiDescription 게시판을 삭제한다
+ * @apiName 게시판 삭제
+ * @apiGroup Board
+ * @apiPermission can.delete
+ * @apiParam {Number} board_id 게시판 아이디
+ *
+ * @apiSuccess {json} 200 게시판 삭제
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200
+ *       {
+ *          message: '게시판을 삭제했습니다',
+ *        }
+ *
+ * @apiError {json} 404 해당 게시판 없음
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404
+ *       {
+ *          message: '존재하지 않는 게시판입니다.',
+ *        }
+ *
+ * @apiError {Number} 500 게시판 삭제 에러
+ */
 router.delete(
     '/boards/:board_id',
     [param('board_id').isNumeric(), validateParams],
@@ -46,9 +89,10 @@ router.delete(
             .equals(req.params.board_id)
 
         if (!board) {
-            const err = new Error('존재하지 않는 게시판입니다.')
-            err.status = 404
-            throw err
+            res.status(404).json({
+                message: '존재하지 않는 게시판입니다.',
+            })
+            return
         }
 
         try {
@@ -67,7 +111,9 @@ router.delete(
 
             await board.remove()
             // await Board.remove({ _id: req.params.board_id })
-            res.end()
+            res.status(200).json({
+                message: '게시판을 삭제했습니다',
+            })
         } catch (error) {
             const errr = new Error('database error')
             errr.status = 500
@@ -76,7 +122,31 @@ router.delete(
     })
 )
 
-//게시판 목록 보기
+/**
+ * @api {get} /simple/boards/ 게시판 목록
+ * @apiDescription 게시판 목록을 불러온다
+ * @apiName 게시판 목록
+ * @apiGroup Board
+ *
+ * @apiSuccess {json} 200 게시판 목록
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200
+ *      {
+ *          "_id": 10,
+ *          "title": "test"
+ *      },
+ *      {
+ *          "_id": 11,
+ *          "title": "익명게시판"
+ *      }
+ *
+ * @apiError {json} 404 해당 게시판 없음
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404
+ *       {
+ *          message: '존재하지 않는 게시판입니다.',
+ *        }
+ */
 router.get(
     '/boards',
     asyncRoute(async (req, res) => {
@@ -89,10 +159,15 @@ router.get(
                 }
             })
         )
+        if (!board) {
+            res.status(404).json({
+                message: '존재하지 않는 게시판입니다.',
+            })
+            return
+        }
     })
 )
 
-//게시글 작성
 router.post(
     '/boards/:board_id',
     [
