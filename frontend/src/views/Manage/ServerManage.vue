@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-row no-gutters justify="center" class="mt-4">
+        <v-row no-gutters justify="center" class="ma-3">
             <v-col cols="12" md="7">
                 <v-card outlined :loading="isLoading">
                     <v-toolbar flat>

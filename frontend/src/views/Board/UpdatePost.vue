@@ -247,6 +247,7 @@ export default {
                             )
                         },
                     })
+                    this.uploadFile.currentProgress = 0
                     this.uploadFile.fileProgress += 1
                     fileIds.push(res.data.id)
                 }
