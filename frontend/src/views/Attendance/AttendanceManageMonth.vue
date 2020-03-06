@@ -196,7 +196,7 @@
             persistent
             max-width="300px"
         >
-            <v-card :loading="attendanceUserDialog.isLoading">
+            <v-card>
                 <v-card-title>
                     <span class="headline">{{
                         attendanceUserDialog.user.realname
@@ -205,10 +205,15 @@
                         attendanceUserDialog.user.username
                     }}</v-card-subtitle>
                 </v-card-title>
-
                 <v-card-text>
                     <v-divider></v-divider>
-                    <v-list>
+                    <v-skeleton-loader
+                        v-if="attendanceUserDialog.isLoading"
+                        class="mx-auto"
+                        max-width="300"
+                        type="list-item-two-line"
+                    ></v-skeleton-loader>
+                    <v-list v-if="attendanceUserDialog.isExist">
                         <v-list-item
                             v-for="recode in attendanceUserDialog.records"
                             :key="recode.date"
@@ -280,6 +285,9 @@
                         <v-divider></v-divider>
                     </v-list>
                 </v-card-text>
+                <v-card-text v-if="!attendanceUserDialog.isExist">
+                    정보가 없습니다.
+                </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn @click.native="closeattendanceUserDialog()" text
@@ -319,6 +327,7 @@ export default {
                 search: '',
                 records: [],
                 isLoading: false,
+                isExist: true,
                 errorMessage: '',
             },
             //date-picker
@@ -414,25 +423,30 @@ export default {
             this.attendanceUserDialog.isLoading = true
             this.attendanceUserDialog.show = true
             this.attendanceUserDialog.user = user
-            const res = await axios.post('attendance/attendanceUser', {
-                name: user.username,
-            })
             const tmp = []
-            for (let i in res.data.status) {
-                if (
-                    parseInt(res.data.status[i].date) >=
-                        parseInt(moment(this.Sdate).format('YYYYMMDD')) &&
-                    parseInt(res.data.status[i].date) <=
-                        parseInt(moment(this.Edate).format('YYYYMMDD'))
-                ) {
-                    tmp.push(res.data.status[i])
+            if (user.v1 == 0 && user.v2 == 0 && user.v3 == 0 && user.v4 == 0) {
+                this.attendanceUserDialog.isExist = false
+            } else {
+                const res = await axios.post('attendance/attendanceUser', {
+                    name: user.username,
+                })
+                for (let i in res.data.status) {
+                    if (
+                        parseInt(res.data.status[i].date) >=
+                            parseInt(moment(this.Sdate).format('YYYYMMDD')) &&
+                        parseInt(res.data.status[i].date) <=
+                            parseInt(moment(this.Edate).format('YYYYMMDD'))
+                    ) {
+                        tmp.push(res.data.status[i])
+                    }
                 }
+                this.attendanceUserDialog.isExist = true
             }
-
             this.attendanceUserDialog.records = tmp
             this.attendanceUserDialog.isLoading = false
         },
         closeattendanceUserDialog() {
+            this.attendanceUserDialog.isExist = true
             this.attendanceUserDialog.records = []
             this.attendanceUserDialog.errorMessage = ''
             this.attendanceUserDialog.show = false
