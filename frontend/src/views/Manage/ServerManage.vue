@@ -88,8 +88,6 @@ export default {
         async saveChanges() {
             this.isLoading = true
 
-            console.log(this.settingData)
-
             await axios.patch('config/admin', _.cloneDeep(this.settingData))
             await this.$store.dispatch('config/fetchConfig')
             await this.fetchSettings()
