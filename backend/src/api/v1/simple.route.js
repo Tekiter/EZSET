@@ -168,6 +168,15 @@ router.get(
     })
 )
 
+/**
+ * @api {post} /simple/boards/:board_id 게시글 생성
+ * @apiDescription 게시글을 작성한다
+ * @apiName 게시글 생성
+ * @apiGroup Board
+ * @apiPermission can.create
+ * @apiParam {Number} board_id 게시판 아이디
+ 
+ */
 router.post(
     '/boards/:board_id',
     [
