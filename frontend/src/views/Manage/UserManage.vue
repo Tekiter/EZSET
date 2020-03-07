@@ -10,10 +10,12 @@
         >
             <template v-slot:header>
                 <v-toolbar flat>
-                    <v-toolbar-title>
-                        유저 관리
-                    </v-toolbar-title>
-                    <v-spacer></v-spacer>
+                    <template v-if="$vuetify.breakpoint.mdAndUp">
+                        <v-toolbar-title>
+                            유저 관리
+                        </v-toolbar-title>
+                        <v-spacer></v-spacer>
+                    </template>
                     <v-text-field
                         v-model="toolbar.search"
                         clearable

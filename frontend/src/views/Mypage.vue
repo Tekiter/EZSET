@@ -1,10 +1,17 @@
 <template>
-    <v-row justify="center">
+    <v-row
+        justify="center"
+        :no-gutters="!$vuetify.breakpoint.mdAndUp"
+        class="ma-3"
+    >
         <v-col xs="12" sm="10" md="8" lg="8" xl="8">
-            <v-tabs centered vertical>
+            <v-tabs
+                :grow="!$vuetify.breakpoint.mdAndUp"
+                :vertical="$vuetify.breakpoint.mdAndUp"
+            >
                 <v-tab>회원정보</v-tab>
                 <v-tab-item>
-                    <v-container fluid class="pa-0">
+                    <div>
                         <div class="primary darken-2 text-center">
                             <v-row class="d-flex justify-center">
                                 <v-col>
@@ -120,7 +127,7 @@
                                                     showpw ? 'text' : 'password'
                                                 "
                                                 label="password"
-                                                hint="비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요"
+                                                hint="비밀번호는 8자 이상의 영문자와 숫자를 필수로 사용해야 합니다."
                                                 @click:append="showpw = !showpw"
                                                 class="px-3 pt-3"
                                             ></v-text-field>
@@ -187,7 +194,7 @@
                                         color="primary darken-3"
                                         @click="changePassword()"
                                     >
-                                        change password
+                                        변경
                                     </v-btn>
                                     <v-dialog v-model="dialog2" max-width="400">
                                         <v-card>
@@ -221,7 +228,7 @@
                                                     showpw ? 'text' : 'password'
                                                 "
                                                 label="새비밀번호"
-                                                hint="비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요"
+                                                hint="비밀번호는 8자 이상의 영문자와 숫자를 필수로 사용해야 합니다."
                                                 @click:append="showpw = !showpw"
                                                 class="px-3 pt-3"
                                             ></v-text-field>
@@ -294,7 +301,7 @@
                                 </v-row>
                             </v-col>
                         </v-row>
-                    </v-container>
+                    </div>
                 </v-tab-item>
             </v-tabs>
         </v-col>
@@ -418,10 +425,10 @@ export default {
             this.dialog2 = true
         },
         async checkPassword() {
-            let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,16}$/
+            let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,32}$/
             if (!pwreg.test(this.form.password)) {
                 this.errors.password =
-                    '비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요'
+                    '비밀번호는 8자 이상의 영문자와 숫자를 필수로 사용해야 합니다.'
             } else this.errors.password = ''
             return
         },
