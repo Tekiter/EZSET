@@ -500,13 +500,13 @@ router.get(
 )
 
 /**
- * @api {get} /attendance/attendanceUserData/ 특정 사용자 출결현황 반환
- * @apiDescription 특정 사용자 출결현황 반환한다.
+ * @api {get} /attendance/attendanceUserData/ 사용자 출결현황 반환
+ * @apiDescription 자신의 출결현황 반환한다.
  * @apiName attendanceUserData
  * @apiGroup AttendanceCheck
  * @apiPermission attendance.canOwn.read
  *
- * @apiSuccess {Object} data 특정 사용자 출결현황 객체 반환
+ * @apiSuccess {Object} data 자신의 출결현황 객체 반환
  *
  * @apiSuccessExample {json} Success-Response:
  * HTTP/1.1 200 OK
@@ -602,9 +602,9 @@ router.post(
 )
 
 /**
- * @api {get} /attendance/manage/user 출석 대상 사용자 반환
+ * @api {get} /attendance/manage/user 출석 대상 조회
  * @apiDescription 출석 대상 사용자 리스트와 출석 대상이 아닌 사용자 리스트 반환
- * @apiName user
+ * @apiName read user
  * @apiGroup AttendanceCheck/manage
  * @apiPermission attendance.can.update
  *
@@ -668,9 +668,9 @@ router.get(
 )
 
 /**
- * @api {put} /attendance/manage/user 출석 대상 사용자 추가
+ * @api {put} /attendance/manage/user 출석 대상 추가
  * @apiDescription 출석대상 사용자 추가
- * @apiName user
+ * @apiName write user
  * @apiGroup AttendanceCheck/manage
  * @apiPermission attendance.can.update
  *
@@ -725,9 +725,9 @@ router.put(
 )
 
 /**
- * @api {delete} /attendance/manage/user/:username 출석 대상에서 사용자 제거
+ * @api {delete} /attendance/manage/user/:username 출석 대상 제거
  * @apiDescription 출석 대상에서 <code>username</code> 라는 아이디를 가지는 사용자 제거
- * @apiName user
+ * @apiName delete user
  * @apiGroup AttendanceCheck/manage
  * @apiPermission attendance.can.update
  *
