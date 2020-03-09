@@ -37,9 +37,9 @@
                 <v-list-item-title class="headline mb-2">{{
                     options.title
                 }}</v-list-item-title>
-                <v-list-item-subtitle>{{
-                    options.content
-                }}</v-list-item-subtitle>
+                <v-list-item-subtitle
+                    ><viewer :value="options.content"
+                /></v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
         <v-card-actions>
@@ -52,11 +52,13 @@
 </template>
 <script>
 import axios from 'axios'
+import { Viewer } from '@toast-ui/vue-editor'
 import FileDownload from '../../components/file/FileDownload.vue'
 import moment from 'moment'
 export default {
     name: 'MaterialPostItem',
     components: {
+        Viewer,
         FileDownload,
     },
     props: {
