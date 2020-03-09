@@ -17,6 +17,15 @@ import {
 
 const router = Router()
 
+/**
+ * @api {get} /filebox/ 자료실 자료 목록
+ * @apiName 자료실 자료 목록
+
+ * @apiGroup Filebox
+ *
+ * @apiSuccess {Array} groups 자료실 자료 목록 배열
+ * @apiDescription groups는 id, name, isfolder, children 이 각각 들어있음
+*/
 //group 목록 보기
 router.get(
     '/',
@@ -60,7 +69,6 @@ router.get(
         for (let root of result) {
             await loops(root)
         }
-
         res.json({
             groups: result,
         })

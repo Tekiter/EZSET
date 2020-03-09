@@ -68,7 +68,7 @@ router.route('/login').post(
 
 /**
  * @api {post} /auth/register 유저 회원가입
- * @apiNmae 유저 회원가입
+ * @apiName 유저 회원가입
  * @apiGroup Auth
  *
  * @apiParam {String} username 유저 아이디
@@ -76,6 +76,7 @@ router.route('/login').post(
  * @apiParam {String} realname 유저 실명
  * @apiParam {Email} email 유저 이메일
  *
+ * @apiSuccess {Number} 201 유저 회원가입 성공
  * @apiSuccessExample Success-Response:
  *  HTTP/1.1 201 OK
  */
@@ -147,13 +148,13 @@ router.route('/register').post(
 
 /**
  * @api {post} /auth/register/doublecheck/username 유저 중복 아이디 체크
- * @apiNmae 유저 중복 아이디 체크
+ * @apiName 유저 중복 아이디 체크
  * @apiGroup Auth
  * @apiDescription 유저가 화원가입 할 시 username을 중복 체크
  *
  * @apiParam {String} username 유저 아이디
  *
- * @apiError {Number} 200 사용할 수 있는 아이디
+ * @apiSuccess {Number} 200 사용할 수 있는 아이디
  *
  * @apiError {Number} 409 username 중복 에러
  * @apiErrorExample {json} Error-Response:
@@ -188,7 +189,7 @@ router.route('/register/doublecheck/username').post(
 
 /**
  * @api {post} /auth/edittoken/issue 유저 회원정보 보안 토큰 발급
- * @apiNmae 유저 회원정보 보안 토큰 발급
+ * @apiName 유저 회원정보 보안 토큰 발급
  * @apiGroup Auth
  *
  * @apiParam {String} username 유저 아이디
@@ -230,7 +231,7 @@ router.route('/edittoken/issue').post(
 
 /**
  * @api {post} /auth/edittoken/check 유저 회원정보 보안 토큰 유효성 검사
- * @apiNmae 유저 회원정보 보안 토큰 유효성 검사
+ * @apiName 유저 회원정보 보안 토큰 유효성 검사
  * @apiGroup Auth
  *
  * @apiParam {JWT} editToken 회원정보 보안 토큰
