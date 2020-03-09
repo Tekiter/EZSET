@@ -286,7 +286,7 @@ router.post(
  * @apiGroup Board
  * @apiPermission can.delete
  *
- * @apiParam {Number} board_id 게시판 아이디
+ * @apiParam {Number} post_id 게시판 아이디
  *
  * @apiSuccess {json} 200 게시글 삭제
  * @apiSuccessExample {json} Success-Response:
@@ -376,7 +376,47 @@ router.delete(
     })
 )
 
-//게시글 수정
+/**
+ * @api {patch} /simple/posts/:post_id 게시글 수정
+ * @apiDescription 게시글을 수정한다
+ * @apiName 게시글 수정
+ * @apiGroup Board
+ * @apiPermission can.update
+ *
+ * @apiParam {Number} board_id 게시판 아이디
+ * @apiParam {String} title 게시글 제목
+ * @apiParam {String} content 게시글 내용
+ * @apiParam {String} files 게시글 첨부파일
+ *
+ * @apiSuccess {json} 200 게시글 수정
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ *       message": '수정 완료',
+ *          "target":{
+ *          "isAnonymous": false,
+ *          "view": 0,
+ *          "like":[],
+ *          "isLike": false,
+ *          "files":["5e65db86b869b0322cbc1bda"],
+ *          "_id": 101,
+ *          "board": 10,
+ *          "title": "hello",
+ *          "content": "hhhhh",
+ *          "author": "admin",
+ *          "created_date": "2020-03-09T06:01:45.804Z",
+ *          "comments":[],
+ *          "__v": 1
+ *          }
+ *
+ * @apiError {Number} 403 권한 없음
+ *
+ * @apiError {json} 404 해당 게시판 없음
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404
+ *       {
+ *          message: no board id 10,
+ *       }
+ */
 router.patch(
     '/posts/:post_id',
     [
@@ -459,7 +499,14 @@ router.patch(
     })
 )
 
-//게시글 보기
+/**
+ * @api {get}} /simple/posts/:post_id 게시글 목록 보기
+ * @apiDescription 해당 게시판의 게시글 목록을 불러온다
+ * @apiName 게시글 목록 보기
+ * @apiGroup Board
+ *
+ * @apiParam {Number} post_id 게시판 아이디
+ */
 router.get(
     '/posts/:post_id',
     [param('post_id').isNumeric(), validateParams],
