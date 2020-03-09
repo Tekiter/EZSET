@@ -33,7 +33,7 @@ router.loginNotRequired = true
  */
 router.route('/login').post(
     [body('username').isString(), body('password').isString(), validateParams],
-    asyncRoute(async (req, res) => {
+    asyncRoute(async(req, res) => {
         try {
             const user = await User.findOne()
                 .where('username')
@@ -88,12 +88,11 @@ router.route('/register').post(
         body('email').isEmail(),
         validateParams,
     ],
-    asyncRoute(async (req, res) => {
+    asyncRoute(async(req, res) => {
         let idreg = /^[a-z0-9]{6,12}$/
         if (!idreg.test(req.body.username)) {
             res.status(400).json({
-                message:
-                    '아이디는 6~12자의 영문 소문자, 숫자만 사용 가능합니다.',
+                message: '아이디는 6~12자의 영문 소문자, 숫자만 사용 가능합니다.',
             })
             return
         }
@@ -101,8 +100,7 @@ router.route('/register').post(
         let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,16}$/
         if (!pwreg.test(req.body.password)) {
             res.status(400).json({
-                message:
-                    '비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요',
+                message: '비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요',
             })
             return
         }
@@ -165,7 +163,7 @@ router.route('/register').post(
  */
 router.route('/register/doublecheck/username').post(
     [body('username').isString(), validateParams],
-    asyncRoute(async (req, res) => {
+    asyncRoute(async(req, res) => {
         try {
             const exits = await User.count()
                 .where('username')
@@ -208,7 +206,7 @@ router.route('/register/doublecheck/username').post(
  */
 router.route('/edittoken/issue').post(
     [body('username').isString(), body('password').isString(), validateParams],
-    asyncRoute(async (req, res) => {
+    asyncRoute(async(req, res) => {
         try {
             const user = await User.findOne()
                 .where('username')
@@ -242,7 +240,7 @@ router.route('/edittoken/issue').post(
  */
 router.route('/edittoken/check').post(
     [body('edittoken').isString(), validateParams],
-    asyncRoute(async (req, res) => {
+    asyncRoute(async(req, res) => {
         try {
             const decoded = await auth.checkToken(req.body.edittoken)
             if (
