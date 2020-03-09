@@ -170,12 +170,45 @@ router.get(
 
 /**
  * @api {post} /simple/boards/:board_id 게시글 생성
- * @apiDescription 게시글을 작성한다
+ * @apiDescription 게시글을 첨부파일과 같이 작성한다
  * @apiName 게시글 생성
  * @apiGroup Board
  * @apiPermission can.create
+ *
  * @apiParam {Number} board_id 게시판 아이디
- 
+ * @apiParam {String} title 게시글 제목
+ * @apiParam {String} content 게시글 내용
+ * @apiParam {String} files 게시글 첨부파일
+ *
+ * @apiSuccess {json} 201 게시글 작성
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 201 OK
+ *       {
+ *           "isAnonymous": false,
+ *           "view": 0,
+ *           "like":[],
+ *           "isLike": false,
+ *           "files":["5e65db86b869b0322cbc1bda"],
+ *           "board": 10,
+ *           "title": "hello",
+ *           "content": "hhhhh",
+ *           "author": "admin",
+ *           "created_date": "2020-03-09T06:01:45.804Z",
+ *           "comments":[],
+ *           "_id": 101,
+ *           "__v": 1
+ *       }
+ * @apiError {Number} 403 권한 없음
+ *
+ * @apiError {json} 404 해당 게시판 없음
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404
+ *       {
+ *          message: no board id 10,
+ *       }
+ *
+ * @apiError {Number} 400 첨부파일 오류
+ * @apiErrorExample {String} '올바르지 않은 첨부파일입니다.'
  */
 router.post(
     '/boards/:board_id',
@@ -246,7 +279,47 @@ router.post(
     })
 )
 
-//게시글 삭제
+/**
+ * @api {delete} /simple/posts/:post_id 게시글 삭제
+ * @apiDescription 게시글을 삭제한다
+ * @apiName 게시글 삭제
+ * @apiGroup Board
+ * @apiPermission can.delete
+ *
+ * @apiParam {Number} board_id 게시판 아이디
+ *
+ * @apiSuccess {json} 200 게시글 삭제
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ *       message": "post deleted",
+ *          "target":{
+ *          "isAnonymous": false,
+ *          "view": 0,
+ *          "like":[],
+ *          "isLike": false,
+ *          "files":["5e65db86b869b0322cbc1bda"],
+ *          "_id": 101,
+ *          "board": 10,
+ *          "title": "hello",
+ *          "content": "hhhhh",
+ *          "author": "admin",
+ *          "created_date": "2020-03-09T06:01:45.804Z",
+ *          "comments":[],
+ *          "__v": 1
+ *          }
+ *
+ * @apiError {Number} 403 권한 없음
+ *
+ * @apiError {json} 404 해당 게시판 없음
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404
+ *       {
+ *          message: no board id 10,
+ *       }
+ *
+ * @apiError {Number} 500 삭제 오류
+ * @apiErrorExample {String} 'database error'
+ */
 router.delete(
     '/posts/:post_id',
     [param('post_id').isNumeric(), validateParams],
