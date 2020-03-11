@@ -13,7 +13,7 @@ var moment = require('moment')
 router.post(
     '/absenceBook',
     [
-        perm('absence').can('update'),
+        perm('absence').canOwn('create'),
         body('dayList').isArray(),
         body('Reason').isString(),
         validateParams,
