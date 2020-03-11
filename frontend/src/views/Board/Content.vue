@@ -202,9 +202,10 @@
                                                 }}<span class="ml-3">{{
                                                     comment.created_date
                                                 }}</span></v-list-item-title
-                                            ><span class="mt-2 subtitle-1">
-                                                {{ comment.content }}</span
-                                            ></v-list-item-content
+                                            >
+                                            <div class="mt-2 subtitle-1">
+                                                {{ comment.content }}
+                                            </div></v-list-item-content
                                         >
                                         <v-btn
                                             icon
