@@ -86,6 +86,24 @@
                     </v-card-actions>
                 </v-card>
             </v-dialog>
+            <v-dialog v-model="titleLengthAlert" max-width="290">
+                <v-card>
+                    <v-card-title class="headline"
+                        >제목은 60자를 넘을 수 없습니다.</v-card-title
+                    >
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+
+                        <v-btn
+                            color="green darken-1"
+                            text
+                            @click="titleLengthAlert = false"
+                        >
+                            확인
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
             <v-dialog v-model="backAlert" max-width="290">
                 <v-card>
                     <v-card-title class="title"
@@ -132,6 +150,7 @@ export default {
             title: '',
             titleAlert: false,
             content: '',
+            titleLengthAlert: false,
             contentAlert: false,
             author: '',
             created_date: '',
@@ -188,6 +207,10 @@ export default {
             }
             if (!this.getMarkdown()) {
                 this.contentAlert = true
+                return
+            }
+            if (this.title.length > 60) {
+                this.titleLengthAlert = true
                 return
             }
             this.certification = true

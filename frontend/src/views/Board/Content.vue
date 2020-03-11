@@ -240,9 +240,10 @@
                                                 }}<span class="ml-3">{{
                                                     comment.created_date
                                                 }}</span></v-list-item-title
-                                            ><span class="mt-2 subtitle-1">
-                                                {{ comment.content }}</span
-                                            ></v-list-item-content
+                                            >
+                                            <div class="mt-2 subtitle-1">
+                                                {{ comment.content }}
+                                            </div></v-list-item-content
                                         >
                                         <v-btn
                                             icon
@@ -323,7 +324,8 @@
                                         <small
                                             class="red--text mr-2"
                                             v-if="writeComment.lengthError"
-                                            >댓글 내용이 없습니다.</small
+                                            >댓글 내용은 적어도 한글자에서 300자
+                                            이내여야 합니다.</small
                                         >
                                         <v-btn
                                             outlined
@@ -444,7 +446,10 @@ export default {
 
         async createComment() {
             this.writeComment.isLoading = true
-            if (this.writeComment.content.length == 0) {
+            if (
+                this.writeComment.content.length == 0 ||
+                this.writeComment.content.length > 300
+            ) {
                 this.writeComment.lengthError = true
                 this.writeComment.isLoading = false
                 return
