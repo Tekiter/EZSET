@@ -117,7 +117,6 @@ export default {
             }
         },
         async submitClick() {
-            console.log(this.contentLength())
             if (this.contentLength() == true) {
                 return
             }

@@ -261,12 +261,13 @@ export default {
                     const res = await axios.post('file/upload', form, {
                         headers: { 'Content-Type': 'multipart/form-data' },
                         // 진행상황 반영
-                        onUploadProgress(e) {
+                        onUploadProgress: e => {
                             this.uploadFile.currentProgress += Math.floor(
                                 (e.loaded * 100) / e.total
                             )
                         },
                     })
+                    this.uploadFile.currentProgress = 0
                     this.uploadFile.fileProgress += 1
                     fileIds.push(res.data.id)
                 }

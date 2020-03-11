@@ -1,72 +1,68 @@
 <template>
-    <div class="">
+    <div class="ma-3 pa-3 ">
         <!-- date picker -->
-        <div
-            class="ma-3 pa-3 fill-width fill-height"
-            v-if="this.$perm('attendance').can('update')"
+
+        <v-card
+            class="ma-3 pa-3 fill-width font-weight-light"
+            flat
+            minHeight="95%"
+            color="primary lighten-1"
+            :dark="isDarkColor('primary')"
         >
-            <v-card tile minHeight="95%">
-                <v-container>
-                    <v-row>
-                        <v-col cols="12" lg="5">
-                            <v-menu
-                                v-model="startDayPicker"
-                                :close-on-content-click="false"
-                                max-width="290"
-                            >
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        :value="computedDateStart"
-                                        clearable
-                                        label="Start date"
-                                        readonly
-                                        v-on="on"
-                                        @click:clear="date = null"
-                                    ></v-text-field>
-                                </template>
-                                <v-date-picker
-                                    v-model="Sdate"
-                                    @change="
-                                        ;(startDayPicker = false), fetchAll()
-                                    "
-                                    locale="ko"
-                                ></v-date-picker>
-                            </v-menu>
-                        </v-col>
-                        <v-col cols="12" lg="2" class="text-center">
-                            <v-icon>
-                                mdi-arrow-right-circle
-                            </v-icon>
-                        </v-col>
-                        <v-col cols="12" lg="5">
-                            <v-menu
-                                v-model="endDayPicker"
-                                :close-on-content-click="false"
-                                max-width="290"
-                            >
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        :value="computedDateEnd"
-                                        clearable
-                                        label="End date"
-                                        readonly
-                                        v-on="on"
-                                        @click:clear="date = null"
-                                    ></v-text-field>
-                                </template>
-                                <v-date-picker
-                                    v-model="Edate"
-                                    @change="
-                                        ;(endDayPicker = false), fetchAll()
-                                    "
-                                    locale="ko"
-                                ></v-date-picker>
-                            </v-menu>
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-card>
-        </div>
+            <v-row align="center">
+                <v-col cols="12" lg="5">
+                    <v-menu
+                        v-model="startDayPicker"
+                        :close-on-content-click="false"
+                        max-width="290"
+                    >
+                        <template v-slot:activator="{ on }">
+                            <v-text-field
+                                :value="computedDateStart"
+                                clearable
+                                label="Start date"
+                                readonly
+                                v-on="on"
+                                @click:clear="date = null"
+                            ></v-text-field>
+                        </template>
+                        <v-date-picker
+                            v-model="Sdate"
+                            @change=";(startDayPicker = false), fetchAll()"
+                            locale="ko"
+                        ></v-date-picker>
+                    </v-menu>
+                </v-col>
+                <v-col cols="12" lg="2" class="text-center">
+                    <v-icon x-large>
+                        mdi-arrow-right-circle
+                    </v-icon>
+                </v-col>
+                <v-col cols="12" lg="5">
+                    <v-menu
+                        v-model="endDayPicker"
+                        :close-on-content-click="false"
+                        max-width="290"
+                    >
+                        <template v-slot:activator="{ on }">
+                            <v-text-field
+                                :value="computedDateEnd"
+                                clearable
+                                label="End date"
+                                readonly
+                                v-on="on"
+                                @click:clear="date = null"
+                            ></v-text-field>
+                        </template>
+                        <v-date-picker
+                            v-model="Edate"
+                            @change=";(endDayPicker = false), fetchAll()"
+                            locale="ko"
+                        ></v-date-picker>
+                    </v-menu>
+                </v-col>
+            </v-row>
+        </v-card>
 
         <!-- 출석 정보 카드 출력 -->
         <v-data-iterator
@@ -111,13 +107,13 @@
                         md="4"
                     >
                         <v-card outlined>
-                            <v-card-title>
-                                <p class="subheader">
+                            <div class="d-flex align-center mx-4 my-6">
+                                <span class="headline">
                                     {{ user.realname }}
-                                </p>
-                                <p class="caption ml-2">
+                                </span>
+                                <span class="subtitle-1 ml-2">
                                     {{ user.username }}
-                                </p>
+                                </span>
                                 <v-spacer></v-spacer>
                                 <v-btn
                                     v-if="$perm('attendance').can('update')"
@@ -127,7 +123,7 @@
                                 >
                                     <v-icon>mdi-plus</v-icon>
                                 </v-btn>
-                            </v-card-title>
+                            </div>
                             <v-divider></v-divider>
                             <v-card-text>
                                 <div class="d-flex">
@@ -200,7 +196,7 @@
             persistent
             max-width="300px"
         >
-            <v-card :loading="attendanceUserDialog.isLoading">
+            <v-card>
                 <v-card-title>
                     <span class="headline">{{
                         attendanceUserDialog.user.realname
@@ -209,10 +205,15 @@
                         attendanceUserDialog.user.username
                     }}</v-card-subtitle>
                 </v-card-title>
-
                 <v-card-text>
                     <v-divider></v-divider>
-                    <v-list>
+                    <v-skeleton-loader
+                        v-if="attendanceUserDialog.isLoading"
+                        class="mx-auto"
+                        max-width="300"
+                        type="list-item-two-line"
+                    ></v-skeleton-loader>
+                    <v-list v-if="attendanceUserDialog.isExist">
                         <v-list-item
                             v-for="recode in attendanceUserDialog.records"
                             :key="recode.date"
@@ -284,6 +285,9 @@
                         <v-divider></v-divider>
                     </v-list>
                 </v-card-text>
+                <v-card-text v-if="!attendanceUserDialog.isExist">
+                    정보가 없습니다.
+                </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn @click.native="closeattendanceUserDialog()" text
@@ -323,6 +327,7 @@ export default {
                 search: '',
                 records: [],
                 isLoading: false,
+                isExist: true,
                 errorMessage: '',
             },
             //date-picker
@@ -418,25 +423,30 @@ export default {
             this.attendanceUserDialog.isLoading = true
             this.attendanceUserDialog.show = true
             this.attendanceUserDialog.user = user
-            const res = await axios.post('attendance/attendanceUser', {
-                name: user.username,
-            })
             const tmp = []
-            for (let i in res.data.status) {
-                if (
-                    parseInt(res.data.status[i].date) >=
-                        parseInt(moment(this.Sdate).format('YYYYMMDD')) &&
-                    parseInt(res.data.status[i].date) <=
-                        parseInt(moment(this.Edate).format('YYYYMMDD'))
-                ) {
-                    tmp.push(res.data.status[i])
+            if (user.v1 == 0 && user.v2 == 0 && user.v3 == 0 && user.v4 == 0) {
+                this.attendanceUserDialog.isExist = false
+            } else {
+                const res = await axios.post('attendance/attendanceUser', {
+                    name: user.username,
+                })
+                for (let i in res.data.status) {
+                    if (
+                        parseInt(res.data.status[i].date) >=
+                            parseInt(moment(this.Sdate).format('YYYYMMDD')) &&
+                        parseInt(res.data.status[i].date) <=
+                            parseInt(moment(this.Edate).format('YYYYMMDD'))
+                    ) {
+                        tmp.push(res.data.status[i])
+                    }
                 }
+                this.attendanceUserDialog.isExist = true
             }
-
             this.attendanceUserDialog.records = tmp
             this.attendanceUserDialog.isLoading = false
         },
         closeattendanceUserDialog() {
+            this.attendanceUserDialog.isExist = true
             this.attendanceUserDialog.records = []
             this.attendanceUserDialog.errorMessage = ''
             this.attendanceUserDialog.show = false

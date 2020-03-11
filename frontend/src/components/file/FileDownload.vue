@@ -67,13 +67,20 @@ export default {
     },
     methods: {
         async onDownload(file) {
-            const res = await axios({
-                url: `file/download/${file.id}`,
-                method: 'GET',
-                responseType: 'blob',
-            })
-            const blob = new Blob([res.data])
-            download(blob, file.filename)
+            try {
+                const res = await axios({
+                    url: `file/download/${file.id}`,
+                    method: 'GET',
+                    responseType: 'blob',
+                })
+                const blob = new Blob([res.data])
+                download(blob, file.filename)
+            } catch (error) {
+                await this.$action.showAlertDialog(
+                    '파일 다운로드',
+                    '파일을 다운로드 할 수 없습니다.'
+                )
+            }
         },
         iconConvert(filename) {
             const ext = filename

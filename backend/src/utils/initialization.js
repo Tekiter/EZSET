@@ -1,4 +1,3 @@
-import random from 'random-number-csprng'
 import { configAvailable, setConfig, setDefaultConfigs } from '../utils/config'
 import User from '../models/User'
 import role from '../utils/role'
@@ -13,16 +12,18 @@ const initialization = {
             await exists.remove()
         }
 
-        const rndNum = await random(11111, 99999)
         const admin = new User({
             username: 'admin',
-            password: 'admin_' + rndNum,
+            password: 'admin',
+            info: {
+                realname: '관리자',
+            },
             roles: ['admin'],
         })
         const result = await admin.save()
         await setConfig('superAdmin', result.username)
 
-        console.log(`Superadmin created (admin/admin_${rndNum})`) // eslint-disable-line no-console
+        console.log(`Superadmin created (admin/admin)`) // eslint-disable-line no-console
     },
     async initialize() {
         const isFirstStart = !(await configAvailable())
