@@ -457,7 +457,13 @@ export default {
         },
         //일정등록
         async reservation() {
-            try {
+            if (this.schedule_title == '') {
+                this.openSnackbar('제목을 확인해주세요!', 'error')
+            } else if (this.schedule_contents == '') {
+                this.openSnackbar('내용을 확인해주세요!', 'error')
+            } else if (this.dayList_fab == '') {
+                this.openSnackbar('날짜를 확인해주세요!', 'error')
+            } else {
                 await axios.post('schedule/write', {
                     dayList: this.dayList_fab,
                     title: this.schedule_title,
@@ -470,8 +476,6 @@ export default {
                 this.scheduleDialog.show = false
                 await this.init()
                 this.openSnackbar('등록되었습니다!', 'success')
-            } catch (err) {
-                //
             }
         },
         //일정 삭제
