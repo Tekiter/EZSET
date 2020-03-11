@@ -12,13 +12,93 @@
                 </v-tabs>
             </v-col>
 
-            <v-col
-                v-show="!isMobileMode || curTab == 0"
-                class="fill-height"
-                cols="12"
-                md="3"
-            >
-                <vue-resizable>
+            <v-col v-if="!isMobileMode" class="fill-height d-flex" cols="12">
+                <div class="flex-shrink-1">
+                    <vue-resizable
+                        :active="['r']"
+                        style="height:100%"
+                        width="500"
+                    >
+                        <v-card tile outlined class="fill-height">
+                            <v-sheet class="pa-4 primary lighten-2" tile>
+                                <v-text-field
+                                    v-model="groupSearch"
+                                    label="검색"
+                                    :dark="isDarkColor('primary')"
+                                    solo-inverted
+                                    hide-details
+                                    clearable
+                                    flat
+                                    prepend-inner-icon="mdi-magnify"
+                                    clear-icon="mdi-close-circle-outline"
+                                >
+                                </v-text-field>
+                            </v-sheet>
+
+                            <v-list v-if="checkManagePerm()">
+                                <v-list-item link @click="showPlusGroup()">
+                                    <v-list-item-icon>
+                                        <v-icon>mdi-plus</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-title class="grey--text"
+                                        >새 그룹 추가</v-list-item-title
+                                    >
+                                </v-list-item>
+                                <v-list-item link @click="showEditGroup()">
+                                    <v-list-item-icon>
+                                        <v-icon>mdi-map-search</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-title class="grey--text"
+                                        >그룹 편집</v-list-item-title
+                                    >
+                                </v-list-item>
+                            </v-list>
+                            <group-tree
+                                v-model="selectedGroups"
+                                :search="groupSearch"
+                                :items="groups"
+                                @change="groupChanged()"
+                            ></group-tree>
+                        </v-card>
+                    </vue-resizable>
+                </div>
+                <div>
+                    <router-view v-show="overlayMode == 'none'"></router-view>
+                    <v-container
+                        v-show="
+                            overlayMode == 'none' &&
+                                selectedGroups[0] &&
+                                !selectedGroups[0].isfolder
+                        "
+                        class="text-center"
+                    >
+                        빈 그룹입니다.
+                    </v-container>
+                    <v-fade-transition hide-on-leave>
+                        <create-group
+                            v-if="overlayMode == 'add'"
+                            :groups="groups"
+                            @close="closePlusGroup"
+                            @change="fetchNewGroups"
+                        ></create-group>
+                    </v-fade-transition>
+                    <v-fade-transition hide-on-leave>
+                        <edit-group
+                            v-if="overlayMode == 'edit'"
+                            :groups="groups"
+                            @close="closeEditGroup"
+                            @change="fetchGroups"
+                        ></edit-group>
+                    </v-fade-transition>
+                </div>
+            </v-col>
+            <template v-else>
+                <v-col
+                    v-show="!isMobileMode || curTab == 0"
+                    class="fill-height"
+                    cols="12"
+                    md="3"
+                >
                     <v-card tile outlined class="fill-height">
                         <v-sheet class="pa-4 primary lighten-2" tile>
                             <v-text-field
@@ -60,44 +140,47 @@
                             @change="groupChanged()"
                         ></group-tree>
                     </v-card>
-                </vue-resizable>
-                <v-snackbar v-model="newGroupSnackbar">
-                    그룹이 생성되었습니다
-                    <v-btn color="pink" text @click="newGroupSnackbar = false">
-                        Close
-                    </v-btn>
-                </v-snackbar>
-            </v-col>
-            <v-col v-show="!isMobileMode || curTab == 1" class="fill-height">
-                <router-view v-show="overlayMode == 'none'"></router-view>
-                <v-container
-                    v-show="
-                        overlayMode == 'none' &&
-                            selectedGroups[0] &&
-                            !selectedGroups[0].isfolder
-                    "
-                    class="text-center"
+                </v-col>
+                <v-col
+                    v-show="!isMobileMode || curTab == 1"
+                    class="fill-height"
                 >
-                    빈 그룹입니다.
-                </v-container>
-                <v-fade-transition hide-on-leave>
-                    <create-group
-                        v-if="overlayMode == 'add'"
-                        :groups="groups"
-                        @close="closePlusGroup"
-                        @change="fetchNewGroups"
-                    ></create-group>
-                </v-fade-transition>
-                <v-fade-transition hide-on-leave>
-                    <edit-group
-                        v-if="overlayMode == 'edit'"
-                        :groups="groups"
-                        @close="closeEditGroup"
-                        @change="fetchGroups"
-                    ></edit-group>
-                </v-fade-transition>
-            </v-col>
+                    <router-view v-show="overlayMode == 'none'"></router-view>
+                    <v-container
+                        v-show="
+                            overlayMode == 'none' &&
+                                selectedGroups[0] &&
+                                !selectedGroups[0].isfolder
+                        "
+                        class="text-center"
+                    >
+                        빈 그룹입니다.
+                    </v-container>
+                    <v-fade-transition hide-on-leave>
+                        <create-group
+                            v-if="overlayMode == 'add'"
+                            :groups="groups"
+                            @close="closePlusGroup"
+                            @change="fetchNewGroups"
+                        ></create-group>
+                    </v-fade-transition>
+                    <v-fade-transition hide-on-leave>
+                        <edit-group
+                            v-if="overlayMode == 'edit'"
+                            :groups="groups"
+                            @close="closeEditGroup"
+                            @change="fetchGroups"
+                        ></edit-group>
+                    </v-fade-transition>
+                </v-col>
+            </template>
         </v-row>
+        <v-snackbar v-model="newGroupSnackbar">
+            그룹이 생성되었습니다
+            <v-btn color="pink" text @click="newGroupSnackbar = false">
+                Close
+            </v-btn>
+        </v-snackbar>
     </div>
 </template>
 
