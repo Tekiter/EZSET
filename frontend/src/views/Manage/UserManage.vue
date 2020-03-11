@@ -116,12 +116,28 @@
                         <v-list-item two-line>
                             <v-list-item-content>
                                 <v-list-item-title>회원탈퇴</v-list-item-title>
-                                <v-list-item-subtitle>
+                                <div
+                                    class="subtitle-2 grey--text text--darken-1"
+                                >
                                     유저가 작성했던 게시글 등은 삭제되지
                                     않습니다.
-                                </v-list-item-subtitle>
+                                </div>
+                                <div v-if="isMobileMode">
+                                    <v-btn
+                                        @click="
+                                            deleteUser(editDialog.user.username)
+                                        "
+                                        :disabled="
+                                            editDialog.user.username === 'admin'
+                                        "
+                                        color="error"
+                                        depressed
+                                    >
+                                        회원탈퇴
+                                    </v-btn>
+                                </div>
                             </v-list-item-content>
-                            <v-list-item-action>
+                            <v-list-item-action v-if="!isMobileMode">
                                 <v-btn
                                     @click="
                                         deleteUser(editDialog.user.username)
@@ -131,22 +147,44 @@
                                     "
                                     color="error"
                                     depressed
-                                    >회원탈퇴</v-btn
                                 >
+                                    회원탈퇴
+                                </v-btn>
                             </v-list-item-action>
                         </v-list-item>
                         <v-divider />
                         <v-list-item two-line>
                             <v-list-item-content>
-                                <v-list-item-title
-                                    >비밀번호 초기화</v-list-item-title
+                                <v-list-item-title>
+                                    비밀번호 초기화
+                                </v-list-item-title>
+                                <div
+                                    class="subtitle-2 grey--text text--darken-1"
                                 >
-                                <v-list-item-subtitle>
                                     비밀번호를 초기화하고, 임시 비밀번호를
                                     발급합니다.
-                                </v-list-item-subtitle>
+                                </div>
+                                <div v-if="isMobileMode">
+                                    <v-btn
+                                        @click="
+                                            resetPassword(
+                                                editDialog.user.username
+                                            )
+                                        "
+                                        :disabled="
+                                            editDialog.user.username === 'admin'
+                                        "
+                                        color="info"
+                                        depressed
+                                    >
+                                        비밀번호 초기화
+                                    </v-btn>
+                                </div>
                             </v-list-item-content>
-                            <v-list-item-action>
+                            <v-list-item-action
+                                style="display: block;"
+                                v-if="!isMobileMode"
+                            >
                                 <v-btn
                                     @click="
                                         resetPassword(editDialog.user.username)
@@ -156,8 +194,9 @@
                                     "
                                     color="info"
                                     depressed
-                                    >비밀번호 초기화</v-btn
                                 >
+                                    비밀번호 초기화
+                                </v-btn>
                             </v-list-item-action>
                         </v-list-item>
                         <v-divider />
@@ -290,6 +329,9 @@ export default {
         },
         assignableRoles() {
             return this.rawRoles.filter(role => role.tag != 'default')
+        },
+        isMobileMode() {
+            return !this.$vuetify.breakpoint.mdAndUp
         },
     },
     methods: {
