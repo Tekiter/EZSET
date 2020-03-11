@@ -72,6 +72,7 @@
         <v-dialog v-model="createBoardDialog.show" max-width="300">
             <v-card :loading="createBoardDialog.isLoading">
                 <v-card-title>게시판 생성</v-card-title>
+
                 <v-card-text>
                     <v-text-field
                         v-model="createBoardDialog.title"
@@ -85,8 +86,10 @@
                         class="ml-3"
                         v-model="isAnonymous"
                         label="익명게시판"
-                    ></v-switch>
-                </v-container>
+                    ></v-switch> </v-container
+                ><small class="red--text ml-3" v-if="createBoardDialog.lenError"
+                    >게시판 이름이 없습니다.</small
+                >
                 <v-card-actions>
                     <v-spacer></v-spacer>
 
@@ -101,7 +104,10 @@
                     <v-btn
                         color="green darken-1"
                         text
-                        @click="createBoardDialog.show = false"
+                        @click="
+                            ;(createBoardDialog.lenError = false),
+                                (createBoardDialog.show = false)
+                        "
                     >
                         취소
                     </v-btn>
@@ -135,7 +141,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="modifyDialog" persistent max-width="290">
+        <v-dialog v-model="modifyDialog" persistent max-width="300">
             <v-card>
                 <v-card-title class="headline">게시판 이름 수정</v-card-title>
                 <v-card-text>
@@ -145,20 +151,26 @@
                         hide-details
                     ></v-text-field>
                 </v-card-text>
+
                 <v-card-actions>
+                    <small class="red--text ml-3" v-if="modifyDialogError"
+                        >게시판 이름이 없습니다.</small
+                    >
                     <v-spacer></v-spacer>
                     <v-btn
                         v-if="modifyTitle"
                         color="green darken-1"
                         text
-                        @click="successPostTitle()"
+                        @click="patchPostTitle()"
                         >수정</v-btn
                     >
                     <v-btn v-else color="black darken-1" text>수정</v-btn>
                     <v-btn
                         color="red darken-1"
                         text
-                        @click="modifyDialog = false"
+                        @click="
+                            ;(modifyDialog = false), (modifyDialogError = false)
+                        "
                         >취소</v-btn
                     >
                 </v-card-actions>
@@ -178,6 +190,7 @@ export default {
         return {
             modifyBoardCurId: '',
             modifyDialog: false,
+            modifyDialogError: false,
             modifyTitle: '',
             curTab: 0,
             boards: [],
@@ -186,6 +199,7 @@ export default {
                 title: '',
                 isLoading: false,
                 error: '',
+                lenError: false,
             },
             deleteBoardDialog: {
                 show: false,
@@ -203,11 +217,16 @@ export default {
         },
     },
     methods: {
-        async successPostTitle() {
+        async patchPostTitle() {
+            if (this.modifyTitle.length == 0) {
+                this.modifyDialogError = true
+                return
+            }
             axios.patch('simple/boards/' + this.modifyBoardCurId, {
                 title: this.modifyTitle,
             })
             this.modifyDialog = false
+            this.modifyDialogError = false
             this.fetchBoards()
             await this.$store.dispatch('board/fetchBoards')
             await this.$refs.roleEdit.resetChanges()
@@ -240,12 +259,6 @@ export default {
             }
             await this.$store.dispatch('board/fetchBoards')
         },
-        delBoard(id) {
-            axios.delete('/simple/boards/' + id)
-            axios.get('/simple/boards').then(res => {
-                this.boards = res.data
-            })
-        },
         async fetchBoards() {
             this.isLoading = true
             const res = await axios.get('simple/boards')
@@ -257,7 +270,13 @@ export default {
             this.createBoardDialog.show = true
         },
         async applyCreateBoardDialog() {
+            console.log(this.createBoardDialog.title)
             this.createBoardDialog.isLoading = true
+            if (this.createBoardDialog.title.length == 0) {
+                this.createBoardDialog.lenError = true
+                this.createBoardDialog.isLoading = false
+                return
+            }
             try {
                 await axios.post('simple/boards', {
                     title: this.createBoardDialog.title,
@@ -265,10 +284,12 @@ export default {
                 })
                 this.createBoardDialog.isLoading = false
                 this.createBoardDialog.show = false
+                this.createBoardDialog.lenError = false
                 await this.fetchBoards()
             } catch (error) {
                 //
                 this.createBoardDialog.error = '게시판 생성에 실패했습니다.'
+                this.createBoardDialog.isLoading = false
             }
             this.isAnonymous = false
             await this.$store.dispatch('board/fetchBoards')
