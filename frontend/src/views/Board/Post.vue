@@ -68,7 +68,10 @@
                             </v-list-item-title>
                             {{ post.author
                             }}<v-divider class="mx-4" vertical></v-divider>
-                            {{ post.created_date
+                            {{
+                                $moment(new Date(post.created_date)).format(
+                                    'YY/MM/DD HH:mm'
+                                )
                             }}<v-divider class="mx-4" vertical></v-divider> 조회
                             {{ post.view }}
                         </v-list-item-content>

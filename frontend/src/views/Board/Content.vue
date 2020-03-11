@@ -41,31 +41,69 @@
                         </v-subheader> -->
                         <v-card-subtitle class="mt-0">
                             <v-row no-gutters>
-                                <span v-if="post.isAnonymous == false"
-                                    ><span class="font-weight-black"
-                                        >작성자</span
+                                <div>
+                                    <span v-if="post.isAnonymous == false"
+                                        ><span class="font-weight-black"
+                                            >작성자</span
+                                        >
+                                        {{ post.author }}</span
                                     >
-                                    {{ post.author }}</span
-                                >
-                                <span v-else>익명</span>
-                                <v-spacer></v-spacer>
-                                <span
-                                    ><span class="font-weight-black"
-                                        >작성일</span
+                                    <span v-else>익명</span>
+                                    <v-spacer
+                                        v-if="$vuetify.breakpoint.mdAndUp"
+                                    ></v-spacer>
+                                    <v-divider
+                                        v-if="$vuetify.breakpoint.xsOnly"
+                                        class="mx-4"
+                                        vertical
+                                    ></v-divider>
+                                    <span v-if="$vuetify.breakpoint.xsOnly"
+                                        ><span class="font-weight-black"
+                                            >조회수</span
+                                        >
+                                        {{ post.view }}</span
                                     >
-                                    {{ post.created_date }}</span
-                                ><v-divider class="mx-4" vertical></v-divider>
-                                <span
-                                    ><span class="font-weight-black"
-                                        >조회수</span
+                                </div>
+                                <v-spacer insert></v-spacer>
+                                <div>
+                                    <span v-if="$vuetify.breakpoint.mdAndUp"
+                                        ><span class="font-weight-black"
+                                            >작성일</span
+                                        >
+                                        {{ post.created_date }}</span
                                     >
-                                    {{ post.view }}</span
-                                ><v-divider class="mx-4" vertical></v-divider>
+                                    <span v-else
+                                        ><span class="font-weight-black"
+                                            >작성일</span
+                                        >
+                                        {{
+                                            $moment(
+                                                new Date(post.created_date)
+                                            ).format('YY/MM/DD HH:mm')
+                                        }}</span
+                                    >
+                                    <v-divider
+                                        class="mx-4"
+                                        vertical
+                                    ></v-divider>
+                                    <span v-if="!$vuetify.breakpoint.xsOnly"
+                                        ><span class="font-weight-black"
+                                            >조회수</span
+                                        >
+                                        {{ post.view }}</span
+                                    ><v-divider
+                                        v-if="!$vuetify.breakpoint.xsOnly"
+                                        class="mx-4"
+                                        vertical
+                                    ></v-divider>
 
-                                <span
-                                    ><span class="font-weight-black">추천</span>
-                                    {{ post.like }}</span
-                                >
+                                    <span
+                                        ><span class="font-weight-black"
+                                            >추천</span
+                                        >
+                                        {{ post.like }}</span
+                                    >
+                                </div>
                             </v-row>
                         </v-card-subtitle>
                         <v-divider></v-divider>
@@ -334,6 +372,7 @@ export default {
                 view: '',
                 like: '',
                 isLike: '',
+                post_date: '',
             },
             writeComment: {
                 content: '',
