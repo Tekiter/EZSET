@@ -477,7 +477,11 @@ router.post(
             err.status = 403
             throw err
         }
-
+        if (req.body.content.length > 300) {
+            const err = new Error('댓글은 300자를 넘을 수 없습니다.')
+            err.status = 500
+            return
+        }
         if (!post) {
             res.status(404).json({ message: 'no post id ' + postId })
             return
@@ -518,7 +522,11 @@ router.patch(
             err.status = 403
             throw err
         }
-
+        if (req.body.content.length > 300) {
+            const err = new Error('댓글은 300자를 넘을 수 없습니다.')
+            err.status = 500
+            return
+        }
         if (post.isAnonymous == false) {
             if (post.author != req.user.username) {
                 res.status(403).end()
