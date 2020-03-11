@@ -23,7 +23,7 @@
                                         <!-- 오늘 날짜로 이동하는 버튼 -->
                                         <v-btn
                                             outlined
-                                            class="mr-4"
+                                            v-if="!isMobileMode"
                                             color="grey darken-2"
                                             @click="setToday"
                                         >
@@ -59,108 +59,119 @@
                                         }}</v-toolbar-title>
                                         <v-spacer></v-spacer>
 
-                                        <form>
-                                            <v-dialog
-                                                v-model="absenceResDialog.show"
-                                                persistent
-                                                max-width="650"
-                                            >
-                                                <template
-                                                    v-slot:activator="{ on }"
+                                        <v-dialog
+                                            v-model="absenceResDialog.show"
+                                            persistent
+                                            max-width="650"
+                                        >
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn
+                                                    class="mr-1"
+                                                    color="primary"
+                                                    depressed
+                                                    :dark="
+                                                        isDarkColor('primary')
+                                                    "
+                                                    v-on="on"
+                                                    :small="
+                                                        $vuetify.breakpoint
+                                                            .smAndDown
+                                                    "
                                                 >
-                                                    <v-btn
-                                                        class="mr-1"
-                                                        color="primary"
-                                                        depressed
-                                                        :dark="
-                                                            isDarkColor(
-                                                                'primary'
-                                                            )
+                                                    <v-icon
+                                                        v-if="
+                                                            $vuetify.breakpoint
+                                                                .xsOnly
                                                         "
-                                                        v-on="on"
-                                                        >결석예약</v-btn
                                                     >
-                                                </template>
-                                                <v-card>
-                                                    <v-row no-gutters>
-                                                        <v-col cols="12" sm="6">
-                                                            <v-date-picker
-                                                                v-model="dates"
-                                                                multiple
+                                                        mdi-calendar-plus
+                                                    </v-icon>
+                                                    <span v-else>
+                                                        결석예약
+                                                    </span>
+                                                </v-btn>
+                                            </template>
+                                            <v-card>
+                                                <v-row no-gutters>
+                                                    <v-col cols="12" sm="6">
+                                                        <v-date-picker
+                                                            v-model="dates"
+                                                            multiple
+                                                            full-width
+                                                        ></v-date-picker>
+                                                    </v-col>
+                                                    <v-col cols="12" sm="6">
+                                                        <v-container>
+                                                            <v-menu
+                                                                ref="menu"
+                                                                v-model="menu"
+                                                                :close-on-content-click="
+                                                                    false
+                                                                "
+                                                                :return-value.sync="
+                                                                    dates
+                                                                "
+                                                                transition="scale-transition"
+                                                                offset-y
                                                                 full-width
-                                                            ></v-date-picker>
-                                                        </v-col>
-                                                        <v-col cols="12" sm="6">
-                                                            <v-container>
-                                                                <v-menu
-                                                                    ref="menu"
-                                                                    v-model="
-                                                                        menu
-                                                                    "
-                                                                    :close-on-content-click="
-                                                                        false
-                                                                    "
-                                                                    :return-value.sync="
-                                                                        dates
-                                                                    "
-                                                                    transition="scale-transition"
-                                                                    offset-y
-                                                                    full-width
-                                                                    min-width="290px"
+                                                                min-width="290px"
+                                                            >
+                                                                <template
+                                                                    v-slot:activator="{
+                                                                        //on,
+                                                                    }"
                                                                 >
-                                                                    <template
-                                                                        v-slot:activator="{
-                                                                            //on,
-                                                                        }"
-                                                                    >
-                                                                        <v-combobox
-                                                                            v-model="
-                                                                                dates
-                                                                            "
-                                                                            multiple
-                                                                            chips
-                                                                            small-chips
-                                                                            label="Multiple picker in menu"
-                                                                            prepend-icon="mdi-plus"
-                                                                            readonly
-                                                                        ></v-combobox>
-                                                                    </template>
-                                                                </v-menu>
-                                                                <v-text-field
-                                                                    label="결석사유"
-                                                                    outlined
-                                                                    v-model="
-                                                                        absence_reason
-                                                                    "
-                                                                ></v-text-field
-                                                            ></v-container>
-                                                            <v-card-actions>
-                                                                <v-spacer></v-spacer>
-                                                                <v-btn
-                                                                    color="green darken-1"
-                                                                    text
-                                                                    @click="
-                                                                        absenceResDialog.show = false
-                                                                    "
-                                                                    >취소</v-btn
-                                                                >
-                                                                <v-btn
-                                                                    color="green darken-1"
-                                                                    text
-                                                                    @click="
-                                                                        reservation
-                                                                    "
-                                                                    >확인</v-btn
-                                                                >
-                                                            </v-card-actions>
-                                                        </v-col>
-                                                    </v-row>
-                                                </v-card>
-                                            </v-dialog>
-                                        </form>
+                                                                    <v-combobox
+                                                                        v-model="
+                                                                            dates
+                                                                        "
+                                                                        multiple
+                                                                        chips
+                                                                        small-chips
+                                                                        label="Multiple picker in menu"
+                                                                        prepend-icon="mdi-plus"
+                                                                        readonly
+                                                                    ></v-combobox>
+                                                                </template>
+                                                            </v-menu>
+                                                            <v-text-field
+                                                                label="결석사유"
+                                                                outlined
+                                                                v-model="
+                                                                    absence_reason
+                                                                "
+                                                            ></v-text-field
+                                                        ></v-container>
+                                                        <v-card-actions>
+                                                            <v-spacer></v-spacer>
+                                                            <v-btn
+                                                                color="green darken-1"
+                                                                text
+                                                                @click="
+                                                                    absenceResDialog.show = false
+                                                                "
+                                                                >취소</v-btn
+                                                            >
+                                                            <v-btn
+                                                                color="green darken-1"
+                                                                text
+                                                                @click="
+                                                                    reservation
+                                                                "
+                                                                >확인</v-btn
+                                                            >
+                                                        </v-card-actions>
+                                                    </v-col>
+                                                </v-row>
+                                            </v-card>
+                                        </v-dialog>
 
                                         <!-- 월/주/4일/일별을 선택하게 하는 드롭다운 메뉴 -->
-                                        <v-menu bottom right>
+                                        <v-menu
+                                            bottom
+                                            right
+                                            v-if="!isMobileMode"
+                                        >
                                             <template v-slot:activator="{ on }">
                                                 <v-btn
                                                     outlined
@@ -434,6 +445,9 @@ export default {
             return this.dates.map(item => {
                 return moment(item).format('YYYY-MM-DD')
             })
+        },
+        isMobileMode() {
+            return this.$vuetify.breakpoint.smAndDown
         },
     },
     methods: {

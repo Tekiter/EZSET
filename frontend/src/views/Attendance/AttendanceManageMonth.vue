@@ -128,11 +128,16 @@
                             <v-card-text>
                                 <div class="d-flex">
                                     <div class="d-flex flex-wrap flex-grow-1">
-                                        <v-btn icon small>
-                                            <v-icon color="success"
-                                                >mdi-checkbox-blank-circle-outline</v-icon
-                                            >
-                                        </v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-icon
+                                                    color="success"
+                                                    v-on="on"
+                                                    >mdi-checkbox-blank-circle-outline</v-icon
+                                                >
+                                            </template>
+                                            <span>출석</span>
+                                        </v-tooltip>
                                     </div>
                                     <div
                                         class="d-flex flex-wrap flex-grow-1 headline"
@@ -140,11 +145,16 @@
                                         {{ user.v1 }}
                                     </div>
                                     <div class="d-flex flex-wrap flex-grow-1">
-                                        <v-btn icon small>
-                                            <v-icon color="warning"
-                                                >mdi-triangle-outline</v-icon
-                                            >
-                                        </v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-icon
+                                                    color="warning"
+                                                    v-on="on"
+                                                    >mdi-triangle-outline</v-icon
+                                                >
+                                            </template>
+                                            <span>지각</span>
+                                        </v-tooltip>
                                     </div>
                                     <div
                                         class="d-flex flex-wrap flex-grow-1 headline"
@@ -152,11 +162,14 @@
                                         {{ user.v2 }}
                                     </div>
                                     <div class="d-flex flex-wrap flex-grow-1">
-                                        <v-btn icon small>
-                                            <v-icon color="error"
-                                                >mdi-close</v-icon
-                                            >
-                                        </v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-icon color="error" v-on="on"
+                                                    >mdi-close</v-icon
+                                                >
+                                            </template>
+                                            <span>결석</span>
+                                        </v-tooltip>
                                     </div>
                                     <div
                                         class="d-flex flex-wrap flex-grow-1 headline"
@@ -164,11 +177,16 @@
                                         {{ user.v3 }}
                                     </div>
                                     <div class="d-flex flex-wrap flex-grow-1">
-                                        <v-btn icon small>
-                                            <v-icon color="success"
-                                                >mdi-close-circle-outline</v-icon
-                                            >
-                                        </v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-icon
+                                                    color="success"
+                                                    v-on="on"
+                                                    >mdi-close-circle-outline</v-icon
+                                                >
+                                            </template>
+                                            <span>공결</span>
+                                        </v-tooltip>
                                     </div>
                                     <div
                                         class="d-flex flex-wrap flex-grow-1 headline"
