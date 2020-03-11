@@ -18,7 +18,7 @@
                                     <!-- 오늘 날짜로 이동하는 버튼 -->
                                     <v-btn
                                         outlined
-                                        class="mr-4"
+                                        v-if="!isMobileMode"
                                         color="grey darken-2"
                                         @click="setToday"
                                     >
@@ -50,88 +50,94 @@
                                     }}</v-toolbar-title>
                                     <v-spacer></v-spacer>
 
-                                    <form>
-                                        <v-dialog
-                                            v-model="scheduleDialog.show"
-                                            persistent
-                                            max-width="650"
-                                        >
-                                            <template v-slot:activator="{ on }">
-                                                <v-btn
+                                    <v-dialog
+                                        v-model="scheduleDialog.show"
+                                        persistent
+                                        max-width="650"
+                                    >
+                                        <template v-slot:activator="{ on }">
+                                            <v-btn
+                                                class="mr-1"
+                                                color="primary"
+                                                depressed
+                                                :dark="isDarkColor('primary')"
+                                                v-on="on"
+                                                :small="
+                                                    $vuetify.breakpoint
+                                                        .smAndDown
+                                                "
+                                            >
+                                                <v-icon
                                                     v-if="
-                                                        $perm('schedule').can(
-                                                            'update'
-                                                        )
+                                                        $vuetify.breakpoint
+                                                            .xsOnly
                                                     "
-                                                    color="primary"
-                                                    dark
-                                                    v-on="on"
-                                                    >일정추가</v-btn
                                                 >
-                                            </template>
-                                            <v-card>
-                                                <v-row no-gutters>
-                                                    <v-col cols="12" sm="6">
-                                                        <v-date-picker
-                                                            v-model="dates"
-                                                            multiple
-                                                            full-width
-                                                        ></v-date-picker>
-                                                    </v-col>
-                                                    <v-col cols="12" sm="6">
-                                                        <v-container>
-                                                            <v-text-field
-                                                                label="제목"
-                                                                v-model="
-                                                                    schedule_title
-                                                                "
-                                                                dense
-                                                            ></v-text-field>
-                                                            <v-text-field
-                                                                label="내용"
-                                                                v-model="
-                                                                    schedule_contents
-                                                                "
-                                                            ></v-text-field>
-                                                        </v-container>
-                                                        <v-color-picker
+                                                    mdi-calendar-plus
+                                                </v-icon>
+                                                <span v-else>
+                                                    일정추가
+                                                </span>
+                                            </v-btn>
+                                        </template>
+                                        <v-card>
+                                            <v-row no-gutters>
+                                                <v-col cols="12" sm="6">
+                                                    <v-date-picker
+                                                        v-model="dates"
+                                                        multiple
+                                                        full-width
+                                                    ></v-date-picker>
+                                                </v-col>
+                                                <v-col cols="12" sm="6">
+                                                    <v-container>
+                                                        <v-text-field
+                                                            label="제목"
                                                             v-model="
-                                                                schedule_color
+                                                                schedule_title
                                                             "
-                                                            disabled
-                                                            hide-canvas
-                                                            hide-inputs
-                                                            show-swatches
-                                                            flat
-                                                            swatches-max-height="90"
-                                                        ></v-color-picker>
-                                                        <v-card-actions>
-                                                            <v-spacer></v-spacer>
-                                                            <v-btn
-                                                                color="green darken-1"
-                                                                text
-                                                                @click="
-                                                                    scheduleDialog.show = false
-                                                                "
-                                                                >취소</v-btn
-                                                            >
-                                                            <v-btn
-                                                                color="green darken-1"
-                                                                text
-                                                                @click="
-                                                                    reservation
-                                                                "
-                                                                >확인</v-btn
-                                                            >
-                                                        </v-card-actions>
-                                                    </v-col>
-                                                </v-row>
-                                            </v-card>
-                                        </v-dialog>
-                                    </form>
+                                                            dense
+                                                        ></v-text-field>
+                                                        <v-text-field
+                                                            label="내용"
+                                                            v-model="
+                                                                schedule_contents
+                                                            "
+                                                        ></v-text-field>
+                                                    </v-container>
+                                                    <v-color-picker
+                                                        v-model="schedule_color"
+                                                        disabled
+                                                        hide-canvas
+                                                        hide-inputs
+                                                        show-swatches
+                                                        flat
+                                                        swatches-max-height="90"
+                                                    ></v-color-picker>
+                                                    <v-card-actions>
+                                                        <v-spacer></v-spacer>
+                                                        <v-btn
+                                                            color="green darken-1"
+                                                            text
+                                                            @click="
+                                                                scheduleDialog.show = false
+                                                            "
+                                                            >취소</v-btn
+                                                        >
+                                                        <v-btn
+                                                            color="green darken-1"
+                                                            text
+                                                            @click="reservation"
+                                                            >확인</v-btn
+                                                        >
+                                                    </v-card-actions>
+                                                </v-col>
+                                            </v-row>
+                                        </v-card>
+                                    </v-dialog>
 
                                     <!-- 월/주/4일/일별을 선택하게 하는 드롭다운 메뉴 -->
-                                    <v-menu bottom right>
+                                    <v-menu bottom right v-if="!isMobileMode">
                                         <template v-slot:activator="{ on }">
                                             <v-btn
                                                 outlined
@@ -385,6 +391,9 @@ export default {
             return this.dates.map(item => {
                 return moment(item).format('YYYY-MM-DD')
             })
+        },
+        isMobileMode() {
+            return this.$vuetify.breakpoint.smAndDown
         },
     },
     methods: {
