@@ -29,8 +29,11 @@
                     <small class="red--text mr-3" v-if="isError"
                         >게시물 작성에 실패했습니다.</small
                     >
-                    <small class="red--text mr-3" v-if="isLengthError"
-                        >제목과 본문의 길이는 100자를 넘을 수 없습니다.</small
+                    <small class="red--text mr-3" v-if="isTitleLengthError"
+                        >제목의 길이는 50자를 넘을 수 없습니다.</small
+                    >
+                    <small class="red--text mr-3" v-if="isContentLengthError"
+                        >본문의 길이는 100자를 넘을 수 없습니다.</small
                     >
                     <v-btn
                         class="ma-2"
@@ -95,7 +98,8 @@ export default {
             },
             isLoading: false,
             isError: false,
-            isLengthError: false,
+            isTitleLengthError: false,
+            isContentLengthError: false,
             editor: {
                 options: {
                     language: 'ko',
@@ -105,16 +109,16 @@ export default {
     },
     methods: {
         contentLength() {
-            if (
-                this.getMarkdown().length > 100 ||
-                this.newMaterial.title.length > 100
-            ) {
-                this.isLengthError = true
+            this.isContentLengthError =
+                this.getMarkdown().length > 100 ? true : false
+
+            this.isTitleLengthError =
+                this.newMaterial.title.length > 50 ? true : false
+
+            if (this.isTitleLengthError || this.isContentLengthError) {
                 return true
-            } else {
-                this.isLengthError = false
-                return false
             }
+            return false
         },
         async submitClick() {
             if (this.contentLength() == true) {

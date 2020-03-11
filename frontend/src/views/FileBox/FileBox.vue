@@ -18,47 +18,49 @@
                 cols="12"
                 md="3"
             >
-                <v-card tile outlined class="fill-height">
-                    <v-sheet class="pa-4 primary lighten-2" tile>
-                        <v-text-field
-                            v-model="groupSearch"
-                            label="검색"
-                            :dark="isDarkColor('primary')"
-                            solo-inverted
-                            hide-details
-                            clearable
-                            flat
-                            prepend-inner-icon="mdi-magnify"
-                            clear-icon="mdi-close-circle-outline"
-                        >
-                        </v-text-field>
-                    </v-sheet>
+                <vue-resizable>
+                    <v-card tile outlined class="fill-height">
+                        <v-sheet class="pa-4 primary lighten-2" tile>
+                            <v-text-field
+                                v-model="groupSearch"
+                                label="검색"
+                                :dark="isDarkColor('primary')"
+                                solo-inverted
+                                hide-details
+                                clearable
+                                flat
+                                prepend-inner-icon="mdi-magnify"
+                                clear-icon="mdi-close-circle-outline"
+                            >
+                            </v-text-field>
+                        </v-sheet>
 
-                    <v-list v-if="checkManagePerm()">
-                        <v-list-item link @click="showPlusGroup()">
-                            <v-list-item-icon>
-                                <v-icon>mdi-plus</v-icon>
-                            </v-list-item-icon>
-                            <v-list-item-title class="grey--text"
-                                >새 그룹 추가</v-list-item-title
-                            >
-                        </v-list-item>
-                        <v-list-item link @click="showEditGroup()">
-                            <v-list-item-icon>
-                                <v-icon>mdi-map-search</v-icon>
-                            </v-list-item-icon>
-                            <v-list-item-title class="grey--text"
-                                >그룹 편집</v-list-item-title
-                            >
-                        </v-list-item>
-                    </v-list>
-                    <group-tree
-                        v-model="selectedGroups"
-                        :search="groupSearch"
-                        :items="groups"
-                        @change="groupChanged()"
-                    ></group-tree>
-                </v-card>
+                        <v-list v-if="checkManagePerm()">
+                            <v-list-item link @click="showPlusGroup()">
+                                <v-list-item-icon>
+                                    <v-icon>mdi-plus</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title class="grey--text"
+                                    >새 그룹 추가</v-list-item-title
+                                >
+                            </v-list-item>
+                            <v-list-item link @click="showEditGroup()">
+                                <v-list-item-icon>
+                                    <v-icon>mdi-map-search</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title class="grey--text"
+                                    >그룹 편집</v-list-item-title
+                                >
+                            </v-list-item>
+                        </v-list>
+                        <group-tree
+                            v-model="selectedGroups"
+                            :search="groupSearch"
+                            :items="groups"
+                            @change="groupChanged()"
+                        ></group-tree>
+                    </v-card>
+                </vue-resizable>
                 <v-snackbar v-model="newGroupSnackbar">
                     그룹이 생성되었습니다
                     <v-btn color="pink" text @click="newGroupSnackbar = false">
@@ -104,12 +106,14 @@ import axios from 'axios'
 import GroupTree from '../../components/filebox/GroupTree.vue'
 import CreateGroup from '../../components/filebox/CreateGroup.vue'
 import EditGroup from '../../components/filebox/EditGroup.vue'
+import VueResizable from 'vue-resizable'
 
 export default {
     components: {
         GroupTree,
         CreateGroup,
         EditGroup,
+        VueResizable,
     },
     data() {
         return {
