@@ -590,32 +590,40 @@ export default {
         },
         //결석예약
         async reservation() {
-            try {
-                let check_date = true
-                this.dayList_fab.forEach(item => {
-                    this.absenceUserdata.forEach(ii => {
-                        if (item == moment(ii.day).format('YYYY-MM-DD')) {
-                            check_date = false
-                            return this.openSnackbar(
-                                '같은 날짜에 이미 공결 예약을 하셨습니다.',
-                                'error'
-                            )
-                        }
+            if (this.absence_reason == '') {
+                this.openSnackbar('사유를 확인해주세요!', 'error')
+            } else if (this.dayList_fab == '') {
+                this.openSnackbar('날짜를 확인해주세요!', 'error')
+            } else {
+                try {
+                    let check_date = true
+                    this.dayList_fab.forEach(item => {
+                        this.absenceUserdata.forEach(ii => {
+                            if (item == moment(ii.day).format('YYYY-MM-DD')) {
+                                check_date = false
+                                return this.openSnackbar(
+                                    '같은 날짜에 이미 공결 예약을 하셨습니다.',
+                                    'error'
+                                )
+                            }
+                        })
                     })
-                })
-                if (check_date) {
-                    await axios.post('absencecheck/absenceBook', {
-                        Reason: this.absence_reason,
-                        dayList: this.dayList_fab,
-                    })
-                    this.dates = [this.$moment(new Date()).format('YYYY-MM-DD')]
-                    this.absence_reason = ''
-                    this.absenceResDialog.show = false
-                    await this.init()
-                    this.openSnackbar('신청되었습니다!', 'success')
+                    if (check_date) {
+                        await axios.post('absencecheck/absenceBook', {
+                            Reason: this.absence_reason,
+                            dayList: this.dayList_fab,
+                        })
+                        this.dates = [
+                            this.$moment(new Date()).format('YYYY-MM-DD'),
+                        ]
+                        this.absence_reason = ''
+                        this.absenceResDialog.show = false
+                        await this.init()
+                        this.openSnackbar('신청되었습니다!', 'success')
+                    }
+                } catch (err) {
+                    //
                 }
-            } catch (err) {
-                //
             }
         },
         //공결 신청 취소
