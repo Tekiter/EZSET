@@ -39,6 +39,10 @@ class Permission {
         let results = this.res.map(resource => {
             let result = false
 
+            if (!resource) {
+                return false
+            }
+
             if (resource.all) {
                 result = hasPermission(resource.all, range, action)
             }

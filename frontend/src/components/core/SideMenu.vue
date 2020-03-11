@@ -27,7 +27,7 @@ export default {
                 },
                 {
                     type: 'simple',
-                    icon: 'mdi-settings',
+                    icon: 'mdi-cog-outline',
                     title: '설정',
 
                     children: [

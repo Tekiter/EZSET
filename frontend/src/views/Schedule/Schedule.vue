@@ -85,6 +85,7 @@
                                                                 v-model="
                                                                     schedule_title
                                                                 "
+                                                                dense
                                                             ></v-text-field>
                                                             <v-text-field
                                                                 label="내용"
@@ -316,7 +317,7 @@ export default {
         scheduleDialog: {
             show: false,
         },
-        dates: [moment(new Date()).format('YYYY-MM-DD')],
+        dates: [],
         menu: false,
         schedule_title: '',
         schedule_contents: '',
