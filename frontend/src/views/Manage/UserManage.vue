@@ -50,9 +50,9 @@
                         <v-card outlined>
                             <v-card-title>
                                 <p class="subheader">
-                                    {{ user.username }}
+                                    {{ user.realname }}
                                 </p>
-                                <p class="caption ml-2">{{ user.realname }}</p>
+                                <p class="caption ml-2">{{ user.username }}</p>
                             </v-card-title>
                             <v-divider></v-divider>
                             <v-card-text>
