@@ -96,7 +96,7 @@
             <v-alert
                 type="success"
                 v-if="
-                    !this.$perm('attendance').can('update') &&
+                    this.output_attendance_code == '' &&
                         flag == true &&
                         code == 1
                 "
@@ -104,16 +104,6 @@
                 이미 출석하셨습니다!
             </v-alert>
         </div>
-
-        <!-- 출석 된 것을 확인 -->
-        <v-snackbar v-model="snackbar_c" color="success">
-            출석되었습니다.
-            <v-btn dark text @click="close">Close</v-btn>
-        </v-snackbar>
-        <v-snackbar v-model="snackbar_e" color="error">
-            번호가 일치하지 않습니다.
-            <v-btn dark text @click="closeSnack">Close</v-btn>
-        </v-snackbar>
     </v-container>
 </template>
 <script>
@@ -129,27 +119,24 @@ export default {
             this.flag = data.flag
             this.remainTime = data.time
         })
-        try {
-            const res = await axios.get('attendance/attendanceCheck')
-            this.code = parseInt(res.data)
-        } catch (err) {
-            //
+
+        const attendanceCheckres = await axios.get('attendance/attendanceCheck')
+        this.code = parseInt(attendanceCheckres.data)
+
+        if (this.$perm('attendance').can('update')) {
+            const res = await axios.get('attendance/attendanceCheckAdmin')
+            if (res.data != 0) this.output_attendance_code = parseInt(res.data)
+            else this.output_attendance_code = 0
         }
-        const res = await axios.get('attendance/attendanceCheckAdmin')
-        if (res.data != 0) this.output_attendance_code = parseInt(res.data)
-        else this.output_attendance_code = 0
 
         if (this.flag == true) this.tick()
     },
 
     data() {
         return {
-            socket_id: '',
             input_attendance_code: '',
             output_attendance_code: '',
             flag: false,
-            snackbar_c: false,
-            snackbar_e: false,
             attendanceCard: true,
             code: 0,
             remainTime: 0,
@@ -183,28 +170,16 @@ export default {
             )
         },
         async attendanceCheck() {
-            try {
-                const res = await axios.post('attendance/attendanceWrite', {
-                    code: this.input_attendance_code,
-                    state: 'attendance',
-                })
-                if (res.data.result) {
-                    this.snackbar_c = true
-                    setTimeout(() => {
-                        this.$router.push('/')
-                    }, 2000)
-                } else this.snackbar_e = true
-            } catch (err) {
-                //
-            }
-        },
-        close() {
-            this.input_attendance_code = ''
-            this.$router.push('/')
-        },
-        closeSnack() {
-            this.snackbar_e = false
-            this.input_attendance_code = ''
+            const res = await axios.post('attendance/attendanceWrite', {
+                code: this.input_attendance_code,
+                state: 'attendance',
+            })
+            if (res.data.result) {
+                this.openSnackbar('출석하셨습니다!', 'success')
+                setTimeout(() => {
+                    this.$router.push('/AttendanceManageMonthUser')
+                }, 2000)
+            } else this.openSnackbar('번호가 일치하지 않습니다', 'error')
         },
         tick() {
             this.interval = setInterval(() => {
@@ -219,6 +194,11 @@ export default {
                 }
                 if (this.flag == false) clearInterval(this.interval)
             }, 1000)
+        },
+        openSnackbar(text, color) {
+            this.snackbar.text = text
+            this.snackbar.color = color
+            this.snackbar.show = true
         },
     },
     computed: {
