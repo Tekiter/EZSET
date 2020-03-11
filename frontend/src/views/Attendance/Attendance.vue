@@ -82,7 +82,7 @@
                 </v-col>
             </div>
             <div class="d-flex justify-center">
-                <v-btn text large @click="attendanceCheck">출석하기</v-btn>
+                <v-btn text large @click="attendanceCheck()">출석하기</v-btn>
             </div>
         </v-card>
 
@@ -104,6 +104,16 @@
                 이미 출석하셨습니다!
             </v-alert>
         </div>
+        <v-snackbar
+            v-model="snackbar.show"
+            :timeout="2000"
+            :color="snackbar.color"
+        >
+            {{ snackbar.text }}
+            <v-btn text @click="snackbar = false">
+                닫기
+            </v-btn>
+        </v-snackbar>
     </v-container>
 </template>
 <script>
@@ -141,6 +151,11 @@ export default {
             code: 0,
             remainTime: 0,
             interval: '',
+            snackbar: {
+                show: false,
+                text: '',
+                color: '',
+            },
         }
     },
     methods: {
@@ -174,7 +189,7 @@ export default {
                 code: this.input_attendance_code,
                 state: 'attendance',
             })
-            if (res.data.result) {
+            if (res.data.result == 1) {
                 this.openSnackbar('출석하셨습니다!', 'success')
                 setTimeout(() => {
                     this.$router.push('/AttendanceManageMonthUser')
