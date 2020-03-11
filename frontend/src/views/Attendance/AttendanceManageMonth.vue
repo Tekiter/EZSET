@@ -128,11 +128,9 @@
                             <v-card-text>
                                 <div class="d-flex">
                                     <div class="d-flex flex-wrap flex-grow-1">
-                                        <v-btn icon small>
-                                            <v-icon color="success"
-                                                >mdi-checkbox-blank-circle-outline</v-icon
-                                            >
-                                        </v-btn>
+                                        <v-icon color="success"
+                                            >mdi-checkbox-blank-circle-outline</v-icon
+                                        >
                                     </div>
                                     <div
                                         class="d-flex flex-wrap flex-grow-1 headline"
@@ -140,11 +138,9 @@
                                         {{ user.v1 }}
                                     </div>
                                     <div class="d-flex flex-wrap flex-grow-1">
-                                        <v-btn icon small>
-                                            <v-icon color="warning"
-                                                >mdi-triangle-outline</v-icon
-                                            >
-                                        </v-btn>
+                                        <v-icon color="warning"
+                                            >mdi-triangle-outline</v-icon
+                                        >
                                     </div>
                                     <div
                                         class="d-flex flex-wrap flex-grow-1 headline"
@@ -152,11 +148,7 @@
                                         {{ user.v2 }}
                                     </div>
                                     <div class="d-flex flex-wrap flex-grow-1">
-                                        <v-btn icon small>
-                                            <v-icon color="error"
-                                                >mdi-close</v-icon
-                                            >
-                                        </v-btn>
+                                        <v-icon color="error">mdi-close</v-icon>
                                     </div>
                                     <div
                                         class="d-flex flex-wrap flex-grow-1 headline"
@@ -164,11 +156,9 @@
                                         {{ user.v3 }}
                                     </div>
                                     <div class="d-flex flex-wrap flex-grow-1">
-                                        <v-btn icon small>
-                                            <v-icon color="success"
-                                                >mdi-close-circle-outline</v-icon
-                                            >
-                                        </v-btn>
+                                        <v-icon color="success"
+                                            >mdi-close-circle-outline</v-icon
+                                        >
                                     </div>
                                     <div
                                         class="d-flex flex-wrap flex-grow-1 headline"
@@ -242,40 +232,37 @@
                                             </div>
                                             <v-spacer></v-spacer>
                                             <div class="d-flex pl-3">
-                                                <v-btn icon small>
-                                                    <v-icon
-                                                        v-if="
-                                                            recode.state ==
-                                                                'attendance'
-                                                        "
-                                                        color="success"
-                                                        >mdi-checkbox-blank-circle-outline</v-icon
-                                                    >
-                                                    <v-icon
-                                                        v-if="
-                                                            recode.state ==
-                                                                'late'
-                                                        "
-                                                        color="warning"
-                                                        >mdi-triangle-outline</v-icon
-                                                    >
-                                                    <v-icon
-                                                        v-if="
-                                                            recode.state ==
-                                                                'absence'
-                                                        "
-                                                        color="error"
-                                                        >mdi-close</v-icon
-                                                    >
-                                                    <v-icon
-                                                        v-if="
-                                                            recode.state ==
-                                                                'official_absence'
-                                                        "
-                                                        color="success"
-                                                        >mdi-close-circle-outline</v-icon
-                                                    >
-                                                </v-btn>
+                                                <v-icon
+                                                    v-if="
+                                                        recode.state ==
+                                                            'attendance'
+                                                    "
+                                                    color="success"
+                                                    >mdi-checkbox-blank-circle-outline</v-icon
+                                                >
+                                                <v-icon
+                                                    v-if="
+                                                        recode.state == 'late'
+                                                    "
+                                                    color="warning"
+                                                    >mdi-triangle-outline</v-icon
+                                                >
+                                                <v-icon
+                                                    v-if="
+                                                        recode.state ==
+                                                            'absence'
+                                                    "
+                                                    color="error"
+                                                    >mdi-close</v-icon
+                                                >
+                                                <v-icon
+                                                    v-if="
+                                                        recode.state ==
+                                                            'official_absence'
+                                                    "
+                                                    color="success"
+                                                    >mdi-close-circle-outline</v-icon
+                                                >
                                             </div>
                                         </div>
                                     </v-list-item-title>
