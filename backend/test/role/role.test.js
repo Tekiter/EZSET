@@ -121,6 +121,10 @@ describe('role grant test', () => {
             .resource('profile', 'password')
             .cannot(['read', 'delete'])
 
+            .resource('board', '0')
+            .can('read')
+            .cannot('write')
+
         const perm = roles.createPermChecker('user')
 
         expect(perm('profile').can('read')).toBeTruthy()
@@ -134,6 +138,9 @@ describe('role grant test', () => {
         expect(perm('profile', 'password').can('update')).toBeFalsy()
         expect(perm('profile', 'password').canOwn('update')).toBeTruthy()
         expect(perm('profile', 'password').canOwn('delete')).toBeFalsy()
+        expect(perm('board', '0').can('read')).toBeTruthy()
+        expect(perm('board', '0').can('write')).toBeFalsy()
+        expect(perm('board', '1').can('read')).toBeFalsy()
     })
 
     test('cannot', () => {

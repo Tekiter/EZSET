@@ -1,12 +1,12 @@
 <template>
-    <v-row class="ma-3 fill-height" :no-gutters="isMobileMode">
+    <v-row class="mt-3 ma-md-3 fill-height" :no-gutters="isMobileMode">
         <v-col v-show="isMobileMode" cols="12">
             <v-tabs v-model="curTab" class="mt-3">
                 <v-tab>
                     게시판
                 </v-tab>
                 <v-tab>
-                    게시판 설정
+                    게시판 권한
                 </v-tab>
             </v-tabs>
         </v-col>
@@ -34,7 +34,23 @@
                 </v-toolbar>
                 <v-list subheader>
                     <v-list-item v-for="board in boards" :key="board._id">
-                        <v-list-item-title>{{ board.title }}</v-list-item-title>
+                        <v-list-item-title
+                            >{{ board.title }}
+                            <v-chip
+                                v-if="board.isAnonymous"
+                                class="ma-2"
+                                color="deep-purple accent-4"
+                                outlined
+                                x-small
+                            >
+                                익명
+                            </v-chip></v-list-item-title
+                        >
+                        <v-list-item-action>
+                            <v-btn icon @click="showModifyDialog(board)">
+                                <v-icon>mdi-pencil-outline</v-icon>
+                            </v-btn>
+                        </v-list-item-action>
                         <v-list-item-action>
                             <v-btn icon @click="showDeleteBoardDialog(board)">
                                 <v-icon>mdi-trash-can-outline</v-icon>
@@ -44,30 +60,13 @@
                 </v-list>
             </v-card>
         </v-col>
-
         <v-col
             cols="12"
             md="7"
             v-show="!isMobileMode || curTab == 1"
             class="fill-height"
         >
-            <v-card outlined>
-                <v-toolbar flat>
-                    <v-toolbar-title>
-                        게시판 설정
-                    </v-toolbar-title>
-                </v-toolbar>
-                <v-list subheader>
-                    <v-list-item v-for="board in boards" :key="board._id">
-                        <v-list-item-title>{{ board.title }}</v-list-item-title>
-                        <v-list-item-action>
-                            <v-btn icon>
-                                <v-icon>mdi-file-edit-outline</v-icon>
-                            </v-btn>
-                        </v-list-item-action>
-                    </v-list-item>
-                </v-list>
-            </v-card>
+            <board-role-edit ref="roleEdit"></board-role-edit>
         </v-col>
 
         <v-dialog v-model="createBoardDialog.show" max-width="300">
@@ -136,14 +135,50 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="modifyDialog" persistent max-width="290">
+            <v-card>
+                <v-card-title class="headline">게시판 이름 수정</v-card-title>
+                <v-card-text>
+                    <v-text-field
+                        v-model="modifyTitle"
+                        label="새 이름"
+                        hide-details
+                    ></v-text-field>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        v-if="modifyTitle"
+                        color="green darken-1"
+                        text
+                        @click="successPostTitle()"
+                        >수정</v-btn
+                    >
+                    <v-btn v-else color="black darken-1" text>수정</v-btn>
+                    <v-btn
+                        color="red darken-1"
+                        text
+                        @click="modifyDialog = false"
+                        >취소</v-btn
+                    >
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-row>
 </template>
 
 <script>
 import axios from 'axios'
+import BoardRoleEdit from '../../components/manage/BoardRoleEdit.vue'
 export default {
+    components: {
+        BoardRoleEdit,
+    },
     data() {
         return {
+            modifyBoardCurId: '',
+            modifyDialog: false,
+            modifyTitle: '',
             curTab: 0,
             boards: [],
             createBoardDialog: {
@@ -168,8 +203,22 @@ export default {
         },
     },
     methods: {
+        async successPostTitle() {
+            axios.patch('simple/boards/' + this.modifyBoardCurId, {
+                title: this.modifyTitle,
+            })
+            this.modifyDialog = false
+            this.fetchBoards()
+            await this.$store.dispatch('board/fetchBoards')
+            await this.$refs.roleEdit.resetChanges()
+        },
         fetch_id(id) {
             this.temp_id = id
+        },
+        showModifyDialog(board) {
+            this.modifyTitle = board.title
+            this.modifyBoardCurId = board._id
+            this.modifyDialog = true
         },
         showDeleteBoardDialog(board) {
             this.deleteBoardDialog.curId = board._id

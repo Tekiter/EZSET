@@ -303,7 +303,7 @@ export default {
         },
     },
     async created() {
-        if (!this.$perm('manageRoles').can('access')) {
+        if (!this.$perm('attendance').can('update')) {
             this.$router.push({ name: 'error403' })
             return
         }

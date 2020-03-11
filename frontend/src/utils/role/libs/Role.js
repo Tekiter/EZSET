@@ -111,12 +111,18 @@ export class Role {
         return this._perm[name]
     }
 
+    /**
+     * 역할의 권한을 체크하는 체인을 생성한다.
+     */
     createPermChecker() {
         return (resource, param) => {
             return new Permission(this._perm[resource], param)
         }
     }
 
+    /**
+     * 역할의 권한 목록을 추출한다.
+     */
     getPerm() {
         let result = {}
 

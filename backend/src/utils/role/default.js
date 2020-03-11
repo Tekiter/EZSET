@@ -9,9 +9,6 @@ export function setDefaultRole(roles) {
         .resource('role')
         .canOwn('read')
 
-        .resource('board')
-        .can('read')
-
         .resource('attendance')
         .canOwn('read')
         .can('att')

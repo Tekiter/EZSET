@@ -54,9 +54,13 @@
                                         ></v-checkbox>
                                     </v-list-item-action>
                                     <v-list-item-content>
-                                        <v-list-item-title>{{
-                                            item.name
-                                        }}</v-list-item-title>
+                                        <v-list-item-title>
+                                            {{ item.realname }}
+                                            <span
+                                                class="font-weight-light caption"
+                                                >{{ item.name }}</span
+                                            >
+                                        </v-list-item-title>
                                         <v-list-item-subtitle>
                                             {{ item.reason }}
                                         </v-list-item-subtitle>
@@ -99,9 +103,13 @@
                                         ></v-checkbox>
                                     </v-list-item-action>
                                     <v-list-item-content>
-                                        <v-list-item-title>{{
-                                            item.name
-                                        }}</v-list-item-title>
+                                        <v-list-item-title>
+                                            {{ item.realname }}
+                                            <span
+                                                class="font-weight-light caption"
+                                                >{{ item.name }}</span
+                                            ></v-list-item-title
+                                        >
                                         <v-list-item-subtitle>
                                             {{ item.reason }}
                                         </v-list-item-subtitle>
@@ -148,7 +156,7 @@ export default {
         },
     }),
     created() {
-        if (!this.$perm('manageRoles').can('access')) {
+        if (!this.$perm('absence').can('update')) {
             this.$router.push({ name: 'error403' })
             return
         }
@@ -159,14 +167,22 @@ export default {
             return this.Official_Absence_No.filter(d => {
                 return this.dayprint(d.day) == this.dayprint(this.picker_date)
             }).map(item => {
-                return { name: item.name, reason: item.reason }
+                return {
+                    name: item.name,
+                    realname: item.realname,
+                    reason: item.reason,
+                }
             })
         },
         official_absence_Yes_arr() {
             return this.Official_Absence_Yes.filter(d => {
                 return this.dayprint(d.day) == this.dayprint(this.picker_date)
             }).map(item => {
-                return { name: item.name, reason: item.reason }
+                return {
+                    name: item.name,
+                    realname: item.realname,
+                    reason: item.reason,
+                }
             })
         },
     },
