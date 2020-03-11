@@ -27,15 +27,6 @@ router.post(
         validateParams,
     ],
     asyncRoute(async (req, res) => {
-        let isBoard = await Board.findOne()
-            .where('title')
-            .equals(req.body.title)
-
-        if (isBoard) {
-            const err = new Error('동일한 이름의 게시판은 만들 수 없습니다.')
-            err.status = 500
-            return
-        }
         let board = new Board()
         board.title = req.body.title
         board.isAnonymous = req.body.isAnonymous
