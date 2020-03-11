@@ -260,37 +260,78 @@
                                             </div>
                                             <v-spacer></v-spacer>
                                             <div class="d-flex pl-3">
-                                                <v-icon
-                                                    v-if="
-                                                        recode.state ==
-                                                            'attendance'
-                                                    "
-                                                    color="success"
-                                                    >mdi-checkbox-blank-circle-outline</v-icon
-                                                >
-                                                <v-icon
-                                                    v-if="
-                                                        recode.state == 'late'
-                                                    "
-                                                    color="warning"
-                                                    >mdi-triangle-outline</v-icon
-                                                >
-                                                <v-icon
-                                                    v-if="
-                                                        recode.state ==
-                                                            'absence'
-                                                    "
-                                                    color="error"
-                                                    >mdi-close</v-icon
-                                                >
-                                                <v-icon
-                                                    v-if="
-                                                        recode.state ==
-                                                            'official_absence'
-                                                    "
-                                                    color="success"
-                                                    >mdi-close-circle-outline</v-icon
-                                                >
+                                                <v-tooltip bottom>
+                                                    <template
+                                                        v-slot:activator="{
+                                                            on,
+                                                        }"
+                                                    >
+                                                        <v-icon
+                                                            v-on="on"
+                                                            v-if="
+                                                                recode.state ==
+                                                                    'attendance'
+                                                            "
+                                                            color="success"
+                                                            >mdi-checkbox-blank-circle-outline</v-icon
+                                                        >
+                                                    </template>
+                                                    <span>출석</span>
+                                                </v-tooltip>
+                                                <v-tooltip bottom>
+                                                    <template
+                                                        v-slot:activator="{
+                                                            on,
+                                                        }"
+                                                    >
+                                                        <v-icon
+                                                            v-on="on"
+                                                            v-if="
+                                                                recode.state ==
+                                                                    'late'
+                                                            "
+                                                            color="warning"
+                                                            >mdi-triangle-outline</v-icon
+                                                        >
+                                                    </template>
+                                                    <span>지각</span>
+                                                </v-tooltip>
+                                                <v-tooltip bottom>
+                                                    <template
+                                                        v-slot:activator="{
+                                                            on,
+                                                        }"
+                                                    >
+                                                        <v-icon
+                                                            v-on="on"
+                                                            v-if="
+                                                                recode.state ==
+                                                                    'absence'
+                                                            "
+                                                            color="error"
+                                                            >mdi-close</v-icon
+                                                        >
+                                                    </template>
+                                                    <span>결석</span>
+                                                </v-tooltip>
+                                                <v-tooltip bottom>
+                                                    <template
+                                                        v-slot:activator="{
+                                                            on,
+                                                        }"
+                                                    >
+                                                        <v-icon
+                                                            v-on="on"
+                                                            v-if="
+                                                                recode.state ==
+                                                                    'official_absence'
+                                                            "
+                                                            color="success"
+                                                            >mdi-close-circle-outline</v-icon
+                                                        >
+                                                    </template>
+                                                    <span>공결</span>
+                                                </v-tooltip>
                                             </div>
                                         </div>
                                     </v-list-item-title>
