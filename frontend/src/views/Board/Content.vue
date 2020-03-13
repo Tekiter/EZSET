@@ -271,7 +271,19 @@
                                     </template>
                                     <!-- 댓글 수정 -->
                                     <template v-else>
-                                        <v-list-item-content>
+                                        <v-list-item-content
+                                            v-if="post.isAnonymous == true"
+                                        >
+                                            <v-list-item-title
+                                                >{{ '익명'
+                                                }}<span class="ml-3">{{
+                                                    comment.created_date
+                                                }}</span></v-list-item-title
+                                            ><v-text-field
+                                                v-model="editContent"
+                                            ></v-text-field>
+                                        </v-list-item-content>
+                                        <v-list-item-content v-else>
                                             <v-list-item-title
                                                 >{{ comment.writer
                                                 }}<span class="ml-3">{{
