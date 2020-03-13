@@ -509,7 +509,6 @@ router.patch(
         let post = await Post.findOne()
             .where('_id')
             .equals(req.params.post_id)
-
         if (!post) {
             res.status(404).json({
                 message: 'no post id ' + req.params.comment_id,
@@ -545,17 +544,7 @@ router.patch(
             }
         }
 
-        if (post.isAnonymous == true) {
-            await post.updateComment(
-                req.body.content,
-                crypto
-                    .createHash('sha512')
-                    .update(req.user.username)
-                    .digest('base64')
-            )
-        } else {
-            await post.updateComment(req.params.comment_id, req.body.content)
-        }
+        await post.updateComment(req.body.content, req.params.comment_id)
 
         res.status(201).json({ message: '댓글 수정 완료' })
     })

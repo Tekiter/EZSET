@@ -101,7 +101,7 @@ postSchema.methods.addComment = function(content, writer) {
 }
 
 //댓글 수정
-postSchema.methods.updateComment = function(comment_id, content) {
+postSchema.methods.updateComment = function(content, comment_id) {
     this.comment = this.comments.id(comment_id)
     this.comment.content = content
     return this.save()
