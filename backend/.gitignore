@@ -64,6 +64,9 @@ typings/
 .idea
 dist
 
+# APIDOC
+apidoc/
+
 uploads/
 upload/
 
