@@ -77,7 +77,7 @@ router.get(
 
 //group 생성 : group의 부모는 항상  group, 자식은 group(isfolder) 이거나 material
 /**
- * @api {post} /group 자료실 그룹(폴더) 생성
+ * @api {post} /filebox/group 자료실 그룹(폴더) 생성
  * @apiName 자료실 그룹 생성
  * @apiGroup Filebox
  *
@@ -148,7 +148,7 @@ router.post(
 
 //group 수정
 /**
- * @api {patch} /group:group_id 자료실 그룹(폴더) 이름 수정
+ * @api {patch} /filebox/group:group_id 자료실 그룹(폴더) 이름 수정
  * @apiName 자료실 그룹 이름 수정
  * @apiGroup Filebox
  *
@@ -195,7 +195,7 @@ router.patch(
 )
 
 /**
- * @api {delete} /group/:group_id 자료실 그룹(폴더) 삭제
+ * @api {delete} /filebox/group/:group_id 자료실 그룹(폴더) 삭제
  * @apiName 자료실 그룹 삭제
  * @apiGroup Filebox
  *
@@ -269,7 +269,7 @@ router.delete(
 
 //folder 조회
 /**
- * @api {get} /folder/:parent_id 자료실 폴더 조회
+ * @api {get} /filebox/folder/:parent_id 자료실 폴더 조회
  * @apiName 자료실 폴더 조회
  * @apiGroup Filebox
  *
@@ -331,7 +331,7 @@ router.get(
 
 //material 생성 : material의 부모는 항상 isfolder
 /**
- * @api {post} /folder/:parent_id 자료실 게시물 생성
+ * @api {post} /filebox/folder/:parent_id 자료실 게시물 생성
  * @apiName 자료실 게시물 생성
  * @apiGroup Filebox
  *
@@ -432,7 +432,7 @@ router.post(
 )
 
 /**
- * @api {get} /material/:material_id 자료실 게시물 조회
+ * @api {get} /filebox/material/:material_id 자료실 게시물 조회
  * @apiName 자료실 게시물 조회
  * @apiGroup Filebox
  *
@@ -484,7 +484,7 @@ router.get(
 
 // material 삭제
 /**
- * @api {delete} /material/:material_id 자료실 게시물 삭제
+ * @api {delete} /filebox/material/:material_id 자료실 게시물 삭제
  * @apiName 자료실 게시물 삭제
  * @apiGroup Filebox
  *
@@ -560,7 +560,7 @@ router.delete(
 
 // material 수정
 /**
- * @api {patch} /material/:material_id 자료실 게시물 수정
+ * @api {patch} /filebox/material/:material_id 자료실 게시물 수정
  * @apiName 자료실 게시물 수정
  * @apiGroup Filebox
  *
