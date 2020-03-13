@@ -14,7 +14,7 @@ app.use(
         skip: () => app.get('env') === 'test',
     })
 )
-app.use(bodyParser.json({ limit: '10mb' }))
+app.use(bodyParser.json({ limit: '11mb' }))
 app.use(
     bodyParser.urlencoded({
         extended: false,
