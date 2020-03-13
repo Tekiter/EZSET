@@ -208,7 +208,11 @@ router.get(
  *       }
  *
  * @apiError {Number} 400 첨부파일 오류
- * @apiErrorExample {String} '올바르지 않은 첨부파일입니다.'
+ * @apiErrorExample {String} Error-Response:
+ *       HTTP/1.1 404
+ *       {
+ *          string: 올바르지 않은 첨부파일입니다.
+ *       }
  */
 router.post(
     '/boards/:board_id',
