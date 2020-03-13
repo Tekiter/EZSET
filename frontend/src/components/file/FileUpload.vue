@@ -30,8 +30,12 @@
                 :color="fileinfo.uploaded ? 'success' : ''"
                 :dark="fileinfo.uploaded ? isDarkColor('success') : undefined"
                 class="mr-2 mt-1"
-                >{{ fileinfo.filename }}</v-chip
             >
+                {{ fileinfo.filename }}
+                <span v-if="fileinfo.file">
+                    ({{ fileinfo.file.size | filesize }})
+                </span>
+            </v-chip>
             <v-btn small icon @click="showFileUploadDialog" class="mt-1">
                 <v-icon>mdi-plus</v-icon>
             </v-btn>
@@ -191,6 +195,24 @@ export default {
         },
         currentProgress(val) {},
         fileProgress(val) {},
+    },
+    filters: {
+        filesize(value) {
+            if (!value) {
+                return ''
+            }
+
+            const val = parseInt(value)
+            if (isNaN(val)) {
+                return ''
+            }
+
+            if (val <= 1000000) {
+                return `${(val / 1000).toFixed(1)}KB`
+            }
+
+            return `${(val / 1000000).toFixed(2)}MB`
+        },
     },
 }
 </script>
