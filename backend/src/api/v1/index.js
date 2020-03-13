@@ -1,12 +1,15 @@
 import fs from 'fs'
 import path from 'path'
-import nocache from 'nocache'
+// import nocache from 'nocache'
 import { Router } from 'express'
 
 import { loginRequired } from '../../utils/auth'
 import { getRoleMiddleware } from '../../utils/role'
 
-const noCacheMiddleware = nocache()
+// const noCacheMiddleware = nocache()
+// const noCacheMiddleware = (req, res, next) => {
+//     next()
+// }
 
 const router = Router()
 const indexJs = path.basename(__filename)
@@ -27,7 +30,7 @@ fs.readdirSync(__dirname)
             throw err
         }
 
-        middlewares.push(noCacheMiddleware)
+        // middlewares.push(noCacheMiddleware)
 
         if (!subrouter.loginNotRequired) {
             middlewares.push(loginRequired)

@@ -28,6 +28,7 @@ Vue.prototype.$action = actionHelper
 axios.defaults.baseURL = '/api/v1'
 axios.defaults.maxContentLength = 10000000
 axios.defaults.maxBodyLength = 10000000
+axios.defaults.headers.common['Cache-Control'] = 'no-cache'
 
 axios.interceptors.response.use(
     function(response) {
