@@ -322,7 +322,11 @@ router.post(
  *       }
  *
  * @apiError {Number} 500 삭제 오류
- * @apiErrorExample {String} 'database error'
+ * @apiErrorExample {String} Error-Response:
+ *       HTTP/1.1 500
+ *       {
+ *          string: database error
+ *       }
  */
 router.delete(
     '/posts/:post_id',
@@ -504,7 +508,7 @@ router.patch(
 )
 
 /**
- * @api {get}} /simple/posts/:post_id 게시글 목록 보기
+ * @api {get} /simple/posts/:post_id 게시글 목록 보기
  * @apiDescription 해당 게시판의 게시글 목록을 불러온다
  * @apiName 게시글 목록 보기
  * @apiGroup Board
