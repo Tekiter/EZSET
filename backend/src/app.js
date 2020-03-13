@@ -18,6 +18,7 @@ app.use(bodyParser.json({ limit: '10mb' }))
 app.use(
     bodyParser.urlencoded({
         extended: false,
+        limit: '10mb',
     })
 )
 app.use('/api/v1', v1API)
