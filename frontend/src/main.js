@@ -26,6 +26,8 @@ Vue.prototype.$action = actionHelper
 
 // api 호출의 기본 경로
 axios.defaults.baseURL = '/api/v1'
+axios.defaults.maxContentLength = 10000000
+axios.defaults.maxBodyLength = 10000000
 
 axios.interceptors.response.use(
     function(response) {
