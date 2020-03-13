@@ -41,31 +41,69 @@
                         </v-subheader> -->
                         <v-card-subtitle class="mt-0">
                             <v-row no-gutters>
-                                <span v-if="post.isAnonymous == false"
-                                    ><span class="font-weight-black"
-                                        >작성자</span
+                                <div>
+                                    <span v-if="post.isAnonymous == false"
+                                        ><span class="font-weight-black"
+                                            >작성자</span
+                                        >
+                                        {{ post.author }}</span
                                     >
-                                    {{ post.author }}</span
-                                >
-                                <span v-else>익명</span>
-                                <v-spacer></v-spacer>
-                                <span
-                                    ><span class="font-weight-black"
-                                        >작성일</span
+                                    <span v-else>익명</span>
+                                    <v-spacer
+                                        v-if="$vuetify.breakpoint.mdAndUp"
+                                    ></v-spacer>
+                                    <v-divider
+                                        v-if="$vuetify.breakpoint.xsOnly"
+                                        class="mx-4"
+                                        vertical
+                                    ></v-divider>
+                                    <span v-if="$vuetify.breakpoint.xsOnly"
+                                        ><span class="font-weight-black"
+                                            >조회수</span
+                                        >
+                                        {{ post.view }}</span
                                     >
-                                    {{ post.created_date }}</span
-                                ><v-divider class="mx-4" vertical></v-divider>
-                                <span
-                                    ><span class="font-weight-black"
-                                        >조회수</span
+                                </div>
+                                <v-spacer insert></v-spacer>
+                                <div>
+                                    <span v-if="$vuetify.breakpoint.mdAndUp"
+                                        ><span class="font-weight-black"
+                                            >작성일</span
+                                        >
+                                        {{ post.created_date }}</span
                                     >
-                                    {{ post.view }}</span
-                                ><v-divider class="mx-4" vertical></v-divider>
+                                    <span v-else
+                                        ><span class="font-weight-black"
+                                            >작성일</span
+                                        >
+                                        {{
+                                            $moment(
+                                                new Date(post.created_date)
+                                            ).format('YY/MM/DD HH:mm')
+                                        }}</span
+                                    >
+                                    <v-divider
+                                        class="mx-4"
+                                        vertical
+                                    ></v-divider>
+                                    <span v-if="!$vuetify.breakpoint.xsOnly"
+                                        ><span class="font-weight-black"
+                                            >조회수</span
+                                        >
+                                        {{ post.view }}</span
+                                    ><v-divider
+                                        v-if="!$vuetify.breakpoint.xsOnly"
+                                        class="mx-4"
+                                        vertical
+                                    ></v-divider>
 
-                                <span
-                                    ><span class="font-weight-black">추천</span>
-                                    {{ post.like }}</span
-                                >
+                                    <span
+                                        ><span class="font-weight-black"
+                                            >추천</span
+                                        >
+                                        {{ post.like }}</span
+                                    >
+                                </div>
                             </v-row>
                         </v-card-subtitle>
                         <v-divider></v-divider>
@@ -202,9 +240,10 @@
                                                 }}<span class="ml-3">{{
                                                     comment.created_date
                                                 }}</span></v-list-item-title
-                                            ><span class="mt-2 subtitle-1">
-                                                {{ comment.content }}</span
-                                            ></v-list-item-content
+                                            >
+                                            <div class="mt-2 subtitle-1">
+                                                {{ comment.content }}
+                                            </div></v-list-item-content
                                         >
                                         <v-btn
                                             icon
@@ -232,7 +271,19 @@
                                     </template>
                                     <!-- 댓글 수정 -->
                                     <template v-else>
-                                        <v-list-item-content>
+                                        <v-list-item-content
+                                            v-if="post.isAnonymous == true"
+                                        >
+                                            <v-list-item-title
+                                                >{{ '익명'
+                                                }}<span class="ml-3">{{
+                                                    comment.created_date
+                                                }}</span></v-list-item-title
+                                            ><v-text-field
+                                                v-model="editContent"
+                                            ></v-text-field>
+                                        </v-list-item-content>
+                                        <v-list-item-content v-else>
                                             <v-list-item-title
                                                 >{{ comment.writer
                                                 }}<span class="ml-3">{{
@@ -285,7 +336,8 @@
                                         <small
                                             class="red--text mr-2"
                                             v-if="writeComment.lengthError"
-                                            >댓글 내용이 없습니다.</small
+                                            >댓글 내용은 적어도 한글자에서 300자
+                                            이내여야 합니다.</small
                                         >
                                         <v-btn
                                             outlined
@@ -334,6 +386,7 @@ export default {
                 view: '',
                 like: '',
                 isLike: '',
+                post_date: '',
             },
             writeComment: {
                 content: '',
@@ -405,7 +458,10 @@ export default {
 
         async createComment() {
             this.writeComment.isLoading = true
-            if (this.writeComment.content.length == 0) {
+            if (
+                this.writeComment.content.length == 0 ||
+                this.writeComment.content.length > 300
+            ) {
                 this.writeComment.lengthError = true
                 this.writeComment.isLoading = false
                 return

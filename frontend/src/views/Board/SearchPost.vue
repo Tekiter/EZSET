@@ -31,7 +31,6 @@
                         solo
                         flat
                         @change="clickSearch()"
-                        :rules="[rules.min]"
                     ></v-text-field>
                 </v-col>
                 <v-col cols="2" sm="1" v-if="$vuetify.breakpoint.mdAndUp">
@@ -196,9 +195,9 @@ export default {
                 { text: '추천', value: 'like' },
                 { text: '조회', value: 'view' },
             ],
-            rules: {
-                min: v => v.length >= 2 || '최소 2글자 이상 입력하세요.',
-            },
+            // rules: {
+            //     min: v => v.length >= 2 || '최소 2글자 이상 입력하세요.',
+            // },
         }
     },
     watch: {
@@ -219,9 +218,9 @@ export default {
             })
         },
         clickSearch() {
-            if (this.searchObject.length < 2) {
-                return
-            }
+            // if (this.searchObject.length < 2) {
+            //     return
+            // }
             this.getData()
             this.showData = true
         },

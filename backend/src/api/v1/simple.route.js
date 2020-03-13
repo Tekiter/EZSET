@@ -477,7 +477,11 @@ router.post(
             err.status = 403
             throw err
         }
-
+        if (req.body.content.length > 300) {
+            const err = new Error('댓글은 300자를 넘을 수 없습니다.')
+            err.status = 500
+            return
+        }
         if (!post) {
             res.status(404).json({ message: 'no post id ' + postId })
             return
@@ -505,7 +509,6 @@ router.patch(
         let post = await Post.findOne()
             .where('_id')
             .equals(req.params.post_id)
-
         if (!post) {
             res.status(404).json({
                 message: 'no post id ' + req.params.comment_id,
@@ -518,7 +521,11 @@ router.patch(
             err.status = 403
             throw err
         }
-
+        if (req.body.content.length > 300) {
+            const err = new Error('댓글은 300자를 넘을 수 없습니다.')
+            err.status = 500
+            return
+        }
         if (post.isAnonymous == false) {
             if (post.author != req.user.username) {
                 res.status(403).end()
@@ -537,17 +544,7 @@ router.patch(
             }
         }
 
-        if (post.isAnonymous == true) {
-            await post.updateComment(
-                req.body.content,
-                crypto
-                    .createHash('sha512')
-                    .update(req.user.username)
-                    .digest('base64')
-            )
-        } else {
-            await post.updateComment(req.params.comment_id, req.body.content)
-        }
+        await post.updateComment(req.body.content, req.params.comment_id)
 
         res.status(201).json({ message: '댓글 수정 완료' })
     })
