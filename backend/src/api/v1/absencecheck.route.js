@@ -11,7 +11,7 @@ var moment = require('moment')
  * @apiDescription 사용자가 결석예약 날짜들을 선택하면 프론트에서 list 형태로 back에 전달하고 db에 해당 정보를 날짜별로 각각 저장한다.
  * @apiName BookedOfficialAbsence
  * @apiGroup OfficialAbsence
- * @apiPermission absence.can('update')
+ * @apiPermission absence.canOwn'create')
  *
  * @apiParam {Array} dayList 공결이 예약된 날짜
  * @apiParam {String} Reason 공결 신청 사유
@@ -25,7 +25,7 @@ var moment = require('moment')
 router.post(
     '/absenceBook',
     [
-        perm('absence').can('update'),
+        perm('absence').canOwn('create'),
         body('dayList').isArray(),
         body('Reason').isString(),
         validateParams,
