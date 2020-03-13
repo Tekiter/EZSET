@@ -56,7 +56,8 @@ const router = Router()
  *      }
  */
 router.get(
-    '/read', [perm('schedule').can('read')],
+    '/read',
+    [perm('schedule').can('read')],
     asyncRoute(async function(req, res) {
         const schedule = await Schedule.find()
         res.json(schedule)
@@ -93,7 +94,8 @@ router.get(
  *       HTTP/1.1 200 OK
  */
 router.post(
-    '/write', [
+    '/write',
+    [
         perm('schedule').can('update'),
         body('dayList').isArray(),
         body('title').isString(),
@@ -103,7 +105,7 @@ router.post(
     ],
     asyncRoute(async function(req, res) {
         var dayArray = req.body.dayList.sort()
-            //날짜 배열을 기준으로 순회하면서 저장
+        //날짜 배열을 기준으로 순회하면서 저장
         var schedule = new Schedule()
         for (var k in dayArray) {
             if (k == 0) {
@@ -117,8 +119,8 @@ router.post(
             }
             if (
                 moment(schedule.end)
-                .add(1, 'days')
-                .format('YYYY-MM-DD') ==
+                    .add(1, 'days')
+                    .format('YYYY-MM-DD') ==
                 moment(req.body.dayList[k]).format('YYYY-MM-DD')
             ) {
                 schedule.end = dayArray[k]
@@ -174,7 +176,8 @@ router.post(
  *       HTTP/1.1 200 OK
  */
 router.post(
-    '/delete', [
+    '/delete',
+    [
         perm('schedule').can('update'),
         body('start').isString(),
         body('end').isString(),

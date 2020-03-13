@@ -27,7 +27,7 @@ export default {
                 },
                 {
                     type: 'simple',
-                    icon: 'mdi-settings',
+                    icon: 'mdi-cog-outline',
                     title: '설정',
 
                     children: [
@@ -72,11 +72,6 @@ export default {
                         {
                             title: '월별출석현황',
                             to: '/AttendanceManageMonth',
-                            perm: this.$perm('attendance').can('update'),
-                        },
-                        {
-                            title: '월별출석현황(Old)',
-                            to: '/AttendanceManageMonthOld',
                             perm: this.$perm('attendance').can('update'),
                         },
                         {

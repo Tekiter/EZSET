@@ -34,7 +34,11 @@ const viewObj = new Object()
  */
 router.post(
     '/boards',
-    [perm('board').can('create'), body('title').isString(), validateParams],
+    [
+        perm('manageBoards').can('access'),
+        body('title').isString(),
+        validateParams,
+    ],
     asyncRoute(async (req, res) => {
         let board = new Board()
         board.title = req.body.title
@@ -75,15 +79,47 @@ router.post(
  *
  * @apiError {Number} 500 게시판 삭제 에러
  */
+//게시판 수정
+router.patch(
+    '/boards/:board_id',
+    [
+        perm('manageBoards').can('access'),
+        param('board_id').isNumeric(),
+        validateParams,
+    ],
+    asyncRoute(async (req, res) => {
+        const board = await Board.findOne()
+            .where('_id')
+            .equals(req.params.board_id)
+
+        if (!board) {
+            const err = new Error('존재하지 않는 게시판입니다.')
+            err.status = 404
+            throw err
+        }
+        try {
+            board.title = req.body.title
+            await board.save()
+            res.status(200).json({
+                message: '수정 완료',
+            })
+        } catch (error) {
+            const errr = new Error('database error')
+            errr.status = 500
+            throw errr
+        }
+    })
+)
+
+//게시판 삭제
 router.delete(
     '/boards/:board_id',
-    [param('board_id').isNumeric(), validateParams],
+    [
+        perm('manageBoards').can('access'),
+        param('board_id').isNumeric(),
+        validateParams,
+    ],
     asyncRoute(async (req, res) => {
-        if (!req.user.perm('board', req.params.board_id).can('delete')) {
-            res.status(403).end()
-            return
-        }
-
         const board = await Board.findOne()
             .where('_id')
             .equals(req.params.board_id)
@@ -156,6 +192,7 @@ router.get(
                 return {
                     _id: board._id,
                     title: board.title,
+                    isAnonymous: board.isAnonymous,
                 }
             })
         )
@@ -224,7 +261,7 @@ router.post(
         validateParams,
     ],
     asyncRoute(async function(req, res) {
-        if (!req.user.perm('board', req.params.board_id).can('create')) {
+        if (!req.user.perm('board', req.params.board_id).can('write')) {
             res.status(403).end()
             return
         }
@@ -332,10 +369,10 @@ router.delete(
     '/posts/:post_id',
     [param('post_id').isNumeric(), validateParams],
     asyncRoute(async function(req, res) {
-        if (!req.user.perm('board', req.params.board_id).canOwn('delete')) {
-            res.status(403).end()
-            return
-        }
+        // if (!req.user.perm('board', req.params.board_id).canOwn('delete')) {
+        //     res.status(403).end()
+        //     return
+        // }
 
         try {
             let post = await Post.findById(req.params.post_id)
@@ -435,10 +472,10 @@ router.patch(
         validateParams,
     ],
     asyncRoute(async function(req, res) {
-        if (!req.user.perm('board', req.params.board_id).canOwn('update')) {
-            res.status(403).end()
-            return
-        }
+        // if (!req.user.perm('board', req.params.board_id).canOwn('update')) {
+        //     res.status(403).end()
+        //     return
+        // }
         let post = await Post.findById(req.params.post_id)
 
         if (post) {
@@ -522,6 +559,13 @@ router.get(
         const post = await Post.findOne()
             .where('_id')
             .equals(req.params.post_id)
+
+        if (!req.user.perm('board', post.board).can('read')) {
+            const err = new Error('권한이 없습니다.')
+            err.status = 403
+            throw err
+        }
+
         if (post) {
             //조회수 증가 viewObj 오브젝트 만들어서 post_id : [username] 형식으로 저장
             if (!viewObj[req.params.post_id]) {
@@ -578,6 +622,12 @@ router.get(
         validateParams,
     ],
     asyncRoute(async function(req, res) {
+        if (!req.user.perm('board', req.params.board_id).can('read')) {
+            const err = new Error('권한이 없습니다.')
+            err.status = 403
+            throw err
+        }
+
         let boardId = parseInt(req.params.board_id)
 
         try {
@@ -632,30 +682,35 @@ router.post(
     '/posts/:post_id/comment',
     [param('post_id').isNumeric(), body('content').isString(), validateParams],
     asyncRoute(async function(req, res) {
-        try {
-            let postId = parseInt(req.params.post_id)
-            let post = await Post.findOne({ _id: postId })
-            if (!post) {
-                res.status(404).json({ message: 'no post id ' + postId })
-                return
-            }
-            if (post.isAnonymous == true) {
-                await post.addComment(
-                    req.body.content,
-                    crypto
-                        .createHash('sha512')
-                        .update(req.user.username)
-                        .digest('base64')
-                )
-            } else {
-                await post.addComment(req.body.content, req.user.username)
-            }
-            res.status(201).json({ message: '댓글 작성 완료' })
-        } catch (error) {
-            const errr = new Error('database error')
-            errr.status = 500
-            throw errr
+        let postId = parseInt(req.params.post_id)
+        let post = await Post.findOne({ _id: postId })
+
+        if (!req.user.perm('board', post.board).can('read')) {
+            const err = new Error('권한이 없습니다.')
+            err.status = 403
+            throw err
         }
+        if (req.body.content.length > 300) {
+            const err = new Error('댓글은 300자를 넘을 수 없습니다.')
+            err.status = 500
+            return
+        }
+        if (!post) {
+            res.status(404).json({ message: 'no post id ' + postId })
+            return
+        }
+        if (post.isAnonymous == true) {
+            await post.addComment(
+                req.body.content,
+                crypto
+                    .createHash('sha512')
+                    .update(req.user.username)
+                    .digest('base64')
+            )
+        } else {
+            await post.addComment(req.body.content, req.user.username)
+        }
+        res.status(201).json({ message: '댓글 작성 완료' })
     })
 )
 
@@ -664,56 +719,47 @@ router.patch(
     '/posts/:post_id/comment/:comment_id',
     [param('post_id').isNumeric(), body('content').isString(), validateParams],
     asyncRoute(async function(req, res) {
-        try {
-            let post = await Post.findOne()
-                .where('_id')
-                .equals(req.params.post_id)
+        let post = await Post.findOne()
+            .where('_id')
+            .equals(req.params.post_id)
+        if (!post) {
+            res.status(404).json({
+                message: 'no post id ' + req.params.comment_id,
+            })
+            return
+        }
 
-            if (!post) {
-                res.status(404).json({
-                    message: 'no post id ' + req.params.comment_id,
-                })
+        if (!req.user.perm('board', post.board).can('read')) {
+            const err = new Error('권한이 없습니다.')
+            err.status = 403
+            throw err
+        }
+        if (req.body.content.length > 300) {
+            const err = new Error('댓글은 300자를 넘을 수 없습니다.')
+            err.status = 500
+            return
+        }
+        if (post.isAnonymous == false) {
+            if (post.author != req.user.username) {
+                res.status(403).end()
                 return
             }
-            if (post.isAnonymous == false) {
-                if (post.author != req.user.username) {
-                    res.status(403).end()
-                    return
-                }
-            } else {
-                if (
-                    post.author !=
-                    crypto
-                        .createHash('sha512')
-                        .update(req.user.username)
-                        .digest('base64')
-                ) {
-                    res.status(403).end()
-                    return
-                }
+        } else {
+            if (
+                post.author !=
+                crypto
+                    .createHash('sha512')
+                    .update(req.user.username)
+                    .digest('base64')
+            ) {
+                res.status(403).end()
+                return
             }
-
-            if (post.isAnonymous == true) {
-                await post.updateComment(
-                    req.body.content,
-                    crypto
-                        .createHash('sha512')
-                        .update(req.user.username)
-                        .digest('base64')
-                )
-            } else {
-                await post.updateComment(
-                    req.params.comment_id,
-                    req.body.content
-                )
-            }
-
-            res.status(201).json({ message: '댓글 수정 완료' })
-        } catch (error) {
-            const errr = new Error('database error')
-            errr.status = 500
-            throw errr
         }
+
+        await post.updateComment(req.body.content, req.params.comment_id)
+
+        res.status(201).json({ message: '댓글 수정 완료' })
     })
 )
 
@@ -726,45 +772,46 @@ router.delete(
         validateParams,
     ],
     asyncRoute(async function(req, res) {
-        try {
-            let post = await Post.findOne()
-                .where('_id')
-                .equals(req.params.post_id)
+        let post = await Post.findOne()
+            .where('_id')
+            .equals(req.params.post_id)
 
-            if (!post) {
-                res.status(404).json({
-                    message: 'no post id ' + req.params.comment_id,
-                })
+        if (!post) {
+            res.status(404).json({
+                message: 'no post id ' + req.params.comment_id,
+            })
+            return
+        }
+
+        if (!req.user.perm('board', post.board).can('delete')) {
+            const err = new Error('권한이 없습니다.')
+            err.status = 403
+            throw err
+        }
+
+        if (post.isAnonymous == false) {
+            if (
+                post.author != req.user.username &&
+                !req.user.perm('board', req.params.comment_id).can('delete')
+            ) {
+                res.status(403).end()
                 return
             }
-            if (post.isAnonymous == false) {
-                if (
-                    post.author != req.user.username &&
-                    !req.user.perm('board', req.params.comment_id).can('delete')
-                ) {
-                    res.status(403).end()
-                    return
-                }
-            } else {
-                if (
-                    post.author !=
-                        crypto
-                            .createHash('sha512')
-                            .update(req.user.username)
-                            .digest('base64') &&
-                    !req.user.perm('board', req.params.comment_id).can('delete')
-                ) {
-                    res.status(403).end()
-                    return
-                }
+        } else {
+            if (
+                post.author !=
+                    crypto
+                        .createHash('sha512')
+                        .update(req.user.username)
+                        .digest('base64') &&
+                !req.user.perm('board', req.params.comment_id).can('delete')
+            ) {
+                res.status(403).end()
+                return
             }
-            await post.removeComment(req.params.comment_id)
-            res.status(200).json({ message: '삭제 성공' })
-        } catch (error) {
-            const errr = new Error('database error')
-            errr.status = 500
-            throw errr
         }
+        await post.removeComment(req.params.comment_id)
+        res.status(200).json({ message: '삭제 성공' })
     })
 )
 
@@ -773,20 +820,22 @@ router.post(
     '/posts/:post_id/like',
     [param('post_id').isNumeric(), validateParams],
     asyncRoute(async function(req, res) {
-        try {
-            let postId = parseInt(req.params.post_id)
-            let post = await Post.findOne({ _id: postId })
-            if (!post) {
-                res.status(404).json({ message: 'no post id ' + postId })
-                return
-            }
-            await post.likes_create(req.user.username)
-            res.status(201).json({ message: '좋아요 생성 완료' })
-        } catch (error) {
-            const errr = new Error('database error')
-            errr.status = 500
-            throw errr
+        let postId = parseInt(req.params.post_id)
+        let post = await Post.findOne({ _id: postId })
+
+        if (!post) {
+            res.status(404).json({ message: 'no post id ' + postId })
+            return
         }
+
+        if (!req.user.perm('board', post.board).can('read')) {
+            const err = new Error('권한이 없습니다.')
+            err.status = 403
+            throw err
+        }
+
+        await post.likes_create(req.user.username)
+        res.status(201).json({ message: '좋아요 생성 완료' })
     })
 )
 
@@ -795,27 +844,33 @@ router.delete(
     '/posts/:post_id/like',
     [param('post_id').isNumeric(), validateParams],
     asyncRoute(async function(req, res) {
-        try {
-            let postId = parseInt(req.params.post_id)
-            let post = await Post.findOne({ _id: postId })
-            if (!post) {
-                res.status(404).json({ message: 'no post id ' + postId })
-                return
-            }
-            await post.likes_delete(req.user.username)
-            res.status(201).json({ message: '좋아요 삭제 완료' })
-        } catch (error) {
-            const errr = new Error('database error')
-            errr.status = 500
-            throw errr
+        let postId = parseInt(req.params.post_id)
+        let post = await Post.findOne({ _id: postId })
+        if (!post) {
+            res.status(404).json({ message: 'no post id ' + postId })
+            return
         }
+
+        if (!req.user.perm('board', post.board).can('read')) {
+            const err = new Error('권한이 없습니다.')
+            err.status = 403
+            throw err
+        }
+        await post.likes_delete(req.user.username)
+        res.status(201).json({ message: '좋아요 삭제 완료' })
     })
 )
 
 //게시물 검색
 router.get(
     '/searchpost',
-    [query('content'), query('option'), validateParams],
+    [
+        query('content'),
+        query('option'),
+        query('page').custom(isPositive),
+        query('pagesize').custom(isPositive),
+        validateParams,
+    ],
     asyncRoute(async function(req, res) {
         let options = []
         if (req.query.option == 'title') {
@@ -833,9 +888,17 @@ router.get(
             throw err
         }
         try {
+            const page = parseInt(req.query.page)
+            const pagesize = parseInt(req.query.pagesize || 8)
+
+            let postcount = await Post.find({ $or: options }).count()
+
             const posts = await Post.find({ $or: options })
+                .limit(pagesize)
+                .skip((page - 1) * pagesize)
 
             res.status(200).json({
+                totalpage: postcount,
                 posts: posts.map(post => {
                     return {
                         board: post.board,
@@ -847,6 +910,7 @@ router.get(
                         created_date: post.created_date,
                         view: post.view,
                         like: post.likes_count,
+                        comment_count: post.comments.length,
                         comment: post.comments,
                     }
                 }),

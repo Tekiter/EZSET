@@ -1,34 +1,7 @@
 <template>
     <v-container class="fill-height">
-        <v-row class="fill-height" :no-gutters="isMobileMode">
-            <v-col v-show="isMobileMode" cols="12">
-                <v-tabs v-model="curTab" class="mt-3">
-                    <v-tab>
-                        출석 설정
-                    </v-tab>
-                    <v-tab>
-                        출석 대상 유저
-                    </v-tab>
-                </v-tabs>
-            </v-col>
-            <v-col
-                cols="12"
-                md="6"
-                class="fill-height"
-                v-show="!isMobileMode || curTab == 0"
-            >
-                <v-card class="fill-height">
-                    <v-card-title>
-                        출석 설정
-                    </v-card-title>
-                </v-card>
-            </v-col>
-            <v-col
-                cols="12"
-                md="6"
-                class="fill-height"
-                v-show="!isMobileMode || curTab == 1"
-            >
+        <v-row class="fill-height" :no-gutters="isMobileMode" justify="center">
+            <v-col cols="12" md="6" class="fill-height">
                 <v-card class="fill-height" :loading="attable.isLoading">
                     <v-toolbar flat>
                         <v-toolbar-title>
@@ -303,7 +276,7 @@ export default {
         },
     },
     async created() {
-        if (!this.$perm('manageRoles').can('access')) {
+        if (!this.$perm('attendance').can('update')) {
             this.$router.push({ name: 'error403' })
             return
         }

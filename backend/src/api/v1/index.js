@@ -1,9 +1,15 @@
 import fs from 'fs'
 import path from 'path'
+// import nocache from 'nocache'
 import { Router } from 'express'
 
 import { loginRequired } from '../../utils/auth'
 import { getRoleMiddleware } from '../../utils/role'
+
+// const noCacheMiddleware = nocache()
+// const noCacheMiddleware = (req, res, next) => {
+//     next()
+// }
 
 const router = Router()
 const indexJs = path.basename(__filename)
@@ -17,15 +23,21 @@ fs.readdirSync(__dirname)
     )
     .forEach(routeFile => {
         const subrouter = require(`./${routeFile}`).default
-        if (subrouter.loginNotRequired) {
-            router.use(`/${routeFile.split('.')[0]}`, subrouter)
-        } else {
-            router.use(
-                `/${routeFile.split('.')[0]}`,
-                [loginRequired, getRoleMiddleware],
-                subrouter
-            )
+        const middlewares = []
+
+        if (!subrouter || !subrouter.use) {
+            const err = Error(`Invalid router file '${routeFile}'`)
+            throw err
         }
+
+        // middlewares.push(noCacheMiddleware)
+
+        if (!subrouter.loginNotRequired) {
+            middlewares.push(loginRequired)
+            middlewares.push(getRoleMiddleware)
+        }
+
+        router.use(`/${routeFile.split('.')[0]}`, middlewares, subrouter)
     })
 
 export default router

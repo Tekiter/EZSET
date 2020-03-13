@@ -30,14 +30,21 @@
                 :color="fileinfo.uploaded ? 'success' : ''"
                 :dark="fileinfo.uploaded ? isDarkColor('success') : undefined"
                 class="mr-2 mt-1"
-                >{{ fileinfo.filename }}</v-chip
             >
+                {{ fileinfo.filename }}
+                <span v-if="fileinfo.file">
+                    ({{ fileinfo.file.size | filesize }})
+                </span>
+            </v-chip>
             <v-btn small icon @click="showFileUploadDialog" class="mt-1">
                 <v-icon>mdi-plus</v-icon>
             </v-btn>
-            <span class="ml-3 mt-1" v-if="selectedFiles.length == 0"
-                >또는 파일을 끌어다 넣으세요...</span
-            >
+            <span class="ml-3 mt-1" v-if="selectedFiles.length == 0">
+                <span v-if="$vuetify.breakpoint.mdAndUp"
+                    >또는 파일을 끌어다 넣으세요...</span
+                >
+                <span v-else>버튼을 눌러 파일을 첨부하세요.</span>
+            </span>
         </v-card-text>
         <!-- <p v-if="dragOver">
             gogo
@@ -188,6 +195,24 @@ export default {
         },
         currentProgress(val) {},
         fileProgress(val) {},
+    },
+    filters: {
+        filesize(value) {
+            if (!value) {
+                return ''
+            }
+
+            const val = parseInt(value)
+            if (isNaN(val)) {
+                return ''
+            }
+
+            if (val <= 1000000) {
+                return `${(val / 1000).toFixed(1)}KB`
+            }
+
+            return `${(val / 1000000).toFixed(2)}MB`
+        },
     },
 }
 </script>

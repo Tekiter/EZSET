@@ -150,7 +150,6 @@ export default {
                     this.$emit('close')
                 } catch (error) {
                     this.removeGroupDialog.error = '삭제에 실패했습니다.'
-                    console.log(error)
                 }
             } else {
                 this.removeGroupDialog.error = '역할 이름이 일치하지 않습니다.'

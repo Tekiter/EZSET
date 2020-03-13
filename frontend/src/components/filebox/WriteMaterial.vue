@@ -117,7 +117,6 @@ export default {
             }
         },
         async submitClick() {
-            console.log(this.contentLength())
             if (this.contentLength() == true) {
                 return
             }
@@ -158,6 +157,14 @@ export default {
         async applyEdit() {
             try {
                 this.isLoading = true
+
+                if (!(await this.checkFilesValid())) {
+                    await this.$action.showAlertDialog(
+                        '파일 업로드 실패',
+                        '10MB 이하의 파일만 첨부 가능합니다.'
+                    )
+                    return
+                }
 
                 const content = this.getMarkdown()
 
@@ -216,6 +223,19 @@ export default {
             }
 
             return fileIds
+        },
+        async checkFilesValid() {
+            // 파일의 크기가 10MB 이하인지 체크
+            const exceed = this.uploadFile.selected.filter(file => {
+                if (!file.uploaded && file.file.size > 10000000) {
+                    return true
+                }
+                return false
+            })
+            if (exceed.length > 0) {
+                return false
+            }
+            return true
         },
         async fetchMaterial() {
             this.isLoading = true

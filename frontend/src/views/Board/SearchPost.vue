@@ -31,12 +31,12 @@
                         solo
                         flat
                         @change="clickSearch()"
-                        :rules="[rules.min]"
                     ></v-text-field>
                 </v-col>
-                <v-col cols="2" sm="1">
+                <v-col cols="2" sm="1" v-if="$vuetify.breakpoint.mdAndUp">
                     <div class="my-2">
                         <v-btn
+                            large
                             depressed
                             color="primary"
                             :dark="isDarkColor('primary')"
@@ -45,9 +45,73 @@
                         >
                     </div>
                 </v-col>
+                <v-col cols="2" sm="1" v-else>
+                    <div class="my-2">
+                        <v-btn
+                            icon
+                            large
+                            color="primary"
+                            :dark="isDarkColor('primary')"
+                            @click="clickSearch()"
+                            ><v-icon>mdi-magnify</v-icon></v-btn
+                        >
+                    </div>
+                </v-col>
             </v-row>
         </div>
         <v-card outlined v-if="showData">
+            <v-data-table
+                v-if="$vuetify.breakpoint.mdAndUp"
+                :headers="headers"
+                :items="posts"
+                :page.sync="page"
+                :loading="loading"
+                :server-items-length="totalpage"
+                :options.sync="options"
+                @update:items-per-page="fetchPostList()"
+                :items-per-page.sync="itemsPerPage"
+                hide-default-footer
+                :mobile-breakpoint="NaN"
+                @page-count="pageCount = $event"
+            >
+                <template v-slot:item.title="props">
+                    <a @click="read(props.item)">
+                        {{ props.item.title }} [{{ props.item.comment_count }}]
+                    </a>
+                </template>
+            </v-data-table>
+            <v-list v-else>
+                <v-list-item v-for="post in posts" :key="post._id">
+                    <v-list-item-content>
+                        <v-list-item-title
+                            ><a @click="read(post)" class="title"
+                                >{{ post.title }} [{{ post.comment_count }}]</a
+                            >
+                            <v-spacer></v-spacer>
+                            <v-icon x-small color="red darken-3"
+                                >mdi-heart-multiple</v-icon
+                            >
+                            {{ post.like }}
+                        </v-list-item-title>
+                        {{ post.author
+                        }}<v-divider class="mx-4" vertical></v-divider>
+                        {{ post.created_date
+                        }}<v-divider class="mx-4" vertical></v-divider> 조회
+                        {{ post.view }}
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list>
+            <v-row>
+                <v-col>
+                    <v-pagination
+                        v-model="page"
+                        :length="pageCount"
+                        :items-per-page.sync="page"
+                    ></v-pagination>
+                </v-col>
+            </v-row>
+        </v-card>
+        <!-- <v-card outlined v-if="showData">
             <v-data-table
                 :headers="$vuetify.breakpoint.mdAndUp ? headers : headersTwo"
                 :items="posts"
@@ -70,7 +134,7 @@
                     </a>
                 </template>
             </v-data-table>
-        </v-card>
+        </v-card> -->
     </v-container>
 </template>
 
@@ -84,7 +148,9 @@ export default {
             loading: false,
             page: 1,
             pageCount: 0,
-            itemsPerPage: 10,
+            totalpage: 0,
+            itemsPerPage: 8,
+            options: {},
             select: { state: '제목', value: 'title' },
             item: [
                 { state: '제목', value: 'title' },
@@ -129,10 +195,21 @@ export default {
                 { text: '추천', value: 'like' },
                 { text: '조회', value: 'view' },
             ],
-            rules: {
-                min: v => v.length >= 2 || '최소 2글자 이상 입력하세요.',
-            },
+            // rules: {
+            //     min: v => v.length >= 2 || '최소 2글자 이상 입력하세요.',
+            // },
         }
+    },
+    watch: {
+        page: {
+            async handler() {
+                await this.getData()
+            },
+        },
+        async $route(to, from) {
+            await this.getData()
+            this.page = 1
+        },
     },
     methods: {
         read(evt) {
@@ -141,9 +218,9 @@ export default {
             })
         },
         clickSearch() {
-            if (this.searchObject.length < 2) {
-                return
-            }
+            // if (this.searchObject.length < 2) {
+            //     return
+            // }
             this.getData()
             this.showData = true
         },
@@ -153,11 +230,13 @@ export default {
                 params: {
                     option: this.select.value,
                     content: this.searchObject,
+                    page: this.page,
+                    pagesize: this.itemsPerPage,
                 },
             })
             this.posts = res.data.posts.map(post => {
                 post.created_date = moment(post.created_date).format(
-                    'YYYY/MM/DD HH:MM'
+                    'YYYY/MM/DD HH:mm'
                 )
                 return post
             })
@@ -171,6 +250,8 @@ export default {
                 }
                 return post
             })
+            this.totalpage = res.data.totalpage
+            this.pageCount = Math.ceil(res.data.totalpage / this.itemsPerPage)
             this.loading = false
         },
     },
