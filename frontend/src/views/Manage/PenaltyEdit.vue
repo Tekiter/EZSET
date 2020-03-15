@@ -132,20 +132,14 @@
             <v-card>
                 <v-card-title>
                     <span class="headline">벌점 항목 수정</span
-                    ><v-card-subtitle>{{
-                        updateDialog.penalty.key
-                    }}</v-card-subtitle>
+                    ><v-card-subtitle>{{ updateDialog.type }}</v-card-subtitle>
                 </v-card-title>
                 <v-card-text>
-                    <v-text-field
-                        v-model="updateDialog.type"
-                        label="벌점 이름"
-                        hide-details
-                    ></v-text-field>
                     <v-text-field
                         v-model="updateDialog.point"
                         label="벌점"
                         hide-details
+                        outlined
                     ></v-text-field>
                 </v-card-text>
                 <v-card-text>
@@ -300,9 +294,7 @@ export default {
             this.updateDialog.show = true
         },
         async updatePenaltyProperty() {
-            if (this.updateDialog.type == '') {
-                this.openSnackbar('벌점 이름을 확인해주세요', 'error')
-            } else if (this.updateDialog.point == '') {
+            if (this.updateDialog.point == '') {
                 this.openSnackbar('벌점 을 확인해주세요', 'error')
             } else {
                 try {
