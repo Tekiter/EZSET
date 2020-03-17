@@ -15,9 +15,18 @@ router.get(
 )
 
 //write config
-router.post('/write', [perm('attendance').can('update'), body('key').isString(), body('value').isNumeric(), validateParams],
+router.post(
+    '/write', [
+        perm('attendance').can('update'),
+        body('key').isString(),
+        body('value').isNumeric(),
+        validateParams,
+    ],
     asyncRoute(async function(req, res) {
-        const cnt = await PenaltyConfig.find().where('key').equals(req.body.key).count()
+        const cnt = await PenaltyConfig.find()
+            .where('key')
+            .equals(req.body.key)
+            .count()
         if (cnt > 0) return res.status(406).json()
         var penaltyConfig = new PenaltyConfig()
         penaltyConfig.key = req.body.key
@@ -28,7 +37,8 @@ router.post('/write', [perm('attendance').can('update'), body('key').isString(),
 )
 
 //delete config
-router.post('/delete', [perm('attendance').can('update'), body('key').isString(), validateParams],
+router.post(
+    '/delete', [perm('attendance').can('update'), body('key').isString(), validateParams],
     asyncRoute(async function(req, res) {
         if (req.body.key == '지각') {
             const err = new Error('지각 항목은 삭제할 수 없습니다.')
@@ -48,12 +58,18 @@ router.post('/delete', [perm('attendance').can('update'), body('key').isString()
 )
 
 //update config
-router.post('/update', [perm('attendance').can('update'), body('key').isString(), body('value').isNumeric(), validateParams],
+router.post(
+    '/update', [
+        perm('attendance').can('update'),
+        body('key').isString(),
+        body('value').isNumeric(),
+        validateParams,
+    ],
     asyncRoute(async function(req, res) {
         await PenaltyConfig.findOneAndUpdate({
-            key: req.body.key
+            key: req.body.key,
         }, {
-            value: req.body.value
+            value: req.body.value,
         })
         res.end()
     })

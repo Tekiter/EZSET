@@ -1,6 +1,7 @@
 import Router from 'express'
 import { asyncRoute, validateParams, checkUsername } from '../../utils/api'
 import Penalty from '../../models/Penalty/Penalty'
+import AttendanceUser from '../../models/attendanceUser'
 import { perm } from '../../utils/role'
 import { param, body } from 'express-validator'
 const router = Router()
@@ -17,13 +18,49 @@ router.get(
         validateParams,
     ],
     asyncRoute(async function(req, res) {
+        var result = []
+        var attendanceUser = await AttendanceUser.findOne({
+            name: req.body.username,
+        }).select({ _id: 0, __v: 0, name: 0 })
+
+        attendanceUser.status.forEach(element => {
+            if (moment(element.date) >= moment(req.body.start_date) && moment(element.date) <= moment(req.body.end_date)) {
+                if (element.state == 'late') {
+                    result.push({
+                        type: "지각",
+                        date: moment(element.date).format("YYYY-MM-DD"),
+                        description: "지각"
+                    })
+                }
+                if (element.state == 'absence') {
+                    result.push({
+                        type: "결석",
+                        date: moment(element.date).format("YYYY-MM-DD"),
+                        description: "결석"
+                    })
+                }
+            }
+        });
+
         var penalty = await Penalty.find({
+            username: req.body.username,
             date: {
                 $gte: moment(req.body.start_date).format('YYYY-MM-DD'),
                 $lte: moment(req.body.end_date).format('YYYY-MM-DD'),
             },
-        }).sort({ date: 1 })
-        res.send(penalty)
+        })
+        penalty.forEach(element => {
+            result.push({
+                type: element.type,
+                date: moment(element.date).format('YYYY-MM-DD'),
+                description: element.description,
+            })
+        });
+
+        result.sort(function(a, b) {
+            return a.date > b.date;
+        })
+        res.json({ result })
     })
 )
 
@@ -45,6 +82,7 @@ router.post(
         penalty.description = req.body.description
 
         await penalty.save()
+
         res.end()
     })
 )
