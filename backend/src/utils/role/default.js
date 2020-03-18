@@ -20,7 +20,7 @@ export function setDefaultRole(roles) {
         .can('read')
 
     .resource('penalty')
-        .canOwn('read')
+        .can('read')
 }
 
 export function setAdminRole(roles) {

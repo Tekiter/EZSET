@@ -116,22 +116,16 @@ export default {
                     perm: this.$perm('schedule').can('read'),
                 },
                 {
-                    type: 'simple',
-                    icon: 'mdi-checkbox-marked-circle-outline',
+                    icon: 'mdi-thumb-up-outline',
                     title: '상벌점',
-
-                    children: [
-                        {
-                            title: '상벌점',
-                            to: '/PenaltyManage',
-                            perm: this.$perm('attendance').can('update'),
-                        },
-                        {
-                            title: '상벌점 조회',
-                            to: '/Penalty',
-                            perm: this.$perm('attendance').can('update'),
-                        },
-                    ],
+                    to: '/PenaltyManage',
+                    perm: this.$perm('penalty').can('update'),
+                },
+                {
+                    icon: 'mdi-thumb-up-outline',
+                    title: '상벌점 조회',
+                    to: '/Penalty',
+                    perm: this.$perm('penalty').can('update'),
                 },
             ]
         },
