@@ -10,12 +10,13 @@
                     hide-details
                     class="mb-4"
                 ></v-text-field>
-                <editor
-                    ref="editor"
-                    mode="wysiwyg"
-                    :options="editor.options"
-                    :value="newMaterial.content"
-                />
+                <v-textarea
+                    outlined
+                    v-model="newMaterial.content"
+                    name="input-7-4"
+                    label="내용"
+                ></v-textarea>
+
                 <file-upload
                     v-model="uploadFile.selected"
                     :currentProgress="uploadFile.currentProgress"
@@ -59,12 +60,10 @@
 </template>
 <script>
 import axios from 'axios'
-import { Editor } from '@toast-ui/vue-editor'
 import FileUpload from '../../components/file/FileUpload'
 
 export default {
     components: {
-        Editor,
         FileUpload,
     },
     props: {
@@ -106,7 +105,7 @@ export default {
     methods: {
         contentLength() {
             if (
-                this.getMarkdown().length > 100 ||
+                this.newMaterial.content.length > 100 ||
                 this.newMaterial.title.length > 100
             ) {
                 this.isLengthError = true
@@ -130,8 +129,6 @@ export default {
             try {
                 this.isLoading = true
 
-                const content = this.getMarkdown()
-
                 // 첨부파일 업로드
                 const fileIds = await this.uploadFiles()
 
@@ -139,7 +136,7 @@ export default {
                     '/filebox/folder/' + this.$route.params.folder_id,
                     {
                         title: this.newMaterial.title,
-                        content: content,
+                        content: this.newMaterial.content,
                         files: fileIds,
                         parent_id: this.$route.params.folder_id,
                     }
@@ -173,7 +170,7 @@ export default {
 
                 await axios.patch('filebox/material/' + this.edit, {
                     title: this.newMaterial.title,
-                    content: content,
+                    content: this.newMaterial.content,
                     files: fileIds,
                 })
                 this.$router.push({
@@ -185,9 +182,6 @@ export default {
             } finally {
                 this.isLoading = false
             }
-        },
-        getMarkdown() {
-            return this.$refs.editor.invoke('getMarkdown')
         },
         async uploadFiles() {
             const fileIds = []
