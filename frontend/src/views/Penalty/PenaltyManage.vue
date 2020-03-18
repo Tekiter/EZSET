@@ -165,7 +165,46 @@
                         </v-row>
                     </v-card>
                     <v-divider></v-divider>
-
+                    <v-form
+                        class="d-flex"
+                        ref="form"
+                        v-model="valid"
+                        :lazy-validation="lazy"
+                    >
+                        <v-select
+                            class="ma-2"
+                            v-model="addPenalty.type"
+                            :items="penaltyConfig.key"
+                            :rules="[v => !!v || '필수 선택 항목입니다!']"
+                            required
+                            label="항목"
+                        ></v-select>
+                        <v-text-field
+                            class="ma-2"
+                            v-model="addPenalty.date"
+                            label="Date"
+                            :rules="[v => !!v || '필수 선택 항목입니다!']"
+                            required
+                        ></v-text-field>
+                        <v-date-picker
+                            v-model="addPenalty.date"
+                        ></v-date-picker>
+                        <v-text-field
+                            class="ma-2"
+                            v-model="addPenalty.description"
+                            label="설명"
+                            :rules="[v => !!v || '필수 작성 항목입니다!']"
+                            required
+                        ></v-text-field>
+                        <v-btn
+                            color="success"
+                            class="ma-5"
+                            @click="addPenalty(addPenalty)"
+                        >
+                            상/벌점 등록
+                        </v-btn>
+                    </v-form>
+                    <v-divider></v-divider>
                     <!-- <v-subheader>소속 유저</v-subheader> -->
 
                     <template v-if="curPenalty.isLoading">
@@ -303,6 +342,12 @@ export default {
                 color: '',
             },
             Totalscore: 0,
+            addPenalty: {
+                type: '',
+                description: '',
+                point: '',
+                date: moment().format('YYYY-MM-DD'),
+            },
         }
     },
     computed: {
