@@ -3,7 +3,7 @@
         <v-list-item three-line>
             <v-list-item-content>
                 <div class="d-flex">
-                    <div class="overline mb-4 flex-grow-1">
+                    <div class="overline mb-4 flex-grow-1 text-none">
                         {{
                             convertDate(options.created_date) +
                                 ' ' +

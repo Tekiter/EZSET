@@ -163,8 +163,6 @@ export default {
                     return
                 }
 
-                const content = this.getMarkdown()
-
                 // 첨부파일 업로드
                 const fileIds = await this.uploadFiles()
 
