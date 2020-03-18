@@ -71,5 +71,5 @@ export function setAdminRole(roles) {
         .can('update')
 
     .resource('penalty')
-        .can('update')
+        .can(['update', 'read'])
 }

@@ -509,9 +509,8 @@ export default {
         this.fetchingCount += 1
         await this.fetchUserList()
         await this.fetchPenaltyConfigList()
-        this.fetchingCount -= 1
-
         await this.switchUser(this.users[0])
+        this.fetchingCount -= 1
     },
 }
 </script>

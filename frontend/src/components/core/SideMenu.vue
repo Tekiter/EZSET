@@ -125,7 +125,7 @@ export default {
                     icon: 'mdi-thumb-up-outline',
                     title: '상벌점 조회',
                     to: '/Penalty',
-                    perm: this.$perm('penalty').can('update'),
+                    perm: this.$perm('penalty').can('read'),
                 },
             ]
         },

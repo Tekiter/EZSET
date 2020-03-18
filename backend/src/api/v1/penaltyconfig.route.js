@@ -7,7 +7,7 @@ const router = Router()
 
 //get config
 router.get(
-    '/read', [perm('penalty').can('update')],
+    '/read', [perm('penalty').can('read')],
     asyncRoute(async function(req, res) {
         const cursor = await PenaltyConfig.find()
         res.json(cursor)

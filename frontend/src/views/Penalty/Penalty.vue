@@ -346,7 +346,6 @@ export default {
             return
         }
         this.fetchingCount += 1
-        await this.fetchUserList()
         await this.fetchPenaltyConfigList()
         await this.getUser()
         this.fetchingCount -= 1
