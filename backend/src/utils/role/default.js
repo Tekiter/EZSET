@@ -3,9 +3,6 @@ export function setDefaultRole(roles) {
     roles
         .role('default')
 
-        .resource('profile')
-        .canOwn('read')
-
         .resource('role')
         .canOwn('read')
 

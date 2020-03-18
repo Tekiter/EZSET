@@ -70,12 +70,6 @@ const routes = [
         component: () => import('../views/Schedule/Schedule.vue'),
     },
     {
-        path: '/board',
-        name: 'board',
-        component: () =>
-            import(/* webpackChunkName: "board" */ '../views/Board/Board.vue'),
-    },
-    {
         path: '/board/:board_id',
         name: 'post',
         component: () =>
