@@ -66,6 +66,11 @@
                                                     $vuetify.breakpoint
                                                         .smAndDown
                                                 "
+                                                v-if="
+                                                    this.$perm('schedule').can(
+                                                        'update'
+                                                    )
+                                                "
                                             >
                                                 <v-icon
                                                     v-if="
