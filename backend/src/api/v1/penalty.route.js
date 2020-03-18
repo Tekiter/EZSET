@@ -1,73 +1,95 @@
 import Router from 'express'
 import { asyncRoute, validateParams, checkUsername } from '../../utils/api'
 import Penalty from '../../models/Penalty/Penalty'
+import PenaltyConfig from '../../models/Penalty/PenaltyConfig'
 import AttendanceUser from '../../models/attendanceUser'
 import { perm } from '../../utils/role'
-import { param, body } from 'express-validator'
+import { param, body, query } from 'express-validator'
 const router = Router()
 var moment = require('moment')
 
 //get penalty
 // penalty.canOwn('read')
 router.get(
-    '/read', [
-        perm('attendance').can('update'),
-        body('start_date').isString(),
-        body('end_date').isString(),
-        body('username').isString(),
+    '/read/:username', [
+        perm('penalty').can('update'),
+        param('username').isString(),
+        query('start_date').isString(),
+        query('end_date').isString(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
         var result = []
         var attendanceUser = await AttendanceUser.findOne({
-            name: req.body.username,
+            name: req.params.username,
         }).select({ _id: 0, __v: 0, name: 0 })
 
+        var penaltyConfig = await PenaltyConfig.find()
+
+        var val = penaltyConfig.find((item, idx) => {
+            return item.key === '지각';
+        })
+        console.log(val)
         attendanceUser.status.forEach(element => {
-            if (moment(element.date) >= moment(req.body.start_date) && moment(element.date) <= moment(req.body.end_date)) {
+            if (moment(element.date) >= moment(req.query.start_date) && moment(element.date) <= moment(req.query.end_date)) {
+
+
                 if (element.state == 'late') {
+                    var Val = penaltyConfig.find((item, idx) => {
+                        return item.key === '지각';
+                    })
                     result.push({
+                        username: req.params.username,
                         type: "지각",
                         date: moment(element.date).format("YYYY-MM-DD"),
-                        description: "지각"
+                        description: "지각",
+                        point: Val.value
                     })
                 }
                 if (element.state == 'absence') {
+                    var val = penaltyConfig.find((item, idx) => {
+                        return item.key === '결석';
+                    })
                     result.push({
+                        username: req.params.username,
                         type: "결석",
                         date: moment(element.date).format("YYYY-MM-DD"),
-                        description: "결석"
+                        description: "결석",
+                        point: val.value
                     })
                 }
             }
         });
 
         var penalty = await Penalty.find({
-            username: req.body.username,
+            username: req.params.username,
             date: {
-                $gte: moment(req.body.start_date).format('YYYY-MM-DD'),
-                $lte: moment(req.body.end_date).format('YYYY-MM-DD'),
+                $gte: moment(req.query.start_date).format('YYYY-MM-DD'),
+                $lte: moment(req.query.end_date).format('YYYY-MM-DD'),
             },
         })
+
         penalty.forEach(element => {
+            var val = penaltyConfig.find((item, idx) => {
+                return item.key === element.type;
+            })
             result.push({
+                username: req.params.username,
                 type: element.type,
                 date: moment(element.date).format('YYYY-MM-DD'),
                 description: element.description,
+                point: val.value
             })
         });
 
-        result.sort(function(a, b) {
-            return a.date > b.date;
-        })
-        res.json({ result })
+        res.json(result)
     })
 )
 
 //write config
 router.post(
     '/write', [
-        perm('attendance').can('update'),
+        perm('penalty').can('update'),
         body('type').isString(),
         body('date').isString(),
         body('username').isString(),
@@ -89,15 +111,15 @@ router.post(
 
 //delete config
 router.post(
-    '/delete', [
-        perm('attendance').can('update'),
-        body('type').isString(),
-        body('date').isString(),
+    '/delete/', [
+        perm('penalty').can('update'),
         body('username').isString(),
-        body('description').isString(),
+        body('date').isString(),
+        body('type').isString(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
+        console.log(req.query.type)
         await Penalty.findOneAndDelete({
             type: req.body.type,
             username: req.body.username,
@@ -108,31 +130,31 @@ router.post(
     })
 )
 
-//delete config
-router.post(
-    '/update', [
-        perm('attendance').can('update'),
-        body('type').isString(),
-        body('date').isString(),
-        body('username').isString(),
-        body('description').isString(),
-        body('ntype').isString(),
-        body('ndate').isString(),
-        body('ndescription').isString(),
-        validateParams,
-    ],
-    asyncRoute(async function(req, res) {
-        await Penalty.findOneAndUpdate({
-            type: req.body.type,
-            username: req.body.username,
-            date: req.body.date,
-            description: req.body.description,
-        }, {
-            type: req.body.ntype,
-            date: req.body.ndate,
-            description: req.body.ndescription,
-        })
-        res.end()
-    })
-)
+// //delete config
+// router.post(
+//     '/update', [
+//         perm('penalty').can('update'),
+//         body('type').isString(),
+//         body('date').isString(),
+//         body('username').isString(),
+//         body('description').isString(),
+//         body('ntype').isString(),
+//         body('ndate').isString(),
+//         body('ndescription').isString(),
+//         validateParams,
+//     ],
+//     asyncRoute(async function(req, res) {
+//         await Penalty.findOneAndUpdate({
+//             type: req.body.type,
+//             username: req.body.username,
+//             date: req.body.date,
+//             description: req.body.description,
+//         }, {
+//             type: req.body.ntype,
+//             date: req.body.ndate,
+//             description: req.body.ndescription,
+//         })
+//         res.end()
+//     })
+// )
 export default router

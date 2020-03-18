@@ -27,25 +27,31 @@
                 <v-card tile minHeight="95%" :loading="isLoading" outlined>
                     <v-card-title>사용자</v-card-title>
                     <v-list>
-                        <template v-if="isLoading && roles.length == 0">
+                        <template v-if="isLoading && users.length == 0">
                             <v-skeleton-loader
                                 v-for="i in 7"
-                                :key="`role-loading-${i}`"
+                                :key="`user-loading-${i}`"
                                 type="list-item"
                             ></v-skeleton-loader>
                         </template>
                         <v-list-item-group v-else :mandatory="true">
                             <v-list-item
-                                v-for="role in roles"
-                                :key="role.tag"
+                                v-for="user in users"
+                                :key="`user-list-${user.username}`"
                                 @click="
-                                    switchRole(role)
+                                    switchUser(user)
                                     curTab = 1
                                 "
                             >
                                 <v-list-item-content>
                                     <v-list-item-title>
-                                        {{ role.name }}
+                                        <span class="title">{{
+                                            user.realname
+                                        }}</span>
+                                        <span
+                                            class="subtitle-2 ml-2 grey--text"
+                                            >{{ user.username }}</span
+                                        >
                                     </v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
@@ -54,239 +60,177 @@
                 </v-card>
             </v-col>
 
-            <!-- 소속 유저 column -->
+            <!-- 세부내역 column -->
+
             <v-col
                 cols="12"
                 md="9"
-                v-show="!isMobileMode || curTab == 2"
+                v-show="!isMobileMode || curTab == 1"
                 class="fill-height"
             >
                 <v-card
-                    :loading="curUsers.isLoading"
-                    :disabled="curRole.tag === 'default'"
+                    :loading="curPenalty.isLoading"
+                    :disabled="curUser.username === 'default'"
                     tile
                     minHeight="95%"
                     outlined
                 >
-                    <v-toolbar flat>
-                        <v-toolbar-title>
-                            세부 내역
-                        </v-toolbar-title>
-                        <v-spacer></v-spacer>
-                        <v-fade-transition>
-                            <v-toolbar-title
-                                v-show="curUsers.selections.length > 0"
-                            >
-                                <v-subheader
-                                    >{{ curUsers.selections.length }}명
-                                    선택됨</v-subheader
-                                >
-                            </v-toolbar-title>
-                        </v-fade-transition>
-                        <v-fade-transition>
-                            <v-btn
-                                icon
-                                @click="showUserRemoveDialog"
-                                v-show="curUsers.selections.length > 0"
-                            >
-                                <v-icon>mdi-delete</v-icon>
-                            </v-btn>
-                        </v-fade-transition>
-                        <v-btn icon @click="showUserAddDialog(curRole)">
-                            <v-icon>mdi-plus</v-icon>
-                        </v-btn>
-                    </v-toolbar>
                     <v-card-title>
-                        {{ curRole.tag }}
+                        <span class="headline">{{ curUser.realname }}</span>
+                        <v-card-subtitle>{{
+                            curUser.username
+                        }}</v-card-subtitle>
+                        <v-spacer></v-spacer>
+                        {{ '점' }}
                     </v-card-title>
-                    <v-list subheader>
-                        <!-- <v-subheader>소속 유저</v-subheader> -->
-                        <v-list-item>
-                            <v-text-field
-                                v-model="curUsers.search"
-                                clearable
-                                solo
-                                outlined
-                                flat
-                                hide-details
-                                dense
-                                label="검색"
-                                prepend-inner-icon="mdi-magnify"
-                            ></v-text-field>
-                        </v-list-item>
+                    <v-divider></v-divider>
+                    <v-card
+                        class="pa-3 fill-width font-weight-light"
+                        flat
+                        minHeight="95%"
+                        color="primary lighten-1"
+                        :dark="isDarkColor('primary')"
+                        v-show="!curPenalty.isLoading"
+                    >
+                        <v-row align="center">
+                            <v-col cols="12" lg="5">
+                                <v-menu
+                                    v-model="startDayPicker"
+                                    :close-on-content-click="false"
+                                    max-width="290"
+                                >
+                                    <template v-slot:activator="{ on }">
+                                        <v-text-field
+                                            :value="computedDateStart"
+                                            clearable
+                                            label="Start date"
+                                            readonly
+                                            v-on="on"
+                                            @click:clear="date = null"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-date-picker
+                                        v-model="curPenalty.start_date"
+                                        @change="
+                                            ;(startDayPicker = false),
+                                                fetchPenalties()
+                                        "
+                                        locale="ko"
+                                    ></v-date-picker>
+                                </v-menu>
+                            </v-col>
+                            <v-col cols="12" lg="2" class="text-center">
+                                <v-icon x-large>
+                                    mdi-arrow-right-circle
+                                </v-icon>
+                            </v-col>
+                            <v-col cols="12" lg="5">
+                                <v-menu
+                                    v-model="endDayPicker"
+                                    :close-on-content-click="false"
+                                    max-width="290"
+                                >
+                                    <template v-slot:activator="{ on }">
+                                        <v-text-field
+                                            :value="computedDateEnd"
+                                            clearable
+                                            label="End date"
+                                            readonly
+                                            v-on="on"
+                                            @click:clear="date = null"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-date-picker
+                                        v-model="curPenalty.end_date"
+                                        @change="
+                                            ;(endDayPicker = false),
+                                                fetchPenalties()
+                                        "
+                                        locale="ko"
+                                    ></v-date-picker>
+                                </v-menu>
+                            </v-col>
+                        </v-row>
+                    </v-card>
+                    <v-divider></v-divider>
 
-                        <template v-if="curUsers.isLoading">
-                            <v-skeleton-loader
-                                v-for="i in 7"
-                                :key="`role-loading-${i}`"
-                                type="list-item"
-                            ></v-skeleton-loader>
+                    <!-- <v-subheader>소속 유저</v-subheader> -->
+
+                    <template v-if="curPenalty.isLoading">
+                        <v-skeleton-loader
+                            v-for="i in 7"
+                            :key="`role-loading-${i}`"
+                            type="data-table"
+                        ></v-skeleton-loader>
+                    </template>
+                    <v-skeleton-loader
+                        class="mx-auto"
+                        type="table"
+                        v-if="curPenalty.isLoading"
+                    ></v-skeleton-loader>
+                    <v-data-table
+                        :headers="datatable.headers"
+                        :items="curPenalty.penalties"
+                        sort-by="date"
+                        class="elevation-1"
+                        v-if="!curPenalty.isLoading"
+                    >
+                        <template v-slot:item.actions="{ item }">
+                            <v-icon small @click="openDeleteItem(item)">
+                                mdi-delete
+                            </v-icon>
                         </template>
-                        <v-list-item-group
-                            v-else
-                            multiple
-                            v-model="curUsers.selections"
-                        >
-                            <v-list-item
-                                v-for="user in curUsers.users"
-                                :key="user.username"
-                                v-show="
-                                    searchMatches(
-                                        user.username,
-                                        curUsers.search
-                                    )
-                                "
-                            >
-                                <template v-slot:default="{ active, toggle }">
-                                    <v-list-item-action>
-                                        <v-checkbox
-                                            :input-value="active"
-                                            :true-value="user"
-                                            @click="toggle"
-                                        ></v-checkbox>
-                                    </v-list-item-action>
-
-                                    <v-list-item-content>
-                                        <v-list-item-title>
-                                            {{ user.realname }}
-                                            <span
-                                                class="caption font-weight-light ml-3"
-                                            >
-                                                {{ user.username }}
-                                            </span>
-                                        </v-list-item-title>
-                                    </v-list-item-content>
-                                </template>
-                            </v-list-item>
-                        </v-list-item-group>
-                    </v-list>
+                    </v-data-table>
                 </v-card>
             </v-col>
         </v-row>
-
-        <!-- 유저 추가 Dialog -->
-        <v-dialog
-            v-model="userAddDialog.show"
-            :fullscreen="isMobileMode"
-            max-width="800px"
-            height="500px"
-        >
-            <v-card :loading="userAddDialog.isLoading">
-                <v-card-title v-if="!isMobileMode"
-                    >유저 추가
-                    <v-card-subtitle>{{ curRole.name }}</v-card-subtitle>
+        <v-dialog v-model="deleteDialog.show" persistent max-width="300px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">삭제</span
+                    ><v-card-subtitle>{{
+                        deleteDialog.penalty.type
+                    }}</v-card-subtitle>
                 </v-card-title>
-                <v-toolbar v-else flat>
-                    <v-btn icon @click="closeUserAddDialog()">
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                    <v-toolbar-title>유저 추가</v-toolbar-title>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        outlined
-                        @click.native="applyUserAddDialog()"
-                        color="primary"
-                        >추가</v-btn
-                    >
-                </v-toolbar>
                 <v-card-text>
-                    <v-text-field
-                        v-model="userAddDialog.search"
-                        clearable
-                        solo
-                        outlined
-                        flat
-                        hide-details
-                        dense
-                        label="검색"
-                        prepend-inner-icon="mdi-magnify"
-                    ></v-text-field>
-                    <v-row no-gutters>
-                        <v-col
-                            v-for="user in filteredUsers"
-                            :key="user.username"
-                            v-show="
-                                searchMatches(
-                                    user.username,
-                                    userAddDialog.search
-                                )
-                            "
-                            cols="12"
-                            sm="6"
-                        >
-                            <v-checkbox
-                                :label="`${user.realname} (${user.username})`"
-                                v-model="userAddDialog.selections"
-                                :value="user.username"
-                                hide-details
-                            ></v-checkbox>
-                        </v-col>
-                        <v-col
-                            cols="12"
-                            class="text-center mt-5"
-                            v-if="filteredUsers.length == 0"
-                        >
-                            <p>추가 할 유저가 없습니다.</p>
-                        </v-col>
-                    </v-row>
-                </v-card-text>
-                <v-spacer></v-spacer>
-                <v-card-actions v-if="!isMobileMode">
-                    <v-spacer></v-spacer>
-                    <v-fade-transition>
-                        <small
-                            v-show="userAddDialog.message"
-                            class="red--text text--darken-4 mr-3"
-                            >{{ userAddDialog.message }}</small
-                        >
-                    </v-fade-transition>
-
-                    <v-btn
-                        @click.native="applyUserAddDialog()"
-                        text
-                        color="primary"
-                        >추가</v-btn
-                    >
-                    <v-btn @click.native="closeUserAddDialog()" text
-                        >취소</v-btn
-                    >
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
-        <!-- 유저 삭제 Dialog -->
-        <v-dialog v-model="userRemoveDialog.show" max-width="400px">
-            <v-card :loading="userRemoveDialog.isLoading">
-                <v-card-title>유저 제거</v-card-title>
-
-                <v-card-text>
-                    <p>
-                        {{ curRole.name }} 역할의 해당 유저들을
-                        제거하시겠습니까?
-                    </p>
-                    <v-list dense>
-                        <v-list-item
-                            v-for="user in userRemoveDialog.users"
-                            :key="user.username"
-                        >
-                            {{ user.username }}
-                        </v-list-item>
-                    </v-list>
+                    해당 항목을 삭제하시겠습니까?
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn
-                        @click.native="applyUserRemoveDialog()"
+                        @click="deleteItem(deleteDialog.penalty)"
                         text
-                        color="primary"
-                        >확인</v-btn
+                        color="error"
+                        >삭제</v-btn
                     >
-                    <v-btn @click.native="userRemoveDialog.show = false" text
-                        >취소</v-btn
-                    >
+                    <v-btn @click="deleteDialog.show = false" text>닫기</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="errorDialog.show" persistent max-width="300px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">경고</span>
+                </v-card-title>
+                <v-card-text>
+                    지각, 결석 항목은 삭제하실수 없습니다!
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="errorDialog.show = false" text>닫기</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-snackbar
+            v-model="snackbar.show"
+            :timeout="2000"
+            :color="snackbar.color"
+        >
+            {{ snackbar.text }}
+            <v-btn text @click="snackbar = false">
+                닫기
+            </v-btn>
+        </v-snackbar>
     </div>
 </template>
 <style scoped>
@@ -296,44 +240,55 @@
 </style>
 <script>
 import axios from 'axios'
-
+import moment from 'moment'
 export default {
     data() {
         return {
-            roles: [],
             fetchingCount: 0,
             users: [],
             curTab: 0,
-
-            curRole: {
-                tag: '',
-                name: '',
+            penaltyConfig: [],
+            curUser: {
+                username: '',
+                realname: '',
             },
-            curUsers: {
-                users: [],
+            curPenalty: {
+                penalties: [],
                 isLoading: false,
                 search: '',
                 selections: [],
                 isActionOpen: false,
+                start_date: moment()
+                    .startOf('month')
+                    .format('YYYY-MM-DD'),
+                end_date: moment()
+                    .endOf('month')
+                    .format('YYYY-MM-DD'),
             },
-            userAddDialog: {
-                show: false,
-                role: {},
-                search: '',
-                isLoading: false,
-                selections: [],
-                message: '',
+            startDayPicker: false,
+            endDayPicker: false,
+
+            datatable: {
+                dialog: false,
+                headers: [
+                    { text: '분류', value: 'type' },
+                    { text: '날짜', value: 'date' },
+                    { text: '비고', value: 'description', sortable: false },
+                    { text: '점수', value: 'point' },
+                    { text: '삭제', value: 'actions', sortable: false },
+                ],
             },
-            userRemoveDialog: {
+            deleteDialog: {
                 show: false,
-                isLoading: false,
-                users: [],
+                penalty: {},
             },
-            roleAddDialog: {
+            errorDialog: {
                 show: false,
-                name: '',
-                isLoading: false,
-                message: '',
+            },
+            snackbar: {
+                show: false,
+                text: '',
+                color: '',
             },
         }
     },
@@ -341,145 +296,108 @@ export default {
         isLoading() {
             return this.fetchingCount > 0
         },
-        filteredUsers() {
-            const userSet = new Set()
-            this.curUsers.users.forEach(user => {
-                userSet.add(user.username)
-            })
-            return this.users.filter(user => {
-                return !userSet.has(user.username)
-            })
-        },
         isMobileMode() {
             return this.$vuetify.breakpoint.smAndDown
         },
+        computedDateStart() {
+            return this.curPenalty.start_date
+                ? moment(this.curPenalty.start_date).format(
+                      'YYYY 년 MM 월 DD 일'
+                  )
+                : ''
+        },
+        computedDateEnd() {
+            return this.curPenalty.start_date
+                ? moment(this.curPenalty.start_date).format(
+                      'YYYY 년 MM 월 DD 일'
+                  )
+                : ''
+        },
     },
     methods: {
-        async fetchPenaltyList() {
+        async fetchUserList() {
             this.fetchingCount += 1
             try {
-                const roles = await axios.get('role')
-                this.roles = roles.data
+                const users = await axios.get('user')
+                this.users = users.data.users
             } finally {
                 this.fetchingCount -= 1
             }
         },
-        async fetchRoleUsers() {
-            this.curUsers.isLoading = true
-            this.curUsers.users = await this.getRoleUsers(this.curRole)
-            this.curUsers.isLoading = false
+        async fetchPenaltyConfigList() {
+            this.fetchingCount += 1
+            try {
+                const penaltyConfig = await axios.get('penaltyConfig/read')
+                this.penaltyConfig = penaltyConfig.data
+            } finally {
+                this.fetchingCount -= 1
+            }
         },
-        async fetchAllUsers() {
-            this.userAddDialog.isLoading = true
-            const res = await axios.get('user')
-            this.users = res.data.users
-            this.userAddDialog.isLoading = false
+        async fetchPenalties() {
+            this.curPenalty.isLoading = true
+            this.curPenalty.penalties = await this.getPenalties(this.curUser)
+            this.curPenalty.isLoading = false
         },
-        async getRoleUsers(role) {
-            const res = await axios.get(`role/${role.tag}/users`)
-            return res.data.users
+        async getPenalties(curUser) {
+            const res = await axios.get(`penalty/read/${curUser.username}`, {
+                params: {
+                    start_date: this.curPenalty.start_date,
+                    end_date: this.curPenalty.end_date,
+                },
+            })
+            return res.data
         },
-        async switchRole(role) {
-            this.curRole.tag = role.tag
-            this.curRole.name = role.name
-            this.curUsers.selections = []
-            this.userAddDialog.selections = []
-            await this.fetchRoleUsers()
+        async switchUser(user) {
+            this.curUser.username = user.username
+            this.curUser.realname = user.realname
+            this.curPenalty.selections = []
+            await this.fetchPenalties()
         },
         searchMatches(haystack, niddle) {
             return haystack.includes(niddle || '')
         },
-        showUserAddDialog(role) {
-            this.userAddDialog.show = true
-        },
-        closeUserAddDialog() {
-            this.userAddDialog.show = false
-        },
-        async applyUserAddDialog() {
-            try {
-                this.userAddDialog.isLoading = true
-                const tasks = this.userAddDialog.selections.map(
-                    async username => {
-                        try {
-                            await axios.post(`user/${username}/role`, {
-                                roletag: this.curRole.tag,
-                            })
-                            return true
-                        } catch (_) {
-                            return false
-                        }
-                    }
-                )
-                await Promise.all(tasks)
-                this.userAddDialog.show = false
-                await this.fetchRoleUsers()
-            } catch (_) {
-                this.userAddDialog.message = '유저 추가에 실패했습니다.'
-            } finally {
-                this.userAddDialog.isLoading = false
+
+        async openDeleteItem(penalty) {
+            if (penalty.type == '지각' || penalty.type == '결석') {
+                this.errorDialog.show = true
+            } else {
+                this.deleteDialog.show = true
+                this.deleteDialog.penalty = penalty
             }
         },
-        showUserRemoveDialog() {
-            this.userRemoveDialog.users = this.curUsers.selections.map(i => {
-                return this.curUsers.users[i]
+        async deleteItem(penalty) {
+            console.log(penalty)
+            await axios.post('penalty/delete', {
+                username: penalty.username,
+                date: penalty.date,
+                type: penalty.type,
+                description: penalty.description,
             })
-            this.userRemoveDialog.show = true
-        },
-        async applyUserRemoveDialog() {
-            this.userRemoveDialog.isLoading = true
-            const tasks = this.userRemoveDialog.users.map(async user => {
-                try {
-                    await axios.delete(
-                        `user/${user.username}/role/${this.curRole.tag}`
-                    )
-                    return true
-                } catch (error) {
-                    return false
-                }
-            })
-            await Promise.all(tasks)
-            this.userRemoveDialog.isLoading = false
-            this.userRemoveDialog.show = false
+            this.openSnackbar('삭제되었습니다', 'success')
 
-            this.curUsers.selections = []
-
-            await this.fetchRoleUsers()
+            this.deleteDialog.show = false
+            this.fetchingCount += 1
+            await this.fetchPenalties()
+            this.fetchingCount -= 1
         },
-        async applyRoleAddDialog() {
-            try {
-                if (!this.roleAddDialog.name) {
-                    throw new Error()
-                }
-                this.roleAddDialog.isLoading = true
-                await axios.post('role', {
-                    name: this.roleAddDialog.name,
-                })
-                this.roleAddDialog.show = false
-                this.roleAddDialog.name = ''
-                this.roleAddDialog.isLoading = false
-                await this.fetchPenaltyList()
-            } catch (error) {
-                this.roleAddDialog.isLoading = false
-                // this.roleAddDialog.message = '역할 추가에 실패했습니다.'
-            }
-        },
-        async roleRemoved() {
-            await this.fetchPenaltyList()
-            this.switchRole(this.roles[0])
-            this.curTab = 0
+        openSnackbar(text, color) {
+            this.snackbar.text = text
+            this.snackbar.color = color
+            this.snackbar.show = true
         },
     },
+
     async created() {
-        if (!this.$perm('role').can('modify')) {
+        if (!this.$perm('penalty').can('update')) {
             this.$router.push({ name: 'error403' })
             return
         }
         this.fetchingCount += 1
-        await this.fetchPenaltyList()
+        await this.fetchUserList()
+        await this.fetchPenaltyConfigList()
         this.fetchingCount -= 1
 
-        await this.switchRole(this.roles[0])
-        await this.fetchAllUsers()
+        await this.switchUser(this.users[0])
     },
 }
 </script>
