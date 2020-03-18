@@ -83,13 +83,13 @@
                         <v-spacer></v-spacer>
                         <span
                             style="color:green"
-                            class="display-2 font-weight-thin ma-2"
+                            class="display-2 font-weight-light ma-2"
                             v-if="Totalscore >= 0"
                             >{{ Totalscore }}</span
                         >
                         <span
                             style="color:red"
-                            class="display-2 font-weight-thin ma-2"
+                            class="display-2 font-weight-light ma-2"
                             v-if="Totalscore < 0"
                             >{{ Totalscore }}</span
                         >
@@ -187,8 +187,8 @@
                         >
                             <template v-slot:activator="{ on }">
                                 <v-text-field
+                                    class="ma-2"
                                     :value="addPenalty.date"
-                                    clearable
                                     label="date"
                                     readonly
                                     v-on="on"
@@ -196,7 +196,6 @@
                                 ></v-text-field>
                             </template>
                             <v-date-picker
-                                class="ma-2"
                                 v-model="curPenalty.date"
                                 @change="curPenalty.datePicker = false"
                                 locale="ko"
@@ -211,9 +210,10 @@
                             required
                         ></v-text-field>
                         <v-btn
-                            color="success"
+                            color="primary lighten-1"
+                            :dark="isDarkColor('primary')"
                             class="ma-5"
-                            @click="addPenalty(addPenalty)"
+                            @click="addPenaltyProc(addPenalty)"
                         >
                             상/벌점 등록
                         </v-btn>
@@ -240,6 +240,11 @@
                         class="elevation-1"
                         v-if="!curPenalty.isLoading"
                     >
+                        <template v-slot:item.point="{ item }">
+                            <v-chip :color="getColor(item.point)" dark>{{
+                                item.point
+                            }}</v-chip>
+                        </template>
                         <template v-slot:item.actions="{ item }">
                             <v-icon small @click="openDeleteItem(item)">
                                 mdi-delete
@@ -380,10 +385,8 @@ export default {
                 : ''
         },
         computedDateEnd() {
-            return this.curPenalty.start_date
-                ? moment(this.curPenalty.start_date).format(
-                      'YYYY 년 MM 월 DD 일'
-                  )
+            return this.curPenalty.end_date
+                ? moment(this.curPenalty.end_date).format('YYYY 년 MM 월 DD 일')
                 : ''
         },
     },
@@ -449,7 +452,6 @@ export default {
             }
         },
         async deleteItem(penalty) {
-            console.log(penalty)
             await axios.post('penalty/delete', {
                 username: penalty.username,
                 date: penalty.date,
@@ -470,6 +472,26 @@ export default {
         },
         getPointColor(point) {
             if (point >= 0) return 'success'
+            else return 'error'
+        },
+        async addPenaltyProc(penalty) {
+            if (penalty.type == '') {
+                this.openSnackbar('항목을 선택해주세요', 'error')
+            } else if (penalty.description == '') {
+                this.openSnackbar('설명을 작성해 주세요', 'error')
+            } else {
+                await axios.post('/penalty/write', {
+                    type: penalty.type,
+                    username: this.curUser.username,
+                    date: penalty.date,
+                    description: penalty.description,
+                })
+                this.fetchPenalties()
+                this.openSnackbar('등록되었습니다', 'success')
+            }
+        },
+        getColor(val) {
+            if (val >= 0) return 'success'
             else return 'error'
         },
     },
