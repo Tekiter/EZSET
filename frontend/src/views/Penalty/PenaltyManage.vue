@@ -165,59 +165,62 @@
                         </v-row>
                     </v-card>
                     <v-divider></v-divider>
-                    <v-form
-                        class="d-flex"
-                        ref="form"
-                        v-model="valid"
-                        :lazy-validation="lazy"
-                    >
-                        <v-select
-                            class="ma-2"
-                            v-model="addPenalty.type"
-                            :items="penaltyConfig"
-                            :rules="[v => !!v || '필수 선택 항목입니다!']"
-                            required
-                            label="항목"
-                        ></v-select>
 
-                        <v-menu
-                            v-model="curPenalty.datePicker"
-                            :close-on-content-click="false"
-                            max-width="290"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-text-field
-                                    class="ma-2"
-                                    :value="addPenalty.date"
-                                    label="date"
-                                    readonly
-                                    v-on="on"
-                                    @click:clear="date = null"
-                                ></v-text-field>
-                            </template>
-                            <v-date-picker
-                                v-model="curPenalty.date"
-                                @change="curPenalty.datePicker = false"
-                                locale="ko"
-                            ></v-date-picker>
-                        </v-menu>
+                    <v-row class="d-flex" align="center" no-gutters>
+                        <v-col cols="12" md="2">
+                            <v-select
+                                class="ma-2"
+                                v-model="addPenalty.type"
+                                :items="penaltyConfig"
+                                :rules="[v => !!v || '필수 선택 항목입니다!']"
+                                required
+                                label="항목"
+                            ></v-select>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <v-menu
+                                v-model="curPenalty.datePicker"
+                                :close-on-content-click="false"
+                                max-width="290"
+                            >
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field
+                                        class="ma-2"
+                                        :value="addPenalty.date"
+                                        label="date"
+                                        readonly
+                                        v-on="on"
+                                        @click:clear="date = null"
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker
+                                    v-model="curPenalty.date"
+                                    @change="curPenalty.datePicker = false"
+                                    locale="ko"
+                                ></v-date-picker>
+                            </v-menu>
+                        </v-col>
+                        <v-col cols="12" md="5">
+                            <v-text-field
+                                class="ma-2"
+                                v-model="addPenalty.description"
+                                label="설명"
+                                :rules="[v => !!v || '필수 작성 항목입니다!']"
+                                required
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="2" align="right">
+                            <v-btn
+                                class="ma-5"
+                                color="primary lighten-1"
+                                :dark="isDarkColor('primary')"
+                                @click="addPenaltyProc(addPenalty)"
+                            >
+                                상/벌점 등록
+                            </v-btn>
+                        </v-col>
+                    </v-row>
 
-                        <v-text-field
-                            class="ma-2"
-                            v-model="addPenalty.description"
-                            label="설명"
-                            :rules="[v => !!v || '필수 작성 항목입니다!']"
-                            required
-                        ></v-text-field>
-                        <v-btn
-                            color="primary lighten-1"
-                            :dark="isDarkColor('primary')"
-                            class="ma-5"
-                            @click="addPenaltyProc(addPenalty)"
-                        >
-                            상/벌점 등록
-                        </v-btn>
-                    </v-form>
                     <v-divider></v-divider>
                     <!-- <v-subheader>소속 유저</v-subheader> -->
 
@@ -487,6 +490,8 @@ export default {
                     description: penalty.description,
                 })
                 this.fetchPenalties()
+                this.addPenalty.type = ''
+                this.addPenalty.description = ''
                 this.openSnackbar('등록되었습니다', 'success')
             }
         },
