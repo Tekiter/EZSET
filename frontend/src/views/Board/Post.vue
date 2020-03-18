@@ -61,18 +61,20 @@
                                     }}]</a
                                 >
                                 <v-spacer></v-spacer>
+
                                 <v-icon x-small color="red darken-3"
                                     >mdi-heart-multiple</v-icon
                                 >
                                 {{ post.like }}
                             </v-list-item-title>
+
                             {{ post.author
-                            }}<v-divider class="mx-4" vertical></v-divider>
+                            }}<v-divider class="mx-3" vertical></v-divider>
                             {{
                                 $moment(new Date(post.created_date)).format(
                                     'YY/MM/DD HH:mm'
                                 )
-                            }}<v-divider class="mx-4" vertical></v-divider> 조회
+                            }}<v-divider class="mx-3" vertical></v-divider> 조회
                             {{ post.view }}
                         </v-list-item-content>
                     </v-list-item>
