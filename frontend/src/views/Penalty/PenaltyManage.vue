@@ -83,13 +83,13 @@
                         <v-spacer></v-spacer>
                         <span
                             style="color:green"
-                            class="display-2 THIN ma-2"
+                            class="display-2 font-weight-thin ma-2"
                             v-if="Totalscore >= 0"
                             >{{ Totalscore }}</span
                         >
                         <span
                             style="color:red"
-                            class="display-2 THIN ma-2"
+                            class="display-2 font-weight-thin ma-2"
                             v-if="Totalscore < 0"
                             >{{ Totalscore }}</span
                         >

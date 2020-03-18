@@ -107,13 +107,13 @@
         <v-dialog v-model="deleteDialog.show" persistent max-width="300px">
             <v-card>
                 <v-card-title>
-                    <span class="headline">벌점 항목 삭제</span
+                    <span class="headline">상벌점 항목 삭제</span
                     ><v-card-subtitle>{{
                         deleteDialog.penalty.key
                     }}</v-card-subtitle>
                 </v-card-title>
                 <v-card-text>
-                    해당 벌점 항목을 삭제하시겠습니까?
+                    해당 상벌점 항목을 삭제하시겠습니까?
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -131,7 +131,7 @@
         <v-dialog v-model="updateDialog.show" persistent max-width="300px">
             <v-card>
                 <v-card-title>
-                    <span class="headline">벌점 항목 수정</span
+                    <span class="headline">상벌점 항목 수정</span
                     ><v-card-subtitle>{{ updateDialog.type }}</v-card-subtitle>
                 </v-card-title>
                 <v-card-text>
@@ -143,7 +143,7 @@
                     ></v-text-field>
                 </v-card-text>
                 <v-card-text>
-                    해당 벌점 항목을 수정 하시겠습니까?
+                    해당 상벌점 항목을 수정 하시겠습니까?
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -162,7 +162,7 @@
         <v-dialog v-model="addDialog.show" persistent max-width="300px">
             <v-card>
                 <v-card-title>
-                    <span class="headline">벌점 항목 추가</span>
+                    <span class="headline">상벌점 항목 추가</span>
                 </v-card-title>
                 <v-card-text>
                     <v-text-field
@@ -177,7 +177,7 @@
                     ></v-text-field>
                 </v-card-text>
                 <v-card-text>
-                    해당 벌점 항목을 추가 하시겠습니까?
+                    해당 상벌점 항목을 추가 하시겠습니까?
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
