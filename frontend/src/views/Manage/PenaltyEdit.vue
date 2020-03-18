@@ -1,5 +1,5 @@
 <template>
-    <div class="">
+    <div class="ma3">
         <v-data-iterator
             :items="penaltys"
             :search="toolbar.search"
@@ -8,36 +8,40 @@
             :page="page"
             hide-default-footer
         >
-            <template v-slot:header>
-                <v-toolbar flat>
-                    <template>
-                        <v-text-field
-                            v-model="toolbar.search"
-                            clearable
-                            solo
-                            outlined
-                            flat
-                            hide-details
-                            dense
-                            label="검색"
-                            prepend-inner-icon="mdi-magnify"
-                        ></v-text-field>
-                    </template>
-                    <template>
-                        <v-btn
-                            @click="showAddDialog(penalty)"
-                            icon
-                            color="primary"
-                            :small="$vuetify.breakpoint.smAndDown"
-                        >
-                            <v-icon v-if="$vuetify.breakpoint.xsOnly">
-                                mdi-plus
-                            </v-icon>
-                            <span v-else>
-                                추가하기
-                            </span>
-                        </v-btn>
-                    </template>
+            <template v-slot:header class="ma-3">
+                <v-toolbar flat class="ma-3">
+                    <v-row no-gutters>
+                        <v-col cols="12" md="11">
+                            <v-text-field
+                                class="ma-3"
+                                v-model="toolbar.search"
+                                clearable
+                                solo
+                                outlined
+                                flat
+                                hide-details
+                                dense
+                                label="검색"
+                                prepend-inner-icon="mdi-magnify"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="1" align="right">
+                            <v-btn
+                                class="ma-3"
+                                @click="showAddDialog(penalty)"
+                                outlined
+                                color="primary"
+                                :small="$vuetify.breakpoint.smAndDown"
+                            >
+                                <v-icon v-if="$vuetify.breakpoint.xsOnly">
+                                    mdi-plus
+                                </v-icon>
+                                <span v-else>
+                                    추가하기
+                                </span>
+                            </v-btn>
+                        </v-col>
+                    </v-row>
                 </v-toolbar>
             </template>
             <template v-slot:loading>
@@ -64,9 +68,9 @@
                                     {{ penalty.key }}
                                 </p>
                                 <v-spacer></v-spacer>
-                                <p class="subheader ml-2">
-                                    {{ penalty.value }}점
-                                </p>
+                                <v-chip :color="getColor(penalty.value)" dark>{{
+                                    penalty.value
+                                }}</v-chip>
                             </v-card-title>
                             <v-divider></v-divider>
                             <v-card-text>
@@ -340,6 +344,10 @@ export default {
             this.snackbar.text = text
             this.snackbar.color = color
             this.snackbar.show = true
+        },
+        getColor(val) {
+            if (val >= 0) return 'success'
+            else return 'error'
         },
     },
     async created() {
