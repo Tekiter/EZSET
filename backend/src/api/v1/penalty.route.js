@@ -26,10 +26,6 @@ router.get(
 
         var penaltyConfig = await PenaltyConfig.find()
 
-        var val = penaltyConfig.find((item, idx) => {
-            return item.key === '지각';
-        })
-        console.log(val)
         attendanceUser.status.forEach(element => {
             if (moment(element.date) >= moment(req.query.start_date) && moment(element.date) <= moment(req.query.end_date)) {
 

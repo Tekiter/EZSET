@@ -81,7 +81,19 @@
                             curUser.username
                         }}</v-card-subtitle>
                         <v-spacer></v-spacer>
-                        {{ '점' }}
+                        <span
+                            style="color:green"
+                            class="display-2 THIN ma-2"
+                            v-if="Totalscore >= 0"
+                            >{{ Totalscore }}</span
+                        >
+                        <span
+                            style="color:red"
+                            class="display-2 THIN ma-2"
+                            v-if="Totalscore < 0"
+                            >{{ Totalscore }}</span
+                        >
+                        <span class="headline">{{ '점' }}</span>
                     </v-card-title>
                     <v-divider></v-divider>
                     <v-card
@@ -290,6 +302,7 @@ export default {
                 text: '',
                 color: '',
             },
+            Totalscore: 0,
         }
     },
     computed: {
@@ -336,6 +349,10 @@ export default {
         async fetchPenalties() {
             this.curPenalty.isLoading = true
             this.curPenalty.penalties = await this.getPenalties(this.curUser)
+            this.Totalscore = 0
+            this.curPenalty.penalties.forEach(element => {
+                this.Totalscore += parseInt(element.point)
+            })
             this.curPenalty.isLoading = false
         },
         async getPenalties(curUser) {
@@ -384,6 +401,10 @@ export default {
             this.snackbar.text = text
             this.snackbar.color = color
             this.snackbar.show = true
+        },
+        getPointColor(point) {
+            if (point >= 0) return 'success'
+            else return 'error'
         },
     },
 
