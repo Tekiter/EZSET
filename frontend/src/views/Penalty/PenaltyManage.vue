@@ -174,21 +174,35 @@
                         <v-select
                             class="ma-2"
                             v-model="addPenalty.type"
-                            :items="penaltyConfig.key"
+                            :items="penaltyConfig"
                             :rules="[v => !!v || '필수 선택 항목입니다!']"
                             required
                             label="항목"
                         ></v-select>
-                        <v-text-field
-                            class="ma-2"
-                            v-model="addPenalty.date"
-                            label="Date"
-                            :rules="[v => !!v || '필수 선택 항목입니다!']"
-                            required
-                        ></v-text-field>
-                        <v-date-picker
-                            v-model="addPenalty.date"
-                        ></v-date-picker>
+
+                        <v-menu
+                            v-model="curPenalty.datePicker"
+                            :close-on-content-click="false"
+                            max-width="290"
+                        >
+                            <template v-slot:activator="{ on }">
+                                <v-text-field
+                                    :value="addPenalty.date"
+                                    clearable
+                                    label="date"
+                                    readonly
+                                    v-on="on"
+                                    @click:clear="date = null"
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker
+                                class="ma-2"
+                                v-model="curPenalty.date"
+                                @change="curPenalty.datePicker = false"
+                                locale="ko"
+                            ></v-date-picker>
+                        </v-menu>
+
                         <v-text-field
                             class="ma-2"
                             v-model="addPenalty.description"
@@ -347,6 +361,7 @@ export default {
                 description: '',
                 point: '',
                 date: moment().format('YYYY-MM-DD'),
+                datePicker: false,
             },
         }
     },
@@ -385,8 +400,14 @@ export default {
         async fetchPenaltyConfigList() {
             this.fetchingCount += 1
             try {
+                var res = []
                 const penaltyConfig = await axios.get('penaltyConfig/read')
-                this.penaltyConfig = penaltyConfig.data
+                penaltyConfig.data.forEach(element => {
+                    if (element.key != '지각' && element.key != '결석') {
+                        res.push(element.key)
+                    }
+                })
+                this.penaltyConfig = res
             } finally {
                 this.fetchingCount -= 1
             }
