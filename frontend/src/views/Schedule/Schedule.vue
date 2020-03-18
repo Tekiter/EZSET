@@ -54,6 +54,9 @@
                                         v-model="scheduleDialog.show"
                                         persistent
                                         max-width="650"
+                                        v-if="
+                                            this.$perm('schedule').can('update')
+                                        "
                                     >
                                         <template v-slot:activator="{ on }">
                                             <v-btn
@@ -65,11 +68,6 @@
                                                 :small="
                                                     $vuetify.breakpoint
                                                         .smAndDown
-                                                "
-                                                v-if="
-                                                    this.$perm('schedule').can(
-                                                        'update'
-                                                    )
                                                 "
                                             >
                                                 <v-icon
