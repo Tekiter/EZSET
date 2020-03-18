@@ -52,7 +52,7 @@ export default {
                             perm: this.$perm('manageBoards').can('access'),
                         },
                         {
-                            title: '벌점 설정',
+                            title: '상벌점 설정',
                             to: '/manage/penalty',
                             perm: this.$perm('attendance').can('update'),
                         },
@@ -118,16 +118,16 @@ export default {
                 {
                     type: 'simple',
                     icon: 'mdi-checkbox-marked-circle-outline',
-                    title: '벌점',
+                    title: '상벌점',
 
                     children: [
                         {
-                            title: '벌점',
+                            title: '상벌점',
                             to: '/PenaltyManage',
                             perm: this.$perm('attendance').can('update'),
                         },
                         {
-                            title: '벌점 조회',
+                            title: '상벌점 조회',
                             to: '/Penalty',
                             perm: this.$perm('attendance').can('update'),
                         },
