@@ -7,7 +7,7 @@ const router = Router()
 
 //get config
 router.get(
-    '/read', [perm('attendance').canOwn('read')],
+    '/read', [perm('penalty').can('update')],
     asyncRoute(async function(req, res) {
         const cursor = await PenaltyConfig.find()
         res.json(cursor)
@@ -17,7 +17,7 @@ router.get(
 //write config
 router.post(
     '/write', [
-        perm('attendance').can('update'),
+        perm('penalty').can('update'),
         body('key').isString(),
         body('value').isNumeric(),
         validateParams,
@@ -38,7 +38,7 @@ router.post(
 
 //delete config
 router.post(
-    '/delete', [perm('attendance').can('update'), body('key').isString(), validateParams],
+    '/delete', [perm('penalty').can('update'), body('key').isString(), validateParams],
     asyncRoute(async function(req, res) {
         if (req.body.key == '지각') {
             const err = new Error('지각 항목은 삭제할 수 없습니다.')
@@ -60,7 +60,7 @@ router.post(
 //update config
 router.post(
     '/update', [
-        perm('attendance').can('update'),
+        perm('penalty').can('update'),
         body('key').isString(),
         body('value').isNumeric(),
         validateParams,

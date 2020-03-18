@@ -130,11 +130,6 @@
                                 item.point
                             }}</v-chip>
                         </template>
-                        <template v-slot:item.actions="{ item }">
-                            <v-icon small @click="openDeleteItem(item)">
-                                mdi-delete
-                            </v-icon>
-                        </template>
                     </v-data-table>
                 </v-card>
             </v-col>
@@ -193,7 +188,6 @@ export default {
                     { text: '날짜', value: 'date' },
                     { text: '비고', value: 'description', sortable: false },
                     { text: '점수', value: 'point' },
-                    { text: '삭제', value: 'actions', sortable: false },
                 ],
             },
             deleteDialog: {
@@ -347,7 +341,7 @@ export default {
     },
 
     async created() {
-        if (!this.$perm('penalty').can('update')) {
+        if (!this.$perm('penalty').can('read')) {
             this.$router.push({ name: 'error403' })
             return
         }

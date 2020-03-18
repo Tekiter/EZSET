@@ -126,31 +126,4 @@ router.post(
     })
 )
 
-// //delete config
-// router.post(
-//     '/update', [
-//         perm('penalty').can('update'),
-//         body('type').isString(),
-//         body('date').isString(),
-//         body('username').isString(),
-//         body('description').isString(),
-//         body('ntype').isString(),
-//         body('ndate').isString(),
-//         body('ndescription').isString(),
-//         validateParams,
-//     ],
-//     asyncRoute(async function(req, res) {
-//         await Penalty.findOneAndUpdate({
-//             type: req.body.type,
-//             username: req.body.username,
-//             date: req.body.date,
-//             description: req.body.description,
-//         }, {
-//             type: req.body.ntype,
-//             date: req.body.ndate,
-//             description: req.body.ndescription,
-//         })
-//         res.end()
-//     })
-// )
 export default router
