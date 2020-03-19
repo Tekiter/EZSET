@@ -2816,6 +2816,476 @@
   },
   {
     "type": "post",
+    "url": "/penaltyconfig/delete/",
+    "title": "상벌점 항목 삭제",
+    "description": "<p>상벌점 항목 삭제</p>",
+    "name": "penaltyconfigDelete",
+    "group": "PenaltyConfig",
+    "permission": [
+      {
+        "name": "penalty.can.update"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>상벌점 항목 이름</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n    key : \"과제 지각\",\n}",
+          "type": "post"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "200",
+            "optional": false,
+            "field": "code",
+            "description": "<p>기록 성공시 코드</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/penaltyconfig.route.js",
+    "groupTitle": "PenaltyConfig"
+  },
+  {
+    "type": "get",
+    "url": "/penaltyconfig/read/",
+    "title": "상벌점 항목 조회",
+    "description": "<p>사용자의 상벌점 항목 조회</p>",
+    "name": "penaltyconfigRead",
+    "group": "PenaltyConfig",
+    "permission": [
+      {
+        "name": "penalty.can.read"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "-",
+            "description": "<p>상벌점 항목을 배열로 반환</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "type",
+            "description": "<p>상벌점 항목의 이름</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "value",
+            "description": "<p>상벌점 항목의 점수</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    [{\n        type:\"지각\",\n        date:\"2020-03-19\",\n        description:\"지각\",\n        point:-1\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/penaltyconfig.route.js",
+    "groupTitle": "PenaltyConfig"
+  },
+  {
+    "type": "post",
+    "url": "/penaltyconfig/update/",
+    "title": "상벌점 항목 수정",
+    "description": "<p>상벌점 항목의 점수 수정</p>",
+    "name": "penaltyconfigUpdate",
+    "group": "PenaltyConfig",
+    "permission": [
+      {
+        "name": "penalty.can.update"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>상벌점 항목 이름</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n    key : \"과제 지각\",\n    value : -1\n}",
+          "type": "post"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "200",
+            "optional": false,
+            "field": "code",
+            "description": "<p>기록 성공시 코드</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/penaltyconfig.route.js",
+    "groupTitle": "PenaltyConfig"
+  },
+  {
+    "type": "post",
+    "url": "/penaltyconfig/write/",
+    "title": "상벌점 항목 생성",
+    "description": "<p>상벌점 항목 생성</p>",
+    "name": "penaltyconfigWrite",
+    "group": "PenaltyConfig",
+    "permission": [
+      {
+        "name": "penalty.can.update"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>상벌점 항목 이름</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "value",
+            "description": "<p>상벌점 점수</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n    key : \"과제 지각\",\n    value : \"-1\"\n}",
+          "type": "post"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "200",
+            "optional": false,
+            "field": "code",
+            "description": "<p>기록 성공시 코드</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/penaltyconfig.route.js",
+    "groupTitle": "PenaltyConfig"
+  },
+  {
+    "type": "post",
+    "url": "/penalty/delete/",
+    "title": "상벌점 삭제",
+    "description": "<p>사용자의 상벌점 삭제</p>",
+    "name": "penaltyDelete",
+    "group": "Penalty",
+    "permission": [
+      {
+        "name": "penalty.can.update"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>조회할 사용자의 아이디</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "type",
+            "description": "<p>상벌점 항목 타입</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "description",
+            "description": "<p>상벌점 항목 설명</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "date",
+            "description": "<p>상벌점 항목 부여 날짜</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n    username : \"admin\",\n    type : \"과제 지각\",\n    description : \"과제 지각\"\n    date : \"2020-03-19\"\n}",
+          "type": "post"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "200",
+            "optional": false,
+            "field": "code",
+            "description": "<p>기록 성공시 코드</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/penalty.route.js",
+    "groupTitle": "Penalty"
+  },
+  {
+    "type": "get",
+    "url": "/penalty/read/:username",
+    "title": "상벌점 조회",
+    "description": "<p>사용자의 상벌점 조회</p>",
+    "name": "penaltyRead",
+    "group": "Penalty",
+    "permission": [
+      {
+        "name": "penalty.can.read"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>조회할 사용자의 아이디</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "start_date",
+            "description": "<p>기간 조회 시작 날짜</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "end_date",
+            "description": "<p>기간 조회 종료 날짜</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "-",
+            "description": "<p>사용자의 상벌점 항목을 배열로 반환</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "type",
+            "description": "<p>상벌점 항목의 타입</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "date",
+            "description": "<p>상벌점 항목이 기록된 날짜</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "description",
+            "description": "<p>상벌점 항목의 설명</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "point",
+            "description": "<p>상벌점 항목의 점수</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    [{\n        type:\"지각\",\n        date:\"2020-03-19\",\n        description:\"지각\",\n        point:-1\n    }]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/penalty.route.js",
+    "groupTitle": "Penalty"
+  },
+  {
+    "type": "post",
+    "url": "/penalty/write/",
+    "title": "상벌점 쓰기",
+    "description": "<p>사용자의 상벌점 기록</p>",
+    "name": "penaltyWrite",
+    "group": "Penalty",
+    "permission": [
+      {
+        "name": "penalty.can.update"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>조회할 사용자의 아이디</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "type",
+            "description": "<p>상벌점 항목 타입</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "description",
+            "description": "<p>상벌점 항목 설명</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "date",
+            "description": "<p>상벌점 항목 부여 날짜</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n    username : \"admin\",\n    type : \"과제 지각\",\n    description : \"과제 지각\"\n    date : \"2020-03-19\"\n}",
+          "type": "post"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "200",
+            "optional": false,
+            "field": "code",
+            "description": "<p>기록 성공시 코드</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/penalty.route.js",
+    "groupTitle": "Penalty"
+  },
+  {
+    "type": "post",
     "url": "/schedule/delete",
     "title": "일정 삭제",
     "description": "<p>일정을 삭제한다.</p>",
