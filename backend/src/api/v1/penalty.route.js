@@ -12,7 +12,7 @@ var moment = require('moment')
 // penalty.canOwn('read')
 router.get(
     '/read/:username', [
-        perm('penalty').can('update'),
+        perm('penalty').can('read'),
         param('username').isString(),
         query('start_date').isString(),
         query('end_date').isString(),
@@ -27,35 +27,36 @@ router.get(
         var penaltyConfig = await PenaltyConfig.find()
 
         attendanceUser.status.forEach(element => {
-            if (moment(element.date) >= moment(req.query.start_date) && moment(element.date) <= moment(req.query.end_date)) {
-
-
+            if (
+                moment(element.date) >= moment(req.query.start_date) &&
+                moment(element.date) <= moment(req.query.end_date)
+            ) {
                 if (element.state == 'late') {
                     var Val = penaltyConfig.find((item, idx) => {
-                        return item.key === '지각';
+                        return item.key === '지각'
                     })
                     result.push({
                         username: req.params.username,
-                        type: "지각",
-                        date: moment(element.date).format("YYYY-MM-DD"),
-                        description: "지각",
-                        point: Val.value
+                        type: '지각',
+                        date: moment(element.date).format('YYYY-MM-DD'),
+                        description: '지각',
+                        point: Val.value,
                     })
                 }
                 if (element.state == 'absence') {
                     var val = penaltyConfig.find((item, idx) => {
-                        return item.key === '결석';
+                        return item.key === '결석'
                     })
                     result.push({
                         username: req.params.username,
-                        type: "결석",
-                        date: moment(element.date).format("YYYY-MM-DD"),
-                        description: "결석",
-                        point: val.value
+                        type: '결석',
+                        date: moment(element.date).format('YYYY-MM-DD'),
+                        description: '결석',
+                        point: val.value,
                     })
                 }
             }
-        });
+        })
 
         var penalty = await Penalty.find({
             username: req.params.username,
@@ -67,16 +68,16 @@ router.get(
 
         penalty.forEach(element => {
             var val = penaltyConfig.find((item, idx) => {
-                return item.key === element.type;
+                return item.key === element.type
             })
             result.push({
                 username: req.params.username,
                 type: element.type,
                 date: moment(element.date).format('YYYY-MM-DD'),
                 description: element.description,
-                point: val.value
+                point: val.value,
             })
-        });
+        })
 
         res.json(result)
     })
