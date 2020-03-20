@@ -457,7 +457,6 @@ export default {
             }
         },
         async deleteItem(penalty) {
-            console.log(penalty)
             await axios.delete(`penalty/${penalty.username}`, {
                 params: {
                     type_id: penalty.type_id,
