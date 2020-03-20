@@ -58,22 +58,24 @@ router.get(
                 moment(element.date) <= moment(req.query.end_date)
             ) {
                 if (element.state == 'late') {
-                    var Val = penaltyConfig.find((item, idx) => {
+                    var val = penaltyConfig.find(item => {
                         return item.key === '지각'
                     })
                     result.push({
+                        type_id: val._id,
                         username: req.params.username,
                         type: '지각',
                         date: moment(element.date).format('YYYY-MM-DD'),
                         description: '지각',
-                        point: Val.value,
+                        point: val.value,
                     })
                 }
                 if (element.state == 'absence') {
-                    var val = penaltyConfig.find((item, idx) => {
+                    var val = penaltyConfig.find(item => {
                         return item.key === '결석'
                     })
                     result.push({
+                        type_id: Val._id,
                         username: req.params.username,
                         type: '결석',
                         date: moment(element.date).format('YYYY-MM-DD'),
@@ -93,10 +95,11 @@ router.get(
         })
 
         penalty.forEach(element => {
-            var val = penaltyConfig.find((item, idx) => {
+            var val = penaltyConfig.find(item => {
                 return item.key === element.type
             })
             result.push({
+                type_id: val._id,
                 username: req.params.username,
                 type: element.type,
                 date: moment(element.date).format('YYYY-MM-DD'),
@@ -144,7 +147,12 @@ router.post(
         validateParams,
     ],
     asyncRoute(async function(req, res) {
+        var penaltyConfig = await PenaltyConfig.find()
+        var val = penaltyConfig.find(item => {
+            return item.key === element.type
+        })
         var penalty = new Penalty()
+        penalty.type_id = val._id
         penalty.type = req.body.type
         penalty.username = req.body.username
         penalty.date = req.body.date

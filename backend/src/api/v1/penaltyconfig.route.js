@@ -59,14 +59,15 @@ router.get(
 router.post(
     '/write', [
         perm('penalty').can('update'),
+        body('_id').isString(),
         body('key').isString(),
         body('value').isNumeric(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
         const cnt = await PenaltyConfig.find()
-            .where('key')
-            .equals(req.body.key)
+            .where('_id')
+            .equals(req.body._id)
             .count()
         if (cnt > 0) return res.status(406).json()
         var penaltyConfig = new PenaltyConfig()
