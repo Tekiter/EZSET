@@ -275,7 +275,7 @@ router.get('/attendanceState/:day', [(0, _expressValidator.param)('day').isStrin
     const cur = await _attendanceDay2.default.findOne({
         day: req.params.day
     }).select({ _id: 0, __v: 0, day: 0 });
-    if (cur != null) res.json(cur);else res.status(404).json();
+    res.json(cur);
 }));
 
 /**
