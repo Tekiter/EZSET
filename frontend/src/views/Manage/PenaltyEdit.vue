@@ -117,7 +117,8 @@
                     }}</v-card-subtitle>
                 </v-card-title>
                 <v-card-text>
-                    해당 항목을 삭제하시겠습니까?
+                    해당 항목을 삭제하시겠습니까? 해당 항목의 이름으로 부여된
+                    상벌점들은 모두 삭제 됩니다.
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>

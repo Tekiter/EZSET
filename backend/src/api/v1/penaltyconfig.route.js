@@ -3,6 +3,7 @@ import { asyncRoute, validateParams } from '../../utils/api'
 import PenaltyConfig from '../../models/Penalty/PenaltyConfig'
 import { perm } from '../../utils/role'
 import { param, body, query } from 'express-validator'
+import Penalty from '../../models/Penalty/Penalty'
 const router = Router()
 
 /**
@@ -109,6 +110,9 @@ router.delete(
             err.status = 400
             throw err
         }
+        await Penalty.deleteMany({
+            type_id: req.params.id,
+        })
         await PenaltyConfig.findOneAndDelete({
             _id: req.params.id,
         })

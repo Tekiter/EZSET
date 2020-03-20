@@ -57,10 +57,12 @@ router.get(
                 moment(element.date) >= moment(req.query.start_date) &&
                 moment(element.date) <= moment(req.query.end_date)
             ) {
+                console.log(element)
                 if (element.state == 'late') {
-                    var val = penaltyConfig.find(item => {
+                    var val = penaltyConfig.find((item, idx) => {
                         return item.key === '지각'
                     })
+
                     result.push({
                         type_id: val._id,
                         username: req.params.username,
@@ -71,7 +73,7 @@ router.get(
                     })
                 }
                 if (element.state == 'absence') {
-                    var val = penaltyConfig.find(item => {
+                    var val = penaltyConfig.find((item, idx) => {
                         return item.key === '결석'
                     })
                     result.push({
@@ -85,7 +87,7 @@ router.get(
                 }
             }
         })
-
+        console.log(result)
         var penalty = await Penalty.find({
             username: req.params.username,
             date: {
