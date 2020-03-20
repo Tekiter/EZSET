@@ -59,15 +59,14 @@ router.get(
 router.post(
     '/write', [
         perm('penalty').can('update'),
-        body('_id').isString(),
         body('key').isString(),
         body('value').isNumeric(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
         const cnt = await PenaltyConfig.find()
-            .where('_id')
-            .equals(req.body._id)
+            .where('key')
+            .equals(req.body.key)
             .count()
         if (cnt > 0) return res.status(406).json()
         var penaltyConfig = new PenaltyConfig()
@@ -140,14 +139,16 @@ router.post(
 router.post(
     '/update', [
         perm('penalty').can('update'),
+        body('_id').isString(),
         body('key').isString(),
         body('value').isNumeric(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
         await PenaltyConfig.findOneAndUpdate({
-            key: req.body.key,
+            _id: req.body._id,
         }, {
+            key: req.body.key,
             value: req.body.value,
         })
         res.end()
