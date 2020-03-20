@@ -3,23 +3,20 @@ export function setDefaultRole(roles) {
     roles
         .role('default')
 
-    .resource('profile')
+        .resource('role')
         .canOwn('read')
 
-    .resource('role')
-        .canOwn('read')
-
-    .resource('attendance')
+        .resource('attendance')
         .canOwn('read')
         .can('att')
 
-    .resource('absence')
+        .resource('absence')
         .canOwn(['create', 'read', 'delete'])
 
-    .resource('schedule')
+        .resource('schedule')
         .can('read')
 
-    .resource('penalty')
+        .resource('penalty')
         .can('read')
 }
 
@@ -28,22 +25,22 @@ export function setAdminRole(roles) {
     roles
         .role('admin')
 
-    .resource('serverConfig')
+        .resource('serverConfig')
         .can('change')
 
-    .resource('profile')
+        .resource('profile')
         .can(['read', 'update'])
 
-    .resource('user')
+        .resource('user')
         .can(['delete'])
 
-    .resource('role')
+        .resource('role')
         .can(['read', 'modify'])
 
-    .resource('board')
+        .resource('board')
         .can(['read', 'create', 'delete', 'update'])
 
-    .resource('manageServer')
+        .resource('manageServer')
         .can(['access'])
         .resource('manageUsers')
         .can('access')
@@ -62,15 +59,15 @@ export function setAdminRole(roles) {
         .resource('fileBox')
         .can(['manage', 'upload'])
 
-    .resource('attendance')
+        .resource('attendance')
         .can('update')
 
-    .resource('absence')
+        .resource('absence')
         .can('update')
 
-    .resource('schedule')
+        .resource('schedule')
         .can('update')
 
-    .resource('penalty')
+        .resource('penalty')
         .can(['update', 'read'])
 }

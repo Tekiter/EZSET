@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: install frontend
+        run: yarn install
+        working-directory: ./frontend
+      - name: build frontend
+        run: yarn build
+        working-directory: ./frontend
+      - name: install backend
+        run: yarn install
+        working-directory:  ./backend
+      - name: build backend
+        run: yarn build
+        working-directory: ./backend
+      - name: cleanup
+        run: |
+            rm -rf ./backend/node_modules
+            rm -rf ./frontend/node_modules
+            rm -rf ./backend/.gitignore
+      - name: Deploy
+        uses: s0/git-publish-subdir-action@master
+        env:
+          REPO: self
+          BRANCH: release
+          FOLDER: ./backend
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

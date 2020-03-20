@@ -29,7 +29,8 @@ const router = Router()
  *      }
  */
 router.get(
-    '/read', [perm('penalty').can('read')],
+    '/read',
+    [perm('penalty').can('read')],
     asyncRoute(async function(req, res) {
         const cursor = await PenaltyConfig.find()
         res.json(cursor)
@@ -58,7 +59,8 @@ router.get(
  *      HTTP/1.1 200 OK
  */
 router.post(
-    '/write', [
+    '/write',
+    [
         perm('penalty').can('update'),
         body('key').isString(),
         body('value').isNumeric(),
@@ -97,6 +99,7 @@ router.post(
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
+
 router.delete(
     '/:id', [perm('penalty').can('update'), query('key').isString(), validateParams],
     asyncRoute(async function(req, res) {
@@ -141,7 +144,8 @@ router.delete(
  *      HTTP/1.1 200 OK
  */
 router.post(
-    '/update', [
+    '/update',
+    [
         perm('penalty').can('update'),
         body('_id').isString(),
         body('key').isString(),
@@ -155,6 +159,7 @@ router.post(
             key: req.body.key,
             value: req.body.value,
         })
+
         res.end()
     })
 )

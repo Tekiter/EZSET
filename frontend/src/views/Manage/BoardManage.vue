@@ -66,7 +66,7 @@
             v-show="!isMobileMode || curTab == 1"
             class="fill-height"
         >
-            <board-role-edit ref="roleEdit"></board-role-edit>
+            <board-role-edit ref="roleEdit" :boards="boards"></board-role-edit>
         </v-col>
 
         <v-dialog v-model="createBoardDialog.show" max-width="300">
@@ -270,7 +270,6 @@ export default {
             this.createBoardDialog.show = true
         },
         async applyCreateBoardDialog() {
-            console.log(this.createBoardDialog.title)
             this.createBoardDialog.isLoading = true
             if (this.createBoardDialog.title.length == 0) {
                 this.createBoardDialog.lenError = true
