@@ -98,7 +98,12 @@ router.post(
  *      HTTP/1.1 200 OK
  */
 router.delete(
-    '/:id', [perm('penalty').can('update'), query('key').isString(), validateParams],
+    '/:id', [
+        perm('penalty').can('update'),
+        param('id').isString(),
+        query('key').isString(),
+        validateParams,
+    ],
     asyncRoute(async function(req, res) {
         if (req.query.key == '지각') {
             const err = new Error('지각 항목은 삭제할 수 없습니다.')
