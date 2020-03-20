@@ -11,17 +11,25 @@ var _mongoose2 = _interopRequireDefault(_mongoose);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const penaltySchema = new _mongoose2.default.Schema({
+    type_id: {
+        type: String,
+        index: true
+    },
     type: {
-        type: String
+        type: String,
+        trim: true
     },
     username: {
-        type: String
+        type: String,
+        trim: true
     },
     date: {
-        type: Date
+        type: Date,
+        trim: true
     },
     description: {
-        type: String
+        type: String,
+        trim: true
     }
 });
 

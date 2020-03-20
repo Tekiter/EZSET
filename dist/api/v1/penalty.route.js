@@ -74,6 +74,7 @@ router.get('/read/:username', [(0, _role.perm)('penalty').can('read'), (0, _expr
                     return item.key === '지각';
                 });
                 result.push({
+                    type_id: Val._id,
                     username: req.params.username,
                     type: '지각',
                     date: moment(element.date).format('YYYY-MM-DD'),
@@ -86,6 +87,7 @@ router.get('/read/:username', [(0, _role.perm)('penalty').can('read'), (0, _expr
                     return item.key === '결석';
                 });
                 result.push({
+                    type_id: val._id,
                     username: req.params.username,
                     type: '결석',
                     date: moment(element.date).format('YYYY-MM-DD'),
@@ -109,6 +111,7 @@ router.get('/read/:username', [(0, _role.perm)('penalty').can('read'), (0, _expr
             return item.key === element.type;
         });
         result.push({
+            type_id: val._id,
             username: req.params.username,
             type: element.type,
             date: moment(element.date).format('YYYY-MM-DD'),
@@ -145,8 +148,9 @@ router.get('/read/:username', [(0, _role.perm)('penalty').can('read'), (0, _expr
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
-router.post('/write', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.body)('type').isString(), (0, _expressValidator.body)('date').isString(), (0, _expressValidator.body)('username').isString(), (0, _expressValidator.body)('description').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
+router.post('/write', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.body)('type_id').isString(), (0, _expressValidator.body)('type').isString(), (0, _expressValidator.body)('date').isString(), (0, _expressValidator.body)('username').isString(), (0, _expressValidator.body)('description').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
     var penalty = new _Penalty2.default();
+    penalty.type_id = req.body.type_id;
     penalty.type = req.body.type;
     penalty.username = req.body.username;
     penalty.date = req.body.date;
@@ -182,12 +186,13 @@ router.post('/write', [(0, _role.perm)('penalty').can('update'), (0, _expressVal
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
-router.post('/delete/', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.body)('username').isString(), (0, _expressValidator.body)('date').isString(), (0, _expressValidator.body)('type').isString(), (0, _expressValidator.body)('description').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
+router.delete('/:username', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.param)('username').isString(), (0, _expressValidator.query)('date').isString(), (0, _expressValidator.query)('type').isString(), (0, _expressValidator.query)('description').isString(), (0, _expressValidator.query)('type_id').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
     await _Penalty2.default.findOneAndDelete({
-        type: req.body.type,
-        username: req.body.username,
-        date: req.body.date,
-        description: req.body.description
+        type_id: req.query.type_id,
+        type: req.query.type,
+        username: req.params.username,
+        date: req.query.date,
+        description: req.query.description
     });
     res.end();
 }));

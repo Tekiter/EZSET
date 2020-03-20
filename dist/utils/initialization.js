@@ -6,6 +6,10 @@ var _User = require('../models/User');
 
 var _User2 = _interopRequireDefault(_User);
 
+var _PenaltyConfig = require('../models/Penalty/PenaltyConfig');
+
+var _PenaltyConfig2 = _interopRequireDefault(_PenaltyConfig);
+
 var _role = require('../utils/role');
 
 var _role2 = _interopRequireDefault(_role);
@@ -33,6 +37,25 @@ const initialization = {
 
         console.log(`Superadmin created (admin/admin)`); // eslint-disable-line no-console
     },
+    async createDefaultPenalty() {
+        console.log('Creating defalut penalty items...'); // eslint-disable-line no-console
+        const existLateConfig = await _PenaltyConfig2.default.findOne().where('key').equals('지각').count();
+        if (existLateConfig == 0) {
+            const Late = new _PenaltyConfig2.default({
+                key: '지각',
+                value: -1
+            });
+            await Late.save();
+        }
+        const existAbsenceConfig = await _PenaltyConfig2.default.findOne().where('key').equals('결석').count();
+        if (existAbsenceConfig == 0) {
+            const Absence = new _PenaltyConfig2.default({
+                key: '결석',
+                value: -1
+            });
+            await Absence.save();
+        }
+    },
     async initialize() {
         const isFirstStart = !(await (0, _config.configAvailable)());
         if (isFirstStart) {
@@ -41,7 +64,7 @@ const initialization = {
 
             await (0, _config.setDefaultConfigs)();
         }
-
+        await initialization.createDefaultPenalty();
         await _role2.default.loadRoles();
     }
 };

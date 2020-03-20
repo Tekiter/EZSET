@@ -1,5 +1,6 @@
 import { configAvailable, setConfig, setDefaultConfigs } from '../utils/config'
 import User from '../models/User'
+import PenaltyConfig from '../models/Penalty/PenaltyConfig'
 import role from '../utils/role'
 
 const initialization = {
@@ -25,6 +26,31 @@ const initialization = {
 
         console.log(`Superadmin created (admin/admin)`) // eslint-disable-line no-console
     },
+    async createDefaultPenalty() {
+        console.log('Creating defalut penalty items...') // eslint-disable-line no-console
+        const existLateConfig = await PenaltyConfig.findOne()
+            .where('key')
+            .equals('지각')
+            .count()
+        if (existLateConfig == 0) {
+            const Late = new PenaltyConfig({
+                key: '지각',
+                value: -1,
+            })
+            await Late.save()
+        }
+        const existAbsenceConfig = await PenaltyConfig.findOne()
+            .where('key')
+            .equals('결석')
+            .count()
+        if (existAbsenceConfig == 0) {
+            const Absence = new PenaltyConfig({
+                key: '결석',
+                value: -1,
+            })
+            await Absence.save()
+        }
+    },
     async initialize() {
         const isFirstStart = !(await configAvailable())
         if (isFirstStart) {
@@ -33,7 +59,7 @@ const initialization = {
 
             await setDefaultConfigs()
         }
-
+        await initialization.createDefaultPenalty()
         await role.loadRoles()
     },
 }

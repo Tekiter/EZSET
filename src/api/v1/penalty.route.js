@@ -63,6 +63,7 @@ router.get(
                         return item.key === '지각'
                     })
                     result.push({
+                        type_id: Val._id,
                         username: req.params.username,
                         type: '지각',
                         date: moment(element.date).format('YYYY-MM-DD'),
@@ -75,6 +76,7 @@ router.get(
                         return item.key === '결석'
                     })
                     result.push({
+                        type_id: val._id,
                         username: req.params.username,
                         type: '결석',
                         date: moment(element.date).format('YYYY-MM-DD'),
@@ -98,6 +100,7 @@ router.get(
                 return item.key === element.type
             })
             result.push({
+                type_id: val._id,
                 username: req.params.username,
                 type: element.type,
                 date: moment(element.date).format('YYYY-MM-DD'),
@@ -139,6 +142,7 @@ router.post(
     '/write',
     [
         perm('penalty').can('update'),
+        body('type_id').isString(),
         body('type').isString(),
         body('date').isString(),
         body('username').isString(),
@@ -147,6 +151,7 @@ router.post(
     ],
     asyncRoute(async function(req, res) {
         var penalty = new Penalty()
+        penalty.type_id = req.body.type_id
         penalty.type = req.body.type
         penalty.username = req.body.username
         penalty.date = req.body.date
@@ -183,25 +188,27 @@ router.post(
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
-router.post(
-    '/delete/',
-    [
+router.delete(
+    '/:username', [
         perm('penalty').can('update'),
-        body('username').isString(),
-        body('date').isString(),
-        body('type').isString(),
-        body('description').isString(),
+        param('username').isString(),
+        query('date').isString(),
+        query('type').isString(),
+        query('description').isString(),
+        query('type_id').isString(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
         await Penalty.findOneAndDelete({
-            type: req.body.type,
-            username: req.body.username,
-            date: req.body.date,
-            description: req.body.description,
+            type_id: req.query.type_id,
+            type: req.query.type,
+            username: req.params.username,
+            date: req.query.date,
+            description: req.query.description,
         })
         res.end()
     })
 )
 
 export default router
+

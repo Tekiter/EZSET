@@ -2,7 +2,8 @@ import Router from 'express'
 import { asyncRoute, validateParams } from '../../utils/api'
 import PenaltyConfig from '../../models/Penalty/PenaltyConfig'
 import { perm } from '../../utils/role'
-import { body } from 'express-validator'
+import { param, body, query } from 'express-validator'
+import Penalty from '../../models/Penalty/Penalty'
 const router = Router()
 
 /**
@@ -98,22 +99,30 @@ router.post(
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
-router.post(
-    '/delete',
-    [perm('penalty').can('update'), body('key').isString(), validateParams],
+
+router.delete(
+    '/:id', [
+        perm('penalty').can('update'),
+        param('id').isString(),
+        query('key').isString(),
+        validateParams,
+    ],
     asyncRoute(async function(req, res) {
-        if (req.body.key == '지각') {
+        if (req.query.key == '지각') {
             const err = new Error('지각 항목은 삭제할 수 없습니다.')
             err.status = 400
             throw err
         }
-        if (req.body.key == '결석') {
+        if (req.query.key == '결석') {
             const err = new Error('결석 항목은 삭제할 수 없습니다.')
             err.status = 400
             throw err
         }
+        await Penalty.deleteMany({
+            type_id: req.params.id,
+        })
         await PenaltyConfig.findOneAndDelete({
-            key: req.body.key,
+            _id: req.params.id,
         })
         res.end()
     })
@@ -143,19 +152,19 @@ router.post(
     '/update',
     [
         perm('penalty').can('update'),
+        body('_id').isString(),
         body('key').isString(),
         body('value').isNumeric(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
-        await PenaltyConfig.findOneAndUpdate(
-            {
-                key: req.body.key,
-            },
-            {
-                value: req.body.value,
-            }
-        )
+        await PenaltyConfig.findOneAndUpdate({
+            _id: req.body._id,
+        }, {
+            key: req.body.key,
+            value: req.body.value,
+        })
+
         res.end()
     })
 )

@@ -18,6 +18,10 @@ var _role = require('../../utils/role');
 
 var _expressValidator = require('express-validator');
 
+var _Penalty = require('../../models/Penalty/Penalty');
+
+var _Penalty2 = _interopRequireDefault(_Penalty);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const router = (0, _express2.default)();
@@ -99,19 +103,23 @@ router.post('/write', [(0, _role.perm)('penalty').can('update'), (0, _expressVal
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
-router.post('/delete', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.body)('key').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    if (req.body.key == '지각') {
+
+router.delete('/:id', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.param)('id').isString(), (0, _expressValidator.query)('key').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
+    if (req.query.key == '지각') {
         const err = new Error('지각 항목은 삭제할 수 없습니다.');
         err.status = 400;
         throw err;
     }
-    if (req.body.key == '결석') {
+    if (req.query.key == '결석') {
         const err = new Error('결석 항목은 삭제할 수 없습니다.');
         err.status = 400;
         throw err;
     }
+    await _Penalty2.default.deleteMany({
+        type_id: req.params.id
+    });
     await _PenaltyConfig2.default.findOneAndDelete({
-        key: req.body.key
+        _id: req.params.id
     });
     res.end();
 }));
@@ -136,12 +144,14 @@ router.post('/delete', [(0, _role.perm)('penalty').can('update'), (0, _expressVa
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
-router.post('/update', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.body)('key').isString(), (0, _expressValidator.body)('value').isNumeric(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
+router.post('/update', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.body)('_id').isString(), (0, _expressValidator.body)('key').isString(), (0, _expressValidator.body)('value').isNumeric(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
     await _PenaltyConfig2.default.findOneAndUpdate({
-        key: req.body.key
+        _id: req.body._id
     }, {
+        key: req.body.key,
         value: req.body.value
     });
+
     res.end();
 }));
 exports.default = router;
