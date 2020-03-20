@@ -37,8 +37,7 @@ var moment = require('moment')
  *      }
  */
 router.get(
-    '/read/:username',
-    [
+    '/read/:username', [
         perm('penalty').can('read'),
         param('username').isString(),
         query('start_date').isString(),
@@ -52,41 +51,41 @@ router.get(
         }).select({ _id: 0, __v: 0, name: 0 })
 
         var penaltyConfig = await PenaltyConfig.find()
-
-        attendanceUser.status.forEach(element => {
-            if (
-                moment(element.date) >= moment(req.query.start_date) &&
-                moment(element.date) <= moment(req.query.end_date)
-            ) {
-                if (element.state == 'late') {
-                    var Val = penaltyConfig.find((item, idx) => {
-                        return item.key === '지각'
-                    })
-                    result.push({
-                        type_id: Val._id,
-                        username: req.params.username,
-                        type: '지각',
-                        date: moment(element.date).format('YYYY-MM-DD'),
-                        description: '지각',
-                        point: Val.value,
-                    })
+        if (attendanceUser != null) {
+            attendanceUser.status.forEach(element => {
+                if (
+                    moment(element.date) >= moment(req.query.start_date) &&
+                    moment(element.date) <= moment(req.query.end_date)
+                ) {
+                    if (element.state == 'late') {
+                        var Val = penaltyConfig.find((item, idx) => {
+                            return item.key === '지각'
+                        })
+                        result.push({
+                            type_id: Val._id,
+                            username: req.params.username,
+                            type: '지각',
+                            date: moment(element.date).format('YYYY-MM-DD'),
+                            description: '지각',
+                            point: Val.value,
+                        })
+                    }
+                    if (element.state == 'absence') {
+                        var val = penaltyConfig.find((item, idx) => {
+                            return item.key === '결석'
+                        })
+                        result.push({
+                            type_id: val._id,
+                            username: req.params.username,
+                            type: '결석',
+                            date: moment(element.date).format('YYYY-MM-DD'),
+                            description: '결석',
+                            point: val.value,
+                        })
+                    }
                 }
-                if (element.state == 'absence') {
-                    var val = penaltyConfig.find((item, idx) => {
-                        return item.key === '결석'
-                    })
-                    result.push({
-                        type_id: val._id,
-                        username: req.params.username,
-                        type: '결석',
-                        date: moment(element.date).format('YYYY-MM-DD'),
-                        description: '결석',
-                        point: val.value,
-                    })
-                }
-            }
-        })
-
+            })
+        }
         var penalty = await Penalty.find({
             username: req.params.username,
             date: {
@@ -139,8 +138,7 @@ router.get(
  *      HTTP/1.1 200 OK
  */
 router.post(
-    '/write',
-    [
+    '/write', [
         perm('penalty').can('update'),
         body('type_id').isString(),
         body('type').isString(),
@@ -211,4 +209,3 @@ router.delete(
 )
 
 export default router
-
