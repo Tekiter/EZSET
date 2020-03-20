@@ -1,5 +1,5 @@
 import Router from 'express'
-import { asyncRoute, validateParams, checkUsername } from '../../utils/api'
+import { asyncRoute, validateParams } from '../../utils/api'
 import Penalty from '../../models/Penalty/Penalty'
 import PenaltyConfig from '../../models/Penalty/PenaltyConfig'
 import AttendanceUser from '../../models/attendanceUser'
@@ -37,7 +37,8 @@ var moment = require('moment')
  *      }
  */
 router.get(
-    '/read/:username', [
+    '/read/:username',
+    [
         perm('penalty').can('read'),
         param('username').isString(),
         query('start_date').isString(),
@@ -135,7 +136,8 @@ router.get(
  *      HTTP/1.1 200 OK
  */
 router.post(
-    '/write', [
+    '/write',
+    [
         perm('penalty').can('update'),
         body('type').isString(),
         body('date').isString(),
@@ -182,7 +184,8 @@ router.post(
  *      HTTP/1.1 200 OK
  */
 router.post(
-    '/delete/', [
+    '/delete/',
+    [
         perm('penalty').can('update'),
         body('username').isString(),
         body('date').isString(),
@@ -191,7 +194,6 @@ router.post(
         validateParams,
     ],
     asyncRoute(async function(req, res) {
-        console.log(req.query.type)
         await Penalty.findOneAndDelete({
             type: req.body.type,
             username: req.body.username,

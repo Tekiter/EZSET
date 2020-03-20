@@ -30,23 +30,32 @@
             </v-fade-transition>
         </v-toolbar>
         <v-list subheader v-show="!loading">
-            <board-perm-edit
-                v-model="board.roles"
-                v-for="board in boards"
-                :key="`board-${board._id}`"
-                :roles="roles"
-                :board="board"
-                :actions="actions"
-                :disabled="loading"
-                @change="settingChanged = true"
-                class="mb-2 mx-1"
-            ></board-perm-edit>
+            <template v-if="$perm('role').can('modify')">
+                <board-perm-edit
+                    v-model="board.roles"
+                    v-for="board in boards_inter"
+                    :key="`board-${board._id}`"
+                    :roles="roles"
+                    :board="board"
+                    :actions="actions"
+                    :disabled="loading"
+                    @change="settingChanged = true"
+                    class="mb-2 mx-1"
+                ></board-perm-edit>
+            </template>
+            <template v-else>
+                <v-list-item>
+                    역할 관리 권한이 있어야, 게시판 접근 권한을 수정할 수
+                    있습니다.
+                </v-list-item>
+            </template>
         </v-list>
     </v-card>
 </template>
 
 <script>
 import axios from 'axios'
+// import _ from 'lodash'
 // import { Role } from '../../utils/role/libs/Role'
 import Permission from '../../utils/role/libs/Permission'
 import BoardPermEdit from './BoardPermEdit.vue'
@@ -55,8 +64,14 @@ export default {
     components: {
         BoardPermEdit,
     },
+    props: {
+        boards: {
+            type: Array,
+            default: () => [],
+        },
+    },
     data: () => ({
-        boards: [],
+        boards_inter: [],
         roles: [],
         roleChecker: {},
         loading: false,
@@ -78,17 +93,21 @@ export default {
     }),
     methods: {
         async fetchBoards() {
-            this.loading = true
-            const res = await axios.get('simple/boards')
-            this.boards = res.data.map(board => ({
+            this.boards_inter = this.boards.map(board => ({
                 ...board,
                 roles: [],
             }))
-            this.loading = false
+            // this.loading = true
+            // const res = await axios.get('simple/boards')
+            // this.boards_inter = res.data.map(board => ({
+            //     ...board,
+            //     roles: [],
+            // }))
+            // this.loading = false
         },
         async fetchRoles() {
             this.loading = true
-            this.roles = []
+            const roles = []
             const res = await axios.get('role')
             const roleNames = res.data
             for (let role of roleNames) {
@@ -96,7 +115,7 @@ export default {
                     continue
                 }
                 const res = await axios.get(`role/${role.tag}`)
-                this.roles.push({
+                roles.push({
                     name: role.name,
                     tag: role.tag,
                     perm: res.data.perm,
@@ -108,15 +127,14 @@ export default {
                 this.roleChecker[role.tag] = (resource, param) => {
                     return new Permission(res.data.perm[resource], param + '')
                 }
-                // console.log(this.roleChecker)
             }
+            this.roles = roles
 
             this.loading = false
         },
         async setInitBoardPerms() {
-            for (let board of this.boards) {
+            for (let board of this.boards_inter) {
                 const newroles = []
-                // console.log(this.roleChecker)
                 for (let action of this.actions) {
                     const selectedRoles = this.roles
                         .filter(role =>
@@ -138,16 +156,18 @@ export default {
             }
         },
         async resetChanges() {
-            await this.fetchRoles()
             await this.fetchBoards()
-            await this.setInitBoardPerms()
+            if (this.$perm('role').can('modify')) {
+                await this.fetchRoles()
+                await this.setInitBoardPerms()
+            }
             this.settingChanged = false
         },
         async saveChanges() {
             // const perms = []
             this.loading = true
             const roles = {}
-            for (let board of this.boards) {
+            for (let board of this.boards_inter) {
                 for (let action of board.roles) {
                     for (let role of this.roles) {
                         if (!roles[role.tag]) {
@@ -183,10 +203,21 @@ export default {
             this.settingChanged = false
         },
     },
+    watch: {
+        async boards(val) {
+            await this.fetchBoards()
+            if (this.$perm('role').can('modify')) {
+                await this.fetchRoles()
+                await this.setInitBoardPerms()
+            }
+        },
+    },
     async created() {
-        await this.fetchRoles()
         await this.fetchBoards()
-        await this.setInitBoardPerms()
+        if (this.$perm('role').can('modify')) {
+            await this.fetchRoles()
+            await this.setInitBoardPerms()
+        }
     },
 }
 </script>

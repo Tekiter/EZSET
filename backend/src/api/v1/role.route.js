@@ -7,7 +7,7 @@ Role과 거기에 대한 권한을 관리하는 API
 import { Router } from 'express'
 import { validateParams, asyncRoute, checkRoleTag } from '../../utils/api'
 import { body, param } from 'express-validator'
-import role, { perm, roles, permOr } from '../../utils/role'
+import role, { perm, roles } from '../../utils/role'
 import permissions from '../../utils/role/permissions'
 import User from '../../models/User'
 
@@ -32,10 +32,7 @@ router.get(
 // 모든 역할 목록 조회
 router.get(
     '/',
-    [
-        permOr(perm => perm('role').can('modify') || perm('role').can('grant')),
-        validateParams,
-    ],
+    [perm('role').can('modify'), validateParams],
     asyncRoute(async (req, res) => {
         let roles = await role.getRoleNames()
 

@@ -28,7 +28,8 @@ const router = Router()
  *      }
  */
 router.get(
-    '/read', [perm('penalty').can('read')],
+    '/read',
+    [perm('penalty').can('read')],
     asyncRoute(async function(req, res) {
         const cursor = await PenaltyConfig.find()
         res.json(cursor)
@@ -57,7 +58,8 @@ router.get(
  *      HTTP/1.1 200 OK
  */
 router.post(
-    '/write', [
+    '/write',
+    [
         perm('penalty').can('update'),
         body('key').isString(),
         body('value').isNumeric(),
@@ -97,7 +99,8 @@ router.post(
  *      HTTP/1.1 200 OK
  */
 router.post(
-    '/delete', [perm('penalty').can('update'), body('key').isString(), validateParams],
+    '/delete',
+    [perm('penalty').can('update'), body('key').isString(), validateParams],
     asyncRoute(async function(req, res) {
         if (req.body.key == '지각') {
             const err = new Error('지각 항목은 삭제할 수 없습니다.')
@@ -137,18 +140,22 @@ router.post(
  *      HTTP/1.1 200 OK
  */
 router.post(
-    '/update', [
+    '/update',
+    [
         perm('penalty').can('update'),
         body('key').isString(),
         body('value').isNumeric(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
-        await PenaltyConfig.findOneAndUpdate({
-            key: req.body.key,
-        }, {
-            value: req.body.value,
-        })
+        await PenaltyConfig.findOneAndUpdate(
+            {
+                key: req.body.key,
+            },
+            {
+                value: req.body.value,
+            }
+        )
         res.end()
     })
 )

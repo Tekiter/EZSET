@@ -196,12 +196,6 @@ router.get(
                 }
             })
         )
-        if (!board) {
-            res.status(404).json({
-                message: '존재하지 않는 게시판입니다.',
-            })
-            return
-        }
     })
 )
 
