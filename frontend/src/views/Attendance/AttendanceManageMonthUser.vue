@@ -391,20 +391,7 @@ export default {
         },
     }),
     async created() {
-        try {
-            const res = await axios.get('attendance/attendanceUserData')
-            this.attendanceUserdata = res.data[0].status
-            try {
-                const res = await axios.get('absencecheck/absenceUserData')
-                this.absenceUserdata = res.data
-            } catch (err) {
-                //
-            }
-        } catch (err) {
-            //
-        }
-        this.updateRange({ start: this.start, end: this.end })
-        this.calLoad = true
+        await this.init()
     },
     computed: {
         title() {
@@ -487,49 +474,52 @@ export default {
         updateRange({ start, end }) {
             const events = []
             //출석현황삽입
-            this.attendanceUserdata.map(item => {
-                //출석
-                if (item.state == 'attendance') {
-                    events.push({
-                        name: '출석',
-                        start: moment(item.date).format('YYYY-MM-DD'),
-                        end: moment(item.date).format('YYYY-MM-DD'),
-                        details: '출석하셨습니다!',
-                        color: 'green',
-                    })
-                }
-                //지각
-                if (item.state == 'late') {
-                    events.push({
-                        name: '지각',
-                        start: moment(item.date).format('YYYY-MM-DD'),
-                        end: moment(item.date).format('YYYY-MM-DD'),
-                        details: '지각하셨습니다!',
-                        color: 'amber',
-                    })
-                }
-                //결석
-                if (item.state == 'absence') {
-                    events.push({
-                        name: '결석',
-                        start: moment(item.date).format('YYYY-MM-DD'),
-                        end: moment(item.date).format('YYYY-MM-DD'),
-                        details: '결석하셨습니다!',
-                        color: 'red',
-                    })
-                }
-                //공결
-                if (item.state == 'official_absence') {
-                    events.push({
-                        name: '공결',
-                        start: moment(item.date).format('YYYY-MM-DD'),
-                        end: moment(item.date).format('YYYY-MM-DD'),
-                        details: '공결처리되었습니다!',
-                        color: 'green',
-                    })
-                }
-                return { name: item.name }
-            })
+            if (this.attendanceUserdata.length > 0) {
+                console.log('in')
+                this.attendanceUserdata.map(item => {
+                    //출석
+                    if (item.state == 'attendance') {
+                        events.push({
+                            name: '출석',
+                            start: moment(item.date).format('YYYY-MM-DD'),
+                            end: moment(item.date).format('YYYY-MM-DD'),
+                            details: '출석하셨습니다!',
+                            color: 'green',
+                        })
+                    }
+                    //지각
+                    if (item.state == 'late') {
+                        events.push({
+                            name: '지각',
+                            start: moment(item.date).format('YYYY-MM-DD'),
+                            end: moment(item.date).format('YYYY-MM-DD'),
+                            details: '지각하셨습니다!',
+                            color: 'amber',
+                        })
+                    }
+                    //결석
+                    if (item.state == 'absence') {
+                        events.push({
+                            name: '결석',
+                            start: moment(item.date).format('YYYY-MM-DD'),
+                            end: moment(item.date).format('YYYY-MM-DD'),
+                            details: '결석하셨습니다!',
+                            color: 'red',
+                        })
+                    }
+                    //공결
+                    if (item.state == 'official_absence') {
+                        events.push({
+                            name: '공결',
+                            start: moment(item.date).format('YYYY-MM-DD'),
+                            end: moment(item.date).format('YYYY-MM-DD'),
+                            details: '공결처리되었습니다!',
+                            color: 'green',
+                        })
+                    }
+                    return { name: item.name }
+                })
+            }
             //공결내역삽입
             this.absenceUserdata.map(item => {
                 if (
@@ -646,17 +636,12 @@ export default {
         //페이지 사용에 필요한 데이터 로드 및 표시
         async init() {
             this.calLoad = false
-            try {
-                const res = await axios.get('attendance/attendanceUserData')
-                this.attendanceUserdata = res.data[0].status
-            } catch (err) {
-                //
-            }
-            try {
-                const res = await axios.get('absencecheck/absenceUserData')
-                this.absenceUserdata = res.data
-            } catch (err) {
-                //
+            const absenceData = await axios.get('absencecheck/absenceUserData')
+            this.absenceUserdata = absenceData.data
+
+            const attData = await axios.get('attendance/attendanceUserData')
+            if (attData.data.length > 0) {
+                this.attendanceUserdata = attData.data[0].status
             }
             this.updateRange({ start: this.start, end: this.end })
             this.calLoad = true
