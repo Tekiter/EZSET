@@ -8,8 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env: 
-      working-directory: ./backend
 
     strategy:
       matrix:
@@ -37,6 +35,7 @@ jobs:
         run: |
             rm -rf ./backend/node_modules
             rm -rf ./frontend/node_modules
+            rm -rf ./backend/.gitignore
       - name: Deploy
         uses: s0/git-publish-subdir-action@master
         env:
