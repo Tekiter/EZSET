@@ -2,7 +2,7 @@ import Router from 'express'
 import { asyncRoute, validateParams } from '../../utils/api'
 import PenaltyConfig from '../../models/Penalty/PenaltyConfig'
 import { perm } from '../../utils/role'
-import { body } from 'express-validator'
+import { param, body, query } from 'express-validator'
 const router = Router()
 
 /**
@@ -96,21 +96,21 @@ router.post(
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
-router.post(
-    '/delete', [perm('penalty').can('update'), body('key').isString(), validateParams],
+router.delete(
+    '/:id', [perm('penalty').can('update'), query('key').isString(), validateParams],
     asyncRoute(async function(req, res) {
-        if (req.body.key == '지각') {
+        if (req.query.key == '지각') {
             const err = new Error('지각 항목은 삭제할 수 없습니다.')
             err.status = 400
             throw err
         }
-        if (req.body.key == '결석') {
+        if (req.query.key == '결석') {
             const err = new Error('결석 항목은 삭제할 수 없습니다.')
             err.status = 400
             throw err
         }
         await PenaltyConfig.findOneAndDelete({
-            key: req.body.key,
+            _id: req.params.id,
         })
         res.end()
     })
