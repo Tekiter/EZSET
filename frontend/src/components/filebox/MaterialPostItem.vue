@@ -3,7 +3,7 @@
         <v-list-item three-line>
             <v-list-item-content>
                 <div class="d-flex">
-                    <div class="overline mb-4 flex-grow-1">
+                    <div class="overline mb-4 flex-grow-1 text-none">
                         {{
                             convertDate(options.created_date) +
                                 ' ' +
@@ -86,7 +86,6 @@ export default {
             if (res) {
                 await axios.delete('/filebox/material/' + this.options.id)
                 this.$emit('delete')
-                console.log('확인버튼누름')
             }
         },
         canEditDelete() {

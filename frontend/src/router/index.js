@@ -5,17 +5,18 @@ import { loginGuard } from './guard'
 
 Vue.use(VueRouter)
 
-const routes = [{
+const routes = [
+    {
         path: '/',
         name: 'home',
         component: () =>
-            import ( /* webpackChunkName: "core" */ '../views/Home.vue'),
+            import(/* webpackChunkName: "core" */ '../views/Home.vue'),
     },
     {
         path: '/login',
         name: 'login',
         component: () =>
-            import ( /* webpackChunkName: "core" */ '../views/Login.vue'),
+            import(/* webpackChunkName: "core" */ '../views/Login.vue'),
         meta: {
             layout: 'empty',
             noLoginRequired: true,
@@ -24,8 +25,7 @@ const routes = [{
     {
         path: '/register',
         name: 'register',
-        component: () =>
-            import ('../views/Register.vue'),
+        component: () => import('../views/Register.vue'),
         meta: {
             layout: 'null',
             noLoginRequired: true,
@@ -34,62 +34,58 @@ const routes = [{
     {
         path: '/attendance',
         name: 'attendance',
-        component: () =>
-            import ('../views/Attendance/Attendance.vue'),
+        component: () => import('../views/Attendance/Attendance.vue'),
     },
     {
         path: '/attendanceManageDay/:day',
         name: 'attendanceManage',
-        component: () =>
-            import ('../views/Attendance/AttendanceManageDay.vue'),
+        component: () => import('../views/Attendance/AttendanceManageDay.vue'),
     },
     {
         path: '/attendanceManageMonth',
         name: 'attendanceManageMonth',
         component: () =>
-            import ('../views/Attendance/AttendanceManageMonth.vue'),
+            import('../views/Attendance/AttendanceManageMonth.vue'),
     },
     {
         path: '/attendanceManageMonthUser',
         name: 'attendanceManageMonthUser',
         component: () =>
-            import ('../views/Attendance/AttendanceManageMonthUser.vue'),
+            import('../views/Attendance/AttendanceManageMonthUser.vue'),
     },
     {
         path: '/officialAbsenceAccept',
         name: 'officialAbsenceAccept',
         component: () =>
-            import ('../views/Attendance/OfficialAbsenceAccept.vue'),
+            import('../views/Attendance/OfficialAbsenceAccept.vue'),
     },
     {
         path: '/manage/attendance',
         name: 'attendanceusermanage',
-        component: () =>
-            import ('../views/Attendance/AttendanceManage.vue'),
+        component: () => import('../views/Attendance/AttendanceManage.vue'),
     },
     {
         path: '/Schedule',
         name: 'Schedule',
-        component: () =>
-            import ('../views/Schedule/Schedule.vue'),
+        component: () => import('../views/Schedule/Schedule.vue'),
     },
     {
         path: '/board',
         name: 'board',
         component: () =>
-            import ( /* webpackChunkName: "board" */ '../views/Board/Board.vue'),
+            import(/* webpackChunkName: "board" */ '../views/Board/Board.vue'),
     },
     {
         path: '/board/:board_id',
         name: 'post',
         component: () =>
-            import ( /* webpackChunkName: "board" */ '../views/Board/Post.vue'),
+            import(/* webpackChunkName: "board" */ '../views/Board/Post.vue'),
     },
     {
         path: '/board/:board_id/:post_id',
         name: 'content',
         component: () =>
-            import (
+            import(
                 /* webpackChunkName: "board" */
                 '../views/Board/Content.vue'
             ),
@@ -97,20 +93,18 @@ const routes = [{
     {
         path: '/write/:board_id',
         name: 'write',
-        component: () =>
-            import ('../views/Board/WritePost.vue'),
+        component: () => import('../views/Board/WritePost.vue'),
     },
     {
         path: '/update/:board_id/:post_id',
         name: 'update',
-        component: () =>
-            import ('../views/Board/UpdatePost.vue'),
+        component: () => import('../views/Board/UpdatePost.vue'),
     },
     {
         path: '/searchpost',
         name: 'serchPost',
         component: () =>
-            import (
+            import(
                 /* webpackChunkName: "board" */
                 '../views/Board/SearchPost.vue'
             ),
@@ -118,84 +112,74 @@ const routes = [{
     {
         path: '/manage/users',
         name: 'manageUsers',
-        component: () =>
-            import ('../views/Manage/UserManage.vue'),
+        component: () => import('../views/Manage/UserManage.vue'),
     },
     {
         path: '/manage/preusers',
         name: 'managePreusers',
-        component: () =>
-            import ('../views/Manage/PreuserManage.vue'),
+        component: () => import('../views/Manage/PreuserManage.vue'),
     },
     {
         path: '/manage/roles',
         name: 'manageRoles',
-        component: () =>
-            import ('../views/Manage/RoleManage.vue'),
+        component: () => import('../views/Manage/RoleManage.vue'),
     },
     {
         path: '/manage/boards',
         name: 'manageBoards',
-        component: () =>
-            import ('../views/Manage/BoardManage.vue'),
+        component: () => import('../views/Manage/BoardManage.vue'),
     },
     {
         path: '/manage/users',
         name: 'manageUsers',
-        component: () =>
-            import ('../views/Manage/UserManage.vue'),
+        component: () => import('../views/Manage/UserManage.vue'),
     },
     {
         path: '/manage/server',
         name: 'manageServer',
-        component: () =>
-            import ('../views/Manage/ServerManage.vue'),
+        component: () => import('../views/Manage/ServerManage.vue'),
     },
     {
         path: '/manage/penalty',
         name: 'penalty',
-        component: () =>
-            import ('../views/Manage/PenaltyEdit.vue'),
+        component: () => import('../views/Manage/PenaltyEdit.vue'),
     },
     {
         path: '/PenaltyManage',
         name: 'PenaltyManage',
-        component: () =>
-            import ('../views/Penalty/PenaltyManage.vue'),
+        component: () => import('../views/Penalty/PenaltyManage.vue'),
     },
     {
         path: '/Penalty',
         name: 'Penalty',
-        component: () =>
-            import ('../views/Penalty/Penalty.vue'),
+        component: () => import('../views/Penalty/Penalty.vue'),
     },
     {
         path: '/manage/theme',
         name: 'manageTheme',
-        component: () =>
-            import ('../views/Manage/ThemeManage.vue'),
+        component: () => import('../views/Manage/ThemeManage.vue'),
     },
     {
         path: '/mypage',
         name: 'mypage',
-        component: () =>
-            import ('../views/Mypage.vue'),
+        component: () => import('../views/Mypage.vue'),
     },
     {
         path: '/filebox',
         component: () =>
-            import (
+            import(
                 /* webpackChunkName: "filebox" */
                 '../views/FileBox/FileBox.vue'
             ),
-        children: [{
+        children: [
+            {
                 path: '',
                 name: 'fileBoxEmpty',
             },
             {
                 path: 'create',
                 component: () =>
-                    import (
+                    import(
                         /* webpackChunkName: "filebox" */
                         '../components/filebox/CreateGroup'
                     ),
@@ -204,7 +188,7 @@ const routes = [{
                 path: 'edit',
                 name: 'fileboxEditGroup',
                 component: () =>
-                    import (
+                    import(
                         /* webpackChunkName: "filebox" */
                         '../components/filebox/EditGroup'
                     ),
@@ -214,7 +198,7 @@ const routes = [{
                 path: 'folder/:folder_id',
                 name: 'fileBoxMaterials',
                 component: () =>
-                    import (
+                    import(
                         /* webpackChunkName: "filebox" */
                         '../components/filebox/MaterialPost.vue'
                     ),
@@ -224,7 +208,7 @@ const routes = [{
                 path: 'folder/:folder_id/write',
                 name: 'fileBoxWriteMaterial',
                 component: () =>
-                    import (
+                    import(
                         /* webpackChunkName: "filebox" */
                         '../components/filebox/WriteMaterial.vue'
                     ),
@@ -234,7 +218,7 @@ const routes = [{
                 path: 'edit/:material_id',
                 name: 'fileBoxEditMaterial',
                 component: () =>
-                    import (
+                    import(
                         /* webpackChunkName: "filebox" */
                         '../components/filebox/WriteMaterial.vue'
                     ),
@@ -248,13 +232,13 @@ const routes = [{
         path: '/403',
         name: 'error403',
         component: () =>
-            import ( /* webpackChunkName: "core" */ '../views/Error/403.vue'),
+            import(/* webpackChunkName: "core" */ '../views/Error/403.vue'),
     },
     {
         path: '*',
         name: 'error404',
         component: () =>
-            import ( /* webpackChunkName: "core" */ '../views/Error/404.vue'),
+            import(/* webpackChunkName: "core" */ '../views/Error/404.vue'),
     },
 ]
 
