@@ -57,19 +57,17 @@ router.get(
                 moment(element.date) >= moment(req.query.start_date) &&
                 moment(element.date) <= moment(req.query.end_date)
             ) {
-                console.log(element)
                 if (element.state == 'late') {
-                    var val = penaltyConfig.find((item, idx) => {
+                    var Val = penaltyConfig.find((item, idx) => {
                         return item.key === '지각'
                     })
-
                     result.push({
-                        type_id: val._id,
+                        type_id: Val._id,
                         username: req.params.username,
                         type: '지각',
                         date: moment(element.date).format('YYYY-MM-DD'),
                         description: '지각',
-                        point: val.value,
+                        point: Val.value,
                     })
                 }
                 if (element.state == 'absence') {
@@ -77,7 +75,7 @@ router.get(
                         return item.key === '결석'
                     })
                     result.push({
-                        type_id: Val._id,
+                        type_id: val._id,
                         username: req.params.username,
                         type: '결석',
                         date: moment(element.date).format('YYYY-MM-DD'),
@@ -87,7 +85,7 @@ router.get(
                 }
             }
         })
-        console.log(result)
+
         var penalty = await Penalty.find({
             username: req.params.username,
             date: {
@@ -97,7 +95,7 @@ router.get(
         })
 
         penalty.forEach(element => {
-            var val = penaltyConfig.find(item => {
+            var val = penaltyConfig.find((item, idx) => {
                 return item.key === element.type
             })
             result.push({
@@ -142,6 +140,7 @@ router.get(
 router.post(
     '/write', [
         perm('penalty').can('update'),
+        body('type_id').isString(),
         body('type').isString(),
         body('date').isString(),
         body('username').isString(),
@@ -149,12 +148,8 @@ router.post(
         validateParams,
     ],
     asyncRoute(async function(req, res) {
-        var penaltyConfig = await PenaltyConfig.find()
-        var val = penaltyConfig.find(item => {
-            return item.key === element.type
-        })
         var penalty = new Penalty()
-        penalty.type_id = val._id
+        penalty.type_id = req.body.type_id
         penalty.type = req.body.type
         penalty.username = req.body.username
         penalty.date = req.body.date
@@ -212,4 +207,25 @@ router.post(
     })
 )
 
+router.delete(
+    '/:username', [
+        perm('penalty').can('update'),
+        param('username').isString(),
+        query('date').isString(),
+        query('type').isString(),
+        query('description').isString(),
+        query('type_id').isString(),
+        validateParams,
+    ],
+    asyncRoute(async function(req, res) {
+        await Penalty.findOneAndDelete({
+            type_id: req.query.type_id,
+            type: req.query.type,
+            username: req.params.username,
+            date: req.query.date,
+            description: req.query.description,
+        })
+        res.end()
+    })
+)
 export default router
