@@ -15,6 +15,9 @@ export function setDefaultRole(roles) {
 
         .resource('schedule')
         .can('read')
+
+        .resource('penalty')
+        .can('read')
 }
 
 export function setAdminRole(roles) {
@@ -51,7 +54,8 @@ export function setAdminRole(roles) {
         .can('update')
         .resource('manageBoards')
         .can('access')
-
+        .resource('managePenalty')
+        .can('access')
         .resource('fileBox')
         .can(['manage', 'upload'])
 
@@ -63,4 +67,7 @@ export function setAdminRole(roles) {
 
         .resource('schedule')
         .can('update')
+
+        .resource('penalty')
+        .can(['update', 'read'])
 }

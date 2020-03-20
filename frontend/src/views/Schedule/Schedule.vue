@@ -54,6 +54,9 @@
                                         v-model="scheduleDialog.show"
                                         persistent
                                         max-width="650"
+                                        v-if="
+                                            this.$perm('schedule').can('update')
+                                        "
                                     >
                                         <template v-slot:activator="{ on }">
                                             <v-btn

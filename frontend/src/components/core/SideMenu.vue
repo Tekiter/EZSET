@@ -52,6 +52,11 @@ export default {
                             perm: this.$perm('manageBoards').can('access'),
                         },
                         {
+                            title: '상벌점 설정',
+                            to: '/manage/penalty',
+                            perm: this.$perm('attendance').can('update'),
+                        },
+                        {
                             title: '서버 설정',
                             to: '/manage/server',
                             perm: this.$perm('serverConfig').can('change'),
@@ -109,6 +114,18 @@ export default {
                     title: '일정표',
                     to: '/Schedule',
                     perm: this.$perm('schedule').can('read'),
+                },
+                {
+                    icon: 'mdi-thumb-up-outline',
+                    title: '상벌점',
+                    to: '/PenaltyManage',
+                    perm: this.$perm('penalty').can('update'),
+                },
+                {
+                    icon: 'mdi-thumb-up-outline',
+                    title: '상벌점 조회',
+                    to: '/Penalty',
+                    perm: this.$perm('penalty').can('read'),
                 },
             ]
         },

@@ -128,5 +128,30 @@ export default {
                 action: 'upload',
             },
         },
+        {
+            type: 'line',
+        },
+        {
+            type: 'header',
+            title: '상벌점',
+        },
+        {
+            type: 'switch',
+            title: '상벌점 관리',
+            content: '상벌점 항목을 수정/삭제 하고 관리합니다',
+            target: {
+                resource: 'penalty',
+                action: 'update',
+            },
+        },
+        {
+            type: 'switch',
+            title: '상벌점 읽기',
+            content: '자신의 상벌점을 읽을 수 있습니다.',
+            target: {
+                resource: 'penalty',
+                action: 'read',
+            },
+        },
     ],
 }

@@ -70,6 +70,12 @@ const routes = [
         component: () => import('../views/Schedule/Schedule.vue'),
     },
     {
+        path: '/board',
+        name: 'board',
+        component: () =>
+            import(/* webpackChunkName: "board" */ '../views/Board/Board.vue'),
+    },
+    {
         path: '/board/:board_id',
         name: 'post',
         component: () =>
@@ -80,7 +86,8 @@ const routes = [
         name: 'content',
         component: () =>
             import(
-                /* webpackChunkName: "board" */ '../views/Board/Content.vue'
+                /* webpackChunkName: "board" */
+                '../views/Board/Content.vue'
             ),
     },
     {
@@ -98,7 +105,8 @@ const routes = [
         name: 'serchPost',
         component: () =>
             import(
-                /* webpackChunkName: "board" */ '../views/Board/SearchPost.vue'
+                /* webpackChunkName: "board" */
+                '../views/Board/SearchPost.vue'
             ),
     },
     {
@@ -122,9 +130,29 @@ const routes = [
         component: () => import('../views/Manage/BoardManage.vue'),
     },
     {
+        path: '/manage/users',
+        name: 'manageUsers',
+        component: () => import('../views/Manage/UserManage.vue'),
+    },
+    {
         path: '/manage/server',
         name: 'manageServer',
         component: () => import('../views/Manage/ServerManage.vue'),
+    },
+    {
+        path: '/manage/penalty',
+        name: 'penalty',
+        component: () => import('../views/Manage/PenaltyEdit.vue'),
+    },
+    {
+        path: '/PenaltyManage',
+        name: 'PenaltyManage',
+        component: () => import('../views/Penalty/PenaltyManage.vue'),
+    },
+    {
+        path: '/Penalty',
+        name: 'Penalty',
+        component: () => import('../views/Penalty/Penalty.vue'),
     },
     {
         path: '/manage/theme',
@@ -140,7 +168,8 @@ const routes = [
         path: '/filebox',
         component: () =>
             import(
-                /* webpackChunkName: "filebox" */ '../views/FileBox/FileBox.vue'
+                /* webpackChunkName: "filebox" */
+                '../views/FileBox/FileBox.vue'
             ),
         children: [
             {
@@ -151,7 +180,8 @@ const routes = [
                 path: 'create',
                 component: () =>
                     import(
-                        /* webpackChunkName: "filebox" */ '../components/filebox/CreateGroup'
+                        /* webpackChunkName: "filebox" */
+                        '../components/filebox/CreateGroup'
                     ),
             },
             {
@@ -159,7 +189,8 @@ const routes = [
                 name: 'fileboxEditGroup',
                 component: () =>
                     import(
-                        /* webpackChunkName: "filebox" */ '../components/filebox/EditGroup'
+                        /* webpackChunkName: "filebox" */
+                        '../components/filebox/EditGroup'
                     ),
                 props: route => ({ groups: route.params.groups }),
             },
@@ -168,7 +199,8 @@ const routes = [
                 name: 'fileBoxMaterials',
                 component: () =>
                     import(
-                        /* webpackChunkName: "filebox" */ '../components/filebox/MaterialPost.vue'
+                        /* webpackChunkName: "filebox" */
+                        '../components/filebox/MaterialPost.vue'
                     ),
                 props: route => ({ folderId: route.params.folder_id }),
             },
@@ -177,7 +209,8 @@ const routes = [
                 name: 'fileBoxWriteMaterial',
                 component: () =>
                     import(
-                        /* webpackChunkName: "filebox" */ '../components/filebox/WriteMaterial.vue'
+                        /* webpackChunkName: "filebox" */
+                        '../components/filebox/WriteMaterial.vue'
                     ),
                 props: route => ({ parent_id: route.params.folder_id }),
             },
@@ -186,7 +219,8 @@ const routes = [
                 name: 'fileBoxEditMaterial',
                 component: () =>
                     import(
-                        /* webpackChunkName: "filebox" */ '../components/filebox/WriteMaterial.vue'
+                        /* webpackChunkName: "filebox" */
+                        '../components/filebox/WriteMaterial.vue'
                     ),
                 props: route => ({
                     edit: route.params.material_id,
