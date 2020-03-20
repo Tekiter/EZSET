@@ -523,24 +523,19 @@ router.delete(
     '/material/:material_id',
     [param('material_id').isMongoId(), validateParams],
     asyncRoute(async (req, res) => {
-        if (
-            !req.user.perm('fileBox').can('upload') &&
-            !req.user.perm('fileBox').can('manage')
-        ) {
-            const err = new Error('권한이 없습니다.')
-            err.status = 403
-            throw err
-        }
         const material = await Material.findById(req.params.material_id)
-
-        //파일을 올린 본인이 아니라면 삭제할 수 없도록함
-        if (
-            req.user.perm('fileBox').can('upload') &&
-            material.author != req.user.username
-        ) {
-            const err = new Error('본인이 아닌경우 파일을 지울 수 없습니다.')
-            err.status = 403
-            throw err
+        if (!req.user.perm('fileBox').can('manage')) {
+            //파일을 올린 본인이 아니라면 삭제할 수 없도록함
+            if (
+                req.user.perm('fileBox').can('upload') &&
+                material.author != req.user.username
+            ) {
+                const err = new Error(
+                    '본인이 아닌경우 파일을 지울 수 없습니다.'
+                )
+                err.status = 403
+                throw err
+            }
         }
 
         if (!material) {
@@ -615,15 +610,21 @@ router.patch(
         validateParams,
     ],
     asyncRoute(async (req, res) => {
-        if (
-            !req.user.perm('fileBox').can('upload') &&
-            !req.user.perm('fileBox').can('manage')
-        ) {
-            const err = new Error('권한이 없습니다.')
-            err.status = 403
-            throw err
-        }
         const material = await Material.findById(req.params.material_id)
+
+        if (!req.user.perm('fileBox').can('manage')) {
+            //파일을 올린 본인이 아니라면 수정할 수 없도록함
+            if (
+                req.user.perm('fileBox').can('upload') &&
+                material.author != req.user.username
+            ) {
+                const err = new Error(
+                    '본인이 아닌경우 파일을 수정할 수 없습니다.'
+                )
+                err.status = 403
+                throw err
+            }
+        }
 
         if (!material) {
             const err = new Error('존재하지 않는 자료입니다.')
@@ -644,16 +645,6 @@ router.patch(
                 err.status = 400
                 throw err
             }
-        }
-
-        //파일을 올린 본인이 아니라면 수정할 수 없도록함
-        if (
-            req.user.perm('fileBox').can('upload') &&
-            material.author != req.user.username
-        ) {
-            const err = new Error('본인이 아닌경우 파일을 수정할 수 없습니다.')
-            err.status = 403
-            throw err
         }
 
         material.title = req.body.title
