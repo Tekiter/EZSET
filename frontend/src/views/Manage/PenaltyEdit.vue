@@ -28,7 +28,7 @@
                         <v-col cols="12" md="1" align="right">
                             <v-btn
                                 class="ma-3"
-                                @click="showAddDialog(penalty)"
+                                @click="showAddDialog()"
                                 outlined
                                 color="primary"
                                 :small="$vuetify.breakpoint.smAndDown"
@@ -58,7 +58,7 @@
                 <v-row class="mx-2">
                     <v-col
                         v-for="penalty in props.items"
-                        :key="penalty.key"
+                        :key="penalty._id"
                         cols="12"
                         md="3"
                     >
@@ -117,7 +117,8 @@
                     }}</v-card-subtitle>
                 </v-card-title>
                 <v-card-text>
-                    해당 상벌점 항목을 삭제하시겠습니까?
+                    해당 항목을 삭제하시겠습니까? 해당 항목의 이름으로 부여된
+                    상벌점들은 모두 삭제 됩니다.
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -135,19 +136,26 @@
         <v-dialog v-model="updateDialog.show" persistent max-width="300px">
             <v-card>
                 <v-card-title>
-                    <span class="headline">상벌점 항목 수정</span
-                    ><v-card-subtitle>{{ updateDialog.type }}</v-card-subtitle>
+                    <span class="headline">상벌점 항목 수정</span>
                 </v-card-title>
                 <v-card-text>
                     <v-text-field
+                        class="ma-3"
+                        v-model="updateDialog.type"
+                        label="항목이름"
+                        hide-details
+                        outlined
+                    ></v-text-field>
+                    <v-text-field
+                        class="ma-3"
                         v-model="updateDialog.point"
-                        label="벌점"
+                        label="점수"
                         hide-details
                         outlined
                     ></v-text-field>
                 </v-card-text>
                 <v-card-text>
-                    해당 상벌점 항목을 수정 하시겠습니까?
+                    해당 항목을 수정 하시겠습니까?
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -171,17 +179,21 @@
                 <v-card-text>
                     <v-text-field
                         v-model="addDialog.name"
-                        label="벌점 이름"
+                        class="ma-3"
+                        label="항목 이름"
                         hide-details
+                        outlined
                     ></v-text-field>
                     <v-text-field
                         v-model="addDialog.point"
-                        label="벌점"
+                        class="ma-3"
+                        label="점수"
                         hide-details
+                        outlined
                     ></v-text-field>
                 </v-card-text>
                 <v-card-text>
-                    해당 상벌점 항목을 추가 하시겠습니까?
+                    해당 항목을 추가 하시겠습니까?
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -227,6 +239,7 @@ export default {
                 search: '',
             },
             updateDialog: {
+                type_id: '',
                 type: '',
                 point: '',
                 show: false,
@@ -278,10 +291,14 @@ export default {
         async closeDeleteDialog(penalty) {
             this.deleteDialog.penalty = penalty
             try {
-                await axios.post('penaltyconfig/delete', {
-                    key: this.deleteDialog.penalty.key,
-                    value: this.deleteDialog.penalty.value,
-                })
+                await axios.delete(
+                    `penaltyconfig/${this.deleteDialog.penalty._id}`,
+                    {
+                        params: {
+                            key: this.deleteDialog.penalty.key,
+                        },
+                    }
+                )
                 this.openSnackbar('삭제되었습니다', 'success')
             } catch (err) {
                 this.openSnackbar(
@@ -293,16 +310,22 @@ export default {
             this.fetchpenaltys()
         },
         showUpdateDialog(penalty) {
+            this.updateDialog.type_id = penalty._id
             this.updateDialog.type = penalty.key
             this.updateDialog.point = penalty.value
             this.updateDialog.show = true
         },
         async updatePenaltyProperty() {
-            if (this.updateDialog.point == '') {
-                this.openSnackbar('벌점 을 확인해주세요', 'error')
+            if (this.updateDialog.type == '') {
+                this.openSnackbar('항목이름을 확인해주세요', 'error')
+            } else if (this.updateDialog.point == '') {
+                this.openSnackbar('점수를 확인해주세요', 'error')
+            } else if (isNaN(this.updateDialog.point)) {
+                this.openSnackbar('점수는 숫자로 입력해 주세요', 'error')
             } else {
                 try {
                     await axios.post('penaltyconfig/update', {
+                        _id: this.updateDialog.type_id,
                         key: this.updateDialog.type,
                         value: this.updateDialog.point,
                     })
@@ -316,14 +339,17 @@ export default {
                 this.fetchpenaltys()
             }
         },
+
         showAddDialog() {
             this.addDialog.show = true
         },
         async addPenaltyProperty() {
             if (this.addDialog.name == '') {
-                this.openSnackbar('벌점 이름을 확인해주세요', 'error')
+                this.openSnackbar('항목 이름을 확인해주세요', 'error')
             } else if (this.addDialog.point == '') {
-                this.openSnackbar('벌점 을 확인해주세요', 'error')
+                this.openSnackbar('항목 을 확인해주세요', 'error')
+            } else if (isNaN(this.addDialog.point)) {
+                this.openSnackbar('점수는 숫자로 입력해 주세요', 'error')
             } else {
                 try {
                     await axios.post('penaltyconfig/write', {
@@ -351,7 +377,7 @@ export default {
         },
     },
     async created() {
-        if (!this.$perm('manageUsers').can('access')) {
+        if (!this.$perm('penalty').can('update')) {
             this.$router.push({ name: 'error403' })
             return
         }

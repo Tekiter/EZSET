@@ -321,6 +321,7 @@ export default {
             users: [],
             curTab: 0,
             penaltyConfig: [],
+            penaltyConfigType_id: [],
             curUser: {
                 username: '',
                 realname: '',
@@ -414,6 +415,7 @@ export default {
                     }
                 })
                 this.penaltyConfig = res
+                this.penaltyConfigType_id = penaltyConfig.data
             } finally {
                 this.fetchingCount -= 1
             }
@@ -455,11 +457,14 @@ export default {
             }
         },
         async deleteItem(penalty) {
-            await axios.post('penalty/delete', {
-                username: penalty.username,
-                date: penalty.date,
-                type: penalty.type,
-                description: penalty.description,
+            console.log(penalty)
+            await axios.delete(`penalty/${penalty.username}`, {
+                params: {
+                    type_id: penalty.type_id,
+                    date: penalty.date,
+                    type: penalty.type,
+                    description: penalty.description,
+                },
             })
             this.openSnackbar('삭제되었습니다', 'success')
 
@@ -483,7 +488,11 @@ export default {
             } else if (penalty.description == '') {
                 this.openSnackbar('설명을 작성해 주세요', 'error')
             } else {
+                var Val = this.penaltyConfigType_id.find((item, idx) => {
+                    return item.key === penalty.type
+                })
                 await axios.post('/penalty/write', {
+                    type_id: Val._id,
                     type: penalty.type,
                     username: this.curUser.username,
                     date: penalty.date,
