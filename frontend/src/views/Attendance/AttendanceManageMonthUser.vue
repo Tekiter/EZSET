@@ -475,7 +475,6 @@ export default {
             const events = []
             //출석현황삽입
             if (this.attendanceUserdata.length > 0) {
-                console.log('in')
                 this.attendanceUserdata.map(item => {
                     //출석
                     if (item.state == 'attendance') {
