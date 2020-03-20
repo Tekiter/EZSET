@@ -881,13 +881,26 @@ router.get(
             err.status = 400
             throw err
         }
+
+        const board = (await Board.find())
+            .filter(item => {
+                return req.user.perm('board', item.id + '').can('read')
+            })
+            .map(item => item.id)
+
         try {
             const page = parseInt(req.query.page)
             const pagesize = parseInt(req.query.pagesize || 8)
 
-            let postcount = await Post.find({ $or: options }).count()
+            let postcount = await Post.find({
+                $or: options,
+                board: { $in: board },
+            }).count()
 
-            const posts = await Post.find({ $or: options })
+            const posts = await Post.find({
+                $or: options,
+                board: { $in: board },
+            })
                 .limit(pagesize)
                 .skip((page - 1) * pagesize)
 
