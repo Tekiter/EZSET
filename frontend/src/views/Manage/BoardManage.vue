@@ -270,7 +270,6 @@ export default {
             this.createBoardDialog.show = true
         },
         async applyCreateBoardDialog() {
-            console.log(this.createBoardDialog.title)
             this.createBoardDialog.isLoading = true
             if (this.createBoardDialog.title.length == 0) {
                 this.createBoardDialog.lenError = true

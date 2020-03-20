@@ -86,7 +86,6 @@ export default {
             if (res) {
                 await axios.delete('/filebox/material/' + this.options.id)
                 this.$emit('delete')
-                console.log('확인버튼누름')
             }
         },
         canEditDelete() {
