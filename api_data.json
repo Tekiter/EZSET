@@ -1713,6 +1713,228 @@
     "groupTitle": "Board"
   },
   {
+    "type": "patch",
+    "url": "/config/admin",
+    "title": "서버 설정 변경 (어드민)",
+    "description": "<p>변경 가능한 서버의 설정 정보를 변경한다. body에 Object 로 설정값의 key: value 쌍을 넣으면 반영된다.</p>",
+    "name": "ChangeConfig",
+    "group": "Config",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>바꿀 설정의 값</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\"groupName\":\"EZSET\",\"usePreUser\":false}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/config.route.js",
+    "groupTitle": "Config"
+  },
+  {
+    "type": "get",
+    "url": "/config/reset",
+    "title": "서버 설정 초기화",
+    "description": "<p>서버의 모든 설정 정보를 초기화</p>",
+    "name": "ResetConfig",
+    "group": "Config",
+    "version": "0.0.0",
+    "filename": "src/api/v1/config.route.js",
+    "groupTitle": "Config"
+  },
+  {
+    "type": "get",
+    "url": "/config/admin",
+    "title": "서버 설정 가져오기 (어드민)",
+    "description": "<p>서버의 모든 설정 정보를 가져옴</p>",
+    "name": "ViewAdminConfig",
+    "group": "Config",
+    "version": "0.0.0",
+    "filename": "src/api/v1/config.route.js",
+    "groupTitle": "Config"
+  },
+  {
+    "type": "get",
+    "url": "/config",
+    "title": "서버 설정 가져오기",
+    "description": "<p>서버의 기본 정보를 가져옴</p>",
+    "name": "ViewConfig",
+    "group": "Config",
+    "version": "0.0.0",
+    "filename": "src/api/v1/config.route.js",
+    "groupTitle": "Config"
+  },
+  {
+    "type": "get",
+    "url": "/file/manage/cleanup",
+    "title": "파일 폴더 정리",
+    "description": "<p>사용되지 않지만, 디스크에 남아있는 파일을 삭제하여 용량을 확보한다.</p>",
+    "name": "CleanupFiles",
+    "group": "File",
+    "version": "0.0.0",
+    "filename": "src/api/v1/file.route.js",
+    "groupTitle": "File"
+  },
+  {
+    "type": "get",
+    "url": "/file/download/:file_id",
+    "title": "파일 다운로드",
+    "description": "<p>업로드된 파일을 다운로드한다. 요청시 파일의 이진 데이터가 결과로 전송된다.</p>",
+    "name": "DownloadFile",
+    "group": "File",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "file_id",
+            "description": "<p>파일의 id</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/file.route.js",
+    "groupTitle": "File"
+  },
+  {
+    "type": "get",
+    "url": "/file/info/:file_id",
+    "title": "업로드된 파일 정보",
+    "description": "<p>업로드된 파일에 대한 기본 정보를 가져옴</p>",
+    "name": "FileInfo",
+    "group": "File",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "file_id",
+            "description": "<p>파일의 id</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>파일의 id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "filename",
+            "description": "<p>파일의 이름</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "size",
+            "description": "<p>파일의 크기</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "uploader",
+            "description": "<p>파일을 올린 유저의 아이디</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Datetime",
+            "optional": false,
+            "field": "timestamp",
+            "description": "<p>파일을 올린 시간</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n  \"id\": \"5e2c0c86850bef7560bfa898\",\n  \"filename\": \"1.PNG\",\n  \"size\": 34850,\n  \"uploader\": \"helloworld\",\n  \"timestamp\": \"2020-01-25T09:38:14.533Z\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/file.route.js",
+    "groupTitle": "File"
+  },
+  {
+    "type": "post",
+    "url": "}",
+    "title": "/file/upload 파일 업로드",
+    "description": "<p>파일을 서버에 업로드한다.</p>",
+    "name": "UploadFile",
+    "group": "File",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "File",
+            "optional": false,
+            "field": "file",
+            "description": "<p>파일의 이진 데이터</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>업로드된 파일의 id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "size",
+            "description": "<p>업로드된 파일의 크기</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n  \"id\":\"5e7480be9c20a25c88590aab\",\n  \"size\":34850\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/file.route.js",
+    "groupTitle": "File"
+  },
+  {
     "type": "delete",
     "url": "/filebox/material/:material_id",
     "title": "자료실 게시물 삭제",
@@ -2404,6 +2626,68 @@
     "version": "0.0.0",
     "filename": "src/api/v1/filebox.route.js",
     "groupTitle": "Filebox"
+  },
+  {
+    "type": "patch",
+    "url": "/home/simple",
+    "title": "Simple 홈 화면 변경",
+    "description": "<p>Simple 홈 화면의 내용을 변경</p>",
+    "name": "EditSimpleHome",
+    "group": "Home",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "content",
+            "description": "<p>바꿀 홈 화면의 내용</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\"content\":\"홈화면 내용\"}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/home.route.js",
+    "groupTitle": "Home"
+  },
+  {
+    "type": "get",
+    "url": "/home/simple",
+    "title": "Simple 홈 화면",
+    "description": "<p>Simple 홈 화면의 내용을 가져옴</p>",
+    "name": "ViewSimpleHome",
+    "group": "Home",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "200",
+            "description": ""
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\"content\":\"홈화면 내용\"}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/home.route.js",
+    "groupTitle": "Home"
   },
   {
     "type": "post",
