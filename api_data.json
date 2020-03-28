@@ -3569,6 +3569,296 @@
     "groupTitle": "Penalty"
   },
   {
+    "type": "patch",
+    "url": "/role/:role_tag",
+    "title": "역할 권한 변경",
+    "description": "<p>태그가 role_tag 역할의 권한을 변경함</p>",
+    "name": "ChangeRolePerm",
+    "group": "role",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>바꿀 역할 이름</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object[]",
+            "optional": false,
+            "field": "perms",
+            "description": "<p>바꿀 권한의 정보</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n    \"name\":\"role1\",\n    \"perms\":[\n        {\"allow\":false,\"resource\":\"manageUsers\",\"action\":\"access\",\"range\":\"any\"},\n        {\"allow\":false,\"resource\":\"manageBoards\",\"action\":\"access\",\"range\":\"any\"}\n    ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/role.route.js",
+    "groupTitle": "role"
+  },
+  {
+    "type": "post",
+    "url": "/role",
+    "title": "역할 추가",
+    "description": "<p>새로운 역할을 추가함</p>",
+    "name": "CreateRole",
+    "group": "role",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>역할 이름</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{ name: \"role1\" }",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tag",
+            "description": "<p>새 역할의 태그</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>새 역할의 이름</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": " HTTP/1.1 200 OK\n{\"tag\":\"1913c\",\"name\":\"role1\",\"perm\":{}}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/role.route.js",
+    "groupTitle": "role"
+  },
+  {
+    "type": "delete",
+    "url": "/role/:role_tag",
+    "title": "역할 삭제",
+    "description": "<p>태그가 role_tag인 역할을 삭제함</p>",
+    "name": "DeleteRole",
+    "group": "role",
+    "version": "0.0.0",
+    "filename": "src/api/v1/role.route.js",
+    "groupTitle": "role"
+  },
+  {
+    "type": "get",
+    "url": "/role/me",
+    "title": "내 역할 조회",
+    "description": "<p>내 아이디에 부여된 역할과 권한 정보를 받아옴</p>",
+    "name": "MyRole",
+    "group": "role",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "roles",
+            "description": "<p>나에게 부여된 역할들</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "perms",
+            "description": "<p>나에게 부여된 권한들</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "      HTTP/1.1 200 OK\n{\n  \"roles\": [\n    \"admin\"\n  ],\n  \"perms\": [\n    {\n      \"role\": {\n        \"all\": {\n          \"any\": [],\n          \"own\": [\n            \"read\"\n          ]\n        }\n      },\n      \"managePreusers\": {},\n      \"serverConfig\": {},\n      \"manageUsers\": {},\n      \"manageBoards\": {}\n    },\n    {\n      \"serverConfig\": {\n        \"all\": [\n          \"change\"\n        ]\n      }\n    }\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/role.route.js",
+    "groupTitle": "role"
+  },
+  {
+    "type": "get",
+    "url": "/role",
+    "title": "역할 조회",
+    "description": "<p>모든 역할들의 정보와 권한들을 가져옴</p>",
+    "name": "RoleAllInfos",
+    "group": "role",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "roles",
+            "description": "<p>나에게 부여된 역할들</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "perms",
+            "description": "<p>나에게 부여된 권한들</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "      HTTP/1.1 200 OK\n{\n  \"roles\": [\n    \"admin\"\n  ],\n  \"perms\": [\n    {\n      \"role\": {\n        \"all\": {\n          \"any\": [],\n          \"own\": [\n            \"read\"\n          ]\n        }\n      },\n      \"managePreusers\": {},\n      \"serverConfig\": {},\n    },\n    {\n      \"serverConfig\": {\n        \"all\": [\n          \"change\"\n        ]\n      }\n    }\n  ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/role.route.js",
+    "groupTitle": "role"
+  },
+  {
+    "type": "get",
+    "url": "/role/:role_tag",
+    "title": "해당 역할의 정보 조회",
+    "description": "<p>태그가 role_tag 역할의 정보를 보여줌</p>",
+    "name": "RoleInfo",
+    "group": "role",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tag",
+            "description": "<p>역할의 태그</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>역할의 이름</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "perm",
+            "description": "<p>역할의 권한</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": " HTTP/1.1 200 OK\n {\n    \"tag\":\"admin\",\n    \"name\":\"관리자\",\n    \"perm\":{ ... }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/role.route.js",
+    "groupTitle": "role"
+  },
+  {
+    "type": "get",
+    "url": "/role/managepage",
+    "title": "역할의 권한 목록 조회",
+    "description": "<p>변경할 수 있는 권한의 정보들을 가져옴</p>",
+    "name": "RolePermList",
+    "group": "role",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "-",
+            "description": "<p>frontend의 SettingSelect 컴포넌트에 들어갈 데이터형식</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n[\n   {\"type\":\"header\",\"title\":\"관리\"},\n   {\"type\":\"switch\",\"title\":\"유저 관리\",\n    \"content\":\"유저의 비밀번호를 초기화하거나, 강제 탈퇴시킬 수 있습니다.\",\n    \"target\":{\"resource\":\"manageUsers\",\"action\":\"access\",\"range\":\"any\"}\n   }\n]",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/role.route.js",
+    "groupTitle": "role"
+  },
+  {
+    "type": "get",
+    "url": "/role/:role_tag/users",
+    "title": "역할 유저 조회",
+    "description": "<p>태그가 role_tag 역할에 속한 유저들을 보여줌</p>",
+    "name": "RoleUsers",
+    "group": "role",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "users",
+            "description": "<p>역할에 속한 유저들</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n   \"users\":[\n       {\"username\":\"admin\",\"realname\":\"관리자\"}]\n   }",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/role.route.js",
+    "groupTitle": "role"
+  },
+  {
     "type": "post",
     "url": "/schedule/delete",
     "title": "일정 삭제",
@@ -3799,5 +4089,142 @@
     "version": "0.0.0",
     "filename": "src/api/v1/schedule.route.js",
     "groupTitle": "schedule"
+  },
+  {
+    "type": "post",
+    "url": "/user/:username/role",
+    "title": "유저 역할 부여",
+    "description": "<p>아이디가 username 인 유저에게 역할을 부여함</p>",
+    "name": "AddUserRole",
+    "group": "user",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "roletag",
+            "description": "<p>부여할 역할의 roletag</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/user.route.js",
+    "groupTitle": "user"
+  },
+  {
+    "type": "delete",
+    "url": "/user/:username",
+    "title": "유저 회원 탈퇴",
+    "description": "<p>아이디가 username 인 유저를 탈퇴시킴</p>",
+    "name": "DeleteUser",
+    "group": "user",
+    "version": "0.0.0",
+    "filename": "src/api/v1/user.route.js",
+    "groupTitle": "user"
+  },
+  {
+    "type": "delete",
+    "url": "/user/:username/role/:roletag",
+    "title": "유저의 역할 제거",
+    "description": "<p>아이디가 username 인 유저의, 태그가 roletag인 역할을 빼버림</p>",
+    "name": "DeleteUserRole",
+    "group": "user",
+    "version": "0.0.0",
+    "filename": "src/api/v1/user.route.js",
+    "groupTitle": "user"
+  },
+  {
+    "type": "post",
+    "url": "/user/:username/resetpassword",
+    "title": "유저 회원 탈퇴",
+    "description": "<p>아이디가 username 인 유저의 비밀번호를 초기화시킴</p>",
+    "name": "ResetUserPassword",
+    "group": "user",
+    "version": "0.0.0",
+    "filename": "src/api/v1/user.route.js",
+    "groupTitle": "user"
+  },
+  {
+    "type": "put",
+    "url": "/user/:username/role",
+    "title": "유저 역할 부여",
+    "description": "<p>아이디가 username 인 유저의 역할을 설정함</p>",
+    "name": "SetUserRole",
+    "group": "user",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": false,
+            "field": "roletags",
+            "description": "<p>설정할 역할들의 태그들</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{roletags: [\"admin\"]}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/user.route.js",
+    "groupTitle": "user"
+  },
+  {
+    "type": "get",
+    "url": "/user/:username/role",
+    "title": "유저 역할 가져오기",
+    "description": "<p>아이디가 username 인 유저에게 부여된 역할들을 가져옴</p>",
+    "name": "UserRoles",
+    "group": "user",
+    "version": "0.0.0",
+    "filename": "src/api/v1/user.route.js",
+    "groupTitle": "user"
+  },
+  {
+    "type": "get",
+    "url": "/user",
+    "title": "유저 조회",
+    "description": "<p>유저의 전체 목록을 가져옴</p>",
+    "name": "Users",
+    "group": "user",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "total",
+            "description": "<p>결과의 개수</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "users",
+            "description": "<p>유저 정보 리스트</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": " HTTP/1.1 200 OK\n {\n    \"total\":1,\n    \"users\":[\n        {\"username\":\"admin\",\"realname\":\"관리자\",\"roles\":[\"admin\"]}\n    ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/user.route.js",
+    "groupTitle": "user"
   }
 ]
