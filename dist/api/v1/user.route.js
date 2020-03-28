@@ -30,7 +30,24 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 const router = (0, _express.Router)();
 
-// 유저의 전체 목록을 가져옴
+/**
+ * @api {get} /user 유저 조회
+ * @apiDescription 유저의 전체 목록을 가져옴
+ * @apiName Users
+ * @apiGroup user
+ *
+ * @apiSuccess {Number} total 결과의 개수
+ * @apiSuccess {Object[]} users 유저 정보 리스트
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ *       {
+ *          "total":1,
+ *          "users":[
+ *              {"username":"admin","realname":"관리자","roles":["admin"]}
+ *          ]
+ *      }
+ */
 router.route('/').get([_role2.default.perm('manageUsers').can('access'), (0, _expressValidator.query)('page').custom(_api.isPositive).optional(), (0, _expressValidator.query)('pagesize').custom(_api.isPositive).optional(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
     let query;
 
@@ -61,7 +78,13 @@ router.route('/').get([_role2.default.perm('manageUsers').can('access'), (0, _ex
     });
 }));
 
-// 유저 회원탈퇴
+/**
+ * @api {delete} /user/:username 유저 회원 탈퇴
+ * @apiDescription 아이디가 username 인 유저를 탈퇴시킴
+ * @apiName DeleteUser
+ * @apiGroup user
+ *
+ */
 router.delete('/:username', [(0, _expressValidator.param)('username').custom(_api.checkUsername), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
     if (!_role2.default.perm('manageUsers').can('access') && req.params.username === req.user.username) {
         const err = new Error('권한이 없습니다.');
@@ -80,7 +103,13 @@ router.delete('/:username', [(0, _expressValidator.param)('username').custom(_ap
     res.status(200).end();
 }));
 
-// 비밀번호 초기화
+/**
+ * @api {post} /user/:username/resetpassword 유저 회원 탈퇴
+ * @apiDescription 아이디가 username 인 유저의 비밀번호를 초기화시킴
+ * @apiName ResetUserPassword
+ * @apiGroup user
+ *
+ */
 router.post('/:username/resetpassword', [_role2.default.perm('manageUsers').can('access'), (0, _expressValidator.param)('username').custom(_api.checkUsername), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
     const user = await _User2.default.findOne().where('username').equals(req.params.username);
     const newpasswd = (await (0, _randomNumberCsprng2.default)(11, 35)).toString(36) + (await (0, _randomNumberCsprng2.default)(36 ** 7, 36 ** 8)).toString(36);
@@ -91,7 +120,13 @@ router.post('/:username/resetpassword', [_role2.default.perm('manageUsers').can(
     res.json({ new_password: newpasswd });
 }));
 
-// 유저의 역할 가져오기
+/**
+ * @api {get} /user/:username/role 유저 역할 가져오기
+ * @apiDescription 아이디가 username 인 유저에게 부여된 역할들을 가져옴
+ * @apiName UserRoles
+ * @apiGroup user
+ *
+ */
 router.get('/:username/role', [_role2.default.perm('role', 'user').can('read'), (0, _expressValidator.param)('username').isString(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
     const user = await _User2.default.findOne().where('username').equals(req.params.username).select('roles');
     // .cache(0, 'USER-ROLE-' + req.user.username)
@@ -107,7 +142,18 @@ router.get('/:username/role', [_role2.default.perm('role', 'user').can('read'), 
     });
 }));
 
-// 유저의 역할 변경
+/**
+ * @api {put} /user/:username/role 유저 역할 부여
+ * @apiDescription 아이디가 username 인 유저의 역할을 설정함
+ * @apiName SetUserRole
+ * @apiGroup user
+ *
+ * @apiParam {String[]} roletags 설정할 역할들의 태그들
+ *
+ * @apiParamExample {json} Request-Example:
+ *      {roletags: ["admin"]}
+ *
+ */
 router.put('/:username/role', [_role2.default.perm('role').can('modify'), (0, _expressValidator.param)('username').custom(_api.checkUsername), (0, _expressValidator.body)('roletags').custom(_api.checkRoleTagArray), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
     const user = await _User2.default.findOne().where('username').equals(req.params.username);
 
@@ -138,7 +184,15 @@ router.put('/:username/role', [_role2.default.perm('role').can('modify'), (0, _e
     res.end();
 }));
 
-// 유저의 역할 추가
+/**
+ * @api {post} /user/:username/role 유저 역할 부여
+ * @apiDescription 아이디가 username 인 유저에게 역할을 부여함
+ * @apiName AddUserRole
+ * @apiGroup user
+ *
+ * @apiParam {String} roletag 부여할 역할의 roletag
+ *
+ */
 router.post('/:username/role', [_role2.default.perm('role').can('modify'),
 // param('username').isString(),
 (0, _expressValidator.param)('username').custom(_api.checkUsername), (0, _expressValidator.body)('roletag').custom(_api.checkRoleTag), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
@@ -164,7 +218,13 @@ router.post('/:username/role', [_role2.default.perm('role').can('modify'),
     res.status(200).json({});
 }));
 
-// 유저의 역할 삭제
+/**
+ * @api {delete} /user/:username/role/:roletag 유저의 역할 제거
+ * @apiDescription 아이디가 username 인 유저의, 태그가 roletag인 역할을 빼버림
+ * @apiName DeleteUserRole
+ * @apiGroup user
+ *
+ */
 router.delete('/:username/role/:roletag', [_role2.default.perm('role').can('modify'), (0, _expressValidator.param)('username').custom(_api.checkUsername), (0, _expressValidator.param)('roletag').custom(_api.checkRoleTag), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
     const user = await _User2.default.findOne().where('username').equals(req.params.username);
 

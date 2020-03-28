@@ -13,6 +13,46 @@ import User from '../../models/User'
 
 const router = Router()
 
+/**
+ * @api {get} /role/me 내 역할 조회
+ * @apiDescription 내 아이디에 부여된 역할과 권한 정보를 받아옴
+ * @apiName MyRole
+ * @apiGroup role
+ *
+ * @apiSuccess {Array} roles 나에게 부여된 역할들
+ * @apiSuccess {Array} perms 나에게 부여된 권한들
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ * {
+ *   "roles": [
+ *     "admin"
+ *   ],
+ *   "perms": [
+ *     {
+ *       "role": {
+ *         "all": {
+ *           "any": [],
+ *           "own": [
+ *             "read"
+ *           ]
+ *         }
+ *       },
+ *       "managePreusers": {},
+ *       "serverConfig": {},
+ *       "manageUsers": {},
+ *       "manageBoards": {}
+ *     },
+ *     {
+ *       "serverConfig": {
+ *         "all": [
+ *           "change"
+ *         ]
+ *       }
+ *     }
+ *   ]
+ * }
+ */
 router.get(
     '/me',
     [perm('role').canOwn('read'), validateParams],
@@ -29,7 +69,44 @@ router.get(
     })
 )
 
-// 모든 역할 목록 조회
+/**
+ * @api {get} /role 역할 조회
+ * @apiDescription 모든 역할들의 정보와 권한들을 가져옴
+ * @apiName RoleAllInfos
+ * @apiGroup role
+ *
+ * @apiSuccess {Array} roles 나에게 부여된 역할들
+ * @apiSuccess {Array} perms 나에게 부여된 권한들
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ * {
+ *   "roles": [
+ *     "admin"
+ *   ],
+ *   "perms": [
+ *     {
+ *       "role": {
+ *         "all": {
+ *           "any": [],
+ *           "own": [
+ *             "read"
+ *           ]
+ *         }
+ *       },
+ *       "managePreusers": {},
+ *       "serverConfig": {},
+ *     },
+ *     {
+ *       "serverConfig": {
+ *         "all": [
+ *           "change"
+ *         ]
+ *       }
+ *     }
+ *   ]
+ * }
+ */
 router.get(
     '/',
     [perm('role').can('modify'), validateParams],
@@ -48,7 +125,24 @@ router.get(
     })
 )
 
-// 역할 생성
+/**
+ * @api {post} /role 역할 추가
+ * @apiDescription 새로운 역할을 추가함
+ * @apiName CreateRole
+ * @apiGroup role
+ *
+ * @apiParam {String} name 역할 이름
+ *
+ * @apiParamExample {json} Request-Example:
+ *      { name: "role1" }
+ *
+ * @apiSuccess {String} tag 새 역할의 태그
+ * @apiSuccess {String} name 새 역할의 이름
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ *      {"tag":"1913c","name":"role1","perm":{}}
+ */
 router.post(
     '/',
     [perm('role').can('modify'), body('name').isString(), validateParams],
@@ -68,6 +162,24 @@ router.post(
     })
 )
 
+/**
+ * @api {get} /role/managepage 역할의 권한 목록 조회
+ * @apiDescription 변경할 수 있는 권한의 정보들을 가져옴
+ * @apiName RolePermList
+ * @apiGroup role
+ *
+ * @apiSuccess {Object[]} - frontend의 SettingSelect 컴포넌트에 들어갈 데이터형식
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ *       [
+ *          {"type":"header","title":"관리"},
+ *          {"type":"switch","title":"유저 관리",
+ *           "content":"유저의 비밀번호를 초기화하거나, 강제 탈퇴시킬 수 있습니다.",
+ *           "target":{"resource":"manageUsers","action":"access","range":"any"}
+ *          }
+ *       ]
+ */
 router.get(
     '/managepage',
     [validateParams],
@@ -76,7 +188,24 @@ router.get(
     })
 )
 
-// 역할 정보 조회
+/**
+ * @api {get} /role/:role_tag 해당 역할의 정보 조회
+ * @apiDescription 태그가 role_tag 역할의 정보를 보여줌
+ * @apiName RoleInfo
+ * @apiGroup role
+ *
+ * @apiSuccess {String} tag 역할의 태그
+ * @apiSuccess {String} name 역할의 이름
+ * @apiSuccess {Object} perm 역할의 권한
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ *       {
+ *          "tag":"admin",
+ *          "name":"관리자",
+ *          "perm":{ ... }
+ *      }
+ */
 router.get(
     '/:role_tag',
     [param('role_tag').isString(), validateParams],
@@ -92,7 +221,21 @@ router.get(
     })
 )
 
-// 역할 유저 조회
+/**
+ * @api {get} /role/:role_tag/users 역할 유저 조회
+ * @apiDescription 태그가 role_tag 역할에 속한 유저들을 보여줌
+ * @apiName RoleUsers
+ * @apiGroup role
+ *
+ * @apiSuccess {Object[]} users 역할에 속한 유저들
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ *       {
+ *          "users":[
+ *              {"username":"admin","realname":"관리자"}]
+ *          }
+ */
 router.get(
     '/:role_tag/users',
     [param('role_tag').custom(checkRoleTag), validateParams],
@@ -108,7 +251,25 @@ router.get(
     })
 )
 
-// 역할 권한 변경
+/**
+ * @api {patch} /role/:role_tag 역할 권한 변경
+ * @apiDescription 태그가 role_tag 역할의 권한을 변경함
+ * @apiName ChangeRolePerm
+ * @apiGroup role
+ *
+ * @apiParam {String} name 바꿀 역할 이름
+ * @apiParam {Object[]} perms 바꿀 권한의 정보
+ *
+ * @apiParamExample {json} Request-Example:
+ *      {
+ *          "name":"role1",
+ *          "perms":[
+ *              {"allow":false,"resource":"manageUsers","action":"access","range":"any"},
+ *              {"allow":false,"resource":"manageBoards","action":"access","range":"any"}
+ *          ]
+ *      }
+ *
+ */
 router.patch(
     '/:role_tag',
     [
@@ -166,7 +327,13 @@ router.patch(
     })
 )
 
-// 역할 제거
+/**
+ * @api {delete} /role/:role_tag 역할 삭제
+ * @apiDescription 태그가 role_tag인 역할을 삭제함
+ * @apiName DeleteRole
+ * @apiGroup role
+ *
+ */
 router.delete(
     '/:role_tag',
     [
@@ -189,8 +356,6 @@ router.delete(
         await role.removeRole(req.params.role_tag)
 
         res.end()
-
-        // NOT IMPLEMENTED
     })
 )
 
