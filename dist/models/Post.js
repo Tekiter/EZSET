@@ -124,6 +124,12 @@ postSchema.methods.removeComment = function (comment_id) {
     return this.save();
 };
 
+//댓글 불러오기
+postSchema.methods.getComment = function (comment_id) {
+    let comment = this.comments.id(comment_id);
+    return comment;
+};
+
 postSchema.plugin(_mongooseAutoIncrement2.default.plugin, 'post');
 module.exports = _mongoose2.default.model('post', postSchema);
 //# sourceMappingURL=Post.js.map
