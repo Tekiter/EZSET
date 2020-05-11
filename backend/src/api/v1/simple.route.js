@@ -728,11 +728,6 @@ router.patch(
             err.status = 403
             throw err
         }
-        if (req.body.content.length > 300) {
-            const err = new Error('댓글은 300자를 넘을 수 없습니다.')
-            err.status = 500
-            return
-        }
 
         let comment = post.getComment(req.params.comment_id)
 
@@ -773,20 +768,27 @@ router.delete(
             .where('_id')
             .equals(req.params.post_id)
 
+        //게시글 유무
         if (!post) {
             res.status(404).json({
                 message: 'no post id ' + req.params.comment_id,
             })
             return
         }
+        //댓글 본인확인
+        let comment = post.getComment(req.params.comment_id)
 
+        if (comment.writer == req.user.username) {
+            await post.removeComment(req.params.comment_id)
+            res.status(200).json({ message: '삭제 성공' })
+        }
+
+        //게시판 권한
         if (!req.user.perm('board', post.board).can('delete')) {
             const err = new Error('권한이 없습니다.')
             err.status = 403
             throw err
         }
-
-        let comment = post.getComment(req.params.comment_id)
 
         if (post.isAnonymous == false) {
             if (
@@ -809,6 +811,8 @@ router.delete(
                 return
             }
         }
+
+        //다른 사람이 삭제할때 모든 권한 확인 후 삭제
         await post.removeComment(req.params.comment_id)
         res.status(200).json({ message: '삭제 성공' })
     })
