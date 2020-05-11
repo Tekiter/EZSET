@@ -3,14 +3,8 @@ export function setDefaultRole(roles) {
     roles
         .role('default')
 
-        .resource('profile')
-        .canOwn('read')
-
         .resource('role')
         .canOwn('read')
-
-        .resource('board')
-        .can('read')
 
         .resource('attendance')
         .canOwn('read')
@@ -20,6 +14,9 @@ export function setDefaultRole(roles) {
         .canOwn(['create', 'read', 'delete'])
 
         .resource('schedule')
+        .can('read')
+
+        .resource('penalty')
         .can('read')
 }
 
@@ -55,9 +52,12 @@ export function setAdminRole(roles) {
         .can('access')
         .resource('manageHome')
         .can('update')
-
         .resource('manageBoards')
         .can('access')
+        .resource('managePenalty')
+        .can('access')
+        .resource('fileBox')
+        .can(['manage', 'upload'])
 
         .resource('attendance')
         .can('update')
@@ -67,4 +67,7 @@ export function setAdminRole(roles) {
 
         .resource('schedule')
         .can('update')
+
+        .resource('penalty')
+        .can(['update', 'read'])
 }

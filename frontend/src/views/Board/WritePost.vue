@@ -1,7 +1,20 @@
 <template>
     <v-container>
         <v-card outlined>
-            <v-card-title> 게시글 작성</v-card-title>
+            <v-card-title>
+                게시글 작성
+                <v-spacer></v-spacer>
+                <v-btn
+                    class="ma-2"
+                    tile
+                    outlined
+                    color="primary darken-2"
+                    @click="back()"
+                >
+                    <v-icon left>mdi-arrow-left-circle</v-icon>
+                    목록
+                </v-btn>
+            </v-card-title>
             <v-card-subtitle> 게시판: {{ curBoardName }}</v-card-subtitle>
             <v-card-text>
                 <v-text-field
@@ -28,7 +41,7 @@
                         tile
                         outlined
                         :disabled="isLoading"
-                        color="black"
+                        color="primary darken-2"
                         @click="submitClick"
                     >
                         <v-icon left>mdi-pencil</v-icon> 작성
@@ -67,6 +80,24 @@
                             color="green darken-1"
                             text
                             @click="contentAlert = false"
+                        >
+                            확인
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+            <v-dialog v-model="titleLengthAlert" max-width="290">
+                <v-card>
+                    <v-card-title class="headline"
+                        >제목은 60자를 넘을 수 없습니다.</v-card-title
+                    >
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+
+                        <v-btn
+                            color="green darken-1"
+                            text
+                            @click="titleLengthAlert = false"
                         >
                             확인
                         </v-btn>
@@ -119,6 +150,7 @@ export default {
             title: '',
             titleAlert: false,
             content: '',
+            titleLengthAlert: false,
             contentAlert: false,
             author: '',
             created_date: '',
@@ -154,6 +186,11 @@ export default {
                 next(false)
             }
         },
+        back() {
+            this.$router.push({
+                path: '/board/' + this.$route.params.board_id,
+            })
+        },
         async getBoards() {
             const res = await axios.get('simple/boards')
             return res.data
@@ -172,9 +209,21 @@ export default {
                 this.contentAlert = true
                 return
             }
+            if (this.title.length > 60) {
+                this.titleLengthAlert = true
+                return
+            }
             this.certification = true
             try {
                 this.isLoading = true
+
+                if (!(await this.checkFilesValid())) {
+                    await this.$action.showAlertDialog(
+                        '파일 업로드 실패',
+                        '10MB 이하의 파일만 첨부 가능합니다.'
+                    )
+                    return
+                }
 
                 const content = this.getMarkdown()
 
@@ -220,12 +269,13 @@ export default {
                     const res = await axios.post('file/upload', form, {
                         headers: { 'Content-Type': 'multipart/form-data' },
                         // 진행상황 반영
-                        onUploadProgress(e) {
+                        onUploadProgress: e => {
                             this.uploadFile.currentProgress += Math.floor(
                                 (e.loaded * 100) / e.total
                             )
                         },
                     })
+                    this.uploadFile.currentProgress = 0
                     this.uploadFile.fileProgress += 1
                     fileIds.push(res.data.id)
                 }
@@ -234,6 +284,19 @@ export default {
             }
 
             return fileIds
+        },
+        async checkFilesValid() {
+            // 파일의 크기가 10MB 이하인지 체크
+            const exceed = this.uploadFile.selected.filter(file => {
+                if (!file.uploaded && file.file.size > 10000000) {
+                    return true
+                }
+                return false
+            })
+            if (exceed.length > 0) {
+                return false
+            }
+            return true
         },
     },
     async created() {

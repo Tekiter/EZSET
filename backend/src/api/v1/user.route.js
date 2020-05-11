@@ -16,7 +16,24 @@ import role from '../../utils/role'
 
 const router = Router()
 
-// 유저의 전체 목록을 가져옴
+/**
+ * @api {get} /user 유저 조회
+ * @apiDescription 유저의 전체 목록을 가져옴
+ * @apiName Users
+ * @apiGroup user
+ *
+ * @apiSuccess {Number} total 결과의 개수
+ * @apiSuccess {Object[]} users 유저 정보 리스트
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ *       {
+ *          "total":1,
+ *          "users":[
+ *              {"username":"admin","realname":"관리자","roles":["admin"]}
+ *          ]
+ *      }
+ */
 router.route('/').get(
     [
         role.perm('manageUsers').can('access'),
@@ -61,7 +78,13 @@ router.route('/').get(
     })
 )
 
-// 유저 회원탈퇴
+/**
+ * @api {delete} /user/:username 유저 회원 탈퇴
+ * @apiDescription 아이디가 username 인 유저를 탈퇴시킴
+ * @apiName DeleteUser
+ * @apiGroup user
+ *
+ */
 router.delete(
     '/:username',
     [param('username').custom(checkUsername), validateParams],
@@ -89,7 +112,13 @@ router.delete(
     })
 )
 
-// 비밀번호 초기화
+/**
+ * @api {post} /user/:username/resetpassword 유저 회원 탈퇴
+ * @apiDescription 아이디가 username 인 유저의 비밀번호를 초기화시킴
+ * @apiName ResetUserPassword
+ * @apiGroup user
+ *
+ */
 router.post(
     '/:username/resetpassword',
     [
@@ -112,7 +141,13 @@ router.post(
     })
 )
 
-// 유저의 역할 가져오기
+/**
+ * @api {get} /user/:username/role 유저 역할 가져오기
+ * @apiDescription 아이디가 username 인 유저에게 부여된 역할들을 가져옴
+ * @apiName UserRoles
+ * @apiGroup user
+ *
+ */
 router.get(
     '/:username/role',
     [
@@ -139,7 +174,18 @@ router.get(
     })
 )
 
-// 유저의 역할 변경
+/**
+ * @api {put} /user/:username/role 유저 역할 부여
+ * @apiDescription 아이디가 username 인 유저의 역할을 설정함
+ * @apiName SetUserRole
+ * @apiGroup user
+ *
+ * @apiParam {String[]} roletags 설정할 역할들의 태그들
+ *
+ * @apiParamExample {json} Request-Example:
+ *      {roletags: ["admin"]}
+ *
+ */
 router.put(
     '/:username/role',
     [
@@ -183,7 +229,15 @@ router.put(
     })
 )
 
-// 유저의 역할 추가
+/**
+ * @api {post} /user/:username/role 유저 역할 부여
+ * @apiDescription 아이디가 username 인 유저에게 역할을 부여함
+ * @apiName AddUserRole
+ * @apiGroup user
+ *
+ * @apiParam {String} roletag 부여할 역할의 roletag
+ *
+ */
 router.post(
     '/:username/role',
     [
@@ -219,7 +273,13 @@ router.post(
     })
 )
 
-// 유저의 역할 삭제
+/**
+ * @api {delete} /user/:username/role/:roletag 유저의 역할 제거
+ * @apiDescription 아이디가 username 인 유저의, 태그가 roletag인 역할을 빼버림
+ * @apiName DeleteUserRole
+ * @apiGroup user
+ *
+ */
 router.delete(
     '/:username/role/:roletag',
     [

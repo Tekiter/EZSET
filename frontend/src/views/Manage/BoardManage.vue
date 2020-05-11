@@ -1,12 +1,12 @@
 <template>
-    <v-row class="ma-3 fill-height" :no-gutters="isMobileMode">
+    <v-row class="mt-3 ma-md-3 fill-height" :no-gutters="isMobileMode">
         <v-col v-show="isMobileMode" cols="12">
             <v-tabs v-model="curTab" class="mt-3">
                 <v-tab>
-                    출석 설정
+                    게시판
                 </v-tab>
                 <v-tab>
-                    출석 대상 유저
+                    게시판 권한
                 </v-tab>
             </v-tabs>
         </v-col>
@@ -32,9 +32,25 @@
                         <v-icon left>mdi-pencil</v-icon> 게시판 생성
                     </v-btn>
                 </v-toolbar>
-                <v-list>
+                <v-list subheader>
                     <v-list-item v-for="board in boards" :key="board._id">
-                        <v-list-item-title>{{ board.title }}</v-list-item-title>
+                        <v-list-item-title
+                            >{{ board.title }}
+                            <v-chip
+                                v-if="board.isAnonymous"
+                                class="ma-2"
+                                color="deep-purple accent-4"
+                                outlined
+                                x-small
+                            >
+                                익명
+                            </v-chip></v-list-item-title
+                        >
+                        <v-list-item-action>
+                            <v-btn icon @click="showModifyDialog(board)">
+                                <v-icon>mdi-pencil-outline</v-icon>
+                            </v-btn>
+                        </v-list-item-action>
                         <v-list-item-action>
                             <v-btn icon @click="showDeleteBoardDialog(board)">
                                 <v-icon>mdi-trash-can-outline</v-icon>
@@ -44,31 +60,19 @@
                 </v-list>
             </v-card>
         </v-col>
-
         <v-col
             cols="12"
             md="7"
             v-show="!isMobileMode || curTab == 1"
             class="fill-height"
         >
-            <v-card outlined>
-                <v-card-title>게시판 설정</v-card-title>
-                <v-list>
-                    <v-list-item v-for="board in boards" :key="board._id">
-                        <v-list-item-title>{{ board.title }}</v-list-item-title>
-                        <v-list-item-action>
-                            <v-btn icon>
-                                <v-icon>mdi-file-edit-outline</v-icon>
-                            </v-btn>
-                        </v-list-item-action>
-                    </v-list-item>
-                </v-list>
-            </v-card>
+            <board-role-edit ref="roleEdit" :boards="boards"></board-role-edit>
         </v-col>
 
         <v-dialog v-model="createBoardDialog.show" max-width="300">
             <v-card :loading="createBoardDialog.isLoading">
                 <v-card-title>게시판 생성</v-card-title>
+
                 <v-card-text>
                     <v-text-field
                         v-model="createBoardDialog.title"
@@ -82,8 +86,10 @@
                         class="ml-3"
                         v-model="isAnonymous"
                         label="익명게시판"
-                    ></v-switch>
-                </v-container>
+                    ></v-switch> </v-container
+                ><small class="red--text ml-3" v-if="createBoardDialog.lenError"
+                    >게시판 이름이 없습니다.</small
+                >
                 <v-card-actions>
                     <v-spacer></v-spacer>
 
@@ -98,7 +104,10 @@
                     <v-btn
                         color="green darken-1"
                         text
-                        @click="createBoardDialog.show = false"
+                        @click="
+                            ;(createBoardDialog.lenError = false),
+                                (createBoardDialog.show = false)
+                        "
                     >
                         취소
                     </v-btn>
@@ -132,14 +141,57 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="modifyDialog" persistent max-width="300">
+            <v-card>
+                <v-card-title class="headline">게시판 이름 수정</v-card-title>
+                <v-card-text>
+                    <v-text-field
+                        v-model="modifyTitle"
+                        label="새 이름"
+                        hide-details
+                    ></v-text-field>
+                </v-card-text>
+
+                <v-card-actions>
+                    <small class="red--text ml-3" v-if="modifyDialogError"
+                        >게시판 이름이 없습니다.</small
+                    >
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        v-if="modifyTitle"
+                        color="green darken-1"
+                        text
+                        @click="patchPostTitle()"
+                        >수정</v-btn
+                    >
+                    <v-btn v-else color="black darken-1" text>수정</v-btn>
+                    <v-btn
+                        color="red darken-1"
+                        text
+                        @click="
+                            ;(modifyDialog = false), (modifyDialogError = false)
+                        "
+                        >취소</v-btn
+                    >
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-row>
 </template>
 
 <script>
 import axios from 'axios'
+import BoardRoleEdit from '../../components/manage/BoardRoleEdit.vue'
 export default {
+    components: {
+        BoardRoleEdit,
+    },
     data() {
         return {
+            modifyBoardCurId: '',
+            modifyDialog: false,
+            modifyDialogError: false,
+            modifyTitle: '',
             curTab: 0,
             boards: [],
             createBoardDialog: {
@@ -147,6 +199,7 @@ export default {
                 title: '',
                 isLoading: false,
                 error: '',
+                lenError: false,
             },
             deleteBoardDialog: {
                 show: false,
@@ -164,8 +217,27 @@ export default {
         },
     },
     methods: {
+        async patchPostTitle() {
+            if (this.modifyTitle.length == 0) {
+                this.modifyDialogError = true
+                return
+            }
+            axios.patch('simple/boards/' + this.modifyBoardCurId, {
+                title: this.modifyTitle,
+            })
+            this.modifyDialog = false
+            this.modifyDialogError = false
+            this.fetchBoards()
+            await this.$store.dispatch('board/fetchBoards')
+            await this.$refs.roleEdit.resetChanges()
+        },
         fetch_id(id) {
             this.temp_id = id
+        },
+        showModifyDialog(board) {
+            this.modifyTitle = board.title
+            this.modifyBoardCurId = board._id
+            this.modifyDialog = true
         },
         showDeleteBoardDialog(board) {
             this.deleteBoardDialog.curId = board._id
@@ -187,12 +259,6 @@ export default {
             }
             await this.$store.dispatch('board/fetchBoards')
         },
-        delBoard(id) {
-            axios.delete('/simple/boards/' + id)
-            axios.get('/simple/boards').then(res => {
-                this.boards = res.data
-            })
-        },
         async fetchBoards() {
             this.isLoading = true
             const res = await axios.get('simple/boards')
@@ -205,6 +271,11 @@ export default {
         },
         async applyCreateBoardDialog() {
             this.createBoardDialog.isLoading = true
+            if (this.createBoardDialog.title.length == 0) {
+                this.createBoardDialog.lenError = true
+                this.createBoardDialog.isLoading = false
+                return
+            }
             try {
                 await axios.post('simple/boards', {
                     title: this.createBoardDialog.title,
@@ -212,10 +283,12 @@ export default {
                 })
                 this.createBoardDialog.isLoading = false
                 this.createBoardDialog.show = false
+                this.createBoardDialog.lenError = false
                 await this.fetchBoards()
             } catch (error) {
                 //
                 this.createBoardDialog.error = '게시판 생성에 실패했습니다.'
+                this.createBoardDialog.isLoading = false
             }
             this.isAnonymous = false
             await this.$store.dispatch('board/fetchBoards')

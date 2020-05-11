@@ -1,14 +1,21 @@
 <template>
     <div class="">
-        <!-- <h2 class="display-1">유저</h2> -->
         <v-data-iterator
             :items="users"
             :search="toolbar.search"
             :loading="true"
+            :items-per-page="itemsPerPage"
+            :page="page"
+            hide-default-footer
         >
             <template v-slot:header>
-                <v-toolbar class="mb-1" flat>
-                    <v-spacer></v-spacer>
+                <v-toolbar flat>
+                    <template v-if="$vuetify.breakpoint.mdAndUp">
+                        <v-toolbar-title>
+                            유저 관리
+                        </v-toolbar-title>
+                        <v-spacer></v-spacer>
+                    </template>
                     <v-text-field
                         v-model="toolbar.search"
                         clearable
@@ -17,18 +24,12 @@
                         flat
                         hide-details
                         dense
-                        label="검색하기"
+                        label="검색"
                         prepend-inner-icon="mdi-magnify"
                     ></v-text-field>
                 </v-toolbar>
             </template>
             <template v-slot:loading>
-                <!-- <div class="text-center py-10">
-                    <v-progress-circular
-                        indeterminate
-                        color="purple"
-                    ></v-progress-circular>
-                </div> -->
                 <v-row class="mx-2">
                     <v-col v-for="i in 6" :key="i" cols="12" md="6"
                         ><v-skeleton-loader
@@ -49,9 +50,9 @@
                         <v-card outlined>
                             <v-card-title>
                                 <p class="subheader">
-                                    {{ user.username }}
+                                    {{ user.realname }}
                                 </p>
-                                <p class="caption ml-2">{{ user.realname }}</p>
+                                <p class="caption ml-2">{{ user.username }}</p>
                             </v-card-title>
                             <v-divider></v-divider>
                             <v-card-text>
@@ -78,6 +79,7 @@
                                         <v-btn
                                             @click="showEditDialog(user)"
                                             icon
+                                            color="primary"
                                         >
                                             <v-icon
                                                 >mdi-account-edit-outline</v-icon
@@ -89,6 +91,13 @@
                         </v-card>
                     </v-col>
                 </v-row>
+            </template>
+            <template v-slot:footer>
+                <Pagination-footer
+                    v-model="page"
+                    :item-count="users.length"
+                    :items-per-page.sync="itemsPerPage"
+                />
             </template>
         </v-data-iterator>
 
@@ -107,12 +116,28 @@
                         <v-list-item two-line>
                             <v-list-item-content>
                                 <v-list-item-title>회원탈퇴</v-list-item-title>
-                                <v-list-item-subtitle>
+                                <div
+                                    class="subtitle-2 grey--text text--darken-1"
+                                >
                                     유저가 작성했던 게시글 등은 삭제되지
                                     않습니다.
-                                </v-list-item-subtitle>
+                                </div>
+                                <div v-if="isMobileMode">
+                                    <v-btn
+                                        @click="
+                                            deleteUser(editDialog.user.username)
+                                        "
+                                        :disabled="
+                                            editDialog.user.username === 'admin'
+                                        "
+                                        color="error"
+                                        depressed
+                                    >
+                                        회원탈퇴
+                                    </v-btn>
+                                </div>
                             </v-list-item-content>
-                            <v-list-item-action>
+                            <v-list-item-action v-if="!isMobileMode">
                                 <v-btn
                                     @click="
                                         deleteUser(editDialog.user.username)
@@ -122,22 +147,44 @@
                                     "
                                     color="error"
                                     depressed
-                                    >회원탈퇴</v-btn
                                 >
+                                    회원탈퇴
+                                </v-btn>
                             </v-list-item-action>
                         </v-list-item>
                         <v-divider />
                         <v-list-item two-line>
                             <v-list-item-content>
-                                <v-list-item-title
-                                    >비밀번호 초기화</v-list-item-title
+                                <v-list-item-title>
+                                    비밀번호 초기화
+                                </v-list-item-title>
+                                <div
+                                    class="subtitle-2 grey--text text--darken-1"
                                 >
-                                <v-list-item-subtitle>
                                     비밀번호를 초기화하고, 임시 비밀번호를
                                     발급합니다.
-                                </v-list-item-subtitle>
+                                </div>
+                                <div v-if="isMobileMode">
+                                    <v-btn
+                                        @click="
+                                            resetPassword(
+                                                editDialog.user.username
+                                            )
+                                        "
+                                        :disabled="
+                                            editDialog.user.username === 'admin'
+                                        "
+                                        color="info"
+                                        depressed
+                                    >
+                                        비밀번호 초기화
+                                    </v-btn>
+                                </div>
                             </v-list-item-content>
-                            <v-list-item-action>
+                            <v-list-item-action
+                                style="display: block;"
+                                v-if="!isMobileMode"
+                            >
                                 <v-btn
                                     @click="
                                         resetPassword(editDialog.user.username)
@@ -147,8 +194,9 @@
                                     "
                                     color="info"
                                     depressed
-                                    >비밀번호 초기화</v-btn
                                 >
+                                    비밀번호 초기화
+                                </v-btn>
                             </v-list-item-action>
                         </v-list-item>
                         <v-divider />
@@ -234,14 +282,22 @@
 </template>
 <script>
 import axios from 'axios'
+import PaginationFooter from '../../components/misc/PaginationFooter.vue'
 
 export default {
+    components: {
+        PaginationFooter,
+    },
     data() {
         return {
             users: [],
             rawRoles: [], // 배열로 된 role 목록
             fetchingCount: 0,
             totalCount: 0,
+
+            itemsPerPage: 8,
+            page: 1,
+
             toolbar: {
                 search: '',
             },
@@ -273,6 +329,9 @@ export default {
         },
         assignableRoles() {
             return this.rawRoles.filter(role => role.tag != 'default')
+        },
+        isMobileMode() {
+            return !this.$vuetify.breakpoint.mdAndUp
         },
     },
     methods: {

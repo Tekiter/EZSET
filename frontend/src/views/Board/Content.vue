@@ -41,31 +41,69 @@
                         </v-subheader> -->
                         <v-card-subtitle class="mt-0">
                             <v-row no-gutters>
-                                <span v-if="post.isAnonymous == false"
-                                    ><span class="font-weight-black"
-                                        >작성자</span
+                                <div>
+                                    <span v-if="post.isAnonymous == false"
+                                        ><span class="font-weight-black"
+                                            >작성자</span
+                                        >
+                                        {{ post.author }}</span
                                     >
-                                    {{ post.author }}</span
-                                >
-                                <span v-else>익명</span>
-                                <v-spacer></v-spacer>
-                                <span
-                                    ><span class="font-weight-black"
-                                        >작성일</span
+                                    <span v-else>익명</span>
+                                    <v-spacer
+                                        v-if="$vuetify.breakpoint.mdAndUp"
+                                    ></v-spacer>
+                                    <v-divider
+                                        v-if="$vuetify.breakpoint.xsOnly"
+                                        class="mx-4"
+                                        vertical
+                                    ></v-divider>
+                                    <span v-if="$vuetify.breakpoint.xsOnly"
+                                        ><span class="font-weight-black"
+                                            >조회수</span
+                                        >
+                                        {{ post.view }}</span
                                     >
-                                    {{ post.created_date }}</span
-                                ><v-divider class="mx-4" vertical></v-divider>
-                                <span
-                                    ><span class="font-weight-black"
-                                        >조회수</span
+                                </div>
+                                <v-spacer insert></v-spacer>
+                                <div>
+                                    <span v-if="$vuetify.breakpoint.mdAndUp"
+                                        ><span class="font-weight-black"
+                                            >작성일</span
+                                        >
+                                        {{ post.created_date }}</span
                                     >
-                                    {{ post.view }}</span
-                                ><v-divider class="mx-4" vertical></v-divider>
+                                    <span v-else
+                                        ><span class="font-weight-black"
+                                            >작성일</span
+                                        >
+                                        {{
+                                            $moment(
+                                                new Date(post.created_date)
+                                            ).format('YY/MM/DD HH:mm')
+                                        }}</span
+                                    >
+                                    <v-divider
+                                        class="mx-4"
+                                        vertical
+                                    ></v-divider>
+                                    <span v-if="!$vuetify.breakpoint.xsOnly"
+                                        ><span class="font-weight-black"
+                                            >조회수</span
+                                        >
+                                        {{ post.view }}</span
+                                    ><v-divider
+                                        v-if="!$vuetify.breakpoint.xsOnly"
+                                        class="mx-4"
+                                        vertical
+                                    ></v-divider>
 
-                                <span
-                                    ><span class="font-weight-black">추천</span>
-                                    {{ post.like }}</span
-                                >
+                                    <span
+                                        ><span class="font-weight-black"
+                                            >추천</span
+                                        >
+                                        {{ post.like }}</span
+                                    >
+                                </div>
                             </v-row>
                         </v-card-subtitle>
                         <v-divider></v-divider>
@@ -74,14 +112,17 @@
                             <viewer :value="post.content" />
 
                             <file-download :files="post.files"></file-download>
-                            <v-row class="d-flex flex-row-reverse">
+                            <v-row
+                                v-if="$vuetify.breakpoint.mdAndUp"
+                                class="d-flex flex-row-reverse"
+                            >
                                 <div>
                                     <v-btn
                                         class="ma-2"
                                         tile
                                         outlined
                                         color="success darken-2"
-                                        v-if="del_auth(post.author)"
+                                        v-if="canEdit(post.author)"
                                         @click="go_modify()"
                                     >
                                         <v-icon left>mdi-autorenew</v-icon>
@@ -92,7 +133,7 @@
                                         tile
                                         outlined
                                         color="error"
-                                        v-if="del_auth(post.author)"
+                                        v-if="canDelete(post.author)"
                                         @click="deletePost"
                                     >
                                         <v-icon>mdi-trash-can</v-icon> 삭제하기
@@ -127,6 +168,55 @@
                                     </v-btn>
                                 </div>
                             </v-row>
+                            <!-- 모바일버전 버튼 -->
+                            <v-row
+                                v-else
+                                class="d-flex flex-row-reverse"
+                                no-gutters
+                            >
+                                <div>
+                                    <v-btn
+                                        class="ma-2"
+                                        icon
+                                        color="success darken-2"
+                                        v-if="canEdit(post.author)"
+                                        @click="go_modify()"
+                                    >
+                                        <v-icon>mdi-cached</v-icon>
+                                    </v-btn>
+                                    <v-btn
+                                        class="ma-2"
+                                        icon
+                                        color="error"
+                                        v-if="canDelete(post.author)"
+                                        @click="deletePost"
+                                    >
+                                        <v-icon>mdi-trash-can</v-icon>
+                                    </v-btn>
+                                    <v-btn
+                                        class="ma-2"
+                                        icon
+                                        color="primary lighten-1"
+                                        v-if="!post.isLike"
+                                        @click="clickLike(post.author)"
+                                    >
+                                        <span
+                                            ><v-icon>mdi-heart-multiple</v-icon>
+                                        </span>
+                                    </v-btn>
+                                    <v-btn
+                                        class="ma-2"
+                                        icon
+                                        color="warning"
+                                        v-else
+                                        @click="clickDislike(post.author)"
+                                    >
+                                        <span
+                                            ><v-icon>mdi-heart-off</v-icon>
+                                        </span>
+                                    </v-btn>
+                                </div>
+                            </v-row>
                         </v-card-text>
                     </v-card>
                     <v-card class="mt-2" outlined>
@@ -150,14 +240,15 @@
                                                 }}<span class="ml-3">{{
                                                     comment.created_date
                                                 }}</span></v-list-item-title
-                                            ><span class="mt-2 subtitle-1">
-                                                {{ comment.content }}</span
-                                            ></v-list-item-content
+                                            >
+                                            <div class="mt-2 subtitle-1">
+                                                {{ comment.content }}
+                                            </div></v-list-item-content
                                         >
                                         <v-btn
                                             icon
                                             small
-                                            v-if="del_auth(comment.writer)"
+                                            v-if="canEdit(comment.writer)"
                                             @click="
                                                 showUpdateComment(comment, idx)
                                             "
@@ -170,7 +261,7 @@
                                             class="ml-2"
                                             icon
                                             small
-                                            v-if="del_auth(comment.writer)"
+                                            v-if="canDelete(comment.writer)"
                                             @click="showDeleteComment(comment)"
                                         >
                                             <v-icon
@@ -180,7 +271,19 @@
                                     </template>
                                     <!-- 댓글 수정 -->
                                     <template v-else>
-                                        <v-list-item-content>
+                                        <v-list-item-content
+                                            v-if="post.isAnonymous == true"
+                                        >
+                                            <v-list-item-title
+                                                >{{ '익명'
+                                                }}<span class="ml-3">{{
+                                                    comment.created_date
+                                                }}</span></v-list-item-title
+                                            ><v-text-field
+                                                v-model="editContent"
+                                            ></v-text-field>
+                                        </v-list-item-content>
+                                        <v-list-item-content v-else>
                                             <v-list-item-title
                                                 >{{ comment.writer
                                                 }}<span class="ml-3">{{
@@ -230,8 +333,20 @@
                                             >댓글 작성에 오류가
                                             발생했습니다.</small
                                         >
+                                        <small
+                                            class="red--text mr-2"
+                                            v-if="writeComment.lengthError"
+                                            >댓글 내용이 없습니다.</small
+                                        >
+                                        <!-- <small
+                                            class="red--text mr-2"
+                                            v-if="writeComment.lengthError"
+                                            >댓글 내용은 적어도 한글자에서 300자
+                                            이내여야 합니다.</small
+                                        > -->
                                         <v-btn
                                             outlined
+                                            color="primary darken-2"
                                             @click="createComment()"
                                             :disabled="writeComment.isLoading"
                                             ><v-icon left
@@ -276,6 +391,7 @@ export default {
                 view: '',
                 like: '',
                 isLike: '',
+                post_date: '',
             },
             writeComment: {
                 content: '',
@@ -290,7 +406,7 @@ export default {
             likeLoading: false,
         }
     },
-    mounted() {
+    created() {
         this.fetch_data()
     },
 
@@ -307,35 +423,16 @@ export default {
 
             this.post = res.data
             this.post.created_date = moment(res.data.created_date).format(
-                'YYYY/MM/DD HH:MM'
+                'YYYY/MM/DD HH:mm'
             )
             this.comment = res.data.comment.map(comment => {
                 comment.created_date = moment(comment.created_date).format(
-                    'YYYY/MM/DD HH:MM'
+                    'YYYY/MM/DD HH:mm'
                 )
             })
             this.loading = false
         },
-        del_auth(writer) {
-            if (this.post.isAnonymous == true) {
-                if (
-                    crypto
-                        .createHash('sha512')
-                        .update(this.$store.state.auth.user.username)
-                        .digest('base64') == writer
-                ) {
-                    return true
-                } else {
-                    return false
-                }
-            } else {
-                if (this.$store.state.auth.user.username == writer) {
-                    return true
-                } else {
-                    return false
-                }
-            }
-        },
+
         async showDeleteComment(comment) {
             const res = await this.$action.showConfirmDialog(
                 '댓글 삭제',
@@ -356,15 +453,9 @@ export default {
             if (res) {
                 axios.delete('/simple/posts/' + this.post._id)
                 this.$router.push({
-                    path: `/`,
+                    path: '/board/' + this.$route.params.board_id,
                 })
             }
-        },
-        delPost() {
-            axios.delete('/simple/posts/' + this.post._id)
-            this.$router.push({
-                path: '/board/' + this.$route.params.board_id,
-            })
         },
         fetch_id(id) {
             this.temp_id = id
@@ -372,6 +463,14 @@ export default {
 
         async createComment() {
             this.writeComment.isLoading = true
+            if (
+                this.writeComment.content.length == 0
+                // || this.writeComment.content.length > 300
+            ) {
+                this.writeComment.lengthError = true
+                this.writeComment.isLoading = false
+                return
+            }
             try {
                 await axios.post(
                     '/simple/posts/' + this.$route.params.post_id + '/comment',
@@ -385,6 +484,7 @@ export default {
                 this.writeComment.isError = true
             } finally {
                 this.writeComment.isLoading = false
+                this.writeComment.lengthError = false
             }
         },
         showUpdateComment(comment, idx) {
@@ -431,6 +531,28 @@ export default {
             )
             this.fetch_data()
             this.likeLoading = false
+        },
+        isOwner(author) {
+            if (this.post.isAnonymous) {
+                return (
+                    crypto
+                        .createHash('sha512')
+                        .update(this.$store.state.auth.user.username)
+                        .digest('base64') == author
+                )
+            } else {
+                return this.$store.state.auth.user.username == author
+            }
+        },
+
+        canDelete(author) {
+            return (
+                this.isOwner(author) ||
+                this.$perm('board', this.$route.params.board_id).can('delete')
+            )
+        },
+        canEdit(author) {
+            return this.isOwner(author)
         },
     },
 }

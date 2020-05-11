@@ -1,8 +1,8 @@
 <template>
     <v-container>
-        <v-card outlined>
-            <v-card-title v-if="!editMaterial">게시물 작성</v-card-title>
-            <v-card-title v-if="editMaterial">게시물 수정</v-card-title>
+        <v-card outlined :loading="isLoading">
+            <v-card-title v-if="!edit">게시물 작성</v-card-title>
+            <v-card-title v-else>게시물 수정</v-card-title>
             <v-card-text>
                 <v-text-field
                     v-model="newMaterial.title"
@@ -10,24 +10,29 @@
                     hide-details
                     class="mb-4"
                 ></v-text-field>
-                <editor
-                    ref="editor"
-                    mode="wysiwyg"
-                    :options="editor.options"
-                    :value="newMaterial.content"
-                />
+                <v-textarea
+                    outlined
+                    v-model="newMaterial.content"
+                    name="input-7-4"
+                    label="내용"
+                ></v-textarea>
+
                 <file-upload
                     v-model="uploadFile.selected"
                     :uploaded="uploadFile.uploaded"
                     :currentProgress="uploadFile.currentProgress"
                     :fileProgress="uploadFile.fileProgress"
                     :uploading="uploadFile.isUploading"
+                    :uploaded="uploadFile.uploaded"
                     class="mt-3"
                 ></file-upload>
                 <div class="d-flex align-center mt-3">
                     <v-spacer></v-spacer>
                     <small class="red--text mr-3" v-if="isError"
                         >게시물 작성에 실패했습니다.</small
+                    >
+                    <small class="red--text mr-3" v-if="isLengthError"
+                        >제목과 본문의 길이는 100자를 넘을 수 없습니다.</small
                     >
                     <v-btn
                         class="ma-2"
@@ -56,16 +61,18 @@
 </template>
 <script>
 import axios from 'axios'
-import { Editor } from '@toast-ui/vue-editor'
 import FileUpload from '../../components/file/FileUpload'
 
 export default {
     components: {
-        Editor,
         FileUpload,
     },
     props: {
         parent_id: String,
+        edit: {
+            type: String,
+            default: undefined,
+        },
         editMaterial: {
             type: Object,
         },
@@ -78,6 +85,7 @@ export default {
                 author: '',
                 created_date: '',
             },
+            folderId: '',
             uploadFile: {
                 selected: [],
                 uploaded: [],
@@ -87,6 +95,7 @@ export default {
             },
             isLoading: false,
             isError: false,
+            isLengthError: false,
             editor: {
                 options: {
                     language: 'ko',
@@ -95,30 +104,83 @@ export default {
         }
     },
     methods: {
+        contentLength() {
+            if (
+                this.newMaterial.content.length > 100 ||
+                this.newMaterial.title.length > 100
+            ) {
+                this.isLengthError = true
+                return true
+            } else {
+                this.isLengthError = false
+                return false
+            }
+        },
         async submitClick() {
+            if (this.contentLength() == true) {
+                return
+            }
+            if (this.edit) {
+                await this.applyEdit()
+            } else {
+                await this.applyWrite()
+            }
+        },
+        async applyWrite() {
             try {
                 this.isLoading = true
-
-                const content = this.getMarkdown()
 
                 // 첨부파일 업로드
                 const fileIds = await this.uploadFiles()
 
-                await axios.post('/filebox/folder/' + this.parent_id, {
-                    title: this.newMaterial.title,
-                    content: content,
-                    files: fileIds,
-                    parent_id: this.parent_id,
+                await axios.post(
+                    '/filebox/folder/' + this.$route.params.folder_id,
+                    {
+                        title: this.newMaterial.title,
+                        content: this.newMaterial.content,
+                        files: fileIds,
+                        parent_id: this.$route.params.folder_id,
+                    }
+                )
+                this.$router.push({
+                    name: 'fileBoxMaterials',
+                    params: { folder_id: this.$route.params.folder_id },
                 })
-                this.$emit('close')
             } catch (error) {
                 this.isError = true
             } finally {
                 this.isLoading = false
             }
         },
-        getMarkdown() {
-            return this.$refs.editor.invoke('getMarkdown')
+        async applyEdit() {
+            try {
+                this.isLoading = true
+
+                if (!(await this.checkFilesValid())) {
+                    await this.$action.showAlertDialog(
+                        '파일 업로드 실패',
+                        '10MB 이하의 파일만 첨부 가능합니다.'
+                    )
+                    return
+                }
+
+                // 첨부파일 업로드
+                const fileIds = await this.uploadFiles()
+
+                await axios.patch('filebox/material/' + this.edit, {
+                    title: this.newMaterial.title,
+                    content: this.newMaterial.content,
+                    files: fileIds,
+                })
+                this.$router.push({
+                    name: 'fileBoxMaterials',
+                    params: { folder_id: this.folderId },
+                })
+            } catch (error) {
+                this.isError = true
+            } finally {
+                this.isLoading = false
+            }
         },
         async uploadFiles() {
             const fileIds = []
@@ -132,7 +194,6 @@ export default {
                 for (let file of this.uploadFile.selected) {
                     if (file.uploaded) {
                         fileIds.push(file.id)
-                        // this.uploadFile.fileProgress += 1
                         continue
                     }
                     let form = new FormData()
@@ -142,7 +203,7 @@ export default {
                     const res = await axios.post('file/upload', form, {
                         headers: { 'Content-Type': 'multipart/form-data' },
                         // 진행상황 반영
-                        onUploadProgress(e) {
+                        onUploadProgress: e => {
                             this.uploadFile.currentProgress += Math.floor(
                                 (e.loaded * 100) / e.total
                             )
@@ -156,24 +217,47 @@ export default {
 
             return fileIds
         },
+        async checkFilesValid() {
+            // 파일의 크기가 10MB 이하인지 체크
+            const exceed = this.uploadFile.selected.filter(file => {
+                if (!file.uploaded && file.file.size > 10000000) {
+                    return true
+                }
+                return false
+            })
+            if (exceed.length > 0) {
+                return false
+            }
+            return true
+        },
+        async fetchMaterial() {
+            this.isLoading = true
+            const res = await axios.get(`filebox/material/${this.edit}`)
+            this.newMaterial = {
+                title: res.data.title,
+                content: res.data.content,
+            }
+            this.folderId = res.data.folder_id
+            this.uploadFile.uploaded = res.data.files.map(file => {
+                return {
+                    filename: file.filename,
+                    id: file.id,
+                }
+            })
+            this.isLoading = false
+        },
         closeButtonClick() {
-            this.$emit('close')
+            // this.$emit('close')
+            this.$router.push({
+                name: 'fileBoxMaterials',
+                params: { folder_id: this.$route.params.folder_id },
+            })
         },
     },
     async created() {
         try {
-            if (this.editMaterial) {
-                this.newMaterial = {
-                    title: this.editMaterial.title,
-                    content: this.editMaterial.content,
-                    parent_id: this.editMaterial.parent_id,
-                }
-                this.uploadFile.uploaded = this.editMaterial.files.map(file => {
-                    return {
-                        filename: file.filename,
-                        id: file.id,
-                    }
-                })
+            if (this.edit) {
+                await this.fetchMaterial()
             }
         } catch (error) {
             //

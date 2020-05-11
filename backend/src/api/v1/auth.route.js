@@ -15,6 +15,22 @@ import PreUser from '../../models/PreUser'
 const router = Router()
 router.loginNotRequired = true
 
+/**
+ * @api {post} /auth/login 로그인
+ * @apiName 로그인
+ * @apiGroup Auth
+ *
+ * @apiParam {String} username 로그인 할 아이디
+ * @apiParam {String} password 로그인 할 비밀번호
+ *
+ * @apiSuccess {JWT} accessToken 로그인 인증 토큰
+ *
+ * @apiSuccessExample Success-Response:
+ *  HTTP/1.1 200 OK
+ *  {
+ *    "accessToken": "<JWT-LOGIN-TOKEN>"
+ *  }
+ */
 router.route('/login').post(
     [body('username').isString(), body('password').isString(), validateParams],
     asyncRoute(async (req, res) => {
@@ -50,12 +66,28 @@ router.route('/login').post(
     })
 )
 
+/**
+ * @api {post} /auth/register 유저 회원가입
+ * @apiName 유저 회원가입
+ * @apiGroup Auth
+ *
+ * @apiParam {String} username 유저 아이디
+ * @apiParam {String} password 유저 비밀번호
+ * @apiParam {String} realname 유저 실명
+ * @apiParam {Email} email 유저 이메일
+ *
+ * @apiSuccess {Number} 201 유저 회원가입 성공
+ * @apiSuccessExample Success-Response:
+ *  HTTP/1.1 201 OK
+ */
 router.route('/register').post(
     [
         body('username').isString(),
         body('password').isString(),
         body('realname').isString(),
-        body('email').isEmail(),
+        body('email')
+            .isEmail()
+            .optional({ checkFalsy: true }),
         validateParams,
     ],
     asyncRoute(async (req, res) => {
@@ -68,11 +100,11 @@ router.route('/register').post(
             return
         }
 
-        let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,16}$/
+        let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,32}$/
         if (!pwreg.test(req.body.password)) {
             res.status(400).json({
                 message:
-                    '비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요',
+                    '비밀번호는 8자 이상의 영문자와 숫자를 필수로 사용해야 합니다.',
             })
             return
         }
@@ -116,6 +148,23 @@ router.route('/register').post(
     })
 )
 
+/**
+ * @api {post} /auth/register/doublecheck/username 유저 중복 아이디 체크
+ * @apiName 유저 중복 아이디 체크
+ * @apiGroup Auth
+ * @apiDescription 유저가 화원가입 할 시 username을 중복 체크
+ *
+ * @apiParam {String} username 유저 아이디
+ *
+ * @apiSuccess {Number} 200 사용할 수 있는 아이디
+ *
+ * @apiError {Number} 409 username 중복 에러
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 409
+ *       {
+ *          message: '이미 사용중인 아이디입니다.',
+ *        }
+ */
 router.route('/register/doublecheck/username').post(
     [body('username').isString(), validateParams],
     asyncRoute(async (req, res) => {
@@ -139,6 +188,26 @@ router.route('/register/doublecheck/username').post(
         }
     })
 )
+
+/**
+ * @api {post} /auth/edittoken/issue 유저 회원정보 보안 토큰 발급
+ * @apiName 유저 회원정보 보안 토큰 발급
+ * @apiGroup Auth
+ *
+ * @apiParam {String} username 유저 아이디
+ * @apiParam {String} password 유저 비밀번호
+ *
+ * @apiSuccess {JWT} editToken 회원정보 보안 토큰
+ * @apiSuccessExample Success-Response:
+ *  HTTP/1.1 200 OK
+ *
+ * @apiError {Number} 403 회원정보 보안 토큰 발급 실패 에러
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 403
+ *       {
+ *          message: '토큰 발급 실패',
+ *        }
+ */
 router.route('/edittoken/issue').post(
     [body('username').isString(), body('password').isString(), validateParams],
     asyncRoute(async (req, res) => {
@@ -161,6 +230,18 @@ router.route('/edittoken/issue').post(
         }
     })
 )
+
+/**
+ * @api {post} /auth/edittoken/check 유저 회원정보 보안 토큰 유효성 검사
+ * @apiName 유저 회원정보 보안 토큰 유효성 검사
+ * @apiGroup Auth
+ *
+ * @apiParam {JWT} editToken 회원정보 보안 토큰
+ *
+ * @apiSuccess {Number} 200 회원정보 보안 토큰이 유효함
+ *
+ * @apiError {Number} 403 회원정보 보안 토큰이 유효하지 않음
+ */
 router.route('/edittoken/check').post(
     [body('edittoken').isString(), validateParams],
     asyncRoute(async (req, res) => {

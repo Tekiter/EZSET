@@ -12,7 +12,8 @@
         "clean": "rimraf dist",
         "build": "npm run clean && mkdir dist && babel src -s -D -d dist",
         "test": "jest --watch",
-        "lint": "esw -w src test"
+        "lint": "esw -w src test",
+        "api": "apidoc -o apidoc/ -i src/api/v1"
     },
     "husky": {
         "hooks": {
@@ -41,7 +42,6 @@
     "dependencies": {
         "babel-cli": "^6.26.0",
         "babel-plugin-transform-class-properties": "^6.24.1",
-        "babel-plugin-transform-object-rest-spread": "^7.0.0",
         "babel-preset-env": "^1.7.0",
         "bcrypt-nodejs": "^0.0.3",
         "body-parser": "^1.18.2",
@@ -55,13 +55,16 @@
         "mongoose-auto-increment": "^5.0.1",
         "morgan": "^1.9.1",
         "multer": "^1.4.2",
+        "nocache": "^2.1.0",
         "random-number-csprng": "^1.0.2",
         "rimraf": "^2.6.3",
         "socket.io": "^2.3.0"
     },
     "devDependencies": {
+        "apidoc": "^0.20.0",
         "babel-eslint": "^10.0.1",
         "babel-jest": "^24.5.0",
+        "babel-plugin-transform-object-rest-spread": "^6.26.0",
         "babel-register": "^6.26.0",
         "dotenv": "^7.0.0",
         "eslint": "^6.6.0",

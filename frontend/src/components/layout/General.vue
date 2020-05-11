@@ -12,8 +12,8 @@
             :dark="isDarkColor('theme-appbar')"
         >
             <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-            <v-btn text large @click="$router.push('/')">
-                <v-toolbar-title>{{
+            <v-btn text large @click="moveToHome()">
+                <v-toolbar-title class="text-none">{{
                     $store.state.config.groupName
                 }}</v-toolbar-title>
             </v-btn>
@@ -81,6 +81,11 @@ export default {
             await this.$store.dispatch('auth/logout')
             await this.$store.dispatch('role/destroyPermission')
             this.$router.push({ path: '/login' })
+        },
+        moveToHome() {
+            if (this.$route.path != '/') {
+                this.$router.push('/')
+            }
         },
     },
 }

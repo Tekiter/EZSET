@@ -11,15 +11,26 @@
                 depressed
                 outlined
                 color="green"
-                class="mr-2 mb-1"
+                class="mr-2 mb-1 text-none d-flex"
+                style="max-width:100%; overflow: hidden;"
             >
-                {{ file.filename }}
+                <div class="flex-grow-1">
+                    {{ file.filename }}
+                </div>
                 <v-icon class="ml-1">{{ iconConvert(file.filename) }}</v-icon>
             </v-btn>
         </div>
     </div>
 </template>
+<style scoped>
+.max-width {
+    min-width: 100%;
+}
 
+.no-overflow {
+    overflow: hidden;
+}
+</style>
 <script>
 import download from 'downloadjs'
 import axios from 'axios'
@@ -67,13 +78,20 @@ export default {
     },
     methods: {
         async onDownload(file) {
-            const res = await axios({
-                url: `file/download/${file.id}`,
-                method: 'GET',
-                responseType: 'blob',
-            })
-            const blob = new Blob([res.data])
-            download(blob, file.filename)
+            try {
+                const res = await axios({
+                    url: `file/download/${file.id}`,
+                    method: 'GET',
+                    responseType: 'blob',
+                })
+                const blob = new Blob([res.data])
+                download(blob, file.filename)
+            } catch (error) {
+                await this.$action.showAlertDialog(
+                    '파일 다운로드',
+                    '파일을 다운로드 할 수 없습니다.'
+                )
+            }
         },
         iconConvert(filename) {
             const ext = filename

@@ -5,11 +5,12 @@
         activatable
         item-key="id"
         :open-on-click="!selectable"
-        :item-disabled="selectable ? 'isfolder' : null"
+        :item-disabled="selectable == 'add' ? 'isfolder' : null"
         :color="color"
         :value="value"
         @update:active="onChange"
         return-object
+        :search="search"
     >
         <template v-slot:prepend="{ item, open }">
             <v-icon v-if="!item.isfolder">{{
@@ -27,8 +28,8 @@ export default {
             default: () => [],
         },
         selectable: {
-            type: Boolean,
-            default: false,
+            type: String,
+            default: '',
         },
         color: {
             type: String,
@@ -37,6 +38,10 @@ export default {
         value: {
             type: Array,
             default: () => [],
+        },
+        search: {
+            type: String,
+            default: '',
         },
     },
     data: () => ({

@@ -158,7 +158,7 @@
                             <v-icon>mdi-plus</v-icon>
                         </v-btn>
                     </v-toolbar>
-                    <v-list>
+                    <v-list subheader>
                         <!-- <v-subheader>소속 유저</v-subheader> -->
                         <v-list-item>
                             <v-text-field
@@ -207,11 +207,11 @@
 
                                     <v-list-item-content>
                                         <v-list-item-title>
-                                            {{ user.username }}
+                                            {{ user.realname }}
                                             <span
                                                 class="caption font-weight-light ml-3"
                                             >
-                                                {{ user.realname }}
+                                                {{ user.username }}
                                             </span>
                                         </v-list-item-title>
                                     </v-list-item-content>
@@ -249,49 +249,45 @@
                     >
                 </v-toolbar>
                 <v-card-text>
-                    <v-container>
-                        <v-text-field
-                            v-model="userAddDialog.search"
-                            clearable
-                            solo
-                            outlined
-                            flat
-                            hide-details
-                            dense
-                            label="검색"
-                            prepend-inner-icon="mdi-magnify"
-                        ></v-text-field>
-                        <v-row no-gutters>
-                            <v-col
-                                v-for="user in filteredUsers"
-                                :key="user.username"
-                                v-show="
-                                    searchMatches(
-                                        user.username,
-                                        userAddDialog.search
-                                    )
-                                "
-                                cols="12"
-                                lg="3"
-                                md="3"
-                                sm="6"
-                            >
-                                <v-checkbox
-                                    :label="`${user.username}`"
-                                    v-model="userAddDialog.selections"
-                                    :value="user.username"
-                                    hide-details
-                                ></v-checkbox>
-                            </v-col>
-                            <v-col
-                                cols="12"
-                                class="text-center mt-5"
-                                v-if="filteredUsers.length == 0"
-                            >
-                                <p>추가 할 유저가 없습니다.</p>
-                            </v-col>
-                        </v-row>
-                    </v-container>
+                    <v-text-field
+                        v-model="userAddDialog.search"
+                        clearable
+                        solo
+                        outlined
+                        flat
+                        hide-details
+                        dense
+                        label="검색"
+                        prepend-inner-icon="mdi-magnify"
+                    ></v-text-field>
+                    <v-row no-gutters>
+                        <v-col
+                            v-for="user in filteredUsers"
+                            :key="user.username"
+                            v-show="
+                                searchMatches(
+                                    user.username,
+                                    userAddDialog.search
+                                )
+                            "
+                            cols="12"
+                            sm="6"
+                        >
+                            <v-checkbox
+                                :label="`${user.realname} (${user.username})`"
+                                v-model="userAddDialog.selections"
+                                :value="user.username"
+                                hide-details
+                            ></v-checkbox>
+                        </v-col>
+                        <v-col
+                            cols="12"
+                            class="text-center mt-5"
+                            v-if="filteredUsers.length == 0"
+                        >
+                            <p>추가 할 유저가 없습니다.</p>
+                        </v-col>
+                    </v-row>
                 </v-card-text>
                 <v-spacer></v-spacer>
                 <v-card-actions v-if="!isMobileMode">

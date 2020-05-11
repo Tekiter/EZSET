@@ -7,6 +7,7 @@ EZSET은 소규모 대학 동아리를 위한 그룹웨어입니다.
 - 일정관리
 - 자료실
 - 커뮤니티 (게시판)
+- 상벌점관리
 
 ## Documentation
 - [시작하기](docs/getting-started.md)

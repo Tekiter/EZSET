@@ -9,7 +9,7 @@
                     tile
                     outlined
                     color="black darken-2"
-                    @click="backClick()"
+                    @click="goCancle()"
                 >
                     <v-icon left>mdi-close-circle</v-icon>
                     수정취소
@@ -91,27 +91,6 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="cancelAlert" max-width="290">
-            <v-card>
-                <v-card-title class="title"
-                    >수정을 취소하시겠습니까?</v-card-title
-                >
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-
-                    <v-btn color="red darken-2" text @click="goCancle()">
-                        예
-                    </v-btn>
-                    <v-btn
-                        color="green darken-1"
-                        text
-                        @click="cancelAlert = false"
-                    >
-                        아니오
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
     </v-container>
 </template>
 <script>
@@ -169,9 +148,6 @@ export default {
                 next(false)
             }
         },
-        backClick() {
-            this.cancelAlert = true
-        },
         goCancle() {
             this.$router.push({
                 path:
@@ -219,6 +195,14 @@ export default {
             try {
                 this.isLoading = true
 
+                if (!(await this.checkFilesValid())) {
+                    await this.$action.showAlertDialog(
+                        '파일 업로드 실패',
+                        '10MB 이하의 파일만 첨부 가능합니다.'
+                    )
+                    return
+                }
+
                 const content = this.getMarkdown()
 
                 const fileIds = await this.uploadFiles()
@@ -265,18 +249,32 @@ export default {
                     const res = await axios.post('file/upload', form, {
                         headers: { 'Content-Type': 'multipart/form-data' },
                         // 진행상황 반영
-                        onUploadProgress(e) {
+                        onUploadProgress: e => {
                             this.uploadFile.currentProgress += Math.floor(
                                 (e.loaded * 100) / e.total
                             )
                         },
                     })
+                    this.uploadFile.currentProgress = 0
                     this.uploadFile.fileProgress += 1
                     fileIds.push(res.data.id)
                 }
                 this.uploadFile.isLoading = false
             }
             return fileIds
+        },
+        async checkFilesValid() {
+            // 파일의 크기가 10MB 이하인지 체크
+            const exceed = this.uploadFile.selected.filter(file => {
+                if (!file.uploaded && file.file.size > 10000000) {
+                    return true
+                }
+                return false
+            })
+            if (exceed.length > 0) {
+                return false
+            }
+            return true
         },
     },
     async created() {

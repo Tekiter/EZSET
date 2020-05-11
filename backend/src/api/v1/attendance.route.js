@@ -10,12 +10,35 @@ const router = Router()
 var moment = require('moment')
 var ranNum = random(100, 999)
 var startUser = ''
-//사용자가 출석코드를 입력했을 경우 서버에서 생성한 코드와 사용자 입력코드가 일치한다면 db에 출석상태로 업데이트
-//body : code
-//Attendance 페이지에서 사용
+
+/**
+ * @api {post} /attendance/attendanceWrite/ 출석 요청
+ * @apiDescription 사용자가 자신이 입력한 코드로 출석요청을 보냄. 서버에서 생성한 출석코드와 일치한다면 출석 처리
+ * @apiName attendanceWrite
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.att
+ *
+ * @apiParam {Number} code 사용자가 입력한 출석번호
+ * @apiParamExample {post} Request-Example:
+ *      {
+ *          "code":129
+ *      }
+ * @apiSuccess {Number} 1 서버가 생성한 번호와 사용자가 입력한 번호가 일치함.
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *           "result":1
+ *      }
+ * @apiSuccess {Number} 0 서버가 생성한 번호와 사용자가 입력한 번호가 일치하지 않음.
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ *      {
+ *          "result":0
+ *      }
+ */
 router.post(
-    '/attendanceWrite',
-    [perm('attendance').can('att')],
+    '/attendanceWrite', [perm('attendance').can('att')],
     asyncRoute(async function(req, res) {
         if (ranNum != req.body.code) {
             res.json({
@@ -26,33 +49,46 @@ router.post(
         var Date = moment().format('YYYYMMDD')
         var Name = req.user.username
 
-        await AttendanceDay.findOneAndUpdate(
-            {
+        await AttendanceDay.findOneAndUpdate({
                 day: Date,
                 'status.name': Name,
-            },
-            { 'status.$.state': 'attendance' },
+            }, { 'status.$.state': 'attendance' },
             function(err, doc) {}
         )
 
-        await AttendanceUser.findOneAndUpdate(
-            {
+        await AttendanceUser.findOneAndUpdate({
                 name: Name,
                 'status.date': Date,
-            },
-            { 'status.$.state': 'attendance' },
+            }, { 'status.$.state': 'attendance' },
             function(err, doc) {}
         )
         res.json({ result: 1 })
     })
 )
 
-//출석 후 다시 출석하기 페이지에 접근시 이미 출석했음을 체크하는 API
-//출석을 했다면 1을 하지않았다면 0을 반환
-//Attendance 페이지에서 사용
+/**
+ * @api {get} /attendance/attendanceCheck/ 출석유무 체크
+ * @apiDescription 현재 날짜에 사용자의 출석 상태가 `attendance`상태인지 체크
+ * @apiName attendanceCheck
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.att
+ *
+ * @apiSuccess {Number} 1 당일 사용자의 출석상태가 `출석` 상태임.
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *           1
+ *      }
+ * @apiSuccess {Number} 0 당일 사용자의 출석상태가 `출석` 상태가 아님.
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ *      {
+ *          0
+ *      }
+ */
 router.get(
-    '/attendanceCheck',
-    [perm('attendance').can('att')],
+    '/attendanceCheck', [perm('attendance').can('att')],
     asyncRoute(async function(req, res) {
         var Date = moment().format('YYYYMMDD')
         var Name = req.user.username
@@ -72,21 +108,51 @@ router.get(
     })
 )
 
-//출석 시작 후 관리자가 새로고침을 했을때 출석번호를 유지하기 위함
-//Attendance 페이지에서 사용
+/**
+ * @api {get} /attendance/attendanceCheckAdmin/ 서버 출석 코드 전송
+ * @apiName attendanceCheckAdmin
+ * @apiDescription 출석을 시작한 관리자가 출석 진행중에 페이지를 새로고침 했을 때 서버에서 생성한 출석 코드를 전송
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.att
+ *
+ * @apiSuccess {Number} ranNum 출석을 시작한 관리자의 요청일 경우
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *           129
+ *      }
+ * @apiSuccess {Number} 0 출석을 시작한 관리자의 요청이 아닐 경우
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ *      {
+ *          0
+ *      }
+ */
+
 router.get(
-    '/attendanceCheckAdmin',
-    [perm('attendance').can('update')],
+    '/attendanceCheckAdmin', [perm('attendance').can('att')],
     asyncRoute(async function(req, res) {
         if (startUser == req.user.username) res.json(ranNum)
         else res.json(0)
     })
 )
-//출석 종료 후 초기화
-//Attendance 페이지에서 사용
+
+/**
+ * @api {post} /attendance/attendanceCheckEnd/ 출석 종료
+ * @apiName attendanceCheckEnd
+ * @apiDescription 출석 종료시 서버에서 생성했던 출석 코드(ranNum)와 출석시작했던 관리자 아이디(startUser) 값을 초기화
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.att
+ *
+ * @apiSuccess {Number} 200 정상 처리되었을 경우
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *
+ */
 router.post(
-    '/attendanceCheckEnd',
-    [perm('attendance').can('update')],
+    '/attendanceCheckEnd', [perm('attendance').can('att')],
     asyncRoute(async function(req, res) {
         startUser = ''
         ranNum = -1
@@ -94,19 +160,31 @@ router.post(
     })
 )
 
-//관리자가 시작버튼을 눌렀을경우 관리자는 출석상태 다른 모든 유저는 결석상태로 업데이트됨
-//attendanceDays, attendanceUsers Collection에 시작버튼을 누른 관리자를 제외한 모두를 '결석'상태로 초기화한 Document가 생성됨
-//Attendance 페이지에서 사용
+/**
+ * @api {post} /attendance/startAttendance/ 출석 시작
+ * @apiName startAttendance
+ * @apiDescription 출석시작버튼을 눌렀을경우 관리자는 출석상태로 다른 모든 유저는 결석상태로 업데이트함
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.update
+ *
+ * @apiSuccess {Number} ranNum 서버에서 생성한 3자리 출석코드 반환
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "code": ranNum
+ *      }
+ *
+ */
 router.post(
-    '/startAttendance',
-    [perm('attendance').can('update')],
+    '/startAttendance', [perm('attendance').can('update')],
     asyncRoute(async function(req, res) {
         var Date = moment().format('YYYYMMDD')
-        //get Userlist in User collection
+            //get Userlist in User collection
         const userList = await User.find({
-            attable: true,
-        }).select('username')
-        //create db - AttendanceDay
+                attable: true,
+            }).select('username')
+            //create db - AttendanceDay
         var attendanceDay = new AttendanceDay()
         attendanceDay.day = Date
 
@@ -157,28 +235,78 @@ router.post(
     })
 )
 
-//날짜를 param으로 받아와서 그 날짜에 해당하는 객체를 반환(그 날짜에 출석한 사람들의 정보가 모두 담겨 있음)
-//param : day(String)
-//AttendanceManageDay 페이지에서 사용
+/**
+ * @api {get} /attendanceState/:day 일별 출석현황 반환
+ * @apiDescription 특정 일자의 출석현황을 반환
+ * @apiName attendanceState
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.update
+ *
+ * @apiParam {String} day 반환하고 싶은 날짜, YYYYMMDD 형태
+ * @apiParamExample {get} Request-Example:
+ *      {
+ *         "day":"20200304"
+ *      }
+ * @apiSuccess {Object} status 해당 일자의 출결 정보 객체
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *           {
+ *               "status": [
+ *                           {
+ *                           "_id": "5e5f4886c785712d2c55b022",
+ *                            "name": "admin",
+ *                            "state": "attendance"
+ *                          },
+ *                           {
+ *                            "_id": "5e5f4886c785712d2c55b026",
+ *                            "name": "user0001",
+ *                            "state": "attendance"
+ *                          },
+ *                          {
+ *                            "_id": "5e5f4886c785712d2c55b02a",
+ *                            "name": "user0002",
+ *                            "state": "attendance"
+ *                          },
+ *                        ]
+ *            }
+ * @apiError {Number} 404 해당 일자에 출결정보 없음
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404 Not Found
+ */
 router.get(
-    '/attendanceState/:day',
-    [param('day').isString(), perm('attendance').can('update'), validateParams],
+    '/attendanceState/:day', [param('day').isString(), perm('attendance').can('update'), validateParams],
     asyncRoute(async function(req, res) {
         const cur = await AttendanceDay.findOne({
             day: req.params.day,
         }).select({ _id: 0, __v: 0, day: 0 })
-        if (cur != null) res.json(cur)
-        else res.status(404).json()
+        res.json(cur)
     })
 )
 
-//AttendanceManageDay 페이지에서 사용자의 출석정보를 변경하면 db에 업데이트 시켜준다.
-//body : state(String), name(String)
-//param : day(String)
-//AttendanceManageDay 페이지에서 사용
+/**
+ * @api {post} /attendancestateupdate/:day 출석 상태 업데이트
+ * @apiDescription <code>day</code>날짜에 <code>name</code>이라는 아이디를 가진 사용자의 출석 상태를 <code>state</code>로 업데이트
+ * @apiName attendancestateupdate
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.update
+ *
+ * @apiParam {String} day 업데이트할 날짜, YYYYMMDD 형태
+ * @apiParam {String} state 업데이트할 상태 (<code>attendance</code>,<code>absence</code>,<code>late</code>,<code>offical_absence</code>)중 하나
+ * @apiParam {String} name 업데이트할 사용자 아이디
+ * @apiParamExample {json} Request-Example:
+ *      {
+ *          "day":"20200304",
+ *          "state":"late",
+ *          "name":"hschoi1104"
+ *      }
+ * @apiSuccess {Object} object 바꾼 상태의 객체 반환
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ */
 router.post(
-    '/attendancestateupdate/:day',
-    [
+    '/attendancestateupdate/:day', [
         perm('attendance').can('update'),
         param('day').isString(),
         body('state').isString(),
@@ -188,65 +316,228 @@ router.post(
     asyncRoute(async function(req, res) {
         var Day = req.params.day
 
-        await AttendanceDay.findOneAndUpdate(
-            {
+        await AttendanceDay.findOneAndUpdate({
                 day: Day,
                 'status.name': req.body.name,
-            },
-            { 'status.$.state': req.body.state },
+            }, { 'status.$.state': req.body.state },
             function(err, doc) {}
         )
 
-        await AttendanceUser.findOneAndUpdate(
-            {
+        await AttendanceUser.findOneAndUpdate({
                 name: req.body.name,
                 'status.date': Day,
-            },
-            { 'status.$.state': req.body.state },
+            }, { 'status.$.state': req.body.state },
             function(err, doc) {}
         )
         res.end()
     })
 )
 
-//users Collection에서 모든 사용자를 가져옴
-//AttendnaceManageDay 페이지에서 사용
+/**
+ * @api {get} /attendance/attendanceUserList/ 사용자 리스트 반환
+ * @apiDescription 전체 사용자 리스트를 반환
+ * @apiName attendanceUserList
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.update
+ *
+ * @apiSuccess {Array} data 전체 사용자정보 객체 배열
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *          {
+ *              [
+ *                    {
+ *                       "_id": "5e1ff2fc39c8d12194bd55f4",
+ *                       "username": "admin"
+ *                   },
+ *                   {
+ *                      "_id": "5e1ff395b7ee260ffc203de2",
+ *                      "username": "user0001"
+ *                   },
+ *                   {
+ *                      "_id": "5e1ff3b3b7ee260ffc203de3",
+ *                      "username": "user0002"
+ *                   },
+ *               ]
+ *          }
+ */
 router.get(
-    '/attendanceUserList',
-    [perm('attendance').can('update')],
+    '/attendanceUserList', [perm('attendance').can('update')],
     asyncRoute(async function(req, res) {
         const userList = await User.find().select('username')
         res.json(userList)
     })
 )
 
-//attendanceDay Collection에서 모든 정보를 가져옴
-//AttendanceManageMonth페이지에서 사용
+/**
+ * @api {get} /attendance/attendanceDayList/ 전체 일별 출결현황 반환
+ * @apiDescription 전체 일별 출결현황 반환
+ * @apiName attendanceDayList
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.read
+ *
+ * @apiSuccess {Array} data 전체 일별 출결현황 객체 배열
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * HTTP/1.1 200 OK
+ * {
+ *  [
+ *  {
+ *    "_id": "5e1ff40db7ee260ffc203de5",
+ *    "status": [
+ *      {
+ *        "_id": "5e1ff40db7ee260ffc203de6",
+ *        "name": "admin",
+ *        "state": "late"
+ *      },
+ *      {
+ *        "_id": "5e1ff40db7ee260ffc203deb",
+ *        "name": "user0001",
+ *        "state": "attendance"
+ *      },
+ *      {
+ *        "_id": "5e1ff40db7ee260ffc203df0",
+ *        "name": "user0002",
+ *        "state": "attendance"
+ *      }
+ *    ],
+ *    "day": "20200115",
+ *    "__v": 2
+ *  },
+ *  {
+ *    "_id": "5e1ff480b7ee260ffc203df6",
+ *    "status": [
+ *      {
+ *        "_id": "5e1ff480b7ee260ffc203df7",
+ *        "name": "admin",
+ *        "state": "attendance"
+ *      },
+ *      {
+ *        "_id": "5e1ff480b7ee260ffc203dfb",
+ *        "name": "user0001",
+ *        "state": "official_absence"
+ *      },
+ *      {
+ *        "_id": "5e1ff480b7ee260ffc203dff",
+ *        "name": "user0002",
+ *        "state": "attendance"
+ *      },
+ *      {
+ *        "_id": "5e3bec45e9ce0e0968a5e781",
+ *        "name": "user0004",
+ *        "state": "absence"
+ *      }
+ *    ],
+ *    "day": "20200116",
+ *    "__v": 3
+ *  },
+ * ]
+ *}
+ */
 router.get(
-    '/attendanceDayList',
-    [perm('attendance').can('update')],
+    '/attendanceDayList', [perm('attendance').can('update')],
     asyncRoute(async function(req, res) {
         const attendnaceDayList = await AttendanceDay.find()
         res.json(attendnaceDayList)
     })
 )
 
-//attendanceUser Collection에서 모든 정보를 가져옴
-// AttendanceManageMonth페이지에서 사용
+/**
+ * @api {get} /attendance/attendanceUserListData/ 사용자별 출결현황 반환
+ * @apiDescription 사용자별 출결현황 반환
+ * @apiName attendanceUserListData
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.read
+ *
+ * @apiSuccess {Object} data 전체 사용자별 출결현황 객체 배열
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * HTTP/1.1 200 OK
+ * [
+ *  {
+ *    "_id": "5e1ff40db7ee260ffc203de8",
+ *    "status": [
+ *      {
+ *        "_id": "5e1ff40db7ee260ffc203de9",
+ *        "date": "20200115",
+ *        "state": "late"
+ *      },
+ *      {
+ *        "_id": "5e1ff480b7ee260ffc203df9",
+ *        "date": "20200116",
+ *        "state": "attendance"
+ *      },
+ *    ],
+ *    "name": "admin",
+ *    "__v": 27
+ *  },
+ *  {
+ *    "_id": "5e1ff40db7ee260ffc203ded",
+ *    "status": [
+ *      {
+ *        "_id": "5e1ff40db7ee260ffc203dee",
+ *        "date": "20200115",
+ *        "state": "attendance"
+ *      },
+ *      {
+ *        "_id": "5e1ff480b7ee260ffc203dfd",
+ *        "date": "20200116",
+ *        "state": "official_absence"
+ *      },
+ *    ],
+ *    "name": "user0001",
+ *    "__v": 27
+ *  },
+ *]
+ */
 router.get(
-    '/attendanceUserListData',
-    [perm('attendance').can('update')],
+    '/attendanceUserListData', [perm('attendance').can('update')],
     asyncRoute(async function(req, res) {
         const attendnaceUser = await AttendanceUser.find()
         res.json(attendnaceUser)
     })
 )
 
-//attendanceUser Collection에서 현재 접속중인 사용자의 정보만 가져옴
-// AttendanceManageMonthUser페이지에서 사용
+/**
+ * @api {get} /attendance/attendanceUserData/ 사용자 출결현황 반환
+ * @apiDescription 자신의 출결현황 반환한다.
+ * @apiName attendanceUserData
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.canOwn.read
+ *
+ * @apiSuccess {Object} data 자신의 출결현황 객체 반환
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * HTTP/1.1 200 OK
+ * {
+ *  [
+ *   {
+ *     "_id": "5e1ff40db7ee260ffc203de8",
+ *     "status": [
+ *       {
+ *         "_id": "5e5bc7f2cb0dba2d48491bff",
+ *         "date": "20200301",
+ *         "state": "attendance"
+ *       },
+ *       {
+ *         "_id": "5e5bece73d513a0d78ba7eb3",
+ *         "date": "20200302",
+ *         "state": "official_absence"
+ *       },
+ *       {
+ *         "_id": "5e5f4886c785712d2c55b024",
+ *         "date": "20200304",
+ *         "state": "attendance"
+ *         }
+ *       ],
+ *     "name": "admin",
+ *     "__v": 27
+ *   }
+ *  ]
+ * }
+ */
 router.get(
-    '/attendanceUserData',
-    [perm('attendance').canOwn('read')],
+    '/attendanceUserData', [perm('attendance').canOwn('read')],
     asyncRoute(async function(req, res) {
         const attendnaceUser = await AttendanceUser.find()
             .where('name')
@@ -255,11 +546,39 @@ router.get(
     })
 )
 
-//attendanceDay Collection에서 출석 정보가 없는 유저를 가져옴
-// AttendanceManageDay 페이지에서사용
+/**
+ * @api {post} /attendance/attendanceNUserData
+ * @apiDescription <code>day</code> 날짜에 출석 정보가 없는 사용자 리스트 반환
+ * @apiName attendanceNUserData
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.update
+ *
+ * @apiParam {String} day 업데이트할 날짜, YYYYMMDD 형태
+ *
+ * @apiParamExample {json} Request-Example:
+ *      {
+ *          "day":"20200304"
+ *      }
+ * @apiSuccess {Array} Array 해당 날짜에 출석 정보가 없는 사용자 리스트
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ * {
+ *  [
+ *  "user0005",
+ *  "user0006",
+ *  "user0007",
+ *  "test01",
+ *  "test02"
+ *  ]
+ * }
+ *
+ * @apiError {Number} 404 해당 날짜에 출결정보가 없을 경우
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404 Not Found
+ */
 router.post(
-    '/attendanceNUserData',
-    [perm('attendance').can('update'), body('day').isString(), validateParams],
+    '/attendanceNUserData', [perm('attendance').can('update'), body('day').isString(), validateParams],
     asyncRoute(async function(req, res) {
         const result = []
         const Users = await User.find().select('username')
@@ -281,11 +600,42 @@ router.post(
     })
 )
 
-// manage/user
-// 출석 대상인 유저들을 가져옴
+/**
+ * @api {get} /attendance/manage/user 출석 대상 조회
+ * @apiDescription 출석 대상 사용자 리스트와 출석 대상이 아닌 사용자 리스트 반환
+ * @apiName read user
+ * @apiGroup AttendanceCheck/manage
+ * @apiPermission attendance.can.update
+ *
+ * @apiSuccess {Array} attableUsers 출석 대상 사용자 리스트
+ * @apiSuccess {Array} excludedUsers 출석 대상이 아닌 사용자 리스트
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ * {
+ *  "attableUsers": [
+ *    {
+ *      "username": "admin",
+ *      "realname": "관리자"
+ *    },
+ *    {
+ *      "username": "test01",
+ *      "realname": "test01"
+ *    },
+ *    {
+ *      "username": "test02",
+ *      "realname": "test02"
+ *    },
+ *    {
+ *      "username": "user0001",
+ *      "realname": "최현석"
+ *    },
+ *  ],
+ *  "excludedUsers": []
+ *}
+ */
 router.get(
-    '/manage/user',
-    [perm('attendance').can('update'), validateParams],
+    '/manage/user', [perm('attendance').can('update'), validateParams],
     asyncRoute(async function(req, res) {
         const users = await User.find()
             .where('attable')
@@ -316,12 +666,41 @@ router.get(
     })
 )
 
-// manage/user
-// 출석 대상인 유저들을 추가 등록
+/**
+ * @api {put} /attendance/manage/user 출석 대상 추가
+ * @apiDescription 출석대상 사용자 추가
+ * @apiName write user
+ * @apiGroup AttendanceCheck/manage
+ * @apiPermission attendance.can.update
+ *
+ * @apiParam {Array} users 출석 대상으로 추가할 사용자정보가 담긴 배열
+ *
+ * @apiParamExample {json} Request-Example:
+ *      {
+ *        [
+ *          "user0001",
+ *          "user0002",
+ *          "user0003"
+ *        ]
+ *      }
+ *
+ * @apiSuccess {Number} 200 성공
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *
+ *
+ * @apiError {Number} 404 올바르지 않은 사용자가 있을 경우
+ *
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404 Not Found
+ * {
+ *      존재하지 않는 유저입니다.
+ * }
+ */
 router.put(
-    '/manage/user',
-    [perm('attendance').can('update'), body('users').isArray(), validateParams],
-    asyncRoute(async (req, res) => {
+    '/manage/user', [perm('attendance').can('update'), body('users').isArray(), validateParams],
+    asyncRoute(async(req, res) => {
         try {
             for (let user of req.body.users) {
                 await checkUsername(user)
@@ -344,16 +723,28 @@ router.put(
     })
 )
 
-// manage/user/:username
-// 출석 대상인 유저 삭제
+/**
+ * @api {delete} /attendance/manage/user/:username 출석 대상 제거
+ * @apiDescription 출석 대상에서 <code>username</code> 라는 아이디를 가지는 사용자 제거
+ * @apiName delete user
+ * @apiGroup AttendanceCheck/manage
+ * @apiPermission attendance.can.update
+ *
+ * @apiParam {String} username 출석대상에서 삭제할 사용자 아이디
+ *
+ * @apiSuccess {Number} 200 성공
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *
+ */
 router.delete(
-    '/manage/user/:username',
-    [
+    '/manage/user/:username', [
         perm('attendance').can('update'),
         param('username').custom(checkUsername),
         validateParams,
     ],
-    asyncRoute(async (req, res) => {
+    asyncRoute(async(req, res) => {
         const user = await User.findOne()
             .where('username')
             .equals(req.params.username)
@@ -364,18 +755,47 @@ router.delete(
     })
 )
 
-// 출석 대상이 아닌 사용자의 출석기록 추가
-// addUsersRecords
-// body : users
+/**
+ * @api {put} /attendance/addUsersRecords 출석 기록 추가
+ * @apiDescription 출석 대상이 아니어서 기록이 없는 사용자의 출석기록을 <code>absence</code> 상태로 추가
+ * @apiName addUsersRecords
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.update
+ *
+ * @apiParam {String} day 업데이트할 날짜, YYYYMMDD 형태
+ * @apiParam {Array} users 출석 대상으로 추가할 사용자정보가 담긴 배열
+ *
+ * @apiParamExample {json} Request-Example:
+ *      {
+ *          "day":"20200306",
+ *          "users":[
+ *                   "admin",
+ *                   "hschoi1104"
+ *                  ]
+ *      }
+ *
+ * @apiSuccess {Number} 200 성공
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *
+ *
+ * @apiError {Number} 404 올바르지 않은 사용자가 있을 경우
+ *
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 400 Not Found
+ * {
+ *      존재하지 않는 유저입니다.
+ * }
+ */
 router.put(
-    '/addUsersRecords',
-    [
+    '/addUsersRecords', [
         perm('attendance').can('update'),
         body('users').isArray(),
         body('day').isString(),
         validateParams,
     ],
-    asyncRoute(async (req, res) => {
+    asyncRoute(async(req, res) => {
         try {
             for (let user of req.body.users) {
                 await checkUsername(user)
@@ -405,6 +825,53 @@ router.put(
             }
         }
         res.end()
+    })
+)
+
+/**
+ * @api {post} /attendance/attendanceUser 특정 사용자 출결정보 반환
+ * @apiDescription <code>name</code>의 아이디를 가지는 사용자의 출결정보 반환
+ * @apiName attendanceUser
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.update
+ *
+ * @apiParam {String} name 조회할 사용자 아이디
+ *
+ * @apiParamExample {json} Request-Example:
+ *      {
+ *         "name":"admin"
+ *      }
+ *
+ * @apiSuccess {Array} status 출결정보 객체 배열
+ * @apiSuccess {String} name 조회한 사용자 아이디
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ * {
+ *{
+ *  "status": [
+ *    {
+ *      "_id": "5e1ff40db7ee260ffc203de9",
+ *      "date": "20200115",
+ *      "state": "late"
+ *    },
+ *    {
+ *      "_id": "5e1ff480b7ee260ffc203df9",
+ *      "date": "20200116",
+ *      "state": "attendance"
+ *    },
+ *  ],
+ *  "name": "admin"
+ *}
+ * }
+ */
+router.post(
+    '/attendanceUser', [perm('attendance').can('update'), validateParams],
+    asyncRoute(async function(req, res) {
+        const attendanceUser = await AttendanceUser.findOne({
+            name: req.body.name,
+        }).select({ _id: 0, __v: 0 })
+        res.json(attendanceUser)
     })
 )
 export default router

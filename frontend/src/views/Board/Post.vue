@@ -1,24 +1,20 @@
 <template>
     <div>
-        <!-- <div>
-            <v-text-field
-                v-if="loading"
-                color="blue darken-2"
-                loading
-                disabled
-            ></v-text-field>
-        </div> -->
         <v-container grid-list-md>
             <v-row>
-                <v-col cols="2"></v-col>
-                <v-col cols="8" class="d-flex justify-center">
-                    <strong class="font-weight-medium display-2">{{
+                <v-col cols="12" sm="2"></v-col>
+                <v-col cols="12" sm="8" class="d-flex justify-center">
+                    <strong
+                        v-if="$vuetify.breakpoint.mdAndUp"
+                        class="font-weight-medium display-2"
+                        >{{ board.title }}</strong
+                    >
+                    <strong v-else class="font-weight-medium display-2">{{
                         board.title
                     }}</strong>
                 </v-col>
-                <v-col cols="2">
+                <v-col cols="12" sm="2">
                     <v-select
-                        class="text-right"
                         v-model="select"
                         :items="viewCount"
                         item-text="state"
@@ -44,44 +40,56 @@
                     hide-default-footer
                     :mobile-breakpoint="NaN"
                     @page-count="pageCount = $event"
+                    no-data-text="게시글이 없습니다."
+                    loading-text="불러오는중..."
                 >
                     <template v-slot:item.title="props">
                         <a @click="read(props.item)">
-                            {{ props.item.title }}
+                            {{ props.item.title }} [{{
+                                props.item.comment_count
+                            }}]
                         </a>
                     </template>
                 </v-data-table>
-                <v-data-table
-                    v-else
-                    :headers="headersTwo"
-                    :items="posts"
-                    :page.sync="page"
-                    :server-items-length="totalpage"
-                    :options.sync="options"
-                    :loading="loading"
-                    @update:items-per-page="fetchPostList()"
-                    :items-per-page.sync="select.value"
-                    hide-default-footer
-                    :mobile-breakpoint="NaN"
-                    @page-count="pageCount = $event"
-                >
-                    <template v-slot:item.title="props">
-                        <a @click="read(props.item)">
-                            {{ props.item.title }}
-                        </a>
-                    </template>
-                </v-data-table>
+                <v-list v-else>
+                    <v-list-item v-for="post in posts" :key="post._id">
+                        <v-list-item-content>
+                            <v-list-item-title
+                                ><a @click="read(post)" class="title"
+                                    >{{ post.title }} [{{
+                                        post.comment_count
+                                    }}]</a
+                                >
+                                <v-spacer></v-spacer>
+
+                                <v-icon x-small color="red darken-3"
+                                    >mdi-heart-multiple</v-icon
+                                >
+                                {{ post.like }}
+                            </v-list-item-title>
+
+                            {{ post.author
+                            }}<v-divider class="mx-3" vertical></v-divider>
+                            {{
+                                $moment(new Date(post.created_date)).format(
+                                    'YY/MM/DD HH:mm'
+                                )
+                            }}<v-divider class="mx-3" vertical></v-divider> 조회
+                            {{ post.view }}
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list>
             </v-card>
-            <div class="row">
-                <div class="col"></div>
-                <div class="col">
+            <v-row v-if="$vuetify.breakpoint.mdAndUp">
+                <v-col cols="2"></v-col>
+                <v-col cols="8">
                     <v-pagination
                         v-model="page"
                         :length="pageCount"
                         :items-per-page.sync="page"
                     ></v-pagination>
-                </div>
-                <div class="col">
+                </v-col>
+                <v-col cols="2">
                     <div class="d-flex flex-row-reverse">
                         <v-btn
                             class="ma-2"
@@ -93,6 +101,7 @@
                             <v-icon left>mdi-magnify</v-icon> 검색
                         </v-btn>
                         <v-btn
+                            v-if="canWrite()"
                             class="ma-2"
                             tile
                             outlined
@@ -102,7 +111,43 @@
                             <v-icon left>mdi-pencil</v-icon> 글쓰기
                         </v-btn>
                     </div>
-                </div>
+                </v-col>
+            </v-row>
+            <div v-else>
+                <v-row>
+                    <v-col>
+                        <v-pagination
+                            v-model="page"
+                            :length="pageCount"
+                            :items-per-page.sync="page"
+                        ></v-pagination>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <div class="d-flex flex-row-reverse">
+                            <v-btn
+                                class="ma-2"
+                                tile
+                                outlined
+                                color="black darken-2"
+                                :to="'/searchpost'"
+                            >
+                                <v-icon left>mdi-magnify</v-icon> 검색
+                            </v-btn>
+                            <v-btn
+                                v-if="canWrite()"
+                                class="ma-2"
+                                tile
+                                outlined
+                                color="black darken-2"
+                                :to="'/write/' + curid"
+                            >
+                                <v-icon left>mdi-pencil</v-icon> 글쓰기
+                            </v-btn>
+                        </div>
+                    </v-col>
+                </v-row>
             </div>
         </v-container>
     </div>
@@ -146,9 +191,14 @@ export default {
                     width: '50%',
                 },
                 { text: '작성자', value: 'author', sortable: false },
-                { text: '작성일', value: 'created_date', width: '20%' },
-                { text: '추천', value: 'like' },
-                { text: '조회', value: 'view' },
+                {
+                    text: '작성일',
+                    value: 'created_date',
+                    width: '20%',
+                    sortable: false,
+                },
+                { text: '추천', value: 'like', sortable: false },
+                { text: '조회', value: 'view', sortable: false },
             ],
             headersTwo: [
                 {
@@ -164,8 +214,8 @@ export default {
                     width: '50%',
                 },
                 { text: '작성자', value: 'author', sortable: false },
-                { text: '추천', value: 'like' },
-                { text: '조회', value: 'view' },
+                { text: '추천', value: 'like', sortable: false },
+                { text: '조회', value: 'view', sortable: false },
             ],
         }
     },
@@ -181,6 +231,7 @@ export default {
             },
         },
         async $route(to, from) {
+            this.posts = []
             await this.fetchPostList()
             this.page = 1
         },
@@ -211,7 +262,7 @@ export default {
                 )
                 this.posts = res.data.posts.map(post => {
                     post.created_date = moment(post.created_date).format(
-                        'YYYY/MM/DD HH:MM'
+                        'YYYY/MM/DD HH:mm'
                     )
                     return post
                 })
@@ -228,21 +279,20 @@ export default {
                 this.board = res.data.board
                 this.loading = false
                 this.totalpage = res.data.totalpage
-                this.pageCount =
-                    Math.floor(res.data.totalpage / this.select.value) + 1
+                this.pageCount = Math.ceil(
+                    res.data.totalpage / this.select.value
+                )
             } catch (error) {
                 //
             }
             this.loading = false
         },
+        canWrite() {
+            return this.$perm('board', this.$route.params.board_id).can('write')
+        },
     },
     async created() {
         await this.fetchPostList()
     },
-    // watch: {
-    //     async $route(to, from) {
-    //         await this.fetchPostList()
-    //     },
-    // },
 }
 </script>

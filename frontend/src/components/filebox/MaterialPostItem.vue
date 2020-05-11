@@ -3,7 +3,7 @@
         <v-list-item three-line>
             <v-list-item-content>
                 <div class="d-flex">
-                    <div class="overline mb-4 flex-grow-1">
+                    <div class="overline mb-4 flex-grow-1 text-none">
                         {{
                             convertDate(options.created_date) +
                                 ' ' +
@@ -11,12 +11,24 @@
                         }}
                     </div>
 
-                    <v-btn text small color="orange" @click="editClick()">
+                    <v-btn
+                        text
+                        small
+                        color="orange"
+                        @click="editClick()"
+                        v-if="canEditDelete()"
+                    >
                         <v-icon>
                             mdi-pencil-outline
                         </v-icon>
                     </v-btn>
-                    <v-btn text small color="red" @click="deleteClick()">
+                    <v-btn
+                        text
+                        small
+                        color="red"
+                        @click="deleteClick()"
+                        v-if="canEditDelete()"
+                    >
                         <v-icon>
                             mdi-trash-can-outline
                         </v-icon>
@@ -67,12 +79,23 @@ export default {
             }
         },
         async deleteClick() {
-            try {
+            const res = await this.$action.showConfirmDialog(
+                '게시물 삭제',
+                '게시물을 삭제하시겠습니까?'
+            )
+            if (res) {
                 await axios.delete('/filebox/material/' + this.options.id)
                 this.$emit('delete')
-            } catch (error) {
-                //
             }
+        },
+        canEditDelete() {
+            if (
+                this.$perm('fileBox').can('manage') ||
+                (this.$perm('fileBox').can('upload') &&
+                    this.options.author == this.$store.state.auth.user.username)
+            )
+                return true
+            else return false
         },
     },
 }

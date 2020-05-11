@@ -36,6 +36,15 @@ export default {
             },
         },
         {
+            type: 'switch',
+            title: '홈화면 관리',
+            content: '홈 화면의 디자인을 수정,적용할 수 있습니다.',
+            target: {
+                resource: 'manageHome',
+                action: 'update',
+            },
+        },
+        {
             type: 'line',
         },
         {
@@ -92,6 +101,56 @@ export default {
             target: {
                 resource: 'schedule',
                 action: 'update',
+            },
+        },
+        {
+            type: 'line',
+        },
+        {
+            type: 'header',
+            title: '자료실',
+        },
+        {
+            type: 'switch',
+            title: '자료실 관리',
+            content: '그룹과 폴더를 추가, 편집할 수 있습니다.',
+            target: {
+                resource: 'fileBox',
+                action: 'manage',
+            },
+        },
+        {
+            type: 'switch',
+            title: '파일 업로드 & 삭제 관리',
+            content: '파일을 업로드하고 삭제할 수 있습니다.',
+            target: {
+                resource: 'fileBox',
+                action: 'upload',
+            },
+        },
+        {
+            type: 'line',
+        },
+        {
+            type: 'header',
+            title: '상벌점',
+        },
+        {
+            type: 'switch',
+            title: '상벌점 관리',
+            content: '상벌점 항목을 수정/삭제 하고 관리합니다',
+            target: {
+                resource: 'penalty',
+                action: 'update',
+            },
+        },
+        {
+            type: 'switch',
+            title: '상벌점 읽기',
+            content: '자신의 상벌점을 읽을 수 있습니다.',
+            target: {
+                resource: 'penalty',
+                action: 'read',
             },
         },
     ],

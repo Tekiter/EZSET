@@ -9,12 +9,14 @@ const routes = [
     {
         path: '/',
         name: 'home',
-        component: () => import('../views/Home.vue'),
+        component: () =>
+            import(/* webpackChunkName: "core" */ '../views/Home.vue'),
     },
     {
         path: '/login',
         name: 'login',
-        component: () => import('../views/Login.vue'),
+        component: () =>
+            import(/* webpackChunkName: "core" */ '../views/Login.vue'),
         meta: {
             layout: 'empty',
             noLoginRequired: true,
@@ -70,17 +72,23 @@ const routes = [
     {
         path: '/board',
         name: 'board',
-        component: () => import('../views/Board/Board.vue'),
+        component: () =>
+            import(/* webpackChunkName: "board" */ '../views/Board/Board.vue'),
     },
     {
         path: '/board/:board_id',
         name: 'post',
-        component: () => import('../views/Board/Post.vue'),
+        component: () =>
+            import(/* webpackChunkName: "board" */ '../views/Board/Post.vue'),
     },
     {
         path: '/board/:board_id/:post_id',
         name: 'content',
-        component: () => import('../views/Board/Content.vue'),
+        component: () =>
+            import(
+                /* webpackChunkName: "board" */
+                '../views/Board/Content.vue'
+            ),
     },
     {
         path: '/write/:board_id',
@@ -95,7 +103,11 @@ const routes = [
     {
         path: '/searchpost',
         name: 'serchPost',
-        component: () => import('../views/Board/SearchPost.vue'),
+        component: () =>
+            import(
+                /* webpackChunkName: "board" */
+                '../views/Board/SearchPost.vue'
+            ),
     },
     {
         path: '/manage/users',
@@ -118,24 +130,34 @@ const routes = [
         component: () => import('../views/Manage/BoardManage.vue'),
     },
     {
+        path: '/manage/users',
+        name: 'manageUsers',
+        component: () => import('../views/Manage/UserManage.vue'),
+    },
+    {
         path: '/manage/server',
         name: 'manageServer',
         component: () => import('../views/Manage/ServerManage.vue'),
     },
     {
+        path: '/manage/penalty',
+        name: 'penalty',
+        component: () => import('../views/Manage/PenaltyEdit.vue'),
+    },
+    {
+        path: '/PenaltyManage',
+        name: 'PenaltyManage',
+        component: () => import('../views/Penalty/PenaltyManage.vue'),
+    },
+    {
+        path: '/Penalty',
+        name: 'Penalty',
+        component: () => import('../views/Penalty/Penalty.vue'),
+    },
+    {
         path: '/manage/theme',
         name: 'manageTheme',
         component: () => import('../views/Manage/ThemeManage.vue'),
-    },
-    {
-        path: '/403',
-        name: 'error403',
-        component: () => import('../views/Error/403.vue'),
-    },
-    {
-        path: '*',
-        name: 'error404',
-        component: () => import('../views/Error/404.vue'),
     },
     {
         path: '/mypage',
@@ -144,8 +166,79 @@ const routes = [
     },
     {
         path: '/filebox',
-        name: 'filebox',
-        component: () => import('../views/FileBox.vue'),
+        component: () =>
+            import(
+                /* webpackChunkName: "filebox" */
+                '../views/FileBox/FileBox.vue'
+            ),
+        children: [
+            {
+                path: '',
+                name: 'fileBoxEmpty',
+            },
+            {
+                path: 'create',
+                component: () =>
+                    import(
+                        /* webpackChunkName: "filebox" */
+                        '../components/filebox/CreateGroup'
+                    ),
+            },
+            {
+                path: 'edit',
+                name: 'fileboxEditGroup',
+                component: () =>
+                    import(
+                        /* webpackChunkName: "filebox" */
+                        '../components/filebox/EditGroup'
+                    ),
+                props: route => ({ groups: route.params.groups }),
+            },
+            {
+                path: 'folder/:folder_id',
+                name: 'fileBoxMaterials',
+                component: () =>
+                    import(
+                        /* webpackChunkName: "filebox" */
+                        '../components/filebox/MaterialPost.vue'
+                    ),
+                props: route => ({ folderId: route.params.folder_id }),
+            },
+            {
+                path: 'folder/:folder_id/write',
+                name: 'fileBoxWriteMaterial',
+                component: () =>
+                    import(
+                        /* webpackChunkName: "filebox" */
+                        '../components/filebox/WriteMaterial.vue'
+                    ),
+                props: route => ({ parent_id: route.params.folder_id }),
+            },
+            {
+                path: 'edit/:material_id',
+                name: 'fileBoxEditMaterial',
+                component: () =>
+                    import(
+                        /* webpackChunkName: "filebox" */
+                        '../components/filebox/WriteMaterial.vue'
+                    ),
+                props: route => ({
+                    edit: route.params.material_id,
+                }),
+            },
+        ],
+    },
+    {
+        path: '/403',
+        name: 'error403',
+        component: () =>
+            import(/* webpackChunkName: "core" */ '../views/Error/403.vue'),
+    },
+    {
+        path: '*',
+        name: 'error404',
+        component: () =>
+            import(/* webpackChunkName: "core" */ '../views/Error/404.vue'),
     },
 ]
 

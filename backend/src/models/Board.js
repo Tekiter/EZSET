@@ -10,5 +10,8 @@ let boardSchema = new Schema({
     },
 })
 
-boardSchema.plugin(autoIncrement.plugin, 'board')
+boardSchema.plugin(autoIncrement.plugin, {
+    model: 'board',
+    startAt: 1,
+})
 module.exports = mongoose.model('board', boardSchema)

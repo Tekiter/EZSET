@@ -33,7 +33,12 @@ const changeableConfigs = [
     },
 ]
 
-// 서버 설정을 가져온다.
+/**
+ * @api {get} /config 서버 설정 가져오기
+ * @apiDescription 서버의 기본 정보를 가져옴
+ * @apiName ViewConfig
+ * @apiGroup Config
+ */
 router.get(
     '/',
     asyncRoute(async (req, res) => {
@@ -47,7 +52,12 @@ router.get(
     })
 )
 
-// 서버 전체 설정을 가져온다.
+/**
+ * @api {get} /config/admin 서버 설정 가져오기 (어드민)
+ * @apiDescription 서버의 모든 설정 정보를 가져옴
+ * @apiName ViewAdminConfig
+ * @apiGroup Config
+ */
 router.get(
     '/admin',
     [loginRequired, getRoleMiddleware, perm('serverConfig').can('change')],
@@ -62,8 +72,16 @@ router.get(
     })
 )
 
-// 변경 가능한 서버 설정들을 수정한다.
-// body에 Object 로 key: value 쌍을 넣으면 반영된다.
+/**
+ * @api {patch} /config/admin 서버 설정 변경 (어드민)
+ * @apiDescription 변경 가능한 서버의 설정 정보를 변경한다. body에 Object 로 설정값의 key: value 쌍을 넣으면 반영된다.
+ * @apiName ChangeConfig
+ * @apiGroup Config
+ * @apiParam {String} key 바꿀 설정의 값
+ * @apiParamExample {json} Request-Example:
+ * {"groupName":"EZSET","usePreUser":false}
+ *
+ */
 router.patch(
     '/admin',
     [
@@ -75,7 +93,7 @@ router.patch(
     ],
     asyncRoute(async (req, res) => {
         for (let { key } of changeableConfigs) {
-            if (req.body[key]) {
+            if (req.body[key] != undefined) {
                 await setConfig(key, req.body[key])
             }
         }
@@ -84,6 +102,12 @@ router.patch(
     })
 )
 
+/**
+ * @api {get} /config/reset 서버 설정 초기화
+ * @apiDescription 서버의 모든 설정 정보를 초기화
+ * @apiName ResetConfig
+ * @apiGroup Config
+ */
 router.post(
     '/reset',
     [

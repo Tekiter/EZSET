@@ -94,11 +94,6 @@ postSchema.methods.likes_delete = function(liker) {
     return this.save()
 }
 
-//댓글 갯수 카운트
-postSchema.virtual('comments_count').get(function() {
-    return this.comments ? this.comments.length : 0
-})
-
 //댓글 작성
 postSchema.methods.addComment = function(content, writer) {
     this.comments.push(new Comment({ content, writer }))
@@ -106,7 +101,7 @@ postSchema.methods.addComment = function(content, writer) {
 }
 
 //댓글 수정
-postSchema.methods.updateComment = function(comment_id, content) {
+postSchema.methods.updateComment = function(content, comment_id) {
     this.comment = this.comments.id(comment_id)
     this.comment.content = content
     return this.save()
@@ -117,6 +112,12 @@ postSchema.methods.removeComment = function(comment_id) {
     let comment = this.comments.id(comment_id)
     comment.remove()
     return this.save()
+}
+
+//댓글 불러오기
+postSchema.methods.getComment = function(comment_id) {
+    let comment = this.comments.id(comment_id)
+    return comment
 }
 
 postSchema.plugin(autoIncrement.plugin, 'post')

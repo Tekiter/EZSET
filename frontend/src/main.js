@@ -26,6 +26,9 @@ Vue.prototype.$action = actionHelper
 
 // api 호출의 기본 경로
 axios.defaults.baseURL = '/api/v1'
+axios.defaults.maxContentLength = 10000000
+axios.defaults.maxBodyLength = 10000000
+axios.defaults.headers.common['Cache-Control'] = 'no-cache'
 
 axios.interceptors.response.use(
     function(response) {
@@ -48,7 +51,7 @@ store.dispatch('auth/restoreEditToken')
 
 // socket.io
 import io from 'socket.io-client'
-const socket = io('http://localhost:5050')
+const socket = io(window.location.hostname + ':5050')
 Vue.prototype.$socket = socket
 
 new Vue({
