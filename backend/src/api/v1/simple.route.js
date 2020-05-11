@@ -733,14 +733,17 @@ router.patch(
             err.status = 500
             return
         }
+
+        let comment = post.getComment(req.params.comment_id)
+
         if (post.isAnonymous == false) {
-            if (post.author != req.user.username) {
+            if (comment.writer != req.user.username) {
                 res.status(403).end()
                 return
             }
         } else {
             if (
-                post.author !=
+                comment.writer !=
                 crypto
                     .createHash('sha512')
                     .update(req.user.username)
@@ -783,9 +786,11 @@ router.delete(
             throw err
         }
 
+        let comment = post.getComment(req.params.comment_id)
+
         if (post.isAnonymous == false) {
             if (
-                post.author != req.user.username &&
+                comment.writer != req.user.username &&
                 !req.user.perm('board', req.params.comment_id).can('delete')
             ) {
                 res.status(403).end()
@@ -793,7 +798,7 @@ router.delete(
             }
         } else {
             if (
-                post.author !=
+                comment.writer !=
                     crypto
                         .createHash('sha512')
                         .update(req.user.username)
