@@ -1,12 +1,7 @@
 <template>
     <div class="ma-3 fill-height" align="center">
         <v-row :no-gutters="isMobileMode" class="fill-height" justify="center">
-            <v-col
-                cols="12"
-                md="9"
-                v-show="!isMobileMode || curTab == 1"
-                class="fill-height"
-            >
+            <v-col cols="12" md="9" class="fill-height">
                 <v-card
                     :loading="curPenalty.isLoading"
                     :disabled="curUser.username === 'default'"
