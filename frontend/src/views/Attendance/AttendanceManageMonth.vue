@@ -584,7 +584,6 @@ export default {
             this.deleteDialog.username = this.attendanceUserDialog.user.username
         },
         async deleteItem(info) {
-            console.log(this.attendanceUserDialog.user.username)
             await axios.delete(`attendance/delete`, {
                 params: {
                     username: this.attendanceUserDialog.user.username,
