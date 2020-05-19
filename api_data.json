@@ -168,6 +168,69 @@
     "groupTitle": "AttendanceCheck/manage"
   },
   {
+    "type": "delete",
+    "url": "/attendance/delete",
+    "title": "출석기록 삭제",
+    "description": "<p>특정유저의 특정일자의 출결기록 삭제</p>",
+    "name": "AttendanceRecordDelete",
+    "group": "AttendanceCheck",
+    "permission": [
+      {
+        "name": "attendance.can.update"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "date",
+            "description": "<p>삭제할 날짜, YYYYMMDD 형태</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>삭제할 유저 아이디</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n    \"date\":\"20200306\",\n    \"usersname\":\"admin\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "200",
+            "description": "<p>성공</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/attendance.route.js",
+    "groupTitle": "AttendanceCheck"
+  },
+  {
     "type": "put",
     "url": "/attendance/addUsersRecords",
     "title": "출석 기록 추가",
