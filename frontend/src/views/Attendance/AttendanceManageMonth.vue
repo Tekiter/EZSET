@@ -212,7 +212,7 @@
         <v-dialog
             v-model="attendanceUserDialog.show"
             persistent
-            max-width="300px"
+            max-width="350px"
         >
             <v-card>
                 <v-card-title>
@@ -333,6 +333,30 @@
                                                     <span>공결</span>
                                                 </v-tooltip>
                                             </div>
+                                            <div class="d-flex pl-3">
+                                                <v-tooltip bottom>
+                                                    <template
+                                                        v-slot:activator="{
+                                                            on,
+                                                        }"
+                                                    >
+                                                        <v-btn
+                                                            icon
+                                                            text
+                                                            @click="
+                                                                openDeleteItem(
+                                                                    recode
+                                                                )
+                                                            "
+                                                        >
+                                                            <v-icon v-on="on">
+                                                                mdi-trash-can-outline
+                                                            </v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                    <span>삭제</span>
+                                                </v-tooltip>
+                                            </div>
                                         </div>
                                     </v-list-item-title>
                                 </v-list-item-content>
@@ -352,6 +376,40 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <!--출석기록삭제-->
+        <v-dialog v-model="deleteDialog.show" persistent max-width="300px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">삭제</span
+                    ><v-card-subtitle>{{
+                        deleteDialog.info.username
+                    }}</v-card-subtitle>
+                </v-card-title>
+                <v-card-text>
+                    해당 항목을 삭제하시겠습니까?
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        @click="deleteItem(deleteDialog.info)"
+                        text
+                        color="error"
+                        >삭제</v-btn
+                    >
+                    <v-btn @click="deleteDialog.show = false" text>닫기</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-snackbar
+            v-model="snackbar.show"
+            :timeout="2000"
+            :color="snackbar.color"
+        >
+            {{ snackbar.text }}
+            <v-btn text @click="snackbar = false">
+                닫기
+            </v-btn>
+        </v-snackbar>
     </div>
 </template>
 <script>
@@ -396,6 +454,16 @@ export default {
             startDayPicker: false,
             endDayPicker: false,
             dataLoading: false,
+            deleteDialog: {
+                show: false,
+                info: {},
+                username: '',
+            },
+            snackbar: {
+                show: false,
+                text: '',
+                color: '',
+            },
         }
     },
     computed: {
@@ -509,6 +577,31 @@ export default {
         },
         changeDateFormat(date) {
             return moment(date).format('YYYY년 MM월 DD일')
+        },
+        async openDeleteItem(info) {
+            this.deleteDialog.show = true
+            this.deleteDialog.info = info
+            this.deleteDialog.username = this.attendanceUserDialog.user.username
+        },
+        async deleteItem(info) {
+            await axios.delete(`attendance/delete`, {
+                params: {
+                    username: this.attendanceUserDialog.user.username,
+                    date: info.date,
+                },
+            })
+            this.openSnackbar('삭제되었습니다', 'success')
+
+            this.deleteDialog.show = false
+            this.fetchingCount += 1
+            this.fetchAll()
+            this.attendanceUserDialog.show = false
+            this.fetchingCount -= 1
+        },
+        openSnackbar(text, color) {
+            this.snackbar.text = text
+            this.snackbar.color = color
+            this.snackbar.show = true
         },
     },
     async created() {
