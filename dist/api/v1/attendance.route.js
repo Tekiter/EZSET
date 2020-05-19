@@ -792,5 +792,44 @@ router.post('/attendanceUser', [(0, _role.perm)('attendance').can('update'), _ap
     }).select({ _id: 0, __v: 0 });
     res.json(attendanceUser);
 }));
+
+/**
+ * @api {delete} /attendance/delete 출석기록 삭제
+ * @apiDescription 특정유저의 특정일자의 출결기록 삭제
+ * @apiName AttendanceRecordDelete
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.update
+ *
+ * @apiParam {String} date 삭제할 날짜, YYYYMMDD 형태
+ * @apiParam {String} username 삭제할 유저 아이디
+ *
+ * @apiParamExample {json} Request-Example:
+ *      {
+ *          "date":"20200306",
+ *          "usersname":"admin"
+ *      }
+ *
+ * @apiSuccess {Number} 200 성공
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *
+ */
+router.delete('/delete', [(0, _role.perm)('attendance').can('update'), (0, _expressValidator.query)('username').isString(), (0, _expressValidator.query)('date').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
+
+    //AttendanceDays Collection 접근
+    await _attendanceDay2.default.findOneAndUpdate({
+        day: req.query.date
+    }, {
+        $pull: { status: { name: req.query.username } }
+    }, function (err, doc) {});
+    //AttendanceUsers Collection 접근
+    await _attendanceUser2.default.findOneAndUpdate({
+        name: req.query.username
+    }, {
+        $pull: { status: { date: req.query.date } }
+    }, function (err, doc) {});
+    res.end();
+}));
 exports.default = router;
 //# sourceMappingURL=attendance.route.js.map

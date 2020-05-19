@@ -5,7 +5,7 @@ import User from '../../models/User'
 import AttendanceDay from '../../models/attendanceDay'
 import AttendanceUser from '../../models/attendanceUser'
 import { perm } from '../../utils/role'
-import { param, body } from 'express-validator'
+import { param, body, query } from 'express-validator'
 const router = Router()
 var moment = require('moment')
 var ranNum = random(100, 999)
@@ -38,7 +38,8 @@ var startUser = ''
  *      }
  */
 router.post(
-    '/attendanceWrite', [perm('attendance').can('att')],
+    '/attendanceWrite',
+    [perm('attendance').can('att')],
     asyncRoute(async function(req, res) {
         if (ranNum != req.body.code) {
             res.json({
@@ -49,17 +50,21 @@ router.post(
         var Date = moment().format('YYYYMMDD')
         var Name = req.user.username
 
-        await AttendanceDay.findOneAndUpdate({
+        await AttendanceDay.findOneAndUpdate(
+            {
                 day: Date,
                 'status.name': Name,
-            }, { 'status.$.state': 'attendance' },
+            },
+            { 'status.$.state': 'attendance' },
             function(err, doc) {}
         )
 
-        await AttendanceUser.findOneAndUpdate({
+        await AttendanceUser.findOneAndUpdate(
+            {
                 name: Name,
                 'status.date': Date,
-            }, { 'status.$.state': 'attendance' },
+            },
+            { 'status.$.state': 'attendance' },
             function(err, doc) {}
         )
         res.json({ result: 1 })
@@ -88,7 +93,8 @@ router.post(
  *      }
  */
 router.get(
-    '/attendanceCheck', [perm('attendance').can('att')],
+    '/attendanceCheck',
+    [perm('attendance').can('att')],
     asyncRoute(async function(req, res) {
         var Date = moment().format('YYYYMMDD')
         var Name = req.user.username
@@ -131,7 +137,8 @@ router.get(
  */
 
 router.get(
-    '/attendanceCheckAdmin', [perm('attendance').can('att')],
+    '/attendanceCheckAdmin',
+    [perm('attendance').can('att')],
     asyncRoute(async function(req, res) {
         if (startUser == req.user.username) res.json(ranNum)
         else res.json(0)
@@ -152,7 +159,8 @@ router.get(
  *
  */
 router.post(
-    '/attendanceCheckEnd', [perm('attendance').can('att')],
+    '/attendanceCheckEnd',
+    [perm('attendance').can('att')],
     asyncRoute(async function(req, res) {
         startUser = ''
         ranNum = -1
@@ -177,14 +185,15 @@ router.post(
  *
  */
 router.post(
-    '/startAttendance', [perm('attendance').can('update')],
+    '/startAttendance',
+    [perm('attendance').can('update')],
     asyncRoute(async function(req, res) {
         var Date = moment().format('YYYYMMDD')
-            //get Userlist in User collection
+        //get Userlist in User collection
         const userList = await User.find({
-                attable: true,
-            }).select('username')
-            //create db - AttendanceDay
+            attable: true,
+        }).select('username')
+        //create db - AttendanceDay
         var attendanceDay = new AttendanceDay()
         attendanceDay.day = Date
 
@@ -275,7 +284,8 @@ router.post(
  *       HTTP/1.1 404 Not Found
  */
 router.get(
-    '/attendanceState/:day', [param('day').isString(), perm('attendance').can('update'), validateParams],
+    '/attendanceState/:day',
+    [param('day').isString(), perm('attendance').can('update'), validateParams],
     asyncRoute(async function(req, res) {
         const cur = await AttendanceDay.findOne({
             day: req.params.day,
@@ -306,7 +316,8 @@ router.get(
  *      HTTP/1.1 200 OK
  */
 router.post(
-    '/attendancestateupdate/:day', [
+    '/attendancestateupdate/:day',
+    [
         perm('attendance').can('update'),
         param('day').isString(),
         body('state').isString(),
@@ -316,17 +327,21 @@ router.post(
     asyncRoute(async function(req, res) {
         var Day = req.params.day
 
-        await AttendanceDay.findOneAndUpdate({
+        await AttendanceDay.findOneAndUpdate(
+            {
                 day: Day,
                 'status.name': req.body.name,
-            }, { 'status.$.state': req.body.state },
+            },
+            { 'status.$.state': req.body.state },
             function(err, doc) {}
         )
 
-        await AttendanceUser.findOneAndUpdate({
+        await AttendanceUser.findOneAndUpdate(
+            {
                 name: req.body.name,
                 'status.date': Day,
-            }, { 'status.$.state': req.body.state },
+            },
+            { 'status.$.state': req.body.state },
             function(err, doc) {}
         )
         res.end()
@@ -362,7 +377,8 @@ router.post(
  *          }
  */
 router.get(
-    '/attendanceUserList', [perm('attendance').can('update')],
+    '/attendanceUserList',
+    [perm('attendance').can('update')],
     asyncRoute(async function(req, res) {
         const userList = await User.find().select('username')
         res.json(userList)
@@ -435,7 +451,8 @@ router.get(
  *}
  */
 router.get(
-    '/attendanceDayList', [perm('attendance').can('update')],
+    '/attendanceDayList',
+    [perm('attendance').can('update')],
     asyncRoute(async function(req, res) {
         const attendnaceDayList = await AttendanceDay.find()
         res.json(attendnaceDayList)
@@ -491,7 +508,8 @@ router.get(
  *]
  */
 router.get(
-    '/attendanceUserListData', [perm('attendance').can('update')],
+    '/attendanceUserListData',
+    [perm('attendance').can('update')],
     asyncRoute(async function(req, res) {
         const attendnaceUser = await AttendanceUser.find()
         res.json(attendnaceUser)
@@ -537,7 +555,8 @@ router.get(
  * }
  */
 router.get(
-    '/attendanceUserData', [perm('attendance').canOwn('read')],
+    '/attendanceUserData',
+    [perm('attendance').canOwn('read')],
     asyncRoute(async function(req, res) {
         const attendnaceUser = await AttendanceUser.find()
             .where('name')
@@ -578,7 +597,8 @@ router.get(
  *       HTTP/1.1 404 Not Found
  */
 router.post(
-    '/attendanceNUserData', [perm('attendance').can('update'), body('day').isString(), validateParams],
+    '/attendanceNUserData',
+    [perm('attendance').can('update'), body('day').isString(), validateParams],
     asyncRoute(async function(req, res) {
         const result = []
         const Users = await User.find().select('username')
@@ -635,7 +655,8 @@ router.post(
  *}
  */
 router.get(
-    '/manage/user', [perm('attendance').can('update'), validateParams],
+    '/manage/user',
+    [perm('attendance').can('update'), validateParams],
     asyncRoute(async function(req, res) {
         const users = await User.find()
             .where('attable')
@@ -699,8 +720,9 @@ router.get(
  * }
  */
 router.put(
-    '/manage/user', [perm('attendance').can('update'), body('users').isArray(), validateParams],
-    asyncRoute(async(req, res) => {
+    '/manage/user',
+    [perm('attendance').can('update'), body('users').isArray(), validateParams],
+    asyncRoute(async (req, res) => {
         try {
             for (let user of req.body.users) {
                 await checkUsername(user)
@@ -739,12 +761,13 @@ router.put(
  *
  */
 router.delete(
-    '/manage/user/:username', [
+    '/manage/user/:username',
+    [
         perm('attendance').can('update'),
         param('username').custom(checkUsername),
         validateParams,
     ],
-    asyncRoute(async(req, res) => {
+    asyncRoute(async (req, res) => {
         const user = await User.findOne()
             .where('username')
             .equals(req.params.username)
@@ -789,13 +812,14 @@ router.delete(
  * }
  */
 router.put(
-    '/addUsersRecords', [
+    '/addUsersRecords',
+    [
         perm('attendance').can('update'),
         body('users').isArray(),
         body('day').isString(),
         validateParams,
     ],
-    asyncRoute(async(req, res) => {
+    asyncRoute(async (req, res) => {
         try {
             for (let user of req.body.users) {
                 await checkUsername(user)
@@ -866,12 +890,71 @@ router.put(
  * }
  */
 router.post(
-    '/attendanceUser', [perm('attendance').can('update'), validateParams],
+    '/attendanceUser',
+    [perm('attendance').can('update'), validateParams],
     asyncRoute(async function(req, res) {
         const attendanceUser = await AttendanceUser.findOne({
             name: req.body.name,
         }).select({ _id: 0, __v: 0 })
         res.json(attendanceUser)
+    })
+)
+
+/**
+ * @api {delete} /attendance/delete 출석기록 삭제
+ * @apiDescription 특정유저의 특정일자의 출결기록 삭제
+ * @apiName AttendanceRecordDelete
+ * @apiGroup AttendanceCheck
+ * @apiPermission attendance.can.update
+ *
+ * @apiParam {String} date 삭제할 날짜, YYYYMMDD 형태
+ * @apiParam {String} username 삭제할 유저 아이디
+ *
+ * @apiParamExample {json} Request-Example:
+ *      {
+ *          "date":"20200306",
+ *          "usersname":"admin"
+ *      }
+ *
+ * @apiSuccess {Number} 200 성공
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *
+ */
+router.delete(
+    '/delete',
+    [
+        perm('attendance').can('update'),
+        query('username').isString(),
+        query('date').isString(),
+        validateParams,
+    ],
+    asyncRoute(async function(req, res) {
+        
+        //AttendanceDays Collection 접근
+        await AttendanceDay.findOneAndUpdate(
+            {
+                day:req.query.date
+            },
+            {
+                $pull: { status: { name:req.query.username } },
+            },
+            function(err, doc) {
+            }
+        )
+        //AttendanceUsers Collection 접근
+        await AttendanceUser.findOneAndUpdate(
+            {
+                name:req.query.username
+            },
+            {
+                $pull: { status: { date:req.query.date } },
+            },
+            function(err, doc) {
+            }
+        )
+        res.end()
     })
 )
 export default router
