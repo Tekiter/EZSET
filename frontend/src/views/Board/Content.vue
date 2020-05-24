@@ -241,7 +241,10 @@
                                                     comment.created_date
                                                 }}</span></v-list-item-title
                                             >
-                                            <div class="mt-2 subtitle-1">
+                                            <div
+                                                style="white-space:pre;overflow:auto;"
+                                                class="mt-2 subtitle-1"
+                                            >
                                                 {{ comment.content }}
                                             </div></v-list-item-content
                                         >
@@ -317,14 +320,15 @@
                             <v-list-item>
                                 <v-list-item-content>
                                     <!-- <v-list-item-title>댓글 작성</v-list-item-title> -->
-                                    <v-text-field
+                                    <!--  -->
+                                    <v-textarea
                                         v-model="writeComment.content"
                                         :loading="writeComment.isLoading"
                                         class="flex-grow-1"
                                         hide-details
                                         outlined
                                         dense
-                                    ></v-text-field>
+                                    ></v-textarea>
                                     <div class="d-flex mt-2 align-center">
                                         <v-spacer></v-spacer>
                                         <small
