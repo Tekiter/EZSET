@@ -70,7 +70,7 @@ export default {
         },
         itemsPerPageExample: {
             type: Array,
-            default: () => [8, 20, 50, 100],
+            default: () => [8, 9, 20, 50, 100],
         },
     },
     data: () => ({}),
