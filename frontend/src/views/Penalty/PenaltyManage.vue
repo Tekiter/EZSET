@@ -134,7 +134,7 @@
                                 <div class="d-flex flex-wrap flex-grow-1">
                                     <v-spacer></v-spacer>
                                     <v-btn
-                                        @click="showAttendanceUserDialog(user)"
+                                        @click="showPenaltyUserDialog(user)"
                                         icon
                                         small
                                     >
@@ -156,31 +156,27 @@
         </v-data-iterator>
 
         <!-- 유저 벌점 정보 Dialog -->
-        <v-dialog
-            v-model="attendanceUserDialog.show"
-            persistent
-            max-width="350px"
-        >
+        <v-dialog v-model="penaltyUserDialog.show" persistent max-width="600px">
             <v-card>
                 <v-card-title>
                     <span class="headline">{{
-                        attendanceUserDialog.user.realname
+                        penaltyUserDialog.user.realname
                     }}</span>
                     <v-card-subtitle>{{
-                        attendanceUserDialog.user.username
+                        penaltyUserDialog.user.username
                     }}</v-card-subtitle>
                 </v-card-title>
                 <v-card-text>
                     <v-divider></v-divider>
                     <v-skeleton-loader
-                        v-if="attendanceUserDialog.isLoading"
+                        v-if="penaltyUserDialog.isLoading"
                         class="mx-auto"
                         max-width="300"
                         type="list-item-two-line"
                     ></v-skeleton-loader>
-                    <v-list v-if="attendanceUserDialog.isExist">
+                    <v-list v-if="penaltyUserDialog.isExist">
                         <v-list-item
-                            v-for="recode in attendanceUserDialog.records"
+                            v-for="recode in penaltyUserDialog.records"
                             :key="recode.date"
                         >
                             <template>
@@ -190,22 +186,18 @@
                                             <div
                                                 class="d-flex flex-wrap flex-grow-1"
                                             >
-                                                <v-btn
-                                                    @click="
-                                                        $router.push(
-                                                            `/AttendanceManageDay/${recode.date}`
-                                                        )
-                                                    "
-                                                    text
-                                                >
-                                                    {{
-                                                        changeDateFormat(
-                                                            recode.date
-                                                        )
-                                                    }}
-                                                </v-btn>
+                                                {{
+                                                    changeDateFormat(
+                                                        recode.date
+                                                    )
+                                                }}
                                             </div>
-                                            <v-spacer></v-spacer>
+                                            <div class="d-flex pl-3">
+                                                {{ recode.type }}
+                                            </div>
+                                            <div class="d-flex pl-3">
+                                                {{ recode.description }}
+                                            </div>
                                             <div class="d-flex pl-3">
                                                 <v-tooltip bottom>
                                                     <template
@@ -216,14 +208,16 @@
                                                         <v-icon
                                                             v-on="on"
                                                             v-if="
-                                                                recode.state ==
-                                                                    'attendance'
+                                                                recode.point >=
+                                                                    0
                                                             "
                                                             color="success"
-                                                            >mdi-checkbox-blank-circle-outline</v-icon
+                                                            >{{
+                                                                recode.point
+                                                            }}</v-icon
                                                         >
                                                     </template>
-                                                    <span>출석</span>
+                                                    <span>점수</span>
                                                 </v-tooltip>
                                                 <v-tooltip bottom>
                                                     <template
@@ -234,50 +228,15 @@
                                                         <v-icon
                                                             v-on="on"
                                                             v-if="
-                                                                recode.state ==
-                                                                    'late'
-                                                            "
-                                                            color="warning"
-                                                            >mdi-triangle-outline</v-icon
-                                                        >
-                                                    </template>
-                                                    <span>지각</span>
-                                                </v-tooltip>
-                                                <v-tooltip bottom>
-                                                    <template
-                                                        v-slot:activator="{
-                                                            on,
-                                                        }"
-                                                    >
-                                                        <v-icon
-                                                            v-on="on"
-                                                            v-if="
-                                                                recode.state ==
-                                                                    'absence'
+                                                                recode.point < 0
                                                             "
                                                             color="error"
-                                                            >mdi-close</v-icon
+                                                            >{{
+                                                                recode.point
+                                                            }}</v-icon
                                                         >
                                                     </template>
-                                                    <span>결석</span>
-                                                </v-tooltip>
-                                                <v-tooltip bottom>
-                                                    <template
-                                                        v-slot:activator="{
-                                                            on,
-                                                        }"
-                                                    >
-                                                        <v-icon
-                                                            v-on="on"
-                                                            v-if="
-                                                                recode.state ==
-                                                                    'official_absence'
-                                                            "
-                                                            color="success"
-                                                            >mdi-close-circle-outline</v-icon
-                                                        >
-                                                    </template>
-                                                    <span>공결</span>
+                                                    <span>점수</span>
                                                 </v-tooltip>
                                             </div>
                                             <div class="d-flex pl-3">
@@ -312,12 +271,12 @@
                         <v-divider></v-divider>
                     </v-list>
                 </v-card-text>
-                <v-card-text v-if="!attendanceUserDialog.isExist">
+                <v-card-text v-if="!penaltyUserDialog.isExist">
                     정보가 없습니다.
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn @click.native="closeattendanceUserDialog()" text
+                    <v-btn @click.native="closePenaltyUserDialog()" text
                         >닫기</v-btn
                     >
                 </v-card-actions>
@@ -524,32 +483,23 @@ export default {
             this.penaltyUserDialog.show = true
             this.penaltyUserDialog.user = user
             const tmp = []
-            if (user.v1 == 0 && user.v2 == 0 && user.v3 == 0 && user.v4 == 0) {
-                this.attendanceUserDialog.isExist = false
-            } else {
-                const res = await axios.post('attendance/attendanceUser', {
-                    name: user.username,
-                })
-                for (let i in res.data.status) {
-                    if (
-                        parseInt(res.data.status[i].date) >=
-                            parseInt(moment(this.Sdate).format('YYYYMMDD')) &&
-                        parseInt(res.data.status[i].date) <=
-                            parseInt(moment(this.Edate).format('YYYYMMDD'))
-                    ) {
-                        tmp.push(res.data.status[i])
-                    }
+            this.penalties.forEach(elem => {
+                if (user.username == elem.username) {
+                    tmp.push({
+                        date: elem.date,
+                        type: elem.type,
+                        description: elem.description,
+                    })
                 }
-                this.attendanceUserDialog.isExist = true
-            }
+            })
             this.penaltyUserDialog.records = tmp
             this.penaltyUserDialog.isLoading = false
         },
-        closeattendanceUserDialog() {
-            this.attendanceUserDialog.isExist = true
-            this.attendanceUserDialog.records = []
-            this.attendanceUserDialog.errorMessage = ''
-            this.attendanceUserDialog.show = false
+        closePenaltyUserDialog() {
+            this.penaltyUserDialog.isExist = true
+            this.penaltyUserDialog.records = []
+            this.penaltyUserDialog.errorMessage = ''
+            this.penaltyUserDialog.show = false
         },
         changeDateFormat(date) {
             return moment(date).format('YYYY년 MM월 DD일')
