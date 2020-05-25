@@ -288,6 +288,20 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="errorDialog.show" persistent max-width="300px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">경고</span>
+                </v-card-title>
+                <v-card-text>
+                    지각, 결석 항목은 삭제하실수 없습니다!
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="errorDialog.show = false" text>닫기</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <v-snackbar
             v-model="snackbar.show"
             :timeout="2000"
@@ -362,6 +376,9 @@ export default {
             },
             penalties: [],
             userScore: [],
+            errorDialog: {
+                show: false,
+            },
         }
     },
     computed: {
