@@ -336,15 +336,6 @@ export default {
             toolbar: {
                 search: '',
             },
-            attendanceUserDialog: {
-                show: false,
-                user: {},
-                search: '',
-                records: [],
-                isLoading: false,
-                isExist: true,
-                errorMessage: '',
-            },
             penaltyUserDialog: {
                 show: false,
                 user: {},
@@ -406,6 +397,7 @@ export default {
             this.fetchingCount -= 1
         },
         async fetchUsers() {
+            this.users = []
             this.fetchingCount += 1
             try {
                 const users = await axios.get('user')
@@ -416,6 +408,7 @@ export default {
             }
         },
         async fetchPenalty() {
+            this.penalties = []
             this.fetchingCount += 1
             try {
                 const penalties = await axios.get(`penalty/read`)
@@ -434,6 +427,7 @@ export default {
             }
         },
         async getUserScore() {
+            this.infoAddedUsers = []
             let res = []
             await this.users.forEach(user => {
                 let point = 0
@@ -472,7 +466,6 @@ export default {
             this.penaltyUserDialog.isLoading = false
         },
         closePenaltyUserDialog() {
-            this.penaltyUserDialog.isExist = true
             this.penaltyUserDialog.records = []
             this.penaltyUserDialog.errorMessage = ''
             this.penaltyUserDialog.show = false
@@ -483,22 +476,31 @@ export default {
         async openDeleteItem(info) {
             this.deleteDialog.show = true
             this.deleteDialog.info = info
-            this.deleteDialog.username = this.attendanceUserDialog.user.username
+            this.deleteDialog.username = this.penaltyUserDialog.user.username
         },
         async deleteItem(info) {
-            await axios.delete(`attendance/delete`, {
-                params: {
-                    username: this.attendanceUserDialog.user.username,
-                    date: info.date,
-                },
-            })
-            this.openSnackbar('삭제되었습니다', 'success')
+            if (info.type == '지각' || info.type == '결석') {
+                this.openSnackbar(
+                    '지각이나 결석항목은 삭제할 수 없습니다!',
+                    'error'
+                )
+            } else {
+                await axios.delete(`penalty/delete`, {
+                    params: {
+                        username: this.deleteDialog.username,
+                        date: this.deleteDialog.info.date,
+                        description: this.deleteDialog.info.description,
+                        type: this.deleteDialog.info.type,
+                    },
+                })
+                this.openSnackbar('삭제되었습니다', 'success')
 
-            this.deleteDialog.show = false
-            this.fetchingCount += 1
-            this.fetchAll()
-            this.attendanceUserDialog.show = false
-            this.fetchingCount -= 1
+                this.deleteDialog.show = false
+                this.fetchingCount += 1
+                this.fetchAll()
+                this.penaltyUserDialog.show = false
+                this.fetchingCount -= 1
+            }
         },
         openSnackbar(text, color) {
             this.snackbar.text = text

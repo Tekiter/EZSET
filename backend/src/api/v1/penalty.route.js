@@ -275,20 +275,18 @@ router.post(
  *      HTTP/1.1 200 OK
  */
 router.delete(
-    '/:username', [
+    '/delete', [
         perm('penalty').can('update'),
-        param('username').isString(),
+        query('username').isString(),
         query('date').isString(),
         query('type').isString(),
         query('description').isString(),
-        query('type_id').isString(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
         await Penalty.findOneAndDelete({
-            type_id: req.query.type_id,
             type: req.query.type,
-            username: req.params.username,
+            username: req.query.username,
             date: req.query.date,
             description: req.query.description,
         })
