@@ -1,268 +1,355 @@
 <template>
-    <div class="ma-3 fill-height">
-        <!-- <v-toolbar class="mb-1" flat></v-toolbar> -->
-        <!-- <v-navigation-drawer permanent>
-            
-        </v-navigation-drawer> -->
+    <div class="ma-3 pa-3 ">
+        <!-- date picker -->
 
-        <v-row :no-gutters="isMobileMode" class="fill-height">
-            <v-col v-show="isMobileMode" cols="12">
-                <v-tabs v-model="curTab" class="mt-3">
-                    <v-tab>
-                        사용자
-                    </v-tab>
-                    <v-tab>
-                        세부 내역
-                    </v-tab>
-                </v-tabs>
-            </v-col>
-
-            <!-- 역할 column  -->
-            <v-col
-                cols="12"
-                md="3"
-                v-show="!isMobileMode || curTab == 0"
-                class="fill-screen"
-            >
-                <v-card tile minHeight="95%" :loading="isLoading" outlined>
-                    <v-card-title>사용자</v-card-title>
-                    <v-list>
-                        <template v-if="isLoading && users.length == 0">
-                            <v-skeleton-loader
-                                v-for="i in 7"
-                                :key="`user-loading-${i}`"
-                                type="list-item"
-                            ></v-skeleton-loader>
+        <v-card
+            class="ma-3 pa-3 fill-width font-weight-light"
+            flat
+            minHeight="95%"
+            color="primary lighten-1"
+            :dark="isDarkColor('primary')"
+        >
+            <v-row align="center">
+                <v-col cols="12" lg="5">
+                    <v-menu
+                        v-model="startDayPicker"
+                        :close-on-content-click="false"
+                        max-width="290"
+                    >
+                        <template v-slot:activator="{ on }">
+                            <v-text-field
+                                :value="computedDateStart"
+                                clearable
+                                label="Start date"
+                                readonly
+                                v-on="on"
+                                @click:clear="date = null"
+                            ></v-text-field>
                         </template>
-                        <v-list-item-group v-else :mandatory="true">
-                            <v-list-item
-                                v-for="user in users"
-                                :key="`user-list-${user.username}`"
-                                @click="
-                                    switchUser(user)
-                                    curTab = 1
-                                "
-                            >
+                        <v-date-picker
+                            v-model="Sdate"
+                            @change=";(startDayPicker = false), fetchAll()"
+                            locale="ko"
+                        ></v-date-picker>
+                    </v-menu>
+                </v-col>
+                <v-col cols="12" lg="2" class="text-center">
+                    <v-icon x-large>
+                        mdi-arrow-right-circle
+                    </v-icon>
+                </v-col>
+                <v-col cols="12" lg="5">
+                    <v-menu
+                        v-model="endDayPicker"
+                        :close-on-content-click="false"
+                        max-width="290"
+                    >
+                        <template v-slot:activator="{ on }">
+                            <v-text-field
+                                :value="computedDateEnd"
+                                clearable
+                                label="End date"
+                                readonly
+                                v-on="on"
+                                @click:clear="date = null"
+                            ></v-text-field>
+                        </template>
+                        <v-date-picker
+                            v-model="Edate"
+                            @change=";(endDayPicker = false), fetchAll()"
+                            locale="ko"
+                        ></v-date-picker>
+                    </v-menu>
+                </v-col>
+            </v-row>
+        </v-card>
+
+        <!-- 벌점 정보 카드 출력 -->
+        <v-data-iterator
+            :items="infoAddedUsers"
+            :search="toolbar.search"
+            :loading="true"
+            :items-per-page="itemsPerPage"
+            :page="page"
+            hide-default-footer
+        >
+            <template v-slot:header>
+                <v-toolbar flat>
+                    <v-text-field
+                        v-model="toolbar.search"
+                        clearable
+                        solo
+                        outlined
+                        flatS
+                        hide-details
+                        dense
+                        label="검색"
+                        prepend-inner-icon="mdi-magnify"
+                    ></v-text-field>
+                </v-toolbar>
+            </template>
+            <template v-slot:loading>
+                <v-row class="mx-2">
+                    <v-col v-for="i in 9" :key="i" cols="12" md="4"
+                        ><v-skeleton-loader
+                            type="article"
+                            class="mx-auto"
+                        ></v-skeleton-loader
+                    ></v-col>
+                </v-row>
+            </template>
+            <template v-slot:default="props">
+                <v-row class="mx-2">
+                    <v-col
+                        v-for="user in props.items"
+                        :key="user.username"
+                        cols="12"
+                        md="4"
+                    >
+                        <v-card outlined>
+                            <div class="d-flex align-center mx-4 my-6">
+                                <span class="headline">
+                                    {{ user.realname }}
+                                </span>
+                                <span class="subtitle-1 ml-2">
+                                    {{ user.username }}
+                                </span>
+                                <v-spacer></v-spacer>
+                                <span
+                                    style="color:green"
+                                    class="display-1 font-weight-light ma-2"
+                                    v-if="
+                                        userScore.find(
+                                            item =>
+                                                item.username == user.username
+                                        ).point >= 0
+                                    "
+                                    >{{
+                                        userScore.find(
+                                            item =>
+                                                item.username == user.username
+                                        ).point
+                                    }}</span
+                                >
+                                <span
+                                    style="color:red"
+                                    class="display-1 font-weight-light ma-2"
+                                    v-if="
+                                        userScore.find(
+                                            item =>
+                                                item.username == user.username
+                                        ).point < 0
+                                    "
+                                    >{{
+                                        userScore.find(
+                                            item =>
+                                                item.username == user.username
+                                        ).point
+                                    }}</span
+                                >
+                                <span class="headline">{{ '점' }}</span>
+                            </div>
+                            <v-divider></v-divider>
+                            <v-card-text>
+                                <div class="d-flex flex-wrap flex-grow-1">
+                                    <v-spacer></v-spacer>
+                                    <v-btn
+                                        @click="showAttendanceUserDialog(user)"
+                                        icon
+                                        small
+                                    >
+                                        <v-icon>mdi-plus</v-icon>
+                                    </v-btn>
+                                </div>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </template>
+            <template v-slot:footer>
+                <Pagination-footer
+                    v-model="page"
+                    :item-count="infoAddedUsers.length"
+                    :items-per-page.sync="itemsPerPage"
+                />
+            </template>
+        </v-data-iterator>
+
+        <!-- 유저 벌점 정보 Dialog -->
+        <v-dialog
+            v-model="attendanceUserDialog.show"
+            persistent
+            max-width="350px"
+        >
+            <v-card>
+                <v-card-title>
+                    <span class="headline">{{
+                        attendanceUserDialog.user.realname
+                    }}</span>
+                    <v-card-subtitle>{{
+                        attendanceUserDialog.user.username
+                    }}</v-card-subtitle>
+                </v-card-title>
+                <v-card-text>
+                    <v-divider></v-divider>
+                    <v-skeleton-loader
+                        v-if="attendanceUserDialog.isLoading"
+                        class="mx-auto"
+                        max-width="300"
+                        type="list-item-two-line"
+                    ></v-skeleton-loader>
+                    <v-list v-if="attendanceUserDialog.isExist">
+                        <v-list-item
+                            v-for="recode in attendanceUserDialog.records"
+                            :key="recode.date"
+                        >
+                            <template>
                                 <v-list-item-content>
                                     <v-list-item-title>
-                                        <span class="title">{{
-                                            user.realname
-                                        }}</span>
-                                        <span
-                                            class="subtitle-2 ml-2 grey--text"
-                                            >{{ user.username }}</span
-                                        >
+                                        <div class="d-flex">
+                                            <div
+                                                class="d-flex flex-wrap flex-grow-1"
+                                            >
+                                                <v-btn
+                                                    @click="
+                                                        $router.push(
+                                                            `/AttendanceManageDay/${recode.date}`
+                                                        )
+                                                    "
+                                                    text
+                                                >
+                                                    {{
+                                                        changeDateFormat(
+                                                            recode.date
+                                                        )
+                                                    }}
+                                                </v-btn>
+                                            </div>
+                                            <v-spacer></v-spacer>
+                                            <div class="d-flex pl-3">
+                                                <v-tooltip bottom>
+                                                    <template
+                                                        v-slot:activator="{
+                                                            on,
+                                                        }"
+                                                    >
+                                                        <v-icon
+                                                            v-on="on"
+                                                            v-if="
+                                                                recode.state ==
+                                                                    'attendance'
+                                                            "
+                                                            color="success"
+                                                            >mdi-checkbox-blank-circle-outline</v-icon
+                                                        >
+                                                    </template>
+                                                    <span>출석</span>
+                                                </v-tooltip>
+                                                <v-tooltip bottom>
+                                                    <template
+                                                        v-slot:activator="{
+                                                            on,
+                                                        }"
+                                                    >
+                                                        <v-icon
+                                                            v-on="on"
+                                                            v-if="
+                                                                recode.state ==
+                                                                    'late'
+                                                            "
+                                                            color="warning"
+                                                            >mdi-triangle-outline</v-icon
+                                                        >
+                                                    </template>
+                                                    <span>지각</span>
+                                                </v-tooltip>
+                                                <v-tooltip bottom>
+                                                    <template
+                                                        v-slot:activator="{
+                                                            on,
+                                                        }"
+                                                    >
+                                                        <v-icon
+                                                            v-on="on"
+                                                            v-if="
+                                                                recode.state ==
+                                                                    'absence'
+                                                            "
+                                                            color="error"
+                                                            >mdi-close</v-icon
+                                                        >
+                                                    </template>
+                                                    <span>결석</span>
+                                                </v-tooltip>
+                                                <v-tooltip bottom>
+                                                    <template
+                                                        v-slot:activator="{
+                                                            on,
+                                                        }"
+                                                    >
+                                                        <v-icon
+                                                            v-on="on"
+                                                            v-if="
+                                                                recode.state ==
+                                                                    'official_absence'
+                                                            "
+                                                            color="success"
+                                                            >mdi-close-circle-outline</v-icon
+                                                        >
+                                                    </template>
+                                                    <span>공결</span>
+                                                </v-tooltip>
+                                            </div>
+                                            <div class="d-flex pl-3">
+                                                <v-tooltip bottom>
+                                                    <template
+                                                        v-slot:activator="{
+                                                            on,
+                                                        }"
+                                                    >
+                                                        <v-btn
+                                                            icon
+                                                            text
+                                                            @click="
+                                                                openDeleteItem(
+                                                                    recode
+                                                                )
+                                                            "
+                                                        >
+                                                            <v-icon v-on="on">
+                                                                mdi-trash-can-outline
+                                                            </v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                    <span>삭제</span>
+                                                </v-tooltip>
+                                            </div>
+                                        </div>
                                     </v-list-item-title>
                                 </v-list-item-content>
-                            </v-list-item>
-                        </v-list-item-group>
+                            </template>
+                        </v-list-item>
+                        <v-divider></v-divider>
                     </v-list>
-                </v-card>
-            </v-col>
-
-            <!-- 세부내역 column -->
-
-            <v-col
-                cols="12"
-                md="9"
-                v-show="!isMobileMode || curTab == 1"
-                class="fill-height"
-            >
-                <v-card
-                    :loading="curPenalty.isLoading"
-                    :disabled="curUser.username === 'default'"
-                    tile
-                    minHeight="95%"
-                    outlined
-                >
-                    <v-card-title>
-                        <span class="headline">{{ curUser.realname }}</span>
-                        <v-card-subtitle>{{
-                            curUser.username
-                        }}</v-card-subtitle>
-                        <v-spacer></v-spacer>
-                        <span
-                            style="color:green"
-                            class="display-2 font-weight-light ma-2"
-                            v-if="Totalscore >= 0"
-                            >{{ Totalscore }}</span
-                        >
-                        <span
-                            style="color:red"
-                            class="display-2 font-weight-light ma-2"
-                            v-if="Totalscore < 0"
-                            >{{ Totalscore }}</span
-                        >
-                        <span class="headline">{{ '점' }}</span>
-                    </v-card-title>
-                    <v-divider></v-divider>
-                    <v-card
-                        class="pa-3 fill-width font-weight-light"
-                        flat
-                        minHeight="95%"
-                        color="primary lighten-1"
-                        :dark="isDarkColor('primary')"
-                        v-show="!curPenalty.isLoading"
+                </v-card-text>
+                <v-card-text v-if="!attendanceUserDialog.isExist">
+                    정보가 없습니다.
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn @click.native="closeattendanceUserDialog()" text
+                        >닫기</v-btn
                     >
-                        <v-row align="center">
-                            <v-col cols="12" lg="5">
-                                <v-menu
-                                    v-model="startDayPicker"
-                                    :close-on-content-click="false"
-                                    max-width="290"
-                                >
-                                    <template v-slot:activator="{ on }">
-                                        <v-text-field
-                                            :value="computedDateStart"
-                                            clearable
-                                            label="Start date"
-                                            readonly
-                                            v-on="on"
-                                            @click:clear="date = null"
-                                        ></v-text-field>
-                                    </template>
-                                    <v-date-picker
-                                        v-model="curPenalty.start_date"
-                                        @change="
-                                            ;(startDayPicker = false),
-                                                fetchPenalties()
-                                        "
-                                        locale="ko"
-                                    ></v-date-picker>
-                                </v-menu>
-                            </v-col>
-                            <v-col cols="12" lg="2" class="text-center">
-                                <v-icon x-large>
-                                    mdi-arrow-right-circle
-                                </v-icon>
-                            </v-col>
-                            <v-col cols="12" lg="5">
-                                <v-menu
-                                    v-model="endDayPicker"
-                                    :close-on-content-click="false"
-                                    max-width="290"
-                                >
-                                    <template v-slot:activator="{ on }">
-                                        <v-text-field
-                                            :value="computedDateEnd"
-                                            clearable
-                                            label="End date"
-                                            readonly
-                                            v-on="on"
-                                            @click:clear="date = null"
-                                        ></v-text-field>
-                                    </template>
-                                    <v-date-picker
-                                        v-model="curPenalty.end_date"
-                                        @change="
-                                            ;(endDayPicker = false),
-                                                fetchPenalties()
-                                        "
-                                        locale="ko"
-                                    ></v-date-picker>
-                                </v-menu>
-                            </v-col>
-                        </v-row>
-                    </v-card>
-                    <v-divider></v-divider>
-
-                    <v-row class="d-flex" align="center" no-gutters>
-                        <v-col cols="12" md="2">
-                            <v-select
-                                class="ma-2"
-                                v-model="addPenalty.type"
-                                :items="penaltyConfig"
-                                :rules="[v => !!v || '필수 선택 항목입니다!']"
-                                required
-                                label="항목"
-                            ></v-select>
-                        </v-col>
-                        <v-col cols="12" md="3">
-                            <v-menu
-                                v-model="curPenalty.datePicker"
-                                :close-on-content-click="false"
-                                max-width="290"
-                            >
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        class="ma-2"
-                                        :value="addPenalty.date"
-                                        label="date"
-                                        readonly
-                                        v-on="on"
-                                        @click:clear="date = null"
-                                    ></v-text-field>
-                                </template>
-                                <v-date-picker
-                                    v-model="curPenalty.date"
-                                    @change="curPenalty.datePicker = false"
-                                    locale="ko"
-                                ></v-date-picker>
-                            </v-menu>
-                        </v-col>
-                        <v-col cols="12" md="5">
-                            <v-text-field
-                                class="ma-2"
-                                v-model="addPenalty.description"
-                                label="설명"
-                                :rules="[v => !!v || '필수 작성 항목입니다!']"
-                                required
-                            ></v-text-field>
-                        </v-col>
-                        <v-col cols="12" md="2" align="right">
-                            <v-btn
-                                class="ma-5"
-                                color="primary lighten-1"
-                                :dark="isDarkColor('primary')"
-                                @click="addPenaltyProc(addPenalty)"
-                            >
-                                상/벌점 등록
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-
-                    <v-divider></v-divider>
-                    <!-- <v-subheader>소속 유저</v-subheader> -->
-
-                    <template v-if="curPenalty.isLoading">
-                        <v-skeleton-loader
-                            v-for="i in 7"
-                            :key="`role-loading-${i}`"
-                            type="data-table"
-                        ></v-skeleton-loader>
-                    </template>
-                    <v-skeleton-loader
-                        class="mx-auto"
-                        type="table"
-                        v-if="curPenalty.isLoading"
-                    ></v-skeleton-loader>
-                    <v-data-table
-                        :headers="datatable.headers"
-                        :items="curPenalty.penalties"
-                        sort-by="date"
-                        class="elevation-1"
-                        v-if="!curPenalty.isLoading"
-                    >
-                        <template v-slot:item.point="{ item }">
-                            <v-chip :color="getColor(item.point)" dark>{{
-                                item.point
-                            }}</v-chip>
-                        </template>
-                        <template v-slot:item.actions="{ item }">
-                            <v-icon small @click="openDeleteItem(item)">
-                                mdi-delete
-                            </v-icon>
-                        </template>
-                    </v-data-table>
-                </v-card>
-            </v-col>
-        </v-row>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <!--출석기록삭제-->
         <v-dialog v-model="deleteDialog.show" persistent max-width="300px">
             <v-card>
                 <v-card-title>
                     <span class="headline">삭제</span
                     ><v-card-subtitle>{{
-                        deleteDialog.penalty.type
+                        deleteDialog.info.username
                     }}</v-card-subtitle>
                 </v-card-title>
                 <v-card-text>
@@ -271,26 +358,12 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn
-                        @click="deleteItem(deleteDialog.penalty)"
+                        @click="deleteItem(deleteDialog.info)"
                         text
                         color="error"
                         >삭제</v-btn
                     >
                     <v-btn @click="deleteDialog.show = false" text>닫기</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-        <v-dialog v-model="errorDialog.show" persistent max-width="300px">
-            <v-card>
-                <v-card-title>
-                    <span class="headline">경고</span>
-                </v-card-title>
-                <v-card-text>
-                    지각, 결석 항목은 삭제하실수 없습니다!
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn @click="errorDialog.show = false" text>닫기</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -306,170 +379,257 @@
         </v-snackbar>
     </div>
 </template>
-<style scoped>
-.fill-screen {
-    min-height: 95%;
-}
-</style>
 <script>
 import axios from 'axios'
 import moment from 'moment'
+import PaginationFooter from '../../components/misc/PaginationFooter.vue'
+
 export default {
+    components: {
+        PaginationFooter,
+    },
     data() {
         return {
-            fetchingCount: 0,
             users: [],
-            curTab: 0,
-            penaltyConfig: [],
-            penaltyConfigType_id: [],
-            curUser: {
-                username: '',
-                realname: '',
-            },
-            curPenalty: {
-                penalties: [],
-                isLoading: false,
+            infoAddedUsers: [],
+            attendanceDayData: [],
+            fetchingCount: 0,
+            totalCount: 0,
+
+            itemsPerPage: 8,
+            page: 1,
+
+            toolbar: {
                 search: '',
-                selections: [],
-                isActionOpen: false,
-                start_date: moment()
-                    .startOf('month')
-                    .format('YYYY-MM-DD'),
-                end_date: moment()
-                    .endOf('month')
-                    .format('YYYY-MM-DD'),
             },
+            attendanceUserDialog: {
+                show: false,
+                user: {},
+                search: '',
+                records: [],
+                isLoading: false,
+                isExist: true,
+                errorMessage: '',
+            },
+            penaltyUserDialog: {
+                show: false,
+                user: {},
+                search: '',
+                records: [],
+                isLoading: false,
+                isExist: true,
+                errorMessage: '',
+            },
+            //date-picker
+            Sdate: moment()
+                .startOf('month')
+                .format('YYYY-MM-DD'),
+            Edate: moment()
+                .endOf('month')
+                .format('YYYY-MM-DD'),
             startDayPicker: false,
             endDayPicker: false,
-
-            datatable: {
-                dialog: false,
-                headers: [
-                    { text: '분류', value: 'type' },
-                    { text: '날짜', value: 'date' },
-                    { text: '비고', value: 'description', sortable: false },
-                    { text: '점수', value: 'point' },
-                    { text: '삭제', value: 'actions', sortable: false },
-                ],
-            },
+            dataLoading: false,
             deleteDialog: {
                 show: false,
-                penalty: {},
-            },
-            errorDialog: {
-                show: false,
+                info: {},
+                username: '',
             },
             snackbar: {
                 show: false,
                 text: '',
                 color: '',
             },
-            Totalscore: 0,
-            addPenalty: {
-                type: '',
-                description: '',
-                point: '',
-                date: moment().format('YYYY-MM-DD'),
-                datePicker: false,
-            },
+            penalties: [],
+            userScore: [],
         }
     },
     computed: {
-        isLoading() {
+        isFetching() {
             return this.fetchingCount > 0
         },
-        isMobileMode() {
-            return this.$vuetify.breakpoint.smAndDown
-        },
         computedDateStart() {
-            return this.curPenalty.start_date
-                ? moment(this.curPenalty.start_date).format(
-                      'YYYY 년 MM 월 DD 일'
-                  )
+            return this.Sdate
+                ? moment(this.Sdate).format('YYYY 년 MM 월 DD 일')
                 : ''
         },
         computedDateEnd() {
-            return this.curPenalty.end_date
-                ? moment(this.curPenalty.end_date).format('YYYY 년 MM 월 DD 일')
+            return this.Edate
+                ? moment(this.Edate).format('YYYY 년 MM 월 DD 일')
                 : ''
         },
     },
     methods: {
-        async fetchUserList() {
+        async fetchAll() {
+            this.infoAddedUsers = []
+            this.fetchingCount += 1
+            const res = await axios.get('attendance/attendanceDayList')
+            this.attendanceDayData = res.data
+
+            await this.fetchUsers()
+            await this.fetchPenalty()
+            await this.getUserScore()
+            this.fetchingCount -= 1
+        },
+        async fetchUsers() {
             this.fetchingCount += 1
             try {
                 const users = await axios.get('user')
+                this.totalCount = users.data.total
                 this.users = users.data.users
             } finally {
                 this.fetchingCount -= 1
             }
         },
-        async fetchPenaltyConfigList() {
+        async fetchPenalty() {
             this.fetchingCount += 1
             try {
-                var res = []
-                const penaltyConfig = await axios.get('penaltyConfig/read')
-                penaltyConfig.data.forEach(element => {
-                    if (element.key != '지각' && element.key != '결석') {
-                        res.push(element.key)
+                const penalties = await axios.get(`penalty/read`)
+                penalties.data.map(item => {
+                    if (
+                        moment(this.Sdate).format('YYYYMMDD') <=
+                            moment(item.date).format('YYYYMMDD') &&
+                        moment(this.Edate).format('YYYYMMDD') >=
+                            moment(item.date).format('YYYYMMDD')
+                    ) {
+                        this.penalties.push(item)
                     }
                 })
-                this.penaltyConfig = res
-                this.penaltyConfigType_id = penaltyConfig.data
             } finally {
                 this.fetchingCount -= 1
             }
         },
-        async fetchPenalties() {
-            this.curPenalty.isLoading = true
-            this.curPenalty.penalties = await this.getPenalties(this.curUser)
-            this.Totalscore = 0
-            this.curPenalty.penalties.forEach(element => {
-                this.Totalscore += parseInt(element.point)
+        async getUserScore() {
+            await this.users.forEach(user => {
+                let point = 0
+                this.penalties.forEach(item => {
+                    if (user.username == item.username) point += item.point
+                })
+                this.userScore.push({
+                    username: user.username,
+                    point: point,
+                })
             })
-            this.curPenalty.isLoading = false
         },
-        async getPenalties(curUser) {
-            const res = await axios.get(`penalty/read/${curUser.username}`, {
-                params: {
-                    start_date: this.curPenalty.start_date,
-                    end_date: this.curPenalty.end_date,
-                },
-            })
-            return res.data
-        },
-        async switchUser(user) {
-            this.curUser.username = user.username
-            this.curUser.realname = user.realname
-            this.curPenalty.selections = []
-            await this.fetchPenalties()
-        },
+        // async addInfoInUsers() {
+        //     const res = this.users.map(user => {
+        //         return {
+        //             username: user.username,
+        //             realname: user.realname,
+        //             v1: 0,
+        //             v2: 0,
+        //             v3: 0,
+        //             v4: 0,
+        //         }
+        //     })
+        //     res.forEach(user => {
+        //         this.attendanceDayData
+        //             .filter(val => {
+        //                 return (
+        //                     parseInt(val.day) >=
+        //                         parseInt(
+        //                             moment(this.Sdate).format('YYYYMMDD')
+        //                         ) &&
+        //                     parseInt(val.day) <=
+        //                         parseInt(moment(this.Edate).format('YYYYMMDD'))
+        //                 )
+        //             })
+        //             .map(item => {
+        //                 item.status.forEach(st => {
+        //                     if (st.name == user.username) {
+        //                         if (st.state == 'attendance') user.v1 += 1
+        //                         else if (st.state == 'late') user.v2 += 1
+        //                         else if (st.state == 'absence') user.v3 += 1
+        //                         else if (st.state == 'official_absence')
+        //                             user.v4 += 1
+        //                     }
+        //                 })
+        //             })
+        //     })
+        //     this.infoAddedUsers = res
+        // },
         searchMatches(haystack, niddle) {
-            return haystack.includes(niddle || '')
+            return haystack.includes(niddle)
         },
-
-        async openDeleteItem(penalty) {
-            if (penalty.type == '지각' || penalty.type == '결석') {
-                this.errorDialog.show = true
+        async showAttendanceUserDialog(user) {
+            this.attendanceUserDialog.isLoading = true
+            this.attendanceUserDialog.show = true
+            this.attendanceUserDialog.user = user
+            const tmp = []
+            if (user.v1 == 0 && user.v2 == 0 && user.v3 == 0 && user.v4 == 0) {
+                this.attendanceUserDialog.isExist = false
             } else {
-                this.deleteDialog.show = true
-                this.deleteDialog.penalty = penalty
+                const res = await axios.post('attendance/attendanceUser', {
+                    name: user.username,
+                })
+                for (let i in res.data.status) {
+                    if (
+                        parseInt(res.data.status[i].date) >=
+                            parseInt(moment(this.Sdate).format('YYYYMMDD')) &&
+                        parseInt(res.data.status[i].date) <=
+                            parseInt(moment(this.Edate).format('YYYYMMDD'))
+                    ) {
+                        tmp.push(res.data.status[i])
+                    }
+                }
+                this.attendanceUserDialog.isExist = true
             }
+            this.attendanceUserDialog.records = tmp
+            this.attendanceUserDialog.isLoading = false
         },
-        async deleteItem(penalty) {
-            await axios.delete(`penalty/${penalty.username}`, {
+        async showPenaltyUserDialog(user) {
+            this.penaltyUserDialog.isLoading = true
+            this.penaltyUserDialog.show = true
+            this.penaltyUserDialog.user = user
+            const tmp = []
+            if (user.v1 == 0 && user.v2 == 0 && user.v3 == 0 && user.v4 == 0) {
+                this.attendanceUserDialog.isExist = false
+            } else {
+                const res = await axios.post('attendance/attendanceUser', {
+                    name: user.username,
+                })
+                for (let i in res.data.status) {
+                    if (
+                        parseInt(res.data.status[i].date) >=
+                            parseInt(moment(this.Sdate).format('YYYYMMDD')) &&
+                        parseInt(res.data.status[i].date) <=
+                            parseInt(moment(this.Edate).format('YYYYMMDD'))
+                    ) {
+                        tmp.push(res.data.status[i])
+                    }
+                }
+                this.attendanceUserDialog.isExist = true
+            }
+            this.penaltyUserDialog.records = tmp
+            this.penaltyUserDialog.isLoading = false
+        },
+        closeattendanceUserDialog() {
+            this.attendanceUserDialog.isExist = true
+            this.attendanceUserDialog.records = []
+            this.attendanceUserDialog.errorMessage = ''
+            this.attendanceUserDialog.show = false
+        },
+        changeDateFormat(date) {
+            return moment(date).format('YYYY년 MM월 DD일')
+        },
+        async openDeleteItem(info) {
+            this.deleteDialog.show = true
+            this.deleteDialog.info = info
+            this.deleteDialog.username = this.attendanceUserDialog.user.username
+        },
+        async deleteItem(info) {
+            await axios.delete(`attendance/delete`, {
                 params: {
-                    type_id: penalty.type_id,
-                    date: penalty.date,
-                    type: penalty.type,
-                    description: penalty.description,
+                    username: this.attendanceUserDialog.user.username,
+                    date: info.date,
                 },
             })
             this.openSnackbar('삭제되었습니다', 'success')
 
             this.deleteDialog.show = false
             this.fetchingCount += 1
-            await this.fetchPenalties()
+            this.fetchAll()
+            this.attendanceUserDialog.show = false
             this.fetchingCount -= 1
         },
         openSnackbar(text, color) {
@@ -477,47 +637,10 @@ export default {
             this.snackbar.color = color
             this.snackbar.show = true
         },
-        getPointColor(point) {
-            if (point >= 0) return 'success'
-            else return 'error'
-        },
-        async addPenaltyProc(penalty) {
-            if (penalty.type == '') {
-                this.openSnackbar('항목을 선택해주세요', 'error')
-            } else if (penalty.description == '') {
-                this.openSnackbar('설명을 작성해 주세요', 'error')
-            } else {
-                var Val = this.penaltyConfigType_id.find((item, idx) => {
-                    return item.key === penalty.type
-                })
-                await axios.post('/penalty/write', {
-                    type_id: Val._id,
-                    type: penalty.type,
-                    username: this.curUser.username,
-                    date: penalty.date,
-                    description: penalty.description,
-                })
-                this.fetchPenalties()
-                this.addPenalty.type = ''
-                this.addPenalty.description = ''
-                this.openSnackbar('등록되었습니다', 'success')
-            }
-        },
-        getColor(val) {
-            if (val >= 0) return 'success'
-            else return 'error'
-        },
     },
-
     async created() {
-        if (!this.$perm('penalty').can('update')) {
-            this.$router.push({ name: 'error403' })
-            return
-        }
         this.fetchingCount += 1
-        await this.fetchUserList()
-        await this.fetchPenaltyConfigList()
-        await this.switchUser(this.users[0])
+        await this.fetchAll()
         this.fetchingCount -= 1
     },
 }
