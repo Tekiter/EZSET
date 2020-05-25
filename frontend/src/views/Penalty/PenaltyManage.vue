@@ -184,7 +184,7 @@
                                     <v-list-item-title>
                                         <div class="d-flex">
                                             <div
-                                                class="d-flex flex-wrap flex-grow-1"
+                                                class=" align-center d-flex flex-wrap flex-grow-1"
                                             >
                                                 {{
                                                     changeDateFormat(
@@ -192,52 +192,31 @@
                                                     )
                                                 }}
                                             </div>
-                                            <div class="d-flex pl-3">
+                                            <div
+                                                class="align-center d-flex pl-3"
+                                            >
                                                 {{ recode.type }}
                                             </div>
-                                            <div class="d-flex pl-3">
+                                            <div
+                                                class="align-center d-flex pl-3"
+                                            >
                                                 {{ recode.description }}
                                             </div>
-                                            <div class="d-flex pl-3">
-                                                <v-tooltip bottom>
-                                                    <template
-                                                        v-slot:activator="{
-                                                            on,
-                                                        }"
-                                                    >
-                                                        <v-icon
-                                                            v-on="on"
-                                                            v-if="
-                                                                recode.point >=
-                                                                    0
-                                                            "
-                                                            color="success"
-                                                            >{{
-                                                                recode.point
-                                                            }}</v-icon
-                                                        >
-                                                    </template>
-                                                    <span>점수</span>
-                                                </v-tooltip>
-                                                <v-tooltip bottom>
-                                                    <template
-                                                        v-slot:activator="{
-                                                            on,
-                                                        }"
-                                                    >
-                                                        <v-icon
-                                                            v-on="on"
-                                                            v-if="
-                                                                recode.point < 0
-                                                            "
-                                                            color="error"
-                                                            >{{
-                                                                recode.point
-                                                            }}</v-icon
-                                                        >
-                                                    </template>
-                                                    <span>점수</span>
-                                                </v-tooltip>
+                                            <div
+                                                class="align-center d-flex pl-3"
+                                            >
+                                                <span
+                                                    style="color:red"
+                                                    class="headline font-weight-light "
+                                                    v-if="recode.point < 0"
+                                                    >{{ recode.point }}</span
+                                                >
+                                                <span
+                                                    style="color:green"
+                                                    class="headline font-weight-light"
+                                                    v-if="recode.point >= 0"
+                                                    >{{ recode.point }}</span
+                                                >
                                             </div>
                                             <div class="d-flex pl-3">
                                                 <v-tooltip bottom>
@@ -272,7 +251,10 @@
                     </v-list>
                 </v-card-text>
                 <v-card-text v-if="!penaltyUserDialog.isExist">
-                    정보가 없습니다.
+                    <div class="align-center pl-3">
+                        정보가 없습니다.
+                    </div>
+                    <v-divider></v-divider>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -482,6 +464,7 @@ export default {
             this.penaltyUserDialog.isLoading = true
             this.penaltyUserDialog.show = true
             this.penaltyUserDialog.user = user
+            this.penaltyUserDialog.isExist = false
             const tmp = []
             this.penalties.forEach(elem => {
                 if (user.username == elem.username) {
@@ -489,7 +472,9 @@ export default {
                         date: elem.date,
                         type: elem.type,
                         description: elem.description,
+                        point: elem.point,
                     })
+                    this.penaltyUserDialog.isExist = true
                 }
             })
             this.penaltyUserDialog.records = tmp
