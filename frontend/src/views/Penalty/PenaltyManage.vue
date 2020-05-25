@@ -118,34 +118,14 @@
                                 <span
                                     style="color:green"
                                     class="display-1 font-weight-light ma-2"
-                                    v-if="
-                                        userScore.find(
-                                            item =>
-                                                item.username == user.username
-                                        ).point >= 0
-                                    "
-                                    >{{
-                                        userScore.find(
-                                            item =>
-                                                item.username == user.username
-                                        ).point
-                                    }}</span
+                                    v-if="user.point >= 0"
+                                    >{{ user.point }}</span
                                 >
                                 <span
                                     style="color:red"
                                     class="display-1 font-weight-light ma-2"
-                                    v-if="
-                                        userScore.find(
-                                            item =>
-                                                item.username == user.username
-                                        ).point < 0
-                                    "
-                                    >{{
-                                        userScore.find(
-                                            item =>
-                                                item.username == user.username
-                                        ).point
-                                    }}</span
+                                    v-if="user.point < 0"
+                                    >{{ user.point }}</span
                                 >
                                 <span class="headline">{{ '점' }}</span>
                             </div>
@@ -392,7 +372,6 @@ export default {
         return {
             users: [],
             infoAddedUsers: [],
-            attendanceDayData: [],
             fetchingCount: 0,
             totalCount: 0,
 
@@ -463,9 +442,6 @@ export default {
         async fetchAll() {
             this.infoAddedUsers = []
             this.fetchingCount += 1
-            const res = await axios.get('attendance/attendanceDayList')
-            this.attendanceDayData = res.data
-
             await this.fetchUsers()
             await this.fetchPenalty()
             await this.getUserScore()
@@ -500,54 +476,20 @@ export default {
             }
         },
         async getUserScore() {
+            let res = []
             await this.users.forEach(user => {
                 let point = 0
                 this.penalties.forEach(item => {
                     if (user.username == item.username) point += item.point
                 })
-                this.userScore.push({
+                res.push({
                     username: user.username,
+                    realname: user.realname,
                     point: point,
                 })
             })
+            this.infoAddedUsers = res
         },
-        // async addInfoInUsers() {
-        //     const res = this.users.map(user => {
-        //         return {
-        //             username: user.username,
-        //             realname: user.realname,
-        //             v1: 0,
-        //             v2: 0,
-        //             v3: 0,
-        //             v4: 0,
-        //         }
-        //     })
-        //     res.forEach(user => {
-        //         this.attendanceDayData
-        //             .filter(val => {
-        //                 return (
-        //                     parseInt(val.day) >=
-        //                         parseInt(
-        //                             moment(this.Sdate).format('YYYYMMDD')
-        //                         ) &&
-        //                     parseInt(val.day) <=
-        //                         parseInt(moment(this.Edate).format('YYYYMMDD'))
-        //                 )
-        //             })
-        //             .map(item => {
-        //                 item.status.forEach(st => {
-        //                     if (st.name == user.username) {
-        //                         if (st.state == 'attendance') user.v1 += 1
-        //                         else if (st.state == 'late') user.v2 += 1
-        //                         else if (st.state == 'absence') user.v3 += 1
-        //                         else if (st.state == 'official_absence')
-        //                             user.v4 += 1
-        //                     }
-        //                 })
-        //             })
-        //     })
-        //     this.infoAddedUsers = res
-        // },
         searchMatches(haystack, niddle) {
             return haystack.includes(niddle)
         },
