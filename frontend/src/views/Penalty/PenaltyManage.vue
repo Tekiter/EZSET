@@ -451,32 +451,6 @@ export default {
         searchMatches(haystack, niddle) {
             return haystack.includes(niddle)
         },
-        async showAttendanceUserDialog(user) {
-            this.attendanceUserDialog.isLoading = true
-            this.attendanceUserDialog.show = true
-            this.attendanceUserDialog.user = user
-            const tmp = []
-            if (user.v1 == 0 && user.v2 == 0 && user.v3 == 0 && user.v4 == 0) {
-                this.attendanceUserDialog.isExist = false
-            } else {
-                const res = await axios.post('attendance/attendanceUser', {
-                    name: user.username,
-                })
-                for (let i in res.data.status) {
-                    if (
-                        parseInt(res.data.status[i].date) >=
-                            parseInt(moment(this.Sdate).format('YYYYMMDD')) &&
-                        parseInt(res.data.status[i].date) <=
-                            parseInt(moment(this.Edate).format('YYYYMMDD'))
-                    ) {
-                        tmp.push(res.data.status[i])
-                    }
-                }
-                this.attendanceUserDialog.isExist = true
-            }
-            this.attendanceUserDialog.records = tmp
-            this.attendanceUserDialog.isLoading = false
-        },
         async showPenaltyUserDialog(user) {
             this.penaltyUserDialog.isLoading = true
             this.penaltyUserDialog.show = true
