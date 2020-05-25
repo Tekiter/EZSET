@@ -113,7 +113,7 @@ router.get(
 )
 
 /**
- * @api {get} /penalty/read 상벌점 조회
+ * @api {get} /penalty/read 상벌점 전체 조회
  * @apiDescription 전체 상벌점 조회
  * @apiName penaltyReadAll
  * @apiGroup Penalty
@@ -250,7 +250,7 @@ router.post(
 )
 
 /**
- * @api {post} /penalty/delete/ 상벌점 삭제
+ * @api {delete} /penalty/delete 상벌점 삭제
  * @apiDescription 사용자의 상벌점 삭제
  * @apiName penaltyDelete
  * @apiGroup Penalty
@@ -261,7 +261,7 @@ router.post(
  * @apiParam {String} description 상벌점 항목 설명
  * @apiParam {String} date 상벌점 항목 부여 날짜
  *
- * @apiParamExample {post} Request-Example:
+ * @apiParamExample {delete} Request-Example:
  *      {
  *          username : "admin",
  *          type : "과제 지각",
