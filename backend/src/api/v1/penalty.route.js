@@ -113,6 +113,94 @@ router.get(
 )
 
 /**
+ * @api {get} /penalty/read 상벌점 조회
+ * @apiDescription 전체 상벌점 조회
+ * @apiName penaltyReadAll
+ * @apiGroup Penalty
+ * @apiPermission penalty.can.read
+ *
+ *
+ * @apiSuccess {Array} - 사용자의 상벌점 항목을 배열로 반환
+ * @apiSuccess {String} type 상벌점 항목의 타입
+ * @apiSuccess {String} username 상벌점 항목의 사용자
+ * @apiSuccess {String} date 상벌점 항목이 기록된 날짜
+ * @apiSuccess {String} description 상벌점 항목의 설명
+ * @apiSuccess {Number} point 상벌점 항목의 점수
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          [{
+ *              type:"지각",
+ *              username:"admin"
+ *              date:"2020-03-19",
+ *              description:"지각",
+ *              point:-1
+ *          }]
+ *      }
+ */
+router.get(
+    '/read', [
+        perm('penalty').can('read'),
+        validateParams,
+    ],
+    asyncRoute(async function(req, res) {
+        var result = []
+        var attendanceUser = await AttendanceUser.find()
+        var penaltyConfig = await PenaltyConfig.find()
+        if (attendanceUser != null) {
+            attendanceUser.forEach(user=>{
+                user.status.forEach(element=>{
+                        if (element.state == 'late') {
+                            var Val = penaltyConfig.find((item, idx) => {
+                                return item.key === '지각'
+                            })
+                            result.push({
+                                type_id: Val._id,
+                                username: user.name,
+                                type: '지각',
+                                date: moment(element.date).format('YYYY-MM-DD'),
+                                description: '지각',
+                                point: Val.value,
+                            })
+                        }
+                        if (element.state == 'absence') {
+                            var val = penaltyConfig.find((item, idx) => {
+                                return item.key === '결석'
+                            })
+                            result.push({
+                                type_id: val._id,
+                                username: user.name,
+                                type: '결석',
+                                date: moment(element.date).format('YYYY-MM-DD'),
+                                description: '결석',
+                                point: val.value,
+                            })
+                        }
+                })
+            })
+        }
+        var penalty = await Penalty.find()
+
+        penalty.forEach(element => {
+            var val = penaltyConfig.find((item, idx) => {
+                return item.key === element.type
+            })
+            result.push({
+                type_id: val._id,
+                username: element.username,
+                type: element.type,
+                date: moment(element.date).format('YYYY-MM-DD'),
+                description: element.description,
+                point: val.value,
+            })
+        })
+
+        res.json(result)
+    })
+)
+
+/**
  * @api {post} /penalty/write/ 상벌점 쓰기
  * @apiDescription 사용자의 상벌점 기록
  * @apiName penaltyWrite
