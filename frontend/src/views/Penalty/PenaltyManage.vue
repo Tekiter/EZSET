@@ -80,12 +80,31 @@
                         clearable
                         solo
                         outlined
-                        flatS
+                        flat
                         hide-details
                         dense
                         label="검색"
                         prepend-inner-icon="mdi-magnify"
                     ></v-text-field>
+
+                    <template>
+                        <v-btn
+                            class="mx-2"
+                            color="primary"
+                            depressed
+                            :dark="isDarkColor('primary')"
+                            v-on="on"
+                            :small="$vuetify.breakpoint.smAndDown"
+                            @click="addPenaltyDialog.show = true"
+                        >
+                            <v-icon v-if="$vuetify.breakpoint.xsOnly">
+                                mdi-pencil-plus-outline
+                            </v-icon>
+                            <span v-else>
+                                상벌점 입력
+                            </span>
+                        </v-btn>
+                    </template>
                 </v-toolbar>
             </template>
             <template v-slot:loading>
@@ -302,6 +321,21 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="addPenaltyDialog.show" persistent max-width="300px">
+            <v-card>
+                <v-card-title>
+                    상벌점 입력 Dialog
+                </v-card-title>
+                <v-card-text>
+                    해당 항목을 삭제하시겠습니까?
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn text color="error">삭제</v-btn>
+                    <v-btn @click="addPenaltyDialog.show = false" text>닫기</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <v-snackbar
             v-model="snackbar.show"
             :timeout="2000"
@@ -344,6 +378,9 @@ export default {
                 isLoading: false,
                 isExist: true,
                 errorMessage: '',
+            },
+            addPenaltyDialog: {
+                show: false,
             },
             //date-picker
             Sdate: moment()
