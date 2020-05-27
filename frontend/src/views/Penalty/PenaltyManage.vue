@@ -718,7 +718,6 @@ export default {
                         return item.key === this.addPenaltyDialog.type
                     }
                 )
-                console.log(type_id)
                 await axios.post('/penalty/write', {
                     type_id: type_id._id,
                     users: this.addPenaltyDialog.selections,
