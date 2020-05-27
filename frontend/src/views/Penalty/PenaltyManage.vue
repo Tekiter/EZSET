@@ -321,18 +321,144 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="addPenaltyDialog.show" persistent max-width="300px">
-            <v-card>
-                <v-card-title>
-                    상벌점 입력 Dialog
-                </v-card-title>
-                <v-card-text>
-                    해당 항목을 삭제하시겠습니까?
-                </v-card-text>
-                <v-card-actions>
+        <!-- 벌점 추가 Dialog -->
+        <v-dialog
+            v-model="addPenaltyDialog.show"
+            :fullscreen="isMobileMode"
+            max-width="800px"
+            height="600px"
+        >
+            <v-card :loading="addPenaltyDialog.isLoading">
+                <v-card-title v-if="!isMobileMode"
+                    >상벌점 추가
                     <v-spacer></v-spacer>
-                    <v-btn text color="error">삭제</v-btn>
-                    <v-btn @click="addPenaltyDialog.show = false" text>닫기</v-btn>
+                    <v-fade-transition>
+                        <v-toolbar-title
+                            v-show="addPenaltyDialog.selections.length > 0"
+                        >
+                            <v-subheader
+                                >{{ addPenaltyDialog.selections.length }}명
+                                선택됨</v-subheader
+                            >
+                        </v-toolbar-title>
+                    </v-fade-transition>
+                </v-card-title>
+
+                <v-toolbar v-else flat>
+                    <v-btn icon @click="closeaddPenaltyDialog()">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                    <v-toolbar-title>유저 추가</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        outlined
+                        @click="applyaddPenaltyDialog()"
+                        color="primary"
+                        >추가</v-btn
+                    >
+                </v-toolbar>
+                <!--상벌점 세부항목-->
+
+                <v-row class="justify-center" align="center" no-gutters>
+                    <v-col cols="12" md="2">
+                        <v-select
+                            class="ma-2"
+                            v-model="addPenaltyDialog.type"
+                            :items="addPenaltyDialog.config"
+                            :rules="[v => !!v || '필수 선택 항목입니다!']"
+                            required
+                            label="항목"
+                        ></v-select>
+                    </v-col>
+                    <v-col cols="12" md="3">
+                        <v-menu
+                            v-model="addPenaltyDialog.datePicker"
+                            :close-on-content-click="false"
+                            max-width="290"
+                        >
+                            <template v-slot:activator="{ on }">
+                                <v-text-field
+                                    class="ma-2"
+                                    :value="addPenaltyDialog.date"
+                                    label="date"
+                                    readonly
+                                    v-on="on"
+                                    @click:clear="date = null"
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker
+                                v-model="addPenaltyDialog.date"
+                                @change="addPenaltyDialog.datePicker = false"
+                                locale="ko"
+                            ></v-date-picker>
+                        </v-menu>
+                    </v-col>
+                    <v-col cols="12" md="5">
+                        <v-text-field
+                            class="ma-2"
+                            v-model="addPenaltyDialog.description"
+                            label="설명"
+                            :rules="[v => !!v || '필수 작성 항목입니다!']"
+                            required
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-card-text>
+                    <v-text-field
+                        v-model="addPenaltyDialog.search"
+                        clearable
+                        solo
+                        outlined
+                        flat
+                        hide-details
+                        dense
+                        label="검색"
+                        prepend-inner-icon="mdi-magnify"
+                    ></v-text-field>
+                    <v-row no-gutters>
+                        <v-col
+                            v-for="user in users"
+                            :key="user.username"
+                            v-show="
+                                searchMatches(
+                                    user.username,
+                                    addPenaltyDialog.search
+                                )
+                            "
+                            cols="12"
+                            sm="6"
+                        >
+                            <v-checkbox
+                                :label="`${user.realname} (${user.username})`"
+                                v-model="addPenaltyDialog.selections"
+                                :value="user.username"
+                                hide-details
+                            ></v-checkbox>
+                        </v-col>
+                        <v-col
+                            cols="12"
+                            class="text-center mt-5"
+                            v-if="users.length == 0"
+                        >
+                            <p>추가 할 유저가 없습니다.</p>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-spacer></v-spacer>
+                <v-card-actions v-if="!isMobileMode">
+                    <v-spacer></v-spacer>
+                    <v-fade-transition>
+                        <small
+                            v-show="addPenaltyDialog.message"
+                            class="red--text text--darken-4 mr-3"
+                            >{{ addPenaltyDialog.message }}</small
+                        >
+                    </v-fade-transition>
+
+                    <v-btn @click="applyaddPenaltyDialog()" text color="primary"
+                        >추가</v-btn
+                    >
+                    <v-btn @click="closeaddPenaltyDialog()" text>취소</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -381,6 +507,15 @@ export default {
             },
             addPenaltyDialog: {
                 show: false,
+                isLoading: false,
+                search: [],
+                selections: [],
+                message: '',
+                config: [],
+                type: '',
+                description: '',
+                date: '',
+                datePicker: false,
             },
             //date-picker
             Sdate: moment()
@@ -423,6 +558,9 @@ export default {
                 ? moment(this.Edate).format('YYYY 년 MM 월 DD 일')
                 : ''
         },
+        isMobileMode() {
+            return this.$vuetify.breakpoint.smAndDown
+        },
     },
     methods: {
         async fetchAll() {
@@ -431,6 +569,7 @@ export default {
             await this.fetchUsers()
             await this.fetchPenalty()
             await this.getUserScore()
+            await this.fetchPenaltyConfig()
             this.fetchingCount -= 1
         },
         async fetchUsers() {
@@ -462,6 +601,17 @@ export default {
             } finally {
                 this.fetchingCount -= 1
             }
+        },
+        async fetchPenaltyConfig() {
+            this.fetchingCount += 1
+            const tmp = await axios.get('penaltyconfig/read')
+            var res = []
+            tmp.data.forEach(element => {
+                if (element.key != '지각' && element.key != '결석')
+                    res.push(element.key)
+            })
+            this.addPenaltyDialog.config = res
+            this.fetchingCount -= 1
         },
         async getUserScore() {
             this.infoAddedUsers = []
@@ -543,6 +693,12 @@ export default {
             this.snackbar.text = text
             this.snackbar.color = color
             this.snackbar.show = true
+        },
+        async closeaddPenaltyDialog() {
+            this.addPenaltyDialog.show = false
+        },
+        async applyaddPenaltyDialog() {
+            this.snackbar('적용', 'success')
         },
     },
     async created() {
