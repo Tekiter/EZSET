@@ -358,51 +358,60 @@
                     >
                 </v-toolbar>
                 <!--상벌점 세부항목-->
-
-                <v-row class="justify-center" align="center" no-gutters>
-                    <v-col cols="12" md="2">
-                        <v-select
-                            class="ma-2"
-                            v-model="addPenaltyDialog.type"
-                            :items="addPenaltyDialog.config"
-                            :rules="[v => !!v || '필수 선택 항목입니다!']"
-                            required
-                            label="항목"
-                        ></v-select>
-                    </v-col>
-                    <v-col cols="12" md="3">
-                        <v-menu
-                            v-model="addPenaltyDialog.datePicker"
-                            :close-on-content-click="false"
-                            max-width="290"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-text-field
-                                    class="ma-2"
-                                    :value="addPenaltyDialog.date"
-                                    label="date"
-                                    readonly
-                                    v-on="on"
-                                    @click:clear="date = null"
-                                ></v-text-field>
-                            </template>
-                            <v-date-picker
-                                v-model="addPenaltyDialog.date"
-                                @change="addPenaltyDialog.datePicker = false"
-                                locale="ko"
-                            ></v-date-picker>
-                        </v-menu>
-                    </v-col>
-                    <v-col cols="12" md="5">
-                        <v-text-field
-                            class="ma-2"
-                            v-model="addPenaltyDialog.description"
-                            label="설명"
-                            :rules="[v => !!v || '필수 작성 항목입니다!']"
-                            required
-                        ></v-text-field>
-                    </v-col>
-                </v-row>
+                <v-card
+                    class="ma-3 fill-width font-weight-light"
+                    flat
+                    minHeight="95%"
+                    color="primary lighten-1"
+                    :dark="isDarkColor('primary')"
+                >
+                    <v-row class="justify-center" align="center" no-gutters>
+                        <v-col cols="12" md="3">
+                            <v-select
+                                class="ma-2"
+                                v-model="addPenaltyDialog.type"
+                                :items="addPenaltyDialog.config"
+                                :rules="[v => !!v || '필수 선택 항목입니다!']"
+                                required
+                                label="항목"
+                            ></v-select>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <v-menu
+                                v-model="addPenaltyDialog.datePicker"
+                                :close-on-content-click="false"
+                                max-width="290"
+                            >
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field
+                                        class="ma-2"
+                                        :value="addPenaltyDialog.date"
+                                        label="date"
+                                        readonly
+                                        v-on="on"
+                                        @click:clear="date = null"
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker
+                                    v-model="addPenaltyDialog.date"
+                                    @change="
+                                        addPenaltyDialog.datePicker = false
+                                    "
+                                    locale="ko"
+                                ></v-date-picker>
+                            </v-menu>
+                        </v-col>
+                        <v-col cols="12" md="5">
+                            <v-text-field
+                                class="ma-2"
+                                v-model="addPenaltyDialog.description"
+                                label="설명"
+                                :rules="[v => !!v || '필수 작성 항목입니다!']"
+                                required
+                            ></v-text-field>
+                        </v-col>
+                    </v-row>
+                </v-card>
                 <v-card-text>
                     <v-text-field
                         v-model="addPenaltyDialog.search"
