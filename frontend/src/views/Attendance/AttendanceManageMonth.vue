@@ -429,7 +429,7 @@ export default {
             fetchingCount: 0,
             totalCount: 0,
 
-            itemsPerPage: 8,
+            itemsPerPage: 9,
             page: 1,
 
             toolbar: {
