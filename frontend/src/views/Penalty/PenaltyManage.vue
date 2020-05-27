@@ -348,7 +348,7 @@
                     <v-btn icon @click="closeaddPenaltyDialog()">
                         <v-icon>mdi-close</v-icon>
                     </v-btn>
-                    <v-toolbar-title>유저 추가</v-toolbar-title>
+                    <v-toolbar-title>상벌점 추가</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn
                         outlined
