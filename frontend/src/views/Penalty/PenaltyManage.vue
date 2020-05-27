@@ -512,6 +512,7 @@ export default {
                 selections: [],
                 message: '',
                 config: [],
+                configKeyValue: [],
                 type: '',
                 description: '',
                 date: '',
@@ -611,6 +612,7 @@ export default {
                     res.push(element.key)
             })
             this.addPenaltyDialog.config = res
+            this.addPenaltyDialog.configKeyValue = tmp.data
             this.fetchingCount -= 1
         },
         async getUserScore() {
@@ -695,10 +697,39 @@ export default {
             this.snackbar.show = true
         },
         async closeaddPenaltyDialog() {
+            this.addPenaltyDialog.type = ''
+            this.addPenaltyDialog.description = ''
+            this.addPenaltyDialog.selections = []
+            this.addPenaltyDialog.date = ''
             this.addPenaltyDialog.show = false
         },
         async applyaddPenaltyDialog() {
-            this.snackbar('적용', 'success')
+            if (this.addPenaltyDialog.selections.length == 0)
+                this.openSnackbar('적용대상을 선택해 주세요! ', 'error')
+            else if (this.addPenaltyDialog.type == '')
+                this.openSnackbar('항목을 선택해 주세요! ', 'error')
+            else if (this.addPenaltyDialog.date == '')
+                this.openSnackbar('날짜를 선택해 주세요! ', 'error')
+            else if (this.addPenaltyDialog.description == '')
+                this.openSnackbar('설명을 작성해 주세요! ', 'error')
+            else {
+                var type_id = this.addPenaltyDialog.configKeyValue.find(
+                    (item, idx) => {
+                        return item.key === this.addPenaltyDialog.type
+                    }
+                )
+                console.log(type_id)
+                await axios.post('/penalty/write', {
+                    type_id: type_id._id,
+                    users: this.addPenaltyDialog.selections,
+                    date: this.addPenaltyDialog.date,
+                    description: this.addPenaltyDialog.description,
+                    type: this.addPenaltyDialog.type,
+                })
+                this.closeaddPenaltyDialog()
+                await this.fetchAll()
+                this.openSnackbar('등록되었습니다', 'success')
+            }
         },
     },
     async created() {
