@@ -207,14 +207,14 @@ router.get(
  * @apiGroup Penalty
  * @apiPermission penalty.can.update
  *
- * @apiParam {String} username 조회할 사용자의 아이디
+ * @apiParam {array} users 입력할 사용자들의 아이디 배열
  * @apiParam {String} type 상벌점 항목 타입
  * @apiParam {String} description 상벌점 항목 설명
  * @apiParam {String} date 상벌점 항목 부여 날짜
  *
  * @apiParamExample {post} Request-Example:
  *      {
- *          username : "admin",
+ *          users : {"admin","test01"},
  *          type : "과제 지각",
  *          description : "과제 지각"
  *          date : "2020-03-19"
@@ -231,20 +231,20 @@ router.post(
         body('type_id').isString(),
         body('type').isString(),
         body('date').isString(),
-        body('username').isString(),
+        body('users').isArray(),
         body('description').isString(),
         validateParams,
     ],
     asyncRoute(async function(req, res) {
-        var penalty = new Penalty()
-        penalty.type_id = req.body.type_id
-        penalty.type = req.body.type
-        penalty.username = req.body.username
-        penalty.date = req.body.date
-        penalty.description = req.body.description
-
-        await penalty.save()
-
+        req.body.users.forEach(async(username)=>{
+            var penalty = new Penalty()
+            penalty.type_id = req.body.type_id
+            penalty.type = req.body.type
+            penalty.username = username
+            penalty.date = req.body.date
+            penalty.description = req.body.description
+            await penalty.save()
+        })
         res.end()
     })
 )
