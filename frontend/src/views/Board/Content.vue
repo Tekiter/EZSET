@@ -282,9 +282,9 @@
                                                 }}<span class="ml-3">{{
                                                     comment.created_date
                                                 }}</span></v-list-item-title
-                                            ><v-text-field
+                                            ><v-textarea
                                                 v-model="editContent"
-                                            ></v-text-field>
+                                            ></v-textarea>
                                         </v-list-item-content>
                                         <v-list-item-content v-else>
                                             <v-list-item-title
@@ -292,9 +292,9 @@
                                                 }}<span class="ml-3">{{
                                                     comment.created_date
                                                 }}</span></v-list-item-title
-                                            ><v-text-field
+                                            ><v-textarea
                                                 v-model="editContent"
-                                            ></v-text-field>
+                                            ></v-textarea>
                                         </v-list-item-content>
                                         <v-btn
                                             icon
