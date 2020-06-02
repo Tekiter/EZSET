@@ -347,12 +347,6 @@
                 max-width="800px"
                 height="500px"
             >
-                <!-- <v-card>
-                    <v-card-title class="headline">출석 정보 추가</v-card-title>
-                    <v-card-text>
-                        출석대상이 설정으로 누락된 유저의 출석 정보를
-                        추가합니다.
-                    </v-card-text> -->
                 <v-card>
                     <v-toolbar flat>
                         <v-card-title>출석 기록 추가 </v-card-title>
@@ -452,6 +446,7 @@ export default {
     },
     data() {
         return {
+            total:{},
             statusData: [],
             absenceDate: [],
             attLoad: false,
@@ -481,7 +476,24 @@ export default {
         Mdate() {
             return moment(this.$route.params.day).format('YYYY-MM-DD')
         },
-        total() {
+    },
+    methods: {
+        async getUserName() {
+            const res = await axios.get('user/')
+            const tmp = res.data.users
+            this.userName = tmp.map(user => {
+                return { username: user.username, realname: user.realname }
+            })
+        },
+        findUserRealname(username) {
+            for (var k in this.userName) {
+                if (this.userName[k].username == username) {
+                    return this.userName[k].realname
+                }
+            }
+            return ''
+        },
+        async fetchTotal(){
             const cols = {
                 sum: 0,
                 attendance: 0,
@@ -499,25 +511,7 @@ export default {
                         cols.official_absence += 1
                 })
             }
-            return cols
-        },
-    },
-    methods: {
-        async getUserName() {
-            const res = await axios.get('user/')
-            const tmp = res.data.users
-            this.userName = tmp.map(user => {
-                return { username: user.username, realname: user.realname }
-            })
-        },
-        findUserRealname(username) {
-            for (var k in this.userName) {
-                if (this.userName[k].username == username) {
-                    return this.userName[k].realname
-                }
-            }
-            // return this.userName
-            return ''
+            this.total = cols
         },
         async fetchAttUsers() {
             this.attLoad = false
@@ -534,7 +528,7 @@ export default {
                 const res1 = await axios.get(
                     `attendance/attendanceState/${this.date}`
                 )
-                this.state = res1.status
+                this.state = res1.data.status
                 this.statusData = res1.data
                 this.attLoad = true
             } catch (err) {
