@@ -446,6 +446,7 @@ export default {
     },
     data() {
         return {
+            total:{},
             statusData: [],
             absenceDate: [],
             attLoad: false,
@@ -475,26 +476,6 @@ export default {
         Mdate() {
             return moment(this.$route.params.day).format('YYYY-MM-DD')
         },
-        total() {
-            const cols = {
-                sum: 0,
-                attendance: 0,
-                late: 0,
-                absence: 0,
-                official_absence: 0,
-            }
-            if (this.statusData.length != 0) {
-                this.statusData.status.forEach(element => {
-                    cols.sum += 1
-                    if (element.state == 'attendance') cols.attendance += 1
-                    else if (element.state == 'late') cols.late += 1
-                    else if (element.state == 'absence') cols.absence += 1
-                    else if (element.state == 'official_absence')
-                        cols.official_absence += 1
-                })
-            }
-            return cols
-        },
     },
     methods: {
         async getUserName() {
@@ -512,6 +493,26 @@ export default {
             }
             return ''
         },
+        async fetchTotal(){
+            const cols = {
+                sum: 0,
+                attendance: 0,
+                late: 0,
+                absence: 0,
+                official_absence: 0,
+            }
+            if (this.statusData.length != 0) {
+                this.statusData.status.forEach(element => {
+                    cols.sum += 1
+                    if (element.state == 'attendance') cols.attendance += 1
+                    else if (element.state == 'late') cols.late += 1
+                    else if (element.state == 'absence') cols.absence += 1
+                    else if (element.state == 'official_absence')
+                        cols.official_absence += 1
+                })
+            }
+            this.total = cols
+        },
         async fetchAttUsers() {
             this.attLoad = false
             this.absenLoad = false
@@ -527,7 +528,7 @@ export default {
                 const res1 = await axios.get(
                     `attendance/attendanceState/${this.date}`
                 )
-                this.state = res1.status
+                this.state = res1.data.status
                 this.statusData = res1.data
                 this.attLoad = true
             } catch (err) {
