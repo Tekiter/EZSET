@@ -8,12 +8,6 @@
                         <v-toolbar-title>
                             출석현황
                         </v-toolbar-title>
-                        <v-spacer></v-spacer>
-                        <v-btn icon @click="userAddDialog.show = true">
-                            <v-icon>mdi-plus</v-icon>
-                        </v-btn>
-                    </v-toolbar>
-                    <v-toolbar flat>
                         <v-subheader>{{ this.Mdate }} </v-subheader>
                         <v-spacer></v-spacer>
                         <v-subheader v-if="attLoad"
@@ -23,6 +17,9 @@
                             {{ this.total.absence }}명, 공결:
                             {{ this.total.official_absence }}명
                         </v-subheader>
+                        <v-btn icon @click="userAddDialog.show = true">
+                            <v-icon>mdi-plus</v-icon>
+                        </v-btn>
                     </v-toolbar>
                     <v-divider></v-divider>
                     <v-skeleton-loader
@@ -30,152 +27,192 @@
                         type="table"
                         v-if="!attLoad"
                     ></v-skeleton-loader>
-                    <v-simple-table
-                        v-if="attLoad && this.$perm('attendance').can('update')"
-                    >
-                        <template v-slot:default>
-                            <tbody>
-                                <tr class="pa-2 d-flex">
-                                    <td class="flex-grow-1">이름</td>
-                                    <td class="flex-grow-0">출석</td>
-                                    <td class="flex-grow-0">지각</td>
-                                    <td class="flex-grow-0">결석</td>
-                                    <td class="flex-grow-0">공결</td>
-                                </tr>
-                                <tr
-                                    v-for="item in statusData.status"
-                                    :key="item.name"
-                                    class="d-flex"
-                                >
-                                    <td class="flex-grow-1">
-                                        {{ findUserRealname(item.name) }}
-                                        <span
-                                            class="caption font-weight-light ml-3"
-                                        >
+                    <template>
+                        <v-row class="mx-3">
+                            <v-col cols="12">
+                                <v-card flat>
+                                    <div class="d-flex align-center mx-2">
+                                        <span class="title">
+                                            이름
+                                        </span>
+                                        <span class="subtitle-1 ml-2"> </span>
+                                        <v-spacer></v-spacer>
+                                        <span class="ma-3">
+                                            출석
+                                        </span>
+                                        <span class="ma-3">
+                                            지각
+                                        </span>
+                                        <span class="ma-3">
+                                            결석
+                                        </span>
+                                        <span class="ma-3">
+                                            공결
+                                        </span>
+                                    </div>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </template>
+                    <v-divider></v-divider>
+                    <template>
+                        <v-row class="mx-3">
+                            <v-col
+                                v-for="item in statusData.status"
+                                :key="item.name"
+                                cols="12"
+                            >
+                                <v-card flat>
+                                    <div class="d-flex align-center mx-2">
+                                        <span class="title font-weight-bold">
+                                            {{ findUserRealname(item.name) }}
+                                        </span>
+                                        <span class="subtitle-1 ml-2">
                                             {{ item.name }}
                                         </span>
-                                    </td>
-                                    <td
-                                        v-if="item.state == 'attendance'"
-                                        class="flex-grow-0"
-                                    >
-                                        <v-btn text icon color="success" dark>
-                                            <v-icon>
-                                                mdi-checkbox-blank-circle-outline
-                                            </v-icon>
-                                        </v-btn>
-                                    </td>
-                                    <td
-                                        v-if="item.state != 'attendance'"
-                                        class="flex-grow-0"
-                                    >
-                                        <v-btn
-                                            text
-                                            icon
-                                            color="grey darken-1"
-                                            @click="
-                                                changeAttendanceState(
-                                                    item,
-                                                    'attendance'
-                                                )
-                                            "
+                                        <v-spacer></v-spacer>
+                                        <span
+                                            v-if="item.state == 'attendance'"
+                                            class="ma-2"
                                         >
-                                            <v-icon>
-                                                mdi-checkbox-blank-circle-outline
-                                            </v-icon>
-                                        </v-btn>
-                                    </td>
+                                            <v-btn
+                                                text
+                                                icon
+                                                color="success"
+                                                dark
+                                            >
+                                                <v-icon>
+                                                    mdi-checkbox-blank-circle-outline
+                                                </v-icon>
+                                            </v-btn>
+                                        </span>
+                                        <span
+                                            v-if="item.state != 'attendance'"
+                                            class="ma-2"
+                                        >
+                                            <v-btn
+                                                text
+                                                icon
+                                                color="grey darken-1"
+                                                @click="
+                                                    changeAttendanceState(
+                                                        item,
+                                                        'attendance'
+                                                    )
+                                                "
+                                            >
+                                                <v-icon>
+                                                    mdi-checkbox-blank-circle-outline
+                                                </v-icon>
+                                            </v-btn>
+                                        </span>
 
-                                    <td
-                                        v-if="item.state == 'late'"
-                                        class="flex-grow-0"
-                                    >
-                                        <v-btn text icon color="warning" dark>
-                                            <v-icon>
-                                                mdi-triangle-outline
-                                            </v-icon>
-                                        </v-btn>
-                                    </td>
-                                    <td
-                                        v-if="item.state != 'late'"
-                                        class="flex-grow-0"
-                                    >
-                                        <v-btn
-                                            text
-                                            icon
-                                            color="grey darken-1"
-                                            @click="
-                                                changeAttendanceState(
-                                                    item,
-                                                    'late'
-                                                )
-                                            "
+                                        <span
+                                            v-if="item.state == 'late'"
+                                            class="ma-2"
                                         >
-                                            <v-icon>
-                                                mdi-triangle-outline
-                                            </v-icon>
-                                        </v-btn>
-                                    </td>
-                                    <td
-                                        v-if="item.state == 'absence'"
-                                        class="flex-grow-0"
-                                    >
-                                        <v-btn text icon color="error" dark>
-                                            <v-icon> mdi-close </v-icon>
-                                        </v-btn>
-                                    </td>
-                                    <td
-                                        v-if="item.state != 'absence'"
-                                        class="flex-grow-0"
-                                    >
-                                        <v-btn
-                                            text
-                                            icon
-                                            color="grey darken-1"
-                                            @click="
-                                                changeAttendanceState(
-                                                    item,
-                                                    'absence'
-                                                )
-                                            "
+                                            <v-btn
+                                                text
+                                                icon
+                                                color="warning"
+                                                dark
+                                            >
+                                                <v-icon>
+                                                    mdi-triangle-outline
+                                                </v-icon>
+                                            </v-btn>
+                                        </span>
+                                        <span
+                                            v-if="item.state != 'late'"
+                                            class="ma-2"
                                         >
-                                            <v-icon> mdi-close </v-icon>
-                                        </v-btn>
-                                    </td>
-                                    <td
-                                        v-if="item.state == 'official_absence'"
-                                        class="flex-grow-0"
-                                    >
-                                        <v-btn text icon color="success" dark>
-                                            <v-icon>
-                                                mdi-close-circle-outline
-                                            </v-icon>
-                                        </v-btn>
-                                    </td>
-                                    <td
-                                        v-if="item.state != 'official_absence'"
-                                        class="flex-grow-0"
-                                    >
-                                        <v-btn
-                                            text
-                                            icon
-                                            color="grey lighten-2"
-                                            @click="
-                                                changeAttendanceState(
-                                                    item,
-                                                    'official_absence'
-                                                )
-                                            "
+                                            <v-btn
+                                                text
+                                                icon
+                                                color="grey darken-1"
+                                                @click="
+                                                    changeAttendanceState(
+                                                        item,
+                                                        'late'
+                                                    )
+                                                "
+                                            >
+                                                <v-icon>
+                                                    mdi-triangle-outline
+                                                </v-icon>
+                                            </v-btn>
+                                        </span>
+                                        <span
+                                            v-if="item.state == 'absence'"
+                                            class="ma-2"
                                         >
-                                            <v-icon>
-                                                mdi-close-circle-outline
-                                            </v-icon>
-                                        </v-btn>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </template>
-                    </v-simple-table>
+                                            <v-btn text icon color="error" dark>
+                                                <v-icon> mdi-close </v-icon>
+                                            </v-btn>
+                                        </span>
+                                        <span
+                                            v-if="item.state != 'absence'"
+                                            class="ma-2"
+                                        >
+                                            <v-btn
+                                                text
+                                                icon
+                                                color="grey darken-1"
+                                                @click="
+                                                    changeAttendanceState(
+                                                        item,
+                                                        'absence'
+                                                    )
+                                                "
+                                            >
+                                                <v-icon> mdi-close </v-icon>
+                                            </v-btn>
+                                        </span>
+                                        <span
+                                            v-if="
+                                                item.state == 'official_absence'
+                                            "
+                                            class="ma-2"
+                                        >
+                                            <v-btn
+                                                text
+                                                icon
+                                                color="success"
+                                                dark
+                                            >
+                                                <v-icon>
+                                                    mdi-close-circle-outline
+                                                </v-icon>
+                                            </v-btn>
+                                        </span>
+                                        <span
+                                            v-if="
+                                                item.state != 'official_absence'
+                                            "
+                                            class="ma-2"
+                                        >
+                                            <v-btn
+                                                text
+                                                icon
+                                                color="grey darken-2"
+                                                @click="
+                                                    changeAttendanceState(
+                                                        item,
+                                                        'official_absence'
+                                                    )
+                                                "
+                                            >
+                                                <v-icon>
+                                                    mdi-close-circle-outline
+                                                </v-icon>
+                                            </v-btn>
+                                        </span>
+                                    </div>
+                                </v-card>
+                                <v-divider></v-divider>
+                            </v-col>
+                        </v-row>
+                    </template>
                     <div>
                         <v-alert type="warning" v-if="statusData.length == 0">
                             출석정보가 없습니다.
@@ -201,74 +238,93 @@
                         type="table"
                         v-if="!absenLoad && this.$perm('absence').can('update')"
                     ></v-skeleton-loader>
-                    <v-simple-table
-                        v-if="
-                            absenLoad &&
-                                this.$perm('absence').can('update') &&
-                                absenceDate.length != 0
-                        "
-                    >
-                        <template v-slot:default>
-                            <tbody>
-                                <tr class="pa-2 d-flex">
-                                    <td class="flex-grow-1">이름</td>
-                                    <td class="flex-grow-0">사유</td>
-                                    <td class="flex-grow-0">승인여부</td>
-                                </tr>
-                                <tr
-                                    v-for="item in absenceDate"
-                                    :key="item.name"
-                                    class="d-flex"
-                                >
-                                    <td class="flex-grow-1">
-                                        {{ findUserRealname(item.name) }}
-                                        <span
-                                            class="caption font-weight-light ml-3"
-                                        >
+                    <template>
+                        <v-row class="mx-3">
+                            <v-col cols="12">
+                                <v-card flat>
+                                    <div class="d-flex align-center mx-2">
+                                        <span class="title">
+                                            이름
+                                        </span>
+                                        <span class="subtitle-1 ml-2"> </span>
+                                        <v-spacer></v-spacer>
+                                        <span class="ma-3">
+                                            사유
+                                        </span>
+                                        <span class="ma-3">
+                                            승인여부
+                                        </span>
+                                    </div>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </template>
+                    <v-divider></v-divider>
+                    <template>
+                        <v-row class="mx-3">
+                            <v-col
+                                v-for="item in absenceDate"
+                                :key="item.name"
+                                cols="12"
+                            >
+                                <v-card flat>
+                                    <div class="d-flex align-center mx-2">
+                                        <span class="title font-weight-bold">
+                                            {{ findUserRealname(item.name) }}
+                                        </span>
+                                        <span class="subtitle-1 ml-2">
                                             {{ item.name }}
                                         </span>
-                                    </td>
-                                    <td class="flex-grow-0">
-                                        {{ item.reason }}
-                                    </td>
-                                    <td
-                                        v-if="item.approval == true"
-                                        class="flex-grow-0"
-                                    >
-                                        <v-btn text icon color="success">
-                                            <v-icon>
-                                                mdi-checkbox-blank-circle-outline
-                                            </v-icon>
-                                        </v-btn>
-                                        <v-btn
-                                            text
-                                            icon
-                                            @click="changeAbsenceState(item)"
+                                        <v-spacer></v-spacer>
+
+                                        <span>
+                                            {{ item.reason }}
+                                        </span>
+                                        <span
+                                            v-if="item.approval == true"
+                                            class="ma-3"
                                         >
-                                            <v-icon> mdi-close </v-icon>
-                                        </v-btn>
-                                    </td>
-                                    <td
-                                        v-if="item.approval == false"
-                                        class="flex-grow-0"
-                                    >
-                                        <v-btn
-                                            text
-                                            icon
-                                            @click="changeAbsenceState(item)"
+                                            <v-btn text icon color="success">
+                                                <v-icon>
+                                                    mdi-checkbox-blank-circle-outline
+                                                </v-icon>
+                                            </v-btn>
+                                            <v-btn
+                                                text
+                                                icon
+                                                @click="
+                                                    changeAbsenceState(item)
+                                                "
+                                            >
+                                                <v-icon> mdi-close </v-icon>
+                                            </v-btn>
+                                        </span>
+                                        <span
+                                            v-if="item.approval == false"
+                                            class="ma-3"
                                         >
-                                            <v-icon>
-                                                mdi-checkbox-blank-circle-outline
-                                            </v-icon>
-                                        </v-btn>
-                                        <v-btn text icon color="error">
-                                            <v-icon> mdi-close </v-icon>
-                                        </v-btn>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </template>
-                    </v-simple-table>
+                                            <v-btn
+                                                text
+                                                icon
+                                                @click="
+                                                    changeAbsenceState(item)
+                                                "
+                                            >
+                                                <v-icon>
+                                                    mdi-checkbox-blank-circle-outline
+                                                </v-icon>
+                                            </v-btn>
+                                            <v-btn text icon color="error">
+                                                <v-icon> mdi-close </v-icon>
+                                            </v-btn>
+                                        </span>
+                                    </div>
+                                    <v-divider></v-divider>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </template>
+
                     <div>
                         <v-alert type="warning" v-if="absenceDate.length == 0">
                             공결정보가 없습니다.

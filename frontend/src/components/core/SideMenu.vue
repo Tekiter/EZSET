@@ -10,7 +10,7 @@
 <style scoped></style>
 <script>
 import SideMenuItem from './SideMenuItem.vue'
-
+import moment from 'moment'
 export default {
     components: { SideMenuItem },
     data() {
@@ -73,6 +73,13 @@ export default {
                             title: '출석체크',
                             to: '/attendance',
                             perm: this.$perm('attendance').can('att'),
+                        },
+                        {
+                            title: '일별출석현황',
+                            to: `/AttendanceManageDay/${moment().format(
+                                'YYYYMMDD'
+                            )}`,
+                            perm: this.$perm('attendance').can('update'),
                         },
                         {
                             title: '월별출석현황',
