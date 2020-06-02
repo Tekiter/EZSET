@@ -10,7 +10,7 @@
 <style scoped></style>
 <script>
 import SideMenuItem from './SideMenuItem.vue'
-
+import moment from 'moment'
 export default {
     components: { SideMenuItem },
     data() {
