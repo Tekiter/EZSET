@@ -443,6 +443,7 @@ export default {
         }
         await this.fetchAttUsers()
         await this.getUserName()
+        await this.fetchTotal()
     },
     data() {
         return {
@@ -502,7 +503,7 @@ export default {
                 official_absence: 0,
             }
             if (this.statusData.length != 0) {
-                this.statusData.status.forEach(element => {
+                await this.statusData.status.forEach(element => {
                     cols.sum += 1
                     if (element.state == 'attendance') cols.attendance += 1
                     else if (element.state == 'late') cols.late += 1
@@ -582,6 +583,7 @@ export default {
             } catch (err) {
                 //console.log(err)
             }
+            await this.fetchTotal()
         },
         async changeAbsenceState(item) {
             try {
@@ -615,6 +617,7 @@ export default {
                 //console.log(err)
                 this.openSnackbar('error', 'error')
             }
+            await this.fetchTotal()
         },
         openSnackbar(text, color) {
             this.snackbar.text = text
