@@ -76,7 +76,9 @@ export default {
                         },
                         {
                             title: '일별출석현황',
-                            to: `/AttendanceManageDay/${moment().format("YYYYMMDD")}`,
+                            to: `/AttendanceManageDay/${moment().format(
+                                'YYYYMMDD'
+                            )}`,
                             perm: this.$perm('attendance').can('update'),
                         },
                         {
