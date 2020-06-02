@@ -75,6 +75,11 @@ export default {
                             perm: this.$perm('attendance').can('att'),
                         },
                         {
+                            title: '일별출석현황',
+                            to: `/AttendanceManageDay/${moment().format("YYYYMMDD")}`,
+                            perm: this.$perm('attendance').can('update'),
+                        },
+                        {
                             title: '월별출석현황',
                             to: '/AttendanceManageMonth',
                             perm: this.$perm('attendance').can('update'),
