@@ -347,12 +347,6 @@
                 max-width="800px"
                 height="500px"
             >
-                <!-- <v-card>
-                    <v-card-title class="headline">출석 정보 추가</v-card-title>
-                    <v-card-text>
-                        출석대상이 설정으로 누락된 유저의 출석 정보를
-                        추가합니다.
-                    </v-card-text> -->
                 <v-card>
                     <v-toolbar flat>
                         <v-card-title>출석 기록 추가 </v-card-title>
@@ -516,7 +510,6 @@ export default {
                     return this.userName[k].realname
                 }
             }
-            // return this.userName
             return ''
         },
         async fetchAttUsers() {
