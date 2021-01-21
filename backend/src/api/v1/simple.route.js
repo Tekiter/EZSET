@@ -56,28 +56,32 @@ router.post(
 )
 
 /**
- * @api {delete} /simple/boards/:board_id 게시판 삭제
- * @apiDescription 게시판을 삭제한다
- * @apiName 게시판 삭제
+ * @api {patch} /simple/posts/:post_id 게시글 수정
+ * @apiDescription 게시글을 수정한다
+ * @apiName 게시글 수정
  * @apiGroup Board
- * @apiPermission can.delete
- * @apiParam {Number} board_id 게시판 아이디
+ * @apiPermission can.update
  *
- * @apiSuccess {json} 200 게시판 삭제
+ * @apiParam {Number} board_id 게시판 아이디
+ * @apiParam {String} title 게시글 제목
+ * @apiParam {String} content 게시글 내용
+ * @apiParam {String} files 게시글 첨부파일
+ *
+ * @apiSuccess {json} 200 게시글 수정
  * @apiSuccessExample {json} Success-Response:
  *       HTTP/1.1 200
- *       {
- *          message: '게시판을 삭제했습니다',
- *        }
+ *      {
+ *       message: 수정 완료
+ *      }
+ *
+ * @apiError {Number} 403 권한 없음
  *
  * @apiError {json} 404 해당 게시판 없음
  * @apiErrorExample {json} Error-Response:
  *       HTTP/1.1 404
  *       {
- *          message: '존재하지 않는 게시판입니다.',
- *        }
- *
- * @apiError {Number} 500 게시판 삭제 에러
+ *          message: no board id 10,
+ *       }
  */
 //게시판 수정
 router.patch(
@@ -111,6 +115,30 @@ router.patch(
     })
 )
 
+/**
+ * @api {delete} /simple/boards/:board_id 게시판 삭제
+ * @apiDescription 게시판을 삭제한다
+ * @apiName 게시판 삭제
+ * @apiGroup Board
+ * @apiPermission can.delete
+ * @apiParam {Number} board_id 게시판 아이디
+ *
+ * @apiSuccess {json} 200 게시판 삭제
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200
+ *       {
+ *          message: '게시판을 삭제했습니다',
+ *        }
+ *
+ * @apiError {json} 404 해당 게시판 없음
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404
+ *       {
+ *          message: '존재하지 않는 게시판입니다.',
+ *        }
+ *
+ * @apiError {Number} 500 게시판 삭제 에러
+ */
 //게시판 삭제
 router.delete(
     '/boards/:board_id',
@@ -539,13 +567,39 @@ router.patch(
 )
 
 /**
- * @api {get} /simple/posts/:post_id 게시글 목록 보기
- * @apiDescription 해당 게시판의 게시글 목록을 불러온다
- * @apiName 게시글 목록 보기
+ * @api {get} /simple/posts/:post_id 게시글 조회
+ * @apiDescription 해당 아이디의 게시글을 불러온다
+ * @apiName 게시글 조회
  * @apiGroup Board
  *
  * @apiParam {Number} post_id 게시판 아이디
+ * 
+ * @apiSuccess {json} 200 게시글 조회
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200
+ *      {
+ *          _id: parseInt(post.id),
+            title: post.title,
+            content: post.content,
+            author: post.author,
+            isAnonymous: post.isAnonymous,
+            created_date: post.created_date,
+            view: post.view,
+            like: post.likes_count,
+            isLike: post.likes_flag(req.user.username),
+            comment: post.comments,
+            files: await getFileInfoArray(post.files)
+ *      }
+ * 
+ * @apiError {Number} 404 게시글 조회 실패 에러
+ * @apiErrorExample Error-Response:
+ *       HTTP/1.1 404
+ *       {
+ *          message: no post id post_id,
+ *       }
+ * 
  */
+//게시글 조회
 router.get(
     '/posts/:post_id',
     [param('post_id').isNumeric(), validateParams],
@@ -606,6 +660,18 @@ router.get(
     })
 )
 
+/**
+ * @api {get} /simple/posts/:post_id 게시글 목록 보기
+ * @apiDescription 해당 게시판의 게시글 목록을 불러온다
+ * @apiName 게시글 목록 보기
+ * @apiGroup Board
+ *
+ * @apiParam {Number} post_id 게시판 아이디
+ *
+ * @apiSuccess {Array} 200 게시글 목록
+ * @apiDescription posts는 배열로 id, title, contnet, author, isAnonymous(익명게시판여부), created_date, view(조회수), like(추천수), comment_count(댓글 갯수), comment가 들어있다
+ *
+ */
 //게시글 목록 보기
 router.get(
     '/boards/:board_id',
@@ -671,6 +737,31 @@ router.get(
     })
 )
 
+/**
+ * @api {post} /posts/:post_id/comment 댓글 생성
+ * @apiDescription 댓글을 작성한다
+ * @apiName 댓글 생성
+ * @apiGroup Board
+ * @apiPermission can.read
+ *
+ * @apiParam {Number} post_id 게시글 아이디
+ * @apiParam {String} content 게시글 내용
+ *
+ * @apiSuccess {json} 201 댓글 작성
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 201 OK
+ *       {
+ *          message: '댓글 작성 완료'
+ *       }
+ * @apiError {Number} 403 권한 없음
+ *
+ * @apiError {json} 404 해당 게시글 없음
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404
+ *       {
+ *          message: no post id post_id,
+ *       }
+ */
 //댓글 작성
 router.post(
     '/posts/:post_id/comment',
@@ -708,6 +799,31 @@ router.post(
     })
 )
 
+/**
+ * @api {patch} /posts/:post_id/comment/:comment_id 댓글 수정
+ * @apiDescription 댓글을 수정한다
+ * @apiName 댓글 수정
+ * @apiGroup Board
+ * @apiPermission can.read
+ *
+ * @apiParam {Number} post_id 게시판 아이디
+ * @apiParam {String} content 댓글 내용
+ *
+ * @apiSuccess {json} 201 댓글 수정
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 201 OK
+ *       {
+ *          message: '댓글 수정 완료'
+ *       }
+ * @apiError {Number} 403 권한 없음
+ *
+ * @apiError {json} 404 해당 게시글 없음
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404
+ *       {
+ *          message: no post id post_id,
+ *       }
+ */
 //댓글 수정
 router.patch(
     '/posts/:post_id/comment/:comment_id',
@@ -755,6 +871,31 @@ router.patch(
     })
 )
 
+/**
+ * @api {delete} /posts/:post_id/comment/:comment_id 댓글 삭제
+ * @apiDescription 댓글을 삭제한다
+ * @apiName 댓글 삭제
+ * @apiGroup Board
+ * @apiPermission can.delete
+ *
+ * @apiParam {Number} post_id 게시글 아이디
+ * @apiParam {Number} comment_id 댓글 아이디
+ *
+ * @apiSuccess {json} 200 댓글 삭제
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 200 OK
+ *       {
+ *          message: '삭제 성공'
+ *       }
+ * @apiError {Number} 403 권한 없음
+ *
+ * @apiError {json} 404 해당 게시글 없음
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404
+ *       {
+ *          message: no post id post_id,
+ *       }
+ */
 //댓글 삭제
 router.delete(
     '/posts/:post_id/comment/:comment_id',
@@ -818,6 +959,30 @@ router.delete(
     })
 )
 
+/**
+ * @api {post} /posts/:post_id/like 추천 생성
+ * @apiDescription 추천 활성화
+ * @apiName 추천 활성화
+ * @apiGroup Board
+ * @apiPermission can.read
+ *
+ * @apiParam {Number} post_id 게시글 아이디
+ *
+ * @apiSuccess {json} 201 댓글 작성
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 201 OK
+ *       {
+ *          message: '좋아요 생성 완료'
+ *       }
+ * @apiError {Number} 403 권한 없음
+ *
+ * @apiError {json} 404 해당 게시글 없음
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404
+ *       {
+ *          message: no post id post_id,
+ *       }
+ */
 //좋아요 생성
 router.post(
     '/posts/:post_id/like',
@@ -842,6 +1007,30 @@ router.post(
     })
 )
 
+/**
+ * @api {delete} /posts/:post_id/like 추천 삭제
+ * @apiDescription 추천 비활성화
+ * @apiName 추천 비활성화
+ * @apiGroup Board
+ * @apiPermission can.read
+ *
+ * @apiParam {Number} post_id 게시글 아이디
+ *
+ * @apiSuccess {json} 201 댓글 작성
+ * @apiSuccessExample {json} Success-Response:
+ *       HTTP/1.1 201 OK
+ *       {
+ *          message: '좋아요 삭제 완료'
+ *       }
+ * @apiError {Number} 403 권한 없음
+ *
+ * @apiError {json} 404 해당 게시글 없음
+ * @apiErrorExample {json} Error-Response:
+ *       HTTP/1.1 404
+ *       {
+ *          message: no post id post_id,
+ *       }
+ */
 //좋아요 삭제
 router.delete(
     '/posts/:post_id/like',
@@ -864,6 +1053,34 @@ router.delete(
     })
 )
 
+/**
+ * @api {get} /searchpost 게시물 검색
+ * @apiDescription 게시물을 제목, 내용, 제목 + 내용으로 검색할 수 있다
+ * @apiName 게시물 검색
+ * @apiGroup Board
+ *
+ * @apiParam {String} content 검색 내용
+ * @apiParam {String} option 검색 옵션
+ * @apiParam {Number} page 현제 페이지 번호
+ * @apiParam {Number} pagesize 한 페이지당 보일 게시글 수
+ *
+ * @apiSuccess {Array} 200 게시글 목록
+ * @apiDescription posts는 배열로 id, title, contnet, author, isAnonymous(익명게시판여부), created_date, view(조회수), like(추천수), comment_count(댓글 갯수), comment가 들어있다
+ *
+ * @apiError {Number} 400 검색 옵션이 없습니다
+ * @apiErrorExample {String} Error-Response:
+ *       HTTP/1.1 400
+ *       {
+ *          string: 검색 옵션이 없습니다.
+ *       }
+ *
+ * @@apiError {Number} 500 검색 오류
+ * @apiErrorExample {String} Error-Response:
+ *       HTTP/1.1 500
+ *       {
+ *          string: database error
+ *       }
+ */
 //게시물 검색
 router.get(
     '/searchpost',
