@@ -1272,7 +1272,7 @@
     "type": "get",
     "url": "/simple/posts/:post_id",
     "title": "게시글 목록 보기",
-    "description": "<p>해당 게시판의 게시글 목록을 불러온다</p>",
+    "description": "<p>posts는 배열로 id, title, contnet, author, isAnonymous(익명게시판여부), created_date, view(조회수), like(추천수), comment_count(댓글 갯수), comment가 들어있다</p>",
     "name": "게시글_목록_보기",
     "group": "Board",
     "parameter": {
@@ -1284,6 +1284,19 @@
             "optional": false,
             "field": "post_id",
             "description": "<p>게시판 아이디</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "200",
+            "description": "<p>게시글 목록</p>"
           }
         ]
       }
@@ -1550,6 +1563,103 @@
       "examples": [
         {
           "title": "Success-Response:",
+          "content": " HTTP/1.1 200\n{\n message: 수정 완료\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "Number",
+            "optional": false,
+            "field": "403",
+            "description": "<p>권한 없음</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "json",
+            "optional": false,
+            "field": "404",
+            "description": "<p>해당 게시판 없음</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404\n{\n   message: no board id 10,\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/simple.route.js",
+    "groupTitle": "Board"
+  },
+  {
+    "type": "patch",
+    "url": "/simple/posts/:post_id",
+    "title": "게시글 수정",
+    "description": "<p>게시글을 수정한다</p>",
+    "name": "게시글_수정",
+    "group": "Board",
+    "permission": [
+      {
+        "name": "can.update"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "board_id",
+            "description": "<p>게시판 아이디</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "title",
+            "description": "<p>게시글 제목</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "content",
+            "description": "<p>게시글 내용</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "files",
+            "description": "<p>게시글 첨부파일</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "200",
+            "description": "<p>게시글 수정</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
           "content": "HTTP/1.1 200 OK\nmessage\": '수정 완료',\n   \"target\":{\n   \"isAnonymous\": false,\n   \"view\": 0,\n   \"like\":[],\n   \"isLike\": false,\n   \"files\":[\"5e65db86b869b0322cbc1bda\"],\n   \"_id\": 101,\n   \"board\": 10,\n   \"title\": \"hello\",\n   \"content\": \"hhhhh\",\n   \"author\": \"admin\",\n   \"created_date\": \"2020-03-09T06:01:45.804Z\",\n   \"comments\":[],\n   \"__v\": 1\n   }",
           "type": "json"
         }
@@ -1579,6 +1689,153 @@
           "title": "Error-Response:",
           "content": "HTTP/1.1 404\n{\n   message: no board id 10,\n}",
           "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/simple.route.js",
+    "groupTitle": "Board"
+  },
+  {
+    "type": "get",
+    "url": "/simple/posts/:post_id",
+    "title": "게시글 조회",
+    "description": "<p>해당 아이디의 게시글을 불러온다</p>",
+    "name": "게시글_조회",
+    "group": "Board",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "post_id",
+            "description": "<p>게시판 아이디</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "200",
+            "description": "<p>게시글 조회</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200\n{\n    _id: parseInt(post.id),\n       title: post.title,\n       content: post.content,\n       author: post.author,\n       isAnonymous: post.isAnonymous,\n       created_date: post.created_date,\n       view: post.view,\n       like: post.likes_count,\n       isLike: post.likes_flag(req.user.username),\n       comment: post.comments,\n       files: await getFileInfoArray(post.files)\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "Number",
+            "optional": false,
+            "field": "404",
+            "description": "<p>게시글 조회 실패 에러</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404\n{\n   message: no post id post_id,\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/simple.route.js",
+    "groupTitle": "Board"
+  },
+  {
+    "type": "get",
+    "url": "/searchpost",
+    "title": "게시물 검색",
+    "description": "<p>posts는 배열로 id, title, contnet, author, isAnonymous(익명게시판여부), created_date, view(조회수), like(추천수), comment_count(댓글 갯수), comment가 들어있다</p>",
+    "name": "게시물_검색",
+    "group": "Board",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "content",
+            "description": "<p>검색 내용</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "option",
+            "description": "<p>검색 옵션</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "page",
+            "description": "<p>현제 페이지 번호</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "pagesize",
+            "description": "<p>한 페이지당 보일 게시글 수</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Array",
+            "optional": false,
+            "field": "200",
+            "description": "<p>게시글 목록</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "Number",
+            "optional": false,
+            "field": "400",
+            "description": "<p>검색 옵션이 없습니다</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400\n{\n   string: 검색 옵션이 없습니다.\n}",
+          "type": "String"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 500\n{\n   string: database error\n}",
+          "type": "String"
         }
       ]
     },
@@ -1770,6 +2027,407 @@
           }
         ]
       }
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/simple.route.js",
+    "groupTitle": "Board"
+  },
+  {
+    "type": "delete",
+    "url": "/posts/:post_id/comment/:comment_id",
+    "title": "댓글 삭제",
+    "description": "<p>댓글을 삭제한다</p>",
+    "name": "댓글_삭제",
+    "group": "Board",
+    "permission": [
+      {
+        "name": "can.delete"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "post_id",
+            "description": "<p>게시글 아이디</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "comment_id",
+            "description": "<p>댓글 아이디</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "200",
+            "description": "<p>댓글 삭제</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n   message: '삭제 성공'\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "Number",
+            "optional": false,
+            "field": "403",
+            "description": "<p>권한 없음</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "json",
+            "optional": false,
+            "field": "404",
+            "description": "<p>해당 게시글 없음</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404\n{\n   message: no post id post_id,\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/simple.route.js",
+    "groupTitle": "Board"
+  },
+  {
+    "type": "post",
+    "url": "/posts/:post_id/comment",
+    "title": "댓글 생성",
+    "description": "<p>댓글을 작성한다</p>",
+    "name": "댓글_생성",
+    "group": "Board",
+    "permission": [
+      {
+        "name": "can.read"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "post_id",
+            "description": "<p>게시글 아이디</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "content",
+            "description": "<p>게시글 내용</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "201",
+            "description": "<p>댓글 작성</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 201 OK\n{\n   message: '댓글 작성 완료'\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "Number",
+            "optional": false,
+            "field": "403",
+            "description": "<p>권한 없음</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "json",
+            "optional": false,
+            "field": "404",
+            "description": "<p>해당 게시글 없음</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404\n{\n   message: no post id post_id,\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/simple.route.js",
+    "groupTitle": "Board"
+  },
+  {
+    "type": "patch",
+    "url": "/posts/:post_id/comment/:comment_id",
+    "title": "댓글 수정",
+    "description": "<p>댓글을 수정한다</p>",
+    "name": "댓글_수정",
+    "group": "Board",
+    "permission": [
+      {
+        "name": "can.read"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "post_id",
+            "description": "<p>게시판 아이디</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "content",
+            "description": "<p>댓글 내용</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "201",
+            "description": "<p>댓글 수정</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 201 OK\n{\n   message: '댓글 수정 완료'\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "Number",
+            "optional": false,
+            "field": "403",
+            "description": "<p>권한 없음</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "json",
+            "optional": false,
+            "field": "404",
+            "description": "<p>해당 게시글 없음</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404\n{\n   message: no post id post_id,\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/simple.route.js",
+    "groupTitle": "Board"
+  },
+  {
+    "type": "delete",
+    "url": "/posts/:post_id/like",
+    "title": "추천 삭제",
+    "description": "<p>추천 비활성화</p>",
+    "name": "추천_비활성화",
+    "group": "Board",
+    "permission": [
+      {
+        "name": "can.read"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "post_id",
+            "description": "<p>게시글 아이디</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "201",
+            "description": "<p>댓글 작성</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 201 OK\n{\n   message: '좋아요 삭제 완료'\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "Number",
+            "optional": false,
+            "field": "403",
+            "description": "<p>권한 없음</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "json",
+            "optional": false,
+            "field": "404",
+            "description": "<p>해당 게시글 없음</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404\n{\n   message: no post id post_id,\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/api/v1/simple.route.js",
+    "groupTitle": "Board"
+  },
+  {
+    "type": "post",
+    "url": "/posts/:post_id/like",
+    "title": "추천 생성",
+    "description": "<p>추천 활성화</p>",
+    "name": "추천_활성화",
+    "group": "Board",
+    "permission": [
+      {
+        "name": "can.read"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "post_id",
+            "description": "<p>게시글 아이디</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "json",
+            "optional": false,
+            "field": "201",
+            "description": "<p>댓글 작성</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 201 OK\n{\n   message: '좋아요 생성 완료'\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "type": "Number",
+            "optional": false,
+            "field": "403",
+            "description": "<p>권한 없음</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "type": "json",
+            "optional": false,
+            "field": "404",
+            "description": "<p>해당 게시글 없음</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404\n{\n   message: no post id post_id,\n}",
+          "type": "json"
+        }
+      ]
     },
     "version": "0.0.0",
     "filename": "src/api/v1/simple.route.js",
