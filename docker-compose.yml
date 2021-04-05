@@ -55,8 +55,8 @@ services:
       elasticsearch:
         condition: service_healthy
     environment:
-      ELASTICSEARCH_URL: http://elasticsearch:9200
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_URL: http://localhost:9200
+      ELASTICSEARCH_HOSTS: http://localhost:9200
     ports:
     - 5601:5601
     networks:
@@ -65,7 +65,7 @@ services:
       interval: 10s
       retries: 20
       test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:5601/api/status
-
+  
 volumes:
   esdata:
     driver: local
@@ -73,3 +73,4 @@ volumes:
 networks:
   elastic:
     driver: bridge
+
