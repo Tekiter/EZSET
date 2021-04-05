@@ -6,6 +6,17 @@ import { initSocket } from './utils/socket'
 
 export default async function initApp({ PORT, DATABASE_URI, SOCKET_PORT }) {
     try {
+        //elastic apm
+        try{
+        const apm = require('elastic-apm-node').start({
+            serviceName: 'ezset',
+            // serverUrl: 'http://localhost:8200',
+        })
+        console.log("Successfully connected to elastic-apm-server")
+        }catch(err){
+            throw err
+        }
+
         if (!DATABASE_URI) {
             const err = new Error(
                 'Environment Variable "DATABASE_URL" has not been set.'

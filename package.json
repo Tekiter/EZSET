@@ -47,6 +47,7 @@
         "body-parser": "^1.18.2",
         "cachegoose": "^8.0.0",
         "connect-history-api-fallback": "^1.6.0",
+        "elastic-apm-node": "^3.12.1",
         "express": "^4.16.4",
         "express-validator": "^6.2.0",
         "jsonwebtoken": "^8.5.1",
