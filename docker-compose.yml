@@ -1,7 +1,8 @@
-version: '2.2'
+version: '3'
 services:
   apm-server:
     image: docker.elastic.co/apm/apm-server:7.12.0
+    container_name: apm-server
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -11,8 +12,6 @@ services:
     cap_drop: ["ALL"]
     ports:
     - 8200:8200
-    networks:
-    - elastic
     command: >
        apm-server -e
          -E apm-server.rum.enabled=true
@@ -24,10 +23,11 @@ services:
     healthcheck:
       interval: 10s
       retries: 12
-      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://apm-server:8200/
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
+    container_name: elasticsearch
     environment:
     - bootstrap.memory_lock=true
     - cluster.name=docker-cluster
@@ -42,35 +42,28 @@ services:
     - esdata:/usr/share/elasticsearch/data
     ports:
     - 9200:9200
-    networks:
-    - elastic
     healthcheck:
       interval: 20s
       retries: 10
-      test: curl -s http://localhost:9200/_cluster/health | grep -vq '"status":"red"'
+      test: curl -s http://elasticsearch:9200/_cluster/health | grep -vq '"status":"red"'
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.12.0
+    container_name: kibana
     depends_on:
       elasticsearch:
         condition: service_healthy
     environment:
-      ELASTICSEARCH_URL: http://localhost:9200
-      ELASTICSEARCH_HOSTS: http://localhost:9200
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
     ports:
     - 5601:5601
-    networks:
-    - elastic
     healthcheck:
       interval: 10s
       retries: 20
-      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:5601/api/status
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://kibana:5601/api/status
   
 volumes:
   esdata:
     driver: local
-
-networks:
-  elastic:
-    driver: bridge
 
