@@ -21,13 +21,13 @@ var _socket = require('./utils/socket');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* eslint-disable no-console */
-exports.default = async function initApp({ PORT, DATABASE_URI, SOCKET_PORT }) {
+exports.default = async function initApp({ PORT, DATABASE_URI, SOCKET_PORT, APM_SERVER_URL }) {
     try {
         //elastic apm
         try {
             const apm = require('elastic-apm-node').start({
-                serviceName: 'ezset'
-                // serverUrl: 'http://localhost:8200',
+                serviceName: 'ezset',
+                serverUrl: APM_SERVER_URL
             });
             console.log("Successfully connected to elastic-apm-server");
         } catch (err) {
