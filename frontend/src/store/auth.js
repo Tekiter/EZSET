@@ -1,4 +1,5 @@
 import axios from 'axios'
+import axiosCommon from './../service/axios.common.service'
 import jwt from 'jsonwebtoken'
 
 export default {
@@ -38,6 +39,10 @@ export default {
                     'Authorization'
                 ] = `Bearer ${token}`
 
+                axiosCommon.defaults.headers.common[
+                    'Authorization'
+                ] = `Bearer ${token}`
+
                 context.commit('SET_ACCESS_TOKEN', token)
                 localStorage.setItem('accessToken', token)
                 context.commit('SET_USER', user)
@@ -48,6 +53,7 @@ export default {
         },
         async logout(context) {
             delete axios.defaults.headers.common['Authorization']
+            delete axiosCommon.defaults.headers.common['Authorization']
             context.commit('SET_ACCESS_TOKEN', null)
             localStorage.removeItem('accessToken')
             localStorage.removeItem('user')
@@ -64,6 +70,10 @@ export default {
                 user = JSON.parse(user)
 
                 axios.defaults.headers.common[
+                    'Authorization'
+                ] = `Bearer ${accessToken}`
+
+                axiosCommon.defaults.headers.common[
                     'Authorization'
                 ] = `Bearer ${accessToken}`
 
