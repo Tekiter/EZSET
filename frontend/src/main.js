@@ -4,8 +4,6 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
 
-import axios from 'axios'
-
 import 'tui-editor/dist/tui-editor.css'
 import 'tui-editor/dist/tui-editor-contents.css'
 import 'codemirror/lib/codemirror.css'
@@ -15,6 +13,9 @@ import { checkPerm } from './utils/role/role'
 import { actionHelper } from './utils/action'
 import { themeHelper } from './utils/theme'
 
+import axios from 'axios'
+import axiosCommon from './service/axios.common.service'
+
 Vue.config.productionTip = false
 
 Vue.use(require('vue-moment'))
@@ -23,6 +24,8 @@ Vue.use(themeHelper)
 
 Vue.prototype.$perm = checkPerm
 Vue.prototype.$action = actionHelper
+
+Vue.prototype.$axiosCommon = axiosCommon
 
 // api 호출의 기본 경로
 axios.defaults.baseURL = '/api/v1'
