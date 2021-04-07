@@ -9,7 +9,7 @@ const io = exports.io = undefined;
 
 async function initSocket(app, SOCKET_PORT) {
     const server = require('http').createServer(app);
-    const io = require('socket.io')(server);
+    const io = require('socket.io')(server, { origins: '*:*' });
 
     //Attendance State
     var curState = {

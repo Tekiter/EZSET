@@ -26,8 +26,10 @@ exports.default = async function initApp({ PORT, DATABASE_URI, SOCKET_PORT, APM_
         //elastic apm
         try {
             const apm = require('elastic-apm-node').start({
-                serviceName: 'ezset',
-                serverUrl: APM_SERVER_URL
+                serviceName: 'ezset_test',
+                serverUrl: APM_SERVER_URL,
+                captureBody: 'all',
+                usePathAsTransactionName: true
             });
             console.log("Successfully connected to elastic-apm-server");
         } catch (err) {
