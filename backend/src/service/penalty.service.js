@@ -10,8 +10,20 @@ export class PenaltyService {
           });
           return result;
       }catch(err){
-          console.log(err)
-          throw new handleError(500,'Create Penalty fail');
+          throw new handleError(404,'Create Penalty fail');
       }
   };
+
+  static deletePenalty = async(req)=>{
+      const {_id} = req;
+      try{
+          const result = await PenaltyDao.deletePenalty(_id);
+          if(result.n == 0){
+            throw new handleError(404,'Penalty not found');  
+          }
+          return result;
+      }catch(err){
+            throw new handleError(404,'Delete Penalty fail');
+      }
+  }
 }

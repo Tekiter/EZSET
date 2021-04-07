@@ -13,11 +13,19 @@ router.post(
        body('type_id').isString(),
        body('type').isString(),
        body('date').isString(),
-       body('users').isString(),
+       body('users').isArray(),
        body('description').isString(),
        validateParams,
     ],
     PenaltyController.createPenalty);
 
+router.delete(
+    '/:_id',
+    [
+        perm('penalty').can('update'),
+        param('_id').isString(),
+        validateParams,
+    ],
+    PenaltyController.deletePenalty);
 
 export default router
