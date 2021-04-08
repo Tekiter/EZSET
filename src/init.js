@@ -9,7 +9,7 @@ export default async function initApp({ PORT, DATABASE_URI, SOCKET_PORT, APM_SER
         //elastic apm
         try{
         const apm = require('elastic-apm-node').start({
-            serviceName: 'ezset_test',
+            serviceName: 'ezset',
             serverUrl: APM_SERVER_URL,
             captureBody: 'all',
             usePathAsTransactionName: true,
