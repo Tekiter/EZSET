@@ -51,7 +51,7 @@ store.dispatch('auth/restoreEditToken')
 
 // socket.io
 import io from 'socket.io-client'
-const socket = io(process.env.socket.url)
+const socket = io(process.env.socketUrl)
 Vue.prototype.$socket = socket
 
 new Vue({
