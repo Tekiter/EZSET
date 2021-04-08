@@ -51,9 +51,7 @@ store.dispatch('auth/restoreEditToken')
 
 // socket.io
 import io from 'socket.io-client'
-const socket = io('https://www.alcuk.co.kr/socket', {
-    transports: ['websocket'],
-})
+const socket = io('https://www.alcuk.co.kr/socket', { secure: true })
 Vue.prototype.$socket = socket
 
 new Vue({
