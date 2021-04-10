@@ -28,6 +28,10 @@ var _v = require('./api/v1');
 
 var _v2 = _interopRequireDefault(_v);
 
+var _v3 = require('./api/v2');
+
+var _v4 = _interopRequireDefault(_v3);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const app = (0, _express2.default)();
@@ -42,8 +46,14 @@ app.use(_bodyParser2.default.urlencoded({
     limit: '10mb'
 }));
 app.use('/api/v1', _v2.default);
+app.use('/api/v2', _v4.default);
 
 app.use('/api/v1/*', (req, res, next) => {
+    const err = new Error('올바르지 않은 API 접근입니다.');
+    err.status = 404;
+    next(err);
+});
+app.use('/api/v2/*', (req, res, next) => {
     const err = new Error('올바르지 않은 API 접근입니다.');
     err.status = 404;
     next(err);
@@ -62,7 +72,9 @@ app.use((req, res, next) => {
 // Error handler
 app.use((err, req, res, next) => {
     // eslint-disable-line no-unused-vars
-    res.status(err.status || 500).json({
+    return res.status(err.statusCode || 500).json({
+        statusCode: err.statusCode,
+        status: 'Error',
         message: err.message
     });
 });
