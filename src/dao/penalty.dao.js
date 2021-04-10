@@ -37,4 +37,11 @@ export class PenaltyDao {
           _id,
       });
   }
+
+  static deletePenaltys = async(type_id)=>{
+      console.log(type_id)
+      return await Penalty.deleteMany({
+          type_id,
+      });
+  }
 }

@@ -48,4 +48,11 @@ PenaltyDao.deletePenalty = async _id => {
         _id
     });
 };
+
+PenaltyDao.deletePenaltys = async type_id => {
+    console.log(type_id);
+    return await _Penalty2.default.deleteMany({
+        type_id
+    });
+};
 //# sourceMappingURL=penalty.dao.js.map

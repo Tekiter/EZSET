@@ -1,7 +1,7 @@
 "use strict";
 
 class Response {
-  constructor(statusCode, status, message, result) {
+  constructor(statusCode, message, result) {
     this.statusCode = statusCode;
     this.message = message;
     this.result = result;
