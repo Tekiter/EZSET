@@ -6,7 +6,7 @@ import { perm } from '../../utils/role'
 import { param, body, query } from 'express-validator'
 import { PenaltyConfigController } from '../../controller/penaltyConfig.controller';
 
-router.post(
+    router.post(
     '/',
     [
         perm('penalty').can('update'),
@@ -15,5 +15,14 @@ router.post(
         validateParams,
     ],
     PenaltyConfigController.createPenaltyConfig);
+
+    router.delete(
+    '/:_id',
+    [
+        perm('penalty').can('update'),
+        param('_id').isString(),
+        validateParams,
+    ],
+    PenaltyConfigController.deletePenaltyConfig);
 
 export default router

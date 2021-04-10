@@ -11,4 +11,14 @@ export class PenaltyConfigController {
             next(err);
         }
     }
+
+    static deletePenaltyConfig = async(req,res,next)=>{
+        try{
+            const result = await PenaltyConfigService.deletePenaltyConfig(req);
+
+            return res.status(200).json(new Response(200,'delete Penalty success', result));
+        }catch(err){
+            next(err);
+        }
+    }
 }

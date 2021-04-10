@@ -9,4 +9,16 @@ export class PenaltyConfigDao {
     return await penaltyConfig.save();
   }
 
+  static deletePenaltyConfig = async(_id)=>{
+    return await PenaltyConfig.deleteOne({
+        _id
+    });
+  }
+
+  static getPenaltyConfig = async(_id)=>{
+    return await PenaltyConfig.findOne({
+        _id
+    });
+  }
+
 }
