@@ -21,4 +21,8 @@ export class PenaltyConfigDao {
     });
   }
 
+  static getPenaltyConfigs = async()=>{
+    return await PenaltyConfig.find({});
+  }
+
 }

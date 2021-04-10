@@ -25,4 +25,11 @@ import { PenaltyConfigController } from '../../controller/penaltyConfig.controll
     ],
     PenaltyConfigController.deletePenaltyConfig);
 
+    router.get(
+    '/',
+    [
+        perm('penalty').can('read'),
+        validateParams,
+    ],
+    PenaltyConfigController.getPenaltyConfigs);
 export default router

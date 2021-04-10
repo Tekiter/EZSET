@@ -21,4 +21,14 @@ export class PenaltyConfigController {
             next(err);
         }
     }
+
+    static getPenaltyConfigs = async(req,res,next)=>{
+        try{
+            const result = await PenaltyConfigService.getPenaltyConfigs();
+
+            return res.status(200).json(new Response(200,'get PenaltyConfigs success', result));
+        }catch(err){
+            next(err);
+        }
+    }
 }

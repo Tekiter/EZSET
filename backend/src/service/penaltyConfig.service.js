@@ -35,4 +35,13 @@ export class PenaltyConfigService {
     }
     };
 
+
+    static getPenaltyConfigs = async(req)=>{
+      try{
+        const result = await PenaltyConfigDao.getPenaltyConfigs();
+        return result;
+      }catch(err){
+          throw new handleError(404,'PenaltyConfig not foudn');
+      }
+  };
 }
