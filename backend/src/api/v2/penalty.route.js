@@ -28,4 +28,11 @@ router.delete(
     ],
     PenaltyController.deletePenalty);
 
+router.get(
+    '/',
+    [
+        perm('penalty').can('read'),
+        validateParams,
+    ],
+    PenaltyController.getPenaltys);
 export default router

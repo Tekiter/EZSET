@@ -11,8 +11,13 @@ export class PenaltyDao {
     return await penalty.save();
   }
 
-  static getPenaltys = async()=>{
-      return await Penalty.find({});
+  static getPenaltys = async(start,end)=>{
+      return await Penalty.find({
+          date:{
+                $gte: start,
+                $lt: end,
+          }
+      });
   }
 
   static getPenalty = async(username,startDate,endDate)=>{
