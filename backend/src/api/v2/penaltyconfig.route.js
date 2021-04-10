@@ -32,4 +32,15 @@ import { PenaltyConfigController } from '../../controller/penaltyConfig.controll
         validateParams,
     ],
     PenaltyConfigController.getPenaltyConfigs);
+
+    router.patch(
+    '/:_id',
+    [
+        perm('penalty').can('update'),
+        param('_id').isString(),
+        body('value').isNumeric(),
+        validateParams,
+    ],
+    PenaltyConfigController.updatePenaltyConfig);
+    
 export default router

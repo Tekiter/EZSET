@@ -41,7 +41,23 @@ export class PenaltyConfigService {
         const result = await PenaltyConfigDao.getPenaltyConfigs();
         return result;
       }catch(err){
-          throw new handleError(404,'PenaltyConfig not foudn');
+          throw new handleError(404,'PenaltyConfig not found');
       }
-  };
+    };
+
+    static updatePenaltyConfig = async(req)=>{
+        const {_id} = req.params;
+        const {value} = req.body;
+        try{
+            const penaltyConfig = await PenaltyConfigDao.getPenaltyConfig(_id);
+            if(penaltyConfig === null){
+                throw new handleError(404,'PenaltyConfig not found');
+            }
+            const result = await PenaltyConfigDao.updatePenaltyConfig(_id, value);
+            return result;
+        }catch(err){
+            console.log(err);
+            throw new handleError(404,'update PenaltyConfig fail');
+        }
+    }
 }

@@ -25,4 +25,8 @@ export class PenaltyConfigDao {
     return await PenaltyConfig.find({});
   }
 
+  static updatePenaltyConfig = async(_id,value)=>{
+    return await PenaltyConfig.findOneAndUpdate({_id},{value},{new:true});
+  }
+
 }

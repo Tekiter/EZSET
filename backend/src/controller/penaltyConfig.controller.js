@@ -31,4 +31,14 @@ export class PenaltyConfigController {
             next(err);
         }
     }
+
+    static updatePenaltyConfig = async(req,res,next)=>{
+        try{
+            const result = await PenaltyConfigService.updatePenaltyConfig(req);
+
+            return res.status(200).json(new Response(200,'update PenaltyConfig success', result));
+        }catch(err){
+            next(err);
+        }
+    }
 }
