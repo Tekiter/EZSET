@@ -147,7 +147,7 @@
 }
 </style>
 <script>
-import axios from 'axios'
+import axios from './../../service/axios.common.service'
 import moment from 'moment'
 export default {
     data() {
@@ -231,7 +231,7 @@ export default {
         async fetchUserList() {
             this.fetchingCount += 1
             try {
-                const users = await axios.get('user')
+                const users = await axios.get('/v1/user')
                 this.users = users.data.users
             } finally {
                 this.fetchingCount -= 1
@@ -241,7 +241,7 @@ export default {
             this.fetchingCount += 1
             try {
                 var res = []
-                const penaltyConfig = await axios.get('penaltyConfig/read')
+                const penaltyConfig = await axios.get('/v2/penaltyConfig/read')
                 penaltyConfig.data.forEach(element => {
                     if (element.key != '지각' && element.key != '결석') {
                         res.push(element.key)
@@ -262,16 +262,19 @@ export default {
             this.curPenalty.isLoading = false
         },
         async getPenalties(curUser) {
-            const res = await axios.get(`penalty/read/${curUser.username}`, {
-                params: {
-                    start_date: this.curPenalty.start_date,
-                    end_date: this.curPenalty.end_date,
-                },
-            })
+            const res = await axios.get(
+                `/v2/penalty/read/${curUser.username}`,
+                {
+                    params: {
+                        start_date: this.curPenalty.start_date,
+                        end_date: this.curPenalty.end_date,
+                    },
+                }
+            )
             return res.data
         },
         async getUser() {
-            var res = await axios.get('/mypage')
+            var res = await axios.get('/v1/mypage')
             this.curUser.username = res.data.username
             this.curUser.realname = res.data.realname
             await this.fetchPenalties()
@@ -289,7 +292,7 @@ export default {
             }
         },
         async deleteItem(penalty) {
-            await axios.post('penalty/delete', {
+            await axios.post('/v2/penalty/delete', {
                 username: penalty.username,
                 date: penalty.date,
                 type: penalty.type,
@@ -317,7 +320,7 @@ export default {
             } else if (penalty.description == '') {
                 this.openSnackbar('설명을 작성해 주세요', 'error')
             } else {
-                await axios.post('/penalty/write', {
+                await axios.post('/v2/penalty/write', {
                     type: penalty.type,
                     username: this.curUser.username,
                     date: penalty.date,

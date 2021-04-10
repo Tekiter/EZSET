@@ -5,6 +5,7 @@ import bodyParser from 'body-parser'
 import history from 'connect-history-api-fallback'
 
 import v1API from './api/v1'
+import v2API from './api/v2'
 
 const app = express()
 app.disable('x-powered-by')
@@ -22,8 +23,14 @@ app.use(
     })
 )
 app.use('/api/v1', v1API)
+app.use('/api/v2', v2API)
 
 app.use('/api/v1/*', (req, res, next) => {
+    const err = new Error('올바르지 않은 API 접근입니다.')
+    err.status = 404
+    next(err)
+})
+app.use('/api/v2/*', (req, res, next) => {
     const err = new Error('올바르지 않은 API 접근입니다.')
     err.status = 404
     next(err)
@@ -42,9 +49,11 @@ app.use((req, res, next) => {
 // Error handler
 app.use((err, req, res, next) => {
     // eslint-disable-line no-unused-vars
-    res.status(err.status || 500).json({
-        message: err.message,
-    })
+    return res.status(err.statusCode || 500).json({
+    statusCode: err.statusCode,
+    status: 'Error',
+    message: err.message,
+  });
 })
 
 export default app
