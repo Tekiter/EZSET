@@ -31,4 +31,14 @@ export class PenaltyController {
             next(err);
         }
     }
+    
+     static getPenalty = async(req,res,next)=>{
+        try{
+            const result = await PenaltyService.getPenalty(req);
+
+            return res.status(200).json(new Response(200,'get Penalty success',result));
+        }catch(err){
+            next(err);
+        }
+    }
 }

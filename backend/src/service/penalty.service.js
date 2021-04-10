@@ -36,4 +36,15 @@ export class PenaltyService {
           throw new handleError(404,'Penalty not found');
       }
   }
+
+  static getPenalty = async(req)=>{
+      const {username} = req.params;
+      const {start,end} = req.query;
+      try{
+          const result = await PenaltyDao.getPenalty(username,start,end);
+          return result;
+      }catch(err){
+          throw new handleError(404,'Penalty not found');
+      }
+  }
 }

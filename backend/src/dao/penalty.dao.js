@@ -20,13 +20,13 @@ export class PenaltyDao {
       });
   }
 
-  static getPenalty = async(username,startDate,endDate)=>{
+  static getPenalty = async(username,start,end)=>{
       return await Penalty.find(
           {
               username,
               date:{
-                  $gte: startDate,
-                  $lt: endDate,
+                  $gte: start,
+                  $lt: end,
               },
           }
       )

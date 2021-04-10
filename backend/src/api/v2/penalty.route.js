@@ -35,4 +35,13 @@ router.get(
         validateParams,
     ],
     PenaltyController.getPenaltys);
+
+router.get(
+    '/:username',
+    [
+        perm('penalty').can('read'),
+        param('username').isString(),
+        validateParams,
+    ],
+    PenaltyController.getPenalty);
 export default router
