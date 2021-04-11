@@ -219,8 +219,8 @@
     </div>
 </template>
 <script>
-import axios from 'axios'
 import PaginationFooter from '../../components/misc/PaginationFooter.vue'
+import { PenaltyConfigService } from '../../service/penaltyConfig.service'
 
 export default {
     components: {
@@ -273,10 +273,9 @@ export default {
         async fetchpenaltys() {
             this.fetchingCount += 1
             try {
-                const penaltys = await axios.get('penaltyconfig/read')
-
-                this.totalCount = penaltys.data.total
-                this.penaltys = penaltys.data
+                const penaltys = await PenaltyConfigService.getPenaltyConfig()
+                this.totalCount = penaltys.length
+                this.penaltys = penaltys
             } finally {
                 this.fetchingCount -= 1
             }
@@ -291,13 +290,9 @@ export default {
         async closeDeleteDialog(penalty) {
             this.deleteDialog.penalty = penalty
             try {
-                await axios.delete(
-                    `penaltyconfig/${this.deleteDialog.penalty._id}`,
-                    {
-                        params: {
-                            key: this.deleteDialog.penalty.key,
-                        },
-                    }
+                await PenaltyConfigService.deletePenaltyConfig(
+                    this.deleteDialog.penalty._id,
+                    this.deleteDialog.penalty.key
                 )
                 this.openSnackbar('삭제되었습니다', 'success')
             } catch (err) {
@@ -324,11 +319,11 @@ export default {
                 this.openSnackbar('점수는 숫자로 입력해 주세요', 'error')
             } else {
                 try {
-                    await axios.post('penaltyconfig/update', {
-                        _id: this.updateDialog.type_id,
-                        key: this.updateDialog.type,
-                        value: this.updateDialog.point,
-                    })
+                    await PenaltyConfigService.updatePenaltyConfig(
+                        this.updateDialog.type_id,
+                        this.updateDialog.type,
+                        this.updateDialog.point
+                    )
                     this.openSnackbar('수정되었습니다', 'success')
                 } catch (err) {
                     this.openSnackbar('수정하지 못했습니다', 'error')
@@ -352,10 +347,10 @@ export default {
                 this.openSnackbar('점수는 숫자로 입력해 주세요', 'error')
             } else {
                 try {
-                    await axios.post('penaltyconfig/write', {
-                        key: this.addDialog.name,
-                        value: this.addDialog.point,
-                    })
+                    await PenaltyConfigService.createPenaltyConfig(
+                        this.addDialog.name,
+                        this.addDialog.point
+                    )
                     this.openSnackbar('추가되었습니다', 'success')
                 } catch (err) {
                     this.openSnackbar('추가하지 못했습니다', 'error')
