@@ -99,8 +99,6 @@
                         </v-row>
                     </v-card>
                     <v-divider></v-divider>
-                    <!-- <v-subheader>소속 유저</v-subheader> -->
-
                     <template v-if="curPenalty.isLoading">
                         <v-skeleton-loader
                             v-for="i in 7"
@@ -147,8 +145,10 @@
 }
 </style>
 <script>
-import axios from './../../service/axios.common.service'
+import axios from 'axios'
 import moment from 'moment'
+import { PenaltyConfigService } from './../../service/penaltyConfig.service'
+import { PenaltyService } from './../../service/penalty.service'
 export default {
     data() {
         return {
@@ -185,10 +185,6 @@ export default {
                     { text: '점수', value: 'point' },
                 ],
             },
-            deleteDialog: {
-                show: false,
-                penalty: {},
-            },
             errorDialog: {
                 show: false,
             },
@@ -198,13 +194,6 @@ export default {
                 color: '',
             },
             Totalscore: 0,
-            addPenalty: {
-                type: '',
-                description: '',
-                point: '',
-                date: moment().format('YYYY-MM-DD'),
-                datePicker: false,
-            },
         }
     },
     computed: {
@@ -231,7 +220,7 @@ export default {
         async fetchUserList() {
             this.fetchingCount += 1
             try {
-                const users = await axios.get('/v1/user')
+                const users = await axios.get('/user')
                 this.users = users.data.users
             } finally {
                 this.fetchingCount -= 1
@@ -240,14 +229,7 @@ export default {
         async fetchPenaltyConfigList() {
             this.fetchingCount += 1
             try {
-                var res = []
-                const penaltyConfig = await axios.get('/v2/penaltyConfig/read')
-                penaltyConfig.data.forEach(element => {
-                    if (element.key != '지각' && element.key != '결석') {
-                        res.push(element.key)
-                    }
-                })
-                this.penaltyConfig = res
+                this.penaltyConfig = await PenaltyConfigService.getPenaltyConfig()
             } finally {
                 this.fetchingCount -= 1
             }
@@ -257,53 +239,36 @@ export default {
             this.curPenalty.penalties = await this.getPenalties(this.curUser)
             this.Totalscore = 0
             this.curPenalty.penalties.forEach(element => {
+                element.date = moment(element.date).format('YYYY년 MM월 DD일')
+            })
+            for (let penalty of this.curPenalty.penalties) {
+                for (let penaltyConfig of this.penaltyConfig) {
+                    if (penalty.type == penaltyConfig.key)
+                        penalty.point = penaltyConfig.value
+                }
+            }
+
+            this.curPenalty.penalties.forEach(element => {
                 this.Totalscore += parseInt(element.point)
             })
+
             this.curPenalty.isLoading = false
         },
         async getPenalties(curUser) {
-            const res = await axios.get(
-                `/v2/penalty/read/${curUser.username}`,
-                {
-                    params: {
-                        start_date: this.curPenalty.start_date,
-                        end_date: this.curPenalty.end_date,
-                    },
-                }
+            return await PenaltyService.getPenalty(
+                curUser.username,
+                this.curPenalty.start_date,
+                this.curPenalty.end_date
             )
-            return res.data
         },
         async getUser() {
-            var res = await axios.get('/v1/mypage')
+            var res = await axios.get('/mypage')
             this.curUser.username = res.data.username
             this.curUser.realname = res.data.realname
             await this.fetchPenalties()
         },
         searchMatches(haystack, niddle) {
             return haystack.includes(niddle || '')
-        },
-
-        async openDeleteItem(penalty) {
-            if (penalty.type == '지각' || penalty.type == '결석') {
-                this.errorDialog.show = true
-            } else {
-                this.deleteDialog.show = true
-                this.deleteDialog.penalty = penalty
-            }
-        },
-        async deleteItem(penalty) {
-            await axios.post('/v2/penalty/delete', {
-                username: penalty.username,
-                date: penalty.date,
-                type: penalty.type,
-                description: penalty.description,
-            })
-            this.openSnackbar('삭제되었습니다', 'success')
-
-            this.deleteDialog.show = false
-            this.fetchingCount += 1
-            await this.fetchPenalties()
-            this.fetchingCount -= 1
         },
         openSnackbar(text, color) {
             this.snackbar.text = text
@@ -313,24 +278,6 @@ export default {
         getPointColor(point) {
             if (point >= 0) return 'success'
             else return 'error'
-        },
-        async addPenaltyProc(penalty) {
-            if (penalty.type == '') {
-                this.openSnackbar('항목을 선택해주세요', 'error')
-            } else if (penalty.description == '') {
-                this.openSnackbar('설명을 작성해 주세요', 'error')
-            } else {
-                await axios.post('/v2/penalty/write', {
-                    type: penalty.type,
-                    username: this.curUser.username,
-                    date: penalty.date,
-                    description: penalty.description,
-                })
-                this.fetchPenalties()
-                this.addPenalty.type = ''
-                this.addPenalty.description = ''
-                this.openSnackbar('등록되었습니다', 'success')
-            }
         },
         getColor(val) {
             if (val >= 0) return 'success'
