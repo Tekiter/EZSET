@@ -10,7 +10,6 @@ router.post(
     '/',
     [
        perm('penalty').can('update'),
-       body('type_id').isString(),
        body('type').isString(),
        body('date').isString(),
        body('users').isArray(),

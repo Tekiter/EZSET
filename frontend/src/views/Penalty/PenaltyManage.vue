@@ -93,7 +93,6 @@
                             color="primary"
                             depressed
                             :dark="isDarkColor('primary')"
-                            v-on="on"
                             :small="$vuetify.breakpoint.smAndDown"
                             @click="addPenaltyDialog.show = true"
                         >
@@ -487,7 +486,8 @@
 import axios from 'axios'
 import moment from 'moment'
 import PaginationFooter from '../../components/misc/PaginationFooter.vue'
-
+import { PenaltyService } from '../../service/penalty.service'
+import { PenaltyConfigService } from '../../service/penaltyConfig.service'
 export default {
     components: {
         PaginationFooter,
@@ -548,6 +548,7 @@ export default {
                 color: '',
             },
             penalties: [],
+            penaltyConfig: [],
             userScore: [],
             errorDialog: {
                 show: false,
@@ -578,8 +579,8 @@ export default {
             this.fetchingCount += 1
             await this.fetchUsers()
             await this.fetchPenalty()
-            await this.getUserScore()
             await this.fetchPenaltyConfig()
+            await this.getUserScore()
             this.fetchingCount -= 1
         },
         async fetchUsers() {
@@ -597,47 +598,46 @@ export default {
             this.penalties = []
             this.fetchingCount += 1
             try {
-                const penalties = await axios.get(`penalty/read`)
-                penalties.data.map(item => {
-                    if (
-                        moment(this.Sdate).format('YYYYMMDD') <=
-                            moment(item.date).format('YYYYMMDD') &&
-                        moment(this.Edate).format('YYYYMMDD') >=
-                            moment(item.date).format('YYYYMMDD')
-                    ) {
-                        this.penalties.push(item)
-                    }
-                })
+                const penalties = await PenaltyService.getPenaltys(
+                    this.Sdate,
+                    this.Edate
+                )
+                this.penalties = penalties
             } finally {
                 this.fetchingCount -= 1
             }
         },
         async fetchPenaltyConfig() {
             this.fetchingCount += 1
-            const tmp = await axios.get('penaltyconfig/read')
+            const tmp = await PenaltyConfigService.getPenaltyConfig()
+            this.penaltyConfig = tmp
             var res = []
-            tmp.data.forEach(element => {
+            tmp.forEach(element => {
                 if (element.key != '지각' && element.key != '결석')
                     res.push(element.key)
             })
             this.addPenaltyDialog.config = res
-            this.addPenaltyDialog.configKeyValue = tmp.data
+            this.addPenaltyDialog.configKeyValue = tmp
             this.fetchingCount -= 1
         },
         async getUserScore() {
             this.infoAddedUsers = []
             let res = []
-            await this.users.forEach(user => {
+            for (let user of this.users) {
                 let point = 0
-                this.penalties.forEach(item => {
-                    if (user.username == item.username) point += item.point
-                })
-                res.push({
+                for (let item of this.penalties) {
+                    if (user.username === item.username) {
+                        for (let config of this.penaltyConfig) {
+                            if (config.key == item.type) point += config.value
+                        }
+                    }
+                }
+                await res.push({
                     username: user.username,
                     realname: user.realname,
                     point: point,
                 })
-            })
+            }
             this.infoAddedUsers = res
         },
         searchMatches(haystack, niddle) {
@@ -652,6 +652,7 @@ export default {
             this.penalties.forEach(elem => {
                 if (user.username == elem.username) {
                     tmp.push({
+                        _id: elem._id,
                         date: elem.date,
                         type: elem.type,
                         description: elem.description,
@@ -683,14 +684,7 @@ export default {
                     'error'
                 )
             } else {
-                await axios.delete(`penalty/delete`, {
-                    params: {
-                        username: this.deleteDialog.username,
-                        date: this.deleteDialog.info.date,
-                        description: this.deleteDialog.info.description,
-                        type: this.deleteDialog.info.type,
-                    },
-                })
+                await PenaltyService.deletePenalty(this.deleteDialog.info._id)
                 this.openSnackbar('삭제되었습니다', 'success')
 
                 this.deleteDialog.show = false
@@ -722,18 +716,12 @@ export default {
             else if (this.addPenaltyDialog.description == '')
                 this.openSnackbar('설명을 작성해 주세요! ', 'error')
             else {
-                var type_id = this.addPenaltyDialog.configKeyValue.find(
-                    (item, idx) => {
-                        return item.key === this.addPenaltyDialog.type
-                    }
+                await PenaltyService.createPenalty(
+                    this.addPenaltyDialog.selections,
+                    this.addPenaltyDialog.type,
+                    this.addPenaltyDialog.description,
+                    this.addPenaltyDialog.date
                 )
-                await axios.post('/penalty/write', {
-                    type_id: type_id._id,
-                    users: this.addPenaltyDialog.selections,
-                    date: this.addPenaltyDialog.date,
-                    description: this.addPenaltyDialog.description,
-                    type: this.addPenaltyDialog.type,
-                })
                 this.closeaddPenaltyDialog()
                 await this.fetchAll()
                 this.openSnackbar('등록되었습니다', 'success')
