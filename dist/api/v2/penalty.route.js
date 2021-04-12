@@ -20,7 +20,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var router = _express2.default.Router();
 
-router.post('/', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.body)('type_id').isString(), (0, _expressValidator.body)('type').isString(), (0, _expressValidator.body)('date').isString(), (0, _expressValidator.body)('users').isArray(), (0, _expressValidator.body)('description').isString(), _api.validateParams], _penalty.PenaltyController.createPenalty);
+router.post('/', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.body)('type').isString(), (0, _expressValidator.body)('date').isString(), (0, _expressValidator.body)('users').isArray(), (0, _expressValidator.body)('description').isString(), _api.validateParams], _penalty.PenaltyController.createPenalty);
 
 router.delete('/:_id', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.param)('_id').isString(), _api.validateParams], _penalty.PenaltyController.deletePenalty);
 
