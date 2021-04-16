@@ -4,6 +4,7 @@ import autoIncrement from 'mongoose-auto-increment'
 
 autoIncrement.initialize(mongoose.connection)
 cachegoose(mongoose)
+mongoose.Promise = global.Promise;
 
 const database = {
     initialize(DATABASE_URI) {
