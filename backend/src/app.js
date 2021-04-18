@@ -50,7 +50,7 @@ app.use((req, res, next) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-    apm.captureError(error);
+    apm.captureError(err);
     // eslint-disable-line no-unused-vars
     return res.status(err.statusCode || 500).json({
     statusCode: err.statusCode,
