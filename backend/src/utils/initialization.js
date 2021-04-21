@@ -64,5 +64,4 @@ const initialization = {
     },
 }
 
-module.exports.default = initialization
-module.exports = initialization
+export default initialization

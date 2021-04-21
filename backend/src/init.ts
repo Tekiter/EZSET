@@ -4,18 +4,30 @@ import app from './app'
 import initialization from './utils/initialization'
 import { initSocket } from './utils/socket'
 
-export default async function initApp({ PORT, DATABASE_URI, SOCKET_PORT, APM_SERVER_URL }) {
+export interface initConfig {
+    PORT: string
+    DATABASE_URI: string
+    SOCKET_PORT: string
+    APM_SERVER_URL: string
+}
+
+export default async function initApp({
+    PORT,
+    DATABASE_URI,
+    SOCKET_PORT,
+    APM_SERVER_URL,
+}: initConfig) {
     try {
         //elastic apm
-        try{
-        const apm = require('elastic-apm-node').start({
-            serviceName: 'ezset',
-            serverUrl: APM_SERVER_URL,
-            captureBody: 'all',
-            usePathAsTransactionName: true,
-        })
-        console.log("Successfully connected to elastic-apm-server")
-        }catch(err){
+        try {
+            const apm = require('elastic-apm-node').start({
+                serviceName: 'ezset',
+                serverUrl: APM_SERVER_URL,
+                captureBody: 'all',
+                usePathAsTransactionName: true,
+            })
+            console.log('Successfully connected to elastic-apm-server')
+        } catch (err) {
             throw err
         }
 

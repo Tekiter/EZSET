@@ -7,6 +7,13 @@ import history from 'connect-history-api-fallback'
 import v1API from './api/v1'
 import v2API from './api/v2'
 
+// 레거시 코드 호환성을 위해 Error.status 프로퍼티 타입 추가
+declare global {
+    interface Error {
+        status: number
+    }
+}
+
 const app = express()
 app.disable('x-powered-by')
 
@@ -50,10 +57,10 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
     // eslint-disable-line no-unused-vars
     return res.status(err.statusCode || 500).json({
-    statusCode: err.statusCode,
-    status: 'Error',
-    message: err.message,
-  });
+        statusCode: err.statusCode,
+        status: 'Error',
+        message: err.message,
+    })
 })
 
 export default app
