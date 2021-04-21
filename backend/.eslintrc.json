@@ -1,20 +1,16 @@
 {
     "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint", "promise", "jest"],
     "parserOptions": {
     },
     "env": {
-        "node": true,
-        "jest": true
+        "node": true
     },
     "extends": ["plugin:@typescript-eslint/recommended", "plugin:prettier/recommended", "prettier/@typescript-eslint"],
     "rules": {
-        "jest/no-focused-tests": 2,
-        "jest/no-identical-title": 2,
         "linebreak-style": 0,
-        "no-console": "error",
+        "no-console": "warn",
         "semi": ["error", "never"],
-
+        "@typescript-eslint/no-empty-function": "warn",
         "no-unused-vars": [
             "error",
             {

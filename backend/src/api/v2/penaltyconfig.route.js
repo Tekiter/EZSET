@@ -1,12 +1,12 @@
-import express from 'express';
-var router = express.Router();
+import express from 'express'
+var router = express.Router()
 
 import { validateParams } from '../../utils/api'
 import { perm } from '../../utils/role'
-import { param, body, query } from 'express-validator'
-import { PenaltyConfigController } from '../../controller/penaltyConfig.controller';
+import { param, body } from 'express-validator'
+import { PenaltyConfigController } from '../../controller/penaltyConfig.controller'
 
-    router.post(
+router.post(
     '/',
     [
         perm('penalty').can('update'),
@@ -14,26 +14,22 @@ import { PenaltyConfigController } from '../../controller/penaltyConfig.controll
         body('value').isNumeric(),
         validateParams,
     ],
-    PenaltyConfigController.createPenaltyConfig);
+    PenaltyConfigController.createPenaltyConfig
+)
 
-    router.delete(
+router.delete(
     '/:_id',
-    [
-        perm('penalty').can('update'),
-        param('_id').isString(),
-        validateParams,
-    ],
-    PenaltyConfigController.deletePenaltyConfig);
+    [perm('penalty').can('update'), param('_id').isString(), validateParams],
+    PenaltyConfigController.deletePenaltyConfig
+)
 
-    router.get(
+router.get(
     '/',
-    [
-        perm('penalty').can('read'),
-        validateParams,
-    ],
-    PenaltyConfigController.getPenaltyConfigs);
+    [perm('penalty').can('read'), validateParams],
+    PenaltyConfigController.getPenaltyConfigs
+)
 
-    router.patch(
+router.patch(
     '/:_id',
     [
         perm('penalty').can('update'),
@@ -41,6 +37,7 @@ import { PenaltyConfigController } from '../../controller/penaltyConfig.controll
         body('value').isNumeric(),
         validateParams,
     ],
-    PenaltyConfigController.updatePenaltyConfig);
-    
+    PenaltyConfigController.updatePenaltyConfig
+)
+
 export default router

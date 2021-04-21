@@ -1,9 +1,12 @@
+import http from 'http'
+import sio from 'socket.io'
+
 //socket io to Attendance
 export const io = undefined
 
 export async function initSocket(app, SOCKET_PORT) {
-    const server = require('http').createServer(app)
-    const io = require('socket.io')(server,{origins: '*:*'})
+    const server = http.createServer(app)
+    const io = sio(server, { origins: '*:*' })
 
     //Attendance State
     var curState = {
