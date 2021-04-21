@@ -16,13 +16,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "sourceMap": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
     "noImplicitAny": false,
     "outDir": "./dist",
-    "rootDir": "./"
+    "baseUrl": "."
   },
+  "exclude": [
+    "node_modules"
+  ],
   "include": [
-    "src"
+    "src/**/*"
   ]
 }

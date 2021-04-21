@@ -4,13 +4,13 @@
     "description": "",
     "repository": "https://github.com/Tekiter/EZSET",
     "license": "MIT",
-    "main": "dist/index.js",
+    "main": "dist/index",
     "scripts": {
         "prestart": "npm run -s build",
         "start": "node dist/index.js",
         "dev": "nodemon src/index.ts --exec \"ts-node -r dotenv/config\"",
         "clean": "rimraf dist",
-        "build": "npm run clean && mkdir dist && tsc --build dist",
+        "build": "npm run clean && tsc --build",
         "test": "jest --watch",
         "lint": "esw -w src test",
         "api": "apidoc -o apidoc/ -i src/api/v1"
