@@ -1,15 +1,13 @@
 {
-    "parser": "babel-eslint",
-    "plugins": ["import", "promise", "jest"],
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint", "promise", "jest"],
     "parserOptions": {
-        "ecmaVersion": 2017,
-        "sourceType": "module"
     },
     "env": {
         "node": true,
         "jest": true
     },
-    "extends": ["prettier"],
+    "extends": ["plugin:@typescript-eslint/recommended", "plugin:prettier/recommended", "prettier/@typescript-eslint"],
     "rules": {
         "jest/no-focused-tests": 2,
         "jest/no-identical-title": 2,
@@ -22,6 +20,9 @@
             {
                 "args": "none"
             }
+        ],
+        "prettier/prettier": [
+            "error", { "endOfLine": "auto" }
         ]
     }
 }
