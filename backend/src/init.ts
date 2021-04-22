@@ -3,6 +3,7 @@ import database from './utils/database'
 import app from './app'
 import initialization from './utils/initialization'
 import { initSocket } from './utils/socket'
+import elasticApmNode from 'elastic-apm-node'
 
 export interface initConfig {
     PORT: string
@@ -11,34 +12,50 @@ export interface initConfig {
     APM_SERVER_URL: string
 }
 
+function initElastic(APM_SERVER_URL: string) {
+    if (APM_SERVER_URL === '') {
+        console.log(
+            'elastic-apm-server is disabled due to empty APM_SERVER_URL.'
+        )
+        return
+    }
+
+    try {
+        elasticApmNode.start({
+            serviceName: 'ezset',
+            serverUrl: APM_SERVER_URL,
+            captureBody: 'all',
+            usePathAsTransactionName: true,
+        })
+        console.log('Successfully connected to elastic-apm-server')
+    } catch (err) {
+        throw err
+    }
+}
+
+async function initDatabase(DATABASE_URI: string) {
+    if (!DATABASE_URI) {
+        const err = new Error(
+            'Environment Variable "DATABASE_URL" has not been set.'
+        )
+        throw err
+    }
+    await database.initialize(DATABASE_URI)
+    console.log('Successfully connected to database')
+}
+
 export default async function initApp({
     PORT,
     DATABASE_URI,
     SOCKET_PORT,
     APM_SERVER_URL,
 }: initConfig) {
+    console.log('Starting EZSET server...')
     try {
         //elastic apm
-        try {
-            const apm = require('elastic-apm-node').start({
-                serviceName: 'ezset',
-                serverUrl: APM_SERVER_URL,
-                captureBody: 'all',
-                usePathAsTransactionName: true,
-            })
-            console.log('Successfully connected to elastic-apm-server')
-        } catch (err) {
-            throw err
-        }
+        initElastic(APM_SERVER_URL)
 
-        if (!DATABASE_URI) {
-            const err = new Error(
-                'Environment Variable "DATABASE_URL" has not been set.'
-            )
-            throw err
-        }
-        await database.initialize(DATABASE_URI)
-        console.log('Successfully connected to database')
+        initDatabase(DATABASE_URI)
 
         await initialization.initialize()
         await initSocket(app, SOCKET_PORT)
