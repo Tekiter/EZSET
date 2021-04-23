@@ -1,25 +1,47 @@
 import bcrypt from 'bcrypt-nodejs'
 import jwt from 'jsonwebtoken'
-import { getConfig } from '../utils/config'
+import { getConfig } from './config'
+
+export interface AccessInfo {
+    username: string
+    roles: string
+}
+
+const JWT_SECRET: string = (({ JWT_SECRET }) => {
+    if (JWT_SECRET === undefined) {
+        throw new Error('Invalid JWT_SECRET')
+    }
+    return JWT_SECRET + ''
+})(process.env)
+
+function checkAccessInfo(raw: Partial<AccessInfo>): raw is AccessInfo {
+    if (!('username' in raw)) {
+        return false
+    }
+    if (!('roles' in raw)) {
+        return false
+    }
+    return true
+}
 
 const auth = {
-    hashPassword(password) {
+    hashPassword(password: string): string {
         return bcrypt.hashSync(password)
     },
-    checkPassword(password, hash) {
+    checkPassword(password: string, hash: string): boolean {
         return bcrypt.compareSync(password, hash)
     },
-    createAccessToken({ username, roles }) {
+    createAccessToken({ username, roles }: AccessInfo): Promise<string> {
         return new Promise(function(resolve, reject) {
             jwt.sign(
                 {
                     username,
                     roles,
                 },
-                process.env.JWT_SECRET,
+                JWT_SECRET,
                 { expiresIn: 86400 },
                 function(err, encoded) {
-                    if (!err) {
+                    if (!err && encoded !== undefined) {
                         resolve(encoded)
                     } else {
                         reject(err)
@@ -29,11 +51,15 @@ const auth = {
         })
     },
     //accessToken이 유효한지 확인
-    checkToken(token) {
+    checkToken(token: string): Promise<AccessInfo> {
         return new Promise(function(resolve, reject) {
-            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
-                if (!err) {
-                    resolve(decoded)
+            jwt.verify(token, JWT_SECRET, function(err, decoded) {
+                if (!err && decoded !== undefined) {
+                    if (checkAccessInfo(decoded)) {
+                        resolve(decoded)
+                    } else {
+                        reject({})
+                    }
                 } else {
                     reject(err)
                 }
@@ -48,7 +74,7 @@ const auth = {
                     username,
                     is_edit_token: true,
                 },
-                process.env.JWT_SECRET,
+                JWT_SECRET,
                 { expiresIn: 300 },
                 function(err, encoded) {
                     if (!err) {
@@ -60,9 +86,9 @@ const auth = {
             )
         })
     },
-    async loginRequired(req, res, next) {
+    async loginRequired(req, res, next): Promise<void> {
         if (req.headers && req.headers.authorization) {
-            let tokenbase = req.headers.authorization.split(' ')
+            const tokenbase = req.headers.authorization.split(' ')
             if (tokenbase[0] === 'Bearer') {
                 try {
                     const user = await auth.checkToken(tokenbase[1])
@@ -77,7 +103,7 @@ const auth = {
         }
         res.status(401).json({ message: '로그인이 필요합니다.' })
     },
-    async superAdminRequired(req, res, next) {
+    async superAdminRequired(req, res, next): Promise<void> {
         const f = async () => {
             if (req.user.username === (await getConfig('superAdmin'))) {
                 next()
@@ -94,5 +120,4 @@ const auth = {
     },
 }
 
-module.exports.default = auth
-module.exports = auth
+export default auth
