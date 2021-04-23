@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import autoIncerment from 'mongoose-auto-increment'
-import auth from '../utils/auth'
+import * as auth from '../utils/auth'
 
 export interface UserDocument extends mongoose.Document {
     username: string
