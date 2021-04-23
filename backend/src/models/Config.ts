@@ -1,5 +1,10 @@
 import mongoose from 'mongoose'
 
+export interface ConfigDocument extends mongoose.Document {
+    key: string
+    value: unknown
+}
+
 const configSchema = new mongoose.Schema({
     key: {
         type: String,
@@ -12,4 +17,4 @@ const configSchema = new mongoose.Schema({
     },
 })
 
-export default mongoose.model('config', configSchema)
+export default mongoose.model<ConfigDocument>('config', configSchema)
