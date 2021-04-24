@@ -1,10 +1,16 @@
+import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcrypt-nodejs'
 import jwt from 'jsonwebtoken'
 import { getConfig } from './config'
 
 export interface AccessInfo {
     username: string
-    roles: string
+    roles: string[]
+}
+
+export interface StrictAccessInfo {
+    username: string
+    is_edit_token: boolean
 }
 
 const JWT_SECRET: string = (({ JWT_SECRET }) => {
@@ -73,17 +79,17 @@ export function checkToken(token: string): Promise<AccessInfo> {
 }
 
 //민감한 개인정보를 수정,관리하기 위한 토큰
-export function createEditToken(username) {
+export function createEditToken(username: string): Promise<string> {
     return new Promise(function(resolve, reject) {
         jwt.sign(
             {
                 username,
                 is_edit_token: true,
-            },
+            } as StrictAccessInfo,
             JWT_SECRET,
             { expiresIn: 300 },
             function(err, encoded) {
-                if (!err) {
+                if (!err && encoded) {
                     resolve(encoded)
                 } else {
                     reject(err)
@@ -93,7 +99,15 @@ export function createEditToken(username) {
     })
 }
 
-export async function loginRequired(req, res, next): Promise<void> {
+export interface RequestWithUser extends Request {
+    user: AccessInfo
+}
+
+export async function loginRequired(
+    req: RequestWithUser,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
     if (req.headers && req.headers.authorization) {
         const tokenbase = req.headers.authorization.split(' ')
         if (tokenbase[0] === 'Bearer') {
@@ -111,7 +125,11 @@ export async function loginRequired(req, res, next): Promise<void> {
     res.status(401).json({ message: '로그인이 필요합니다.' })
 }
 
-export async function superAdminRequired(req, res, next): Promise<void> {
+export async function superAdminRequired(
+    req: RequestWithUser,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
     const f = async () => {
         if (req.user.username === (await getConfig('superAdmin'))) {
             next()
