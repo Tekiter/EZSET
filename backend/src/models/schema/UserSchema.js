@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import auth from '../../utils/auth'
+import * as auth from '../../utils/auth'
 
 const userSchema = new mongoose.Schema({
     username: {
