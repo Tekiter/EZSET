@@ -14,8 +14,8 @@ import {
     checkUnlinkedFile,
     getFileLinks,
 } from '../../utils/file'
+import crypto from 'crypto'
 const router = Router()
-const crypto = require('crypto')
 const viewObj = new Object()
 
 /**

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 import fs from 'fs'
 import path from 'path'
 import { Router } from 'express'
@@ -22,7 +24,6 @@ fs.readdirSync(__dirname)
             const err = Error(`Invalid router file '${routeFile}'`)
             throw err
         }
-
 
         if (!subrouter.loginNotRequired) {
             middlewares.push(loginRequired)
