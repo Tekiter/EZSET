@@ -57,4 +57,11 @@ export class AttendanceDao {
           }
       });
   }
+
+  static deleteAttendance = async(username,date)=>{
+      return await Attendance.deleteOne({
+            username,
+            date : new Date(date)
+      });
+  }
 }

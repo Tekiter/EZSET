@@ -28,6 +28,16 @@ router.delete(
     ],
     AttendanceController.deleteAttendances);
 
+router.delete(
+    '/:username/:date',
+    [
+        perm('attendance').can('update'),
+        param('username').isString(),
+        param('date').isString(),
+        validateParams,
+    ],
+    AttendanceController.deleteAttendance);
+
 router.get(
     '/:date',
     [
