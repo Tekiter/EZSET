@@ -25,6 +25,20 @@ export class AttendanceService {
             throw new handleError(404,'Delete Attendance fail');
       }
   }
+
+  static deleteAttendance = async(req)=>{
+      const {username, date} = req.params;
+      try{
+          const result = await AttendanceDao.deleteAttendance(username,date);
+          if(result.ok == 0){
+            throw new handleError(404,'Attendance not found');  
+          }
+          return result;
+      }catch(err){
+          console.log(err);
+            throw new handleError(404,'Delete Attendance fail');
+      }
+  }
   
   static getAttendanceByDate = async(req)=>{
       const {date} = req.params;

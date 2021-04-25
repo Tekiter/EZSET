@@ -22,6 +22,16 @@ export class AttendanceController {
         }
     }
 
+    static deleteAttendance = async(req,res,next)=>{
+        try{       
+            const result = await AttendanceService.deleteAttendance(req);
+            return res.status(200).json(new Response(200,'delete Attendance success',result));
+        }catch(err){
+            console.log(err);
+            next(err);
+        }
+    }
+
     static getAttendanceByDate = async(req,res,next)=>{
         try{
             const result = await AttendanceService.getAttendanceByDate(req);
