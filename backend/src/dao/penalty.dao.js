@@ -16,30 +16,32 @@ export class PenaltyDao {
             date: {
                 $gte: start,
                 $lt: end,
-            },
-        })
-    }
+          }
+      }).exec();
+  }
 
-    static getPenalty = async (username, start, end) => {
-        return await Penalty.find({
-            username,
-            date: {
-                $gte: start,
-                $lt: end,
-            },
-        })
-    }
+  static getPenalty = async(username,start,end)=>{
+      return await Penalty.find(
+          {
+              username,
+              date:{
+                  $gte: start,
+                  $lt: end,
+              },
+          }
+      ).exec()
+  }
 
-    static deletePenalty = async _id => {
-        return await Penalty.deleteOne({
-            _id,
-        })
-    }
+  static deletePenalty = async(_id)=>{
+      return await Penalty.deleteOne({
+          _id,
+      }).exec();
+  }
 
-    static deletePenaltys = async type_id => {
-        console.log(type_id)
-        return await Penalty.deleteMany({
-            type_id,
-        })
-    }
+  static deletePenaltys = async(type_id)=>{
+      console.log(type_id)
+      return await Penalty.deleteMany({
+          type_id,
+      }).exec();
+  }
 }
