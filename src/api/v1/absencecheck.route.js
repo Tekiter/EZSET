@@ -4,8 +4,8 @@ import OfficialAbsence from '../../models/officialAbsenceReason'
 import { perm } from '../../utils/role'
 import { getRealname } from '../../utils/user'
 import { param, body } from 'express-validator'
+import moment from 'moment'
 const router = Router()
-var moment = require('moment')
 
 /**
  * @api {post} /absencecheck/absenceBook/ 공결예약

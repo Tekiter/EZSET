@@ -1,43 +1,36 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _mongoose = require('mongoose');
-
-var _mongoose2 = _interopRequireDefault(_mongoose);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const MaterialSchema = new _mongoose2.default.Schema({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const MaterialSchema = new mongoose_1.default.Schema({
     title: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
     },
     author: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
     },
     content: {
         type: String,
         required: false,
-        trim: true
+        trim: true,
     },
     created_date: {
         type: Date,
-        default: Date.now
+        default: Date.now,
     },
     //업로드한 파일의 id 저장
-    files: [{ type: _mongoose2.default.SchemaTypes.ObjectId }],
+    files: [{ type: mongoose_1.default.SchemaTypes.ObjectId }],
     //상위 폴더의 id 저장 (부모)
     parent: {
-        type: _mongoose2.default.SchemaTypes.ObjectId,
-        required: true
-    }
+        type: mongoose_1.default.SchemaTypes.ObjectId,
+        required: true,
+    },
 });
-
-exports.default = _mongoose2.default.model('FileboxMaterial', MaterialSchema);
+exports.default = mongoose_1.default.model('FileboxMaterial', MaterialSchema);
 //# sourceMappingURL=Material.js.map

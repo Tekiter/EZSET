@@ -1,46 +1,39 @@
-import express from 'express';
-var router = express.Router();
+import express from 'express'
+var router = express.Router()
 
 import { validateParams } from '../../utils/api'
 import { perm } from '../../utils/role'
-import { param, body, query } from 'express-validator'
-import { PenaltyController } from '../../controller/penalty.controller';
+import { param, body } from 'express-validator'
+import { PenaltyController } from '../../controller/penalty.controller'
 
 router.post(
     '/',
     [
-       perm('penalty').can('update'),
-       body('type').isString(),
-       body('date').isString(),
-       body('users').isArray(),
-       body('description').isString(),
-       validateParams,
+        perm('penalty').can('update'),
+        body('type').isString(),
+        body('date').isString(),
+        body('users').isArray(),
+        body('description').isString(),
+        validateParams,
     ],
-    PenaltyController.createPenalty);
+    PenaltyController.createPenalty
+)
 
 router.delete(
     '/:_id',
-    [
-        perm('penalty').can('update'),
-        param('_id').isString(),
-        validateParams,
-    ],
-    PenaltyController.deletePenalty);
+    [perm('penalty').can('update'), param('_id').isString(), validateParams],
+    PenaltyController.deletePenalty
+)
 
 router.get(
     '/',
-    [
-        perm('penalty').can('read'),
-        validateParams,
-    ],
-    PenaltyController.getPenaltys);
+    [perm('penalty').can('read'), validateParams],
+    PenaltyController.getPenaltys
+)
 
 router.get(
     '/:username',
-    [
-        perm('penalty').can('read'),
-        param('username').isString(),
-        validateParams,
-    ],
-    PenaltyController.getPenalty);
+    [perm('penalty').can('read'), param('username').isString(), validateParams],
+    PenaltyController.getPenalty
+)
 export default router

@@ -1,30 +1,25 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _express = require('express');
-
-var _express2 = _interopRequireDefault(_express);
-
-var _api = require('../../utils/api');
-
-var _Schedule = require('../../models/Schedule');
-
-var _Schedule2 = _interopRequireDefault(_Schedule);
-
-var _role = require('../../utils/role');
-
-var _expressValidator = require('express-validator');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var moment = require('moment');
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const api_1 = require("../../utils/api");
+const Schedule_1 = __importDefault(require("../../models/Schedule"));
+const role_1 = require("../../utils/role");
 //import { param, body } from 'express-validator'
-
-const router = (0, _express2.default)();
-
+const express_validator_1 = require("express-validator");
+const moment_1 = __importDefault(require("moment"));
+const router = express_1.default();
 /**
  * @api {get} /schedule/read 일정 조회
  * @apiDescription schedule Collection 에서 모든 일정을 조회 한다.
@@ -73,11 +68,12 @@ const router = (0, _express2.default)();
  *          ]
  *      }
  */
-router.get('/read', [(0, _role.perm)('schedule').can('read')], (0, _api.asyncRoute)(async function (req, res) {
-    const schedule = await _Schedule2.default.find();
-    res.json(schedule);
+router.get('/read', [role_1.perm('schedule').can('read')], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const schedule = yield Schedule_1.default.find();
+        res.json(schedule);
+    });
 }));
-
 /**
  * @api {post} /schedule/write 일정 추가
  * @apiDescription 일정을 추가한다. 연속된 날짜의 일정일 경우 <code>start</code>,<code>end</code>를 처리하여 하나의 일정으로 만들어 준다.
@@ -107,38 +103,51 @@ router.get('/read', [(0, _role.perm)('schedule').can('read')], (0, _api.asyncRou
  * @apiSuccessExample {json} Success-Response:
  *       HTTP/1.1 200 OK
  */
-router.post('/write', [(0, _role.perm)('schedule').can('update'), (0, _expressValidator.body)('dayList').isArray(), (0, _expressValidator.body)('title').isString(), (0, _expressValidator.body)('content').isString(), (0, _expressValidator.body)('color').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    var dayArray = req.body.dayList.sort();
-    //날짜 배열을 기준으로 순회하면서 저장
-    var schedule = new _Schedule2.default();
-    for (var k in dayArray) {
-        if (k == 0) {
-            schedule.title = req.body.title;
-            schedule.content = req.body.content;
-            schedule.color = req.body.color;
-            schedule.start = dayArray[0];
-            schedule.end = dayArray[0];
-            if (1 == req.body.dayList.length) schedule.save();
-            continue;
+router.post('/write', [
+    role_1.perm('schedule').can('update'),
+    express_validator_1.body('dayList').isArray(),
+    express_validator_1.body('title').isString(),
+    express_validator_1.body('content').isString(),
+    express_validator_1.body('color').isString(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var dayArray = req.body.dayList.sort();
+        //날짜 배열을 기준으로 순회하면서 저장
+        var schedule = new Schedule_1.default();
+        for (var k in dayArray) {
+            if (k == 0) {
+                schedule.title = req.body.title;
+                schedule.content = req.body.content;
+                schedule.color = req.body.color;
+                schedule.start = dayArray[0];
+                schedule.end = dayArray[0];
+                if (1 == req.body.dayList.length)
+                    schedule.save();
+                continue;
+            }
+            if (moment_1.default(schedule.end)
+                .add(1, 'days')
+                .format('YYYY-MM-DD') ==
+                moment_1.default(req.body.dayList[k]).format('YYYY-MM-DD')) {
+                schedule.end = dayArray[k];
+            }
+            else {
+                yield schedule.save();
+                schedule = new Schedule_1.default();
+                schedule.title = req.body.title;
+                schedule.content = req.body.content;
+                schedule.color = req.body.color;
+                schedule.start = dayArray[k];
+                schedule.end = dayArray[k];
+            }
+            if (k == req.body.dayList.length - 1) {
+                yield schedule.save();
+            }
         }
-        if (moment(schedule.end).add(1, 'days').format('YYYY-MM-DD') == moment(req.body.dayList[k]).format('YYYY-MM-DD')) {
-            schedule.end = dayArray[k];
-        } else {
-            await schedule.save();
-            schedule = new _Schedule2.default();
-            schedule.title = req.body.title;
-            schedule.content = req.body.content;
-            schedule.color = req.body.color;
-            schedule.start = dayArray[k];
-            schedule.end = dayArray[k];
-        }
-        if (k == req.body.dayList.length - 1) {
-            await schedule.save();
-        }
-    }
-    res.end();
+        res.end();
+    });
 }));
-
 //관리자가 일정을 삭제함
 //body : day(String), type(string), title(string), content(string), color(string)
 // schedule 페이지에서 사용
@@ -173,16 +182,25 @@ router.post('/write', [(0, _role.perm)('schedule').can('update'), (0, _expressVa
  * @apiSuccessExample {json} Success-Response:
  *       HTTP/1.1 200 OK
  */
-router.post('/delete', [(0, _role.perm)('schedule').can('update'), (0, _expressValidator.body)('start').isString(), (0, _expressValidator.body)('end').isString(), (0, _expressValidator.body)('title').isString(), (0, _expressValidator.body)('content').isString(), (0, _expressValidator.body)('color').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    await _Schedule2.default.deleteOne({
-        start: req.body.start,
-        end: req.body.end,
-        title: req.body.title,
-        content: req.body.content,
-        color: req.body.color
+router.post('/delete', [
+    role_1.perm('schedule').can('update'),
+    express_validator_1.body('start').isString(),
+    express_validator_1.body('end').isString(),
+    express_validator_1.body('title').isString(),
+    express_validator_1.body('content').isString(),
+    express_validator_1.body('color').isString(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield Schedule_1.default.deleteOne({
+            start: req.body.start,
+            end: req.body.end,
+            title: req.body.title,
+            content: req.body.content,
+            color: req.body.color,
+        });
+        res.end();
     });
-    res.end();
 }));
-
 exports.default = router;
 //# sourceMappingURL=schedule.route.js.map

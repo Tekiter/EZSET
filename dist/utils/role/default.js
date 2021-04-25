@@ -1,17 +1,63 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.setDefaultRole = setDefaultRole;
-exports.setAdminRole = setAdminRole;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.setAdminRole = exports.setDefaultRole = void 0;
 function setDefaultRole(roles) {
     roles.setRole({ tag: 'default', name: '모든 유저' });
-    roles.role('default').resource('role').canOwn('read').resource('attendance').canOwn('read').can('att').resource('absence').canOwn(['create', 'read', 'delete']).resource('schedule').can('read').resource('penalty').can('read');
+    roles
+        .role('default')
+        .resource('role')
+        .canOwn('read')
+        .resource('attendance')
+        .canOwn('read')
+        .can('att')
+        .resource('absence')
+        .canOwn(['create', 'read', 'delete'])
+        .resource('schedule')
+        .can('read')
+        .resource('penalty')
+        .can('read');
 }
-
+exports.setDefaultRole = setDefaultRole;
 function setAdminRole(roles) {
     roles.setRole({ tag: 'admin', name: '관리자' });
-    roles.role('admin').resource('serverConfig').can('change').resource('profile').can(['read', 'update']).resource('user').can(['delete']).resource('role').can(['read', 'modify']).resource('board').can(['read', 'create', 'delete', 'update']).resource('manageServer').can(['access']).resource('manageUsers').can('access').resource('managePreusers').can('access').resource('manageRoles').can('access').resource('manageAttendance').can('access').resource('manageHome').can('update').resource('manageBoards').can('access').resource('managePenalty').can('access').resource('fileBox').can(['manage', 'upload']).resource('attendance').can('update').resource('absence').can('update').resource('schedule').can('update').resource('penalty').can(['update', 'read']);
+    roles
+        .role('admin')
+        .resource('serverConfig')
+        .can('change')
+        .resource('profile')
+        .can(['read', 'update'])
+        .resource('user')
+        .can(['delete'])
+        .resource('role')
+        .can(['read', 'modify'])
+        .resource('board')
+        .can(['read', 'create', 'delete', 'update'])
+        .resource('manageServer')
+        .can(['access'])
+        .resource('manageUsers')
+        .can('access')
+        .resource('managePreusers')
+        .can('access')
+        .resource('manageRoles')
+        .can('access')
+        .resource('manageAttendance')
+        .can('access')
+        .resource('manageHome')
+        .can('update')
+        .resource('manageBoards')
+        .can('access')
+        .resource('managePenalty')
+        .can('access')
+        .resource('fileBox')
+        .can(['manage', 'upload'])
+        .resource('attendance')
+        .can('update')
+        .resource('absence')
+        .can('update')
+        .resource('schedule')
+        .can('update')
+        .resource('penalty')
+        .can(['update', 'read']);
 }
+exports.setAdminRole = setAdminRole;
 //# sourceMappingURL=default.js.map

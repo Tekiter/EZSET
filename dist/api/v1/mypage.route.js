@@ -1,27 +1,23 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _express = require('express');
-
-var _expressValidator = require('express-validator');
-
-var _auth = require('../../utils/auth');
-
-var _auth2 = _interopRequireDefault(_auth);
-
-var _api = require('../../utils/api');
-
-var _User = require('../../models/User');
-
-var _User2 = _interopRequireDefault(_User);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const router = (0, _express.Router)();
-
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const express_validator_1 = require("express-validator");
+const auth_1 = __importDefault(require("../../utils/auth"));
+const api_1 = require("../../utils/api");
+const User_1 = __importDefault(require("../../models/User"));
+const router = express_1.Router();
 // 유저 정보 조회하여 회원 정보를 넘겨줌
 /**
  * @api {get} /mypage/ 마이페이지 회원정보 조회
@@ -38,15 +34,17 @@ const router = (0, _express.Router)();
  *          }
  */
 //group 목록 보기
-router.route('/').get([_api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    const user = await _User2.default.findOne().where('username').equals(req.user.username).select('username info');
-
+router.route('/').get([api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield User_1.default.findOne()
+        .where('username')
+        .equals(req.user.username)
+        .select('username info');
     res.json({
         username: user.username,
         realname: user.info.realname,
-        email: user.info.email
+        email: user.info.email,
     });
-}));
+})));
 /**
  * @api {post} /mypage/edit 마이페이지 회원정보 수정
  * @apiName 마이페이지 회원정보 수정
@@ -85,12 +83,20 @@ router.route('/').get([_api.validateParams], (0, _api.asyncRoute)(async (req, re
  *       }
  *
  */
-router.route('/edit').post([(0, _expressValidator.body)('username').isString(), (0, _expressValidator.body)('password').isString(), (0, _expressValidator.body)('realname').isString(), (0, _expressValidator.body)('email').isString(), (0, _expressValidator.body)('edittoken').isString(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
+router.route('/edit').post([
+    express_validator_1.body('username').isString(),
+    express_validator_1.body('password').isString(),
+    express_validator_1.body('realname').isString(),
+    express_validator_1.body('email').isString(),
+    express_validator_1.body('edittoken').isString(),
+    api_1.validateParams,
+], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let decoded;
         try {
-            decoded = await _auth2.default.checkToken(req.body.edittoken);
-        } catch (error) {
+            decoded = yield auth_1.default.checkToken(req.body.edittoken);
+        }
+        catch (error) {
             const err = new Error('토큰이 만료되었습니다.');
             err.status = 403;
             throw err;
@@ -100,13 +106,14 @@ router.route('/edit').post([(0, _expressValidator.body)('username').isString(), 
                 let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,16}$/;
                 if (!pwreg.test(req.body.password)) {
                     res.status(400).json({
-                        message: '비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요'
+                        message: '비밀번호는 8~16자로 영문대 소문자, 숫자, 특수문자를 사용하세요',
                     });
                     return;
                 }
             }
-
-            const user = await _User2.default.findOne().where('username').equals(req.body.username);
+            const user = yield User_1.default.findOne()
+                .where('username')
+                .equals(req.body.username);
             if (req.body.realname != '') {
                 user.info.realname = req.body.realname;
             }
@@ -117,16 +124,16 @@ router.route('/edit').post([(0, _expressValidator.body)('username').isString(), 
                 user.password = req.body.password;
             }
             user.markModified('info');
-            await user.save();
-
+            yield user.save();
             res.status(201).json({ message: 'success' });
-        } else {
+        }
+        else {
             res.status(403).json({
-                message: '정상적인 접근이 아닙니다'
+                message: '정상적인 접근이 아닙니다',
             });
         }
-    } catch (error) {}
-}));
-
+    }
+    catch (error) { }
+})));
 exports.default = router;
 //# sourceMappingURL=mypage.route.js.map

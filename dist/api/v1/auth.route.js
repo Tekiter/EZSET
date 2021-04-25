@@ -1,34 +1,26 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _express = require('express');
-
-var _expressValidator = require('express-validator');
-
-var _config = require('../../utils/config');
-
-var _auth = require('../../utils/auth');
-
-var _auth2 = _interopRequireDefault(_auth);
-
-var _api = require('../../utils/api');
-
-var _User = require('../../models/User');
-
-var _User2 = _interopRequireDefault(_User);
-
-var _PreUser = require('../../models/PreUser');
-
-var _PreUser2 = _interopRequireDefault(_PreUser);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const router = (0, _express.Router)();
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const express_validator_1 = require("express-validator");
+const config_1 = require("../../utils/config");
+const auth_1 = __importDefault(require("../../utils/auth"));
+const api_1 = require("../../utils/api");
+const User_1 = __importDefault(require("../../models/User"));
+const PreUser_1 = __importDefault(require("../../models/PreUser"));
+const router = express_1.Router();
 router.loginNotRequired = true;
-
 /**
  * @api {post} /auth/login 로그인
  * @apiName 로그인
@@ -45,34 +37,37 @@ router.loginNotRequired = true;
  *    "accessToken": "<JWT-LOGIN-TOKEN>"
  *  }
  */
-router.route('/login').post([(0, _expressValidator.body)('username').isString(), (0, _expressValidator.body)('password').isString(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
+router.route('/login').post([express_validator_1.body('username').isString(), express_validator_1.body('password').isString(), api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = await _User2.default.findOne().where('username').equals(req.body.username);
-
+        const user = yield User_1.default.findOne()
+            .where('username')
+            .equals(req.body.username);
         if (user && user.checkPassword(req.body.password)) {
-            const accessToken = await _auth2.default.createAccessToken(user);
-
+            const accessToken = yield auth_1.default.createAccessToken(user);
             res.status(200).json({
-                accessToken
+                accessToken,
             });
-        } else {
-            const user = await _PreUser2.default.findOne().where('username').equals(req.body.username);
-
+        }
+        else {
+            const user = yield PreUser_1.default.findOne()
+                .where('username')
+                .equals(req.body.username);
             if (user) {
                 res.status(403).json({ message: '가입 승인 대기중입니다.' });
-            } else {
+            }
+            else {
                 res.status(403).json({
-                    message: '올바르지 않은 아이디 또는 비밀번호입니다.'
+                    message: '올바르지 않은 아이디 또는 비밀번호입니다.',
                 });
             }
         }
-    } catch (error) {
+    }
+    catch (error) {
         const err = new Error('알 수 없는 오류가 발생했습니다.');
         err.status = 500;
         throw err;
     }
-}));
-
+})));
 /**
  * @api {post} /auth/register 유저 회원가입
  * @apiName 유저 회원가입
@@ -87,56 +82,62 @@ router.route('/login').post([(0, _expressValidator.body)('username').isString(),
  * @apiSuccessExample Success-Response:
  *  HTTP/1.1 201 OK
  */
-router.route('/register').post([(0, _expressValidator.body)('username').isString(), (0, _expressValidator.body)('password').isString(), (0, _expressValidator.body)('realname').isString(), (0, _expressValidator.body)('email').isEmail().optional({ checkFalsy: true }), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
+router.route('/register').post([
+    express_validator_1.body('username').isString(),
+    express_validator_1.body('password').isString(),
+    express_validator_1.body('realname').isString(),
+    express_validator_1.body('email')
+        .isEmail()
+        .optional({ checkFalsy: true }),
+    api_1.validateParams,
+], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let idreg = /^[a-z0-9]{6,12}$/;
     if (!idreg.test(req.body.username)) {
         res.status(400).json({
-            message: '아이디는 6~12자의 영문 소문자, 숫자만 사용 가능합니다.'
+            message: '아이디는 6~12자의 영문 소문자, 숫자만 사용 가능합니다.',
         });
         return;
     }
-
     let pwreg = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,32}$/;
     if (!pwreg.test(req.body.password)) {
         res.status(400).json({
-            message: '비밀번호는 8자 이상의 영문자와 숫자를 필수로 사용해야 합니다.'
+            message: '비밀번호는 8자 이상의 영문자와 숫자를 필수로 사용해야 합니다.',
         });
         return;
     }
-
-    const exists = await _User2.default.count().where('username').equals(req.body.username);
-
-    const existsPreuser = await _PreUser2.default.count().where('username').equals(req.body.username);
-
+    const exists = yield User_1.default.count()
+        .where('username')
+        .equals(req.body.username);
+    const existsPreuser = yield PreUser_1.default.count()
+        .where('username')
+        .equals(req.body.username);
     if (exists || existsPreuser) {
         res.status(409).json({
-            message: '이미 사용중인 아이디입니다.'
+            message: '이미 사용중인 아이디입니다.',
         });
         return;
     }
-
     const userData = {
         username: req.body.username,
         password: req.body.password,
         info: {
             realname: req.body.realname,
-            email: req.body.email
-        }
-
-        // 회원승인제 설정이 도입되어있으면 PreUser 에 회원가입 넣기
-    };let user;
-    if (await (0, _config.getConfig)('usePreUser', false)) {
-        user = new _PreUser2.default(userData);
-    } else {
-        user = new _User2.default(userData);
+            email: req.body.email,
+        },
+    };
+    // 회원승인제 설정이 도입되어있으면 PreUser 에 회원가입 넣기
+    let user;
+    if (yield config_1.getConfig('usePreUser', false)) {
+        user = new PreUser_1.default(userData);
     }
-    await user.save();
-
+    else {
+        user = new User_1.default(userData);
+    }
+    yield user.save();
     res.status(201).json({
-        message: 'success'
+        message: 'success',
     });
-}));
-
+})));
 /**
  * @api {post} /auth/register/doublecheck/username 유저 중복 아이디 체크
  * @apiName 유저 중복 아이디 체크
@@ -154,23 +155,26 @@ router.route('/register').post([(0, _expressValidator.body)('username').isString
  *          message: '이미 사용중인 아이디입니다.',
  *        }
  */
-router.route('/register/doublecheck/username').post([(0, _expressValidator.body)('username').isString(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
+router.route('/register/doublecheck/username').post([express_validator_1.body('username').isString(), api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const exits = await _User2.default.count().where('username').equals(req.body.username);
-        const existsPreuser = await _PreUser2.default.count().where('username').equals(req.body.username);
-
+        const exits = yield User_1.default.count()
+            .where('username')
+            .equals(req.body.username);
+        const existsPreuser = yield PreUser_1.default.count()
+            .where('username')
+            .equals(req.body.username);
         if (exits || existsPreuser) {
             res.status(409).json({
-                message: '이미 사용중인 아이디입니다.'
+                message: '이미 사용중인 아이디입니다.',
             });
             return;
         }
         res.status(200).end();
-    } catch (error) {
-        (0, _api.unexpectedError)(res, error);
     }
-}));
-
+    catch (error) {
+        api_1.unexpectedError(res, error);
+    }
+})));
 /**
  * @api {post} /auth/edittoken/issue 유저 회원정보 보안 토큰 발급
  * @apiName 유저 회원정보 보안 토큰 발급
@@ -190,24 +194,25 @@ router.route('/register/doublecheck/username').post([(0, _expressValidator.body)
  *          message: '토큰 발급 실패',
  *        }
  */
-router.route('/edittoken/issue').post([(0, _expressValidator.body)('username').isString(), (0, _expressValidator.body)('password').isString(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
+router.route('/edittoken/issue').post([express_validator_1.body('username').isString(), express_validator_1.body('password').isString(), api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = await _User2.default.findOne().where('username').equals(req.body.username);
-
+        const user = yield User_1.default.findOne()
+            .where('username')
+            .equals(req.body.username);
         if (user && user.checkPassword(req.body.password)) {
-            const editToken = await _auth2.default.createEditToken(req.body.username);
-
+            const editToken = yield auth_1.default.createEditToken(req.body.username);
             res.status(200).json({
-                editToken
+                editToken,
             });
-        } else {
+        }
+        else {
             res.status(403).json({ message: '토큰 발급 실패' });
         }
-    } catch (error) {
-        (0, _api.databaseError)(res, error);
     }
-}));
-
+    catch (error) {
+        api_1.databaseError(res, error);
+    }
+})));
 /**
  * @api {post} /auth/edittoken/check 유저 회원정보 보안 토큰 유효성 검사
  * @apiName 유저 회원정보 보안 토큰 유효성 검사
@@ -219,15 +224,17 @@ router.route('/edittoken/issue').post([(0, _expressValidator.body)('username').i
  *
  * @apiError {Number} 403 회원정보 보안 토큰이 유효하지 않음
  */
-router.route('/edittoken/check').post([(0, _expressValidator.body)('edittoken').isString(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
+router.route('/edittoken/check').post([express_validator_1.body('edittoken').isString(), api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const decoded = await _auth2.default.checkToken(req.body.edittoken);
-        if (decoded.is_edit_token && decoded.username === req.user.username) {
+        const decoded = yield auth_1.default.checkToken(req.body.edittoken);
+        if (decoded.is_edit_token &&
+            decoded.username === req.user.username) {
             res.status(200).end();
         }
-    } catch (err) {
+    }
+    catch (err) {
         res.status(403).end();
     }
-}));
+})));
 exports.default = router;
 //# sourceMappingURL=auth.route.js.map

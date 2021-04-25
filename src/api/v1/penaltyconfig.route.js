@@ -101,7 +101,8 @@ router.post(
  */
 
 router.delete(
-    '/:id', [
+    '/:id',
+    [
         perm('penalty').can('update'),
         param('id').isString(),
         query('key').isString(),
@@ -158,12 +159,15 @@ router.post(
         validateParams,
     ],
     asyncRoute(async function(req, res) {
-        await PenaltyConfig.findOneAndUpdate({
-            _id: req.body._id,
-        }, {
-            key: req.body.key,
-            value: req.body.value,
-        })
+        await PenaltyConfig.findOneAndUpdate(
+            {
+                _id: req.body._id,
+            },
+            {
+                key: req.body.key,
+                value: req.body.value,
+            }
+        )
 
         res.end()
     })

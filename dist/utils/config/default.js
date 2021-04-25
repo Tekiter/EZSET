@@ -1,8 +1,5 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = {
     groupName: 'EZSET',
     usePreUser: true,
@@ -16,7 +13,7 @@ exports.default = {
                 info: '#2196F3',
                 success: '#4CAF50',
                 warning: '#FB8C00',
-                'theme-appbar': '#4464A5'
+                'theme-appbar': '#4464A5',
             },
             dark: {
                 primary: '#2196F3',
@@ -26,9 +23,9 @@ exports.default = {
                 info: '#2196F3',
                 success: '#4CAF50',
                 warning: '#FB8C00',
-                'theme-appbar': '#4464A5'
-            }
-        }
-    }
+                'theme-appbar': '#4464A5',
+            },
+        },
+    },
 };
 //# sourceMappingURL=default.js.map

@@ -1,25 +1,26 @@
-'use strict';
-
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+var Schema = mongoose_1.default.Schema;
 var ScheduleSchema = new Schema({
     start: {
-        type: Date
+        type: Date,
     },
     end: {
-        type: Date
+        type: Date,
     },
     title: {
-        type: String
+        type: String,
     },
     content: {
-        type: String
+        type: String,
     },
     color: {
-        type: String
-    }
+        type: String,
+    },
 });
-
-module.exports = mongoose.model('schedule', ScheduleSchema);
+module.exports = mongoose_1.default.model('schedule', ScheduleSchema);
 //# sourceMappingURL=Schedule.js.map

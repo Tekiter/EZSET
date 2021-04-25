@@ -1,37 +1,48 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _express = require('express');
-
-var _api = require('../../utils/api');
-
-var _expressValidator = require('express-validator');
-
-var _role = require('../../utils/role');
-
-var _role2 = _interopRequireDefault(_role);
-
-var _permissions = require('../../utils/role/permissions');
-
-var _permissions2 = _interopRequireDefault(_permissions);
-
-var _User = require('../../models/User');
-
-var _User2 = _interopRequireDefault(_User);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
+"use strict";
 /*
 role.route.js
 Role과 거기에 대한 권한을 관리하는 API
 
 */
-
-const router = (0, _express.Router)();
-
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const api_1 = require("../../utils/api");
+const express_validator_1 = require("express-validator");
+const role_1 = __importStar(require("../../utils/role"));
+const permissions_1 = __importDefault(require("../../utils/role/permissions"));
+const User_1 = __importDefault(require("../../models/User"));
+const router = express_1.Router();
 /**
  * @api {get} /role/me 내 역할 조회
  * @apiDescription 내 아이디에 부여된 역할과 권한 정보를 받아옴
@@ -72,18 +83,16 @@ const router = (0, _express.Router)();
  *   ]
  * }
  */
-router.get('/me', [(0, _role.perm)('role').canOwn('read'), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    const userRoles = await _role2.default.getUserRoles(req.user.username);
+router.get('/me', [role_1.perm('role').canOwn('read'), api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userRoles = yield role_1.default.getUserRoles(req.user.username);
     const userPerms = userRoles.map(i => {
-        return _role2.default.roles.export(i).perm;
+        return role_1.default.roles.export(i).perm;
     });
-
     res.json({
         roles: userRoles,
-        perms: [_role2.default.roles.export('default').perm, ...userPerms]
+        perms: [role_1.default.roles.export('default').perm, ...userPerms],
     });
-}));
-
+})));
 /**
  * @api {get} /role 역할 조회
  * @apiDescription 모든 역할들의 정보와 권한들을 가져옴
@@ -122,14 +131,17 @@ router.get('/me', [(0, _role.perm)('role').canOwn('read'), _api.validateParams],
  *   ]
  * }
  */
-router.get('/', [(0, _role.perm)('role').can('modify'), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    let roles = await _role2.default.getRoleNames();
-
-    roles = roles.filter(item => !['admin', 'default'].includes(item.tag)).sort((a, b) => a.name.localeCompare(b.name));
-
-    res.json([{ tag: 'default', name: '모든 유저' }, { tag: 'admin', name: '관리자' }, ...roles]);
-}));
-
+router.get('/', [role_1.perm('role').can('modify'), api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let roles = yield role_1.default.getRoleNames();
+    roles = roles
+        .filter(item => !['admin', 'default'].includes(item.tag))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    res.json([
+        { tag: 'default', name: '모든 유저' },
+        { tag: 'admin', name: '관리자' },
+        ...roles,
+    ]);
+})));
 /**
  * @api {post} /role 역할 추가
  * @apiDescription 새로운 역할을 추가함
@@ -148,7 +160,7 @@ router.get('/', [(0, _role.perm)('role').can('modify'), _api.validateParams], (0
  *       HTTP/1.1 200 OK
  *      {"tag":"1913c","name":"role1","perm":{}}
  */
-router.post('/', [(0, _role.perm)('role').can('modify'), (0, _expressValidator.body)('name').isString(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
+router.post('/', [role_1.perm('role').can('modify'), express_validator_1.body('name').isString(), api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // if (req.user.perm('role').can('create')) {
     //     const newrole = await role.createRole({ name: req.body.name })
     //     res.json(newrole)
@@ -157,12 +169,11 @@ router.post('/', [(0, _role.perm)('role').can('modify'), (0, _expressValidator.b
     //     err.status = 403
     //     throw err
     // }
-    const newrole = await _role2.default.createRole({
-        name: req.body.name
+    const newrole = yield role_1.default.createRole({
+        name: req.body.name,
     });
     res.json(newrole);
-}));
-
+})));
 /**
  * @api {get} /role/managepage 역할의 권한 목록 조회
  * @apiDescription 변경할 수 있는 권한의 정보들을 가져옴
@@ -181,10 +192,9 @@ router.post('/', [(0, _role.perm)('role').can('modify'), (0, _expressValidator.b
  *          }
  *       ]
  */
-router.get('/managepage', [_api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    res.json(_permissions2.default.managePage);
-}));
-
+router.get('/managepage', [api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.json(permissions_1.default.managePage);
+})));
 /**
  * @api {get} /role/:role_tag 해당 역할의 정보 조회
  * @apiDescription 태그가 role_tag 역할의 정보를 보여줌
@@ -203,17 +213,17 @@ router.get('/managepage', [_api.validateParams], (0, _api.asyncRoute)(async (req
  *          "perm":{ ... }
  *      }
  */
-router.get('/:role_tag', [(0, _expressValidator.param)('role_tag').isString(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    if (_role2.default.roles.hasRole(req.params.role_tag)) {
-        const roleobj = _role2.default.roles.export(req.params.role_tag);
+router.get('/:role_tag', [express_validator_1.param('role_tag').isString(), api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (role_1.default.roles.hasRole(req.params.role_tag)) {
+        const roleobj = role_1.default.roles.export(req.params.role_tag);
         res.json(roleobj);
-    } else {
+    }
+    else {
         const err = new Error('invalid role tag');
         err.status = 404;
         throw err;
     }
-}));
-
+})));
 /**
  * @api {get} /role/:role_tag/users 역할 유저 조회
  * @apiDescription 태그가 role_tag 역할에 속한 유저들을 보여줌
@@ -229,15 +239,14 @@ router.get('/:role_tag', [(0, _expressValidator.param)('role_tag').isString(), _
  *              {"username":"admin","realname":"관리자"}]
  *          }
  */
-router.get('/:role_tag/users', [(0, _expressValidator.param)('role_tag').custom(_api.checkRoleTag), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    const users = await _User2.default.find({ roles: req.params.role_tag }).select('username info');
+router.get('/:role_tag/users', [express_validator_1.param('role_tag').custom(api_1.checkRoleTag), api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const users = yield User_1.default.find({ roles: req.params.role_tag }).select('username info');
     res.json({
         users: users.map(user => {
             return { username: user.username, realname: user.info.realname };
-        })
+        }),
     });
-}));
-
+})));
 /**
  * @api {patch} /role/:role_tag 역할 권한 변경
  * @apiDescription 태그가 role_tag 역할의 권한을 변경함
@@ -257,44 +266,49 @@ router.get('/:role_tag/users', [(0, _expressValidator.param)('role_tag').custom(
  *      }
  *
  */
-router.patch('/:role_tag', [(0, _role.perm)('role').can('modify'), (0, _expressValidator.param)('role_tag').custom(_api.checkRoleTag), (0, _expressValidator.body)('name').isString().optional(), (0, _expressValidator.body)('perms').isArray(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
+router.patch('/:role_tag', [
+    role_1.perm('role').can('modify'),
+    express_validator_1.param('role_tag').custom(api_1.checkRoleTag),
+    express_validator_1.body('name')
+        .isString()
+        .optional(),
+    express_validator_1.body('perms').isArray(),
+    api_1.validateParams,
+], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.params.role_tag == 'admin') {
         const err = new Error('admin 역할은 변경할 수 없습니다.');
         err.status = 400;
         throw err;
     }
-
     // Validation
     // 올바른 perm 배열인지 체크
     for (let item of req.body.perms) {
-        if (!item.resource || !item.action || !(item.range || item.range == 'any' || item.range == 'own')) {
+        if (!item.resource ||
+            !item.action ||
+            !(item.range || item.range == 'any' || item.range == 'own')) {
             const err = new Error('Invalid action');
             err.status = 400;
             throw err;
         }
     }
-
     // 역할 name 변경
     if (req.body.name) {
-        _role.roles.getRole(req.params.role_tag).name = req.body.name;
+        role_1.roles.getRole(req.params.role_tag).name = req.body.name;
     }
-
     // 수정할 데이터를 Role 에 반영
-    const context = _role.roles.role(req.params.role_tag);
+    const context = role_1.roles.role(req.params.role_tag);
     for (let item of req.body.perms) {
         const resource = context.resource(item.resource, item.param != undefined ? item.param + '' : undefined);
         if (item.allow) {
             resource.can(item.action, item.range);
-        } else {
+        }
+        else {
             resource.cannot(item.action, item.range);
         }
     }
-
-    await _role2.default.updateRole(req.params.role_tag);
-
+    yield role_1.default.updateRole(req.params.role_tag);
     res.end();
-}));
-
+})));
 /**
  * @api {delete} /role/:role_tag 역할 삭제
  * @apiDescription 태그가 role_tag인 역할을 삭제함
@@ -302,7 +316,11 @@ router.patch('/:role_tag', [(0, _role.perm)('role').can('modify'), (0, _expressV
  * @apiGroup role
  *
  */
-router.delete('/:role_tag', [(0, _role.perm)('role').can('modify'), (0, _expressValidator.param)('role_tag').custom(_api.checkRoleTag), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
+router.delete('/:role_tag', [
+    role_1.perm('role').can('modify'),
+    express_validator_1.param('role_tag').custom(api_1.checkRoleTag),
+    api_1.validateParams,
+], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.params.role_tag == 'admin') {
         const err = new Error('admin 역할은 삭제할 수 없습니다.');
         err.status = 400;
@@ -313,11 +331,8 @@ router.delete('/:role_tag', [(0, _role.perm)('role').can('modify'), (0, _express
         err.status = 400;
         throw err;
     }
-
-    await _role2.default.removeRole(req.params.role_tag);
-
+    yield role_1.default.removeRole(req.params.role_tag);
     res.end();
-}));
-
+})));
 exports.default = router;
 //# sourceMappingURL=role.route.js.map

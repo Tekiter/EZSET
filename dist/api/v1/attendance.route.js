@@ -1,42 +1,29 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _express = require('express');
-
-var _express2 = _interopRequireDefault(_express);
-
-var _api = require('../../utils/api');
-
-var _randomNumberCsprng = require('random-number-csprng');
-
-var _randomNumberCsprng2 = _interopRequireDefault(_randomNumberCsprng);
-
-var _User = require('../../models/User');
-
-var _User2 = _interopRequireDefault(_User);
-
-var _attendanceDay = require('../../models/attendanceDay');
-
-var _attendanceDay2 = _interopRequireDefault(_attendanceDay);
-
-var _attendanceUser = require('../../models/attendanceUser');
-
-var _attendanceUser2 = _interopRequireDefault(_attendanceUser);
-
-var _role = require('../../utils/role');
-
-var _expressValidator = require('express-validator');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const router = (0, _express2.default)();
-var moment = require('moment');
-var ranNum = (0, _randomNumberCsprng2.default)(100, 999);
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const api_1 = require("../../utils/api");
+const random_number_csprng_1 = __importDefault(require("random-number-csprng"));
+const User_1 = __importDefault(require("../../models/User"));
+const attendanceDay_1 = __importDefault(require("../../models/attendanceDay"));
+const attendanceUser_1 = __importDefault(require("../../models/attendanceUser"));
+const role_1 = require("../../utils/role");
+const express_validator_1 = require("express-validator");
+const moment_1 = __importDefault(require("moment"));
+const router = express_1.default();
+var ranNum = random_number_csprng_1.default(100, 999);
 var startUser = '';
-
 /**
  * @api {post} /attendance/attendanceWrite/ 출석 요청
  * @apiDescription 사용자가 자신이 입력한 코드로 출석요청을 보냄. 서버에서 생성한 출석코드와 일치한다면 출석 처리
@@ -63,28 +50,27 @@ var startUser = '';
  *          "result":0
  *      }
  */
-router.post('/attendanceWrite', [(0, _role.perm)('attendance').can('att')], (0, _api.asyncRoute)(async function (req, res) {
-    if (ranNum != req.body.code) {
-        res.json({
-            message: 'wrongCode!',
-            result: 0
-        });
-    }
-    var Date = moment().format('YYYYMMDD');
-    var Name = req.user.username;
-
-    await _attendanceDay2.default.findOneAndUpdate({
-        day: Date,
-        'status.name': Name
-    }, { 'status.$.state': 'attendance' }, function (err, doc) {});
-
-    await _attendanceUser2.default.findOneAndUpdate({
-        name: Name,
-        'status.date': Date
-    }, { 'status.$.state': 'attendance' }, function (err, doc) {});
-    res.json({ result: 1 });
+router.post('/attendanceWrite', [role_1.perm('attendance').can('att')], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (ranNum != req.body.code) {
+            res.json({
+                message: 'wrongCode!',
+                result: 0,
+            });
+        }
+        var Date = moment_1.default().format('YYYYMMDD');
+        var Name = req.user.username;
+        yield attendanceDay_1.default.findOneAndUpdate({
+            day: Date,
+            'status.name': Name,
+        }, { 'status.$.state': 'attendance' }, function (err, doc) { });
+        yield attendanceUser_1.default.findOneAndUpdate({
+            name: Name,
+            'status.date': Date,
+        }, { 'status.$.state': 'attendance' }, function (err, doc) { });
+        res.json({ result: 1 });
+    });
 }));
-
 /**
  * @api {get} /attendance/attendanceCheck/ 출석유무 체크
  * @apiDescription 현재 날짜에 사용자의 출석 상태가 `attendance`상태인지 체크
@@ -106,24 +92,27 @@ router.post('/attendanceWrite', [(0, _role.perm)('attendance').can('att')], (0, 
  *          0
  *      }
  */
-router.get('/attendanceCheck', [(0, _role.perm)('attendance').can('att')], (0, _api.asyncRoute)(async function (req, res) {
-    var Date = moment().format('YYYYMMDD');
-    var Name = req.user.username;
-    try {
-        const cursor = await _attendanceDay2.default.find({
-            day: Date,
-            status: { $elemMatch: { name: Name, state: 'attendance' } }
-        });
-        if (cursor != '') {
-            res.json(1);
-        } else {
-            res.json(0);
+router.get('/attendanceCheck', [role_1.perm('attendance').can('att')], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var Date = moment_1.default().format('YYYYMMDD');
+        var Name = req.user.username;
+        try {
+            const cursor = yield attendanceDay_1.default.find({
+                day: Date,
+                status: { $elemMatch: { name: Name, state: 'attendance' } },
+            });
+            if (cursor != '') {
+                res.json(1);
+            }
+            else {
+                res.json(0);
+            }
         }
-    } catch (err) {
-        res.status(501).json(err);
-    }
+        catch (err) {
+            res.status(501).json(err);
+        }
+    });
 }));
-
 /**
  * @api {get} /attendance/attendanceCheckAdmin/ 서버 출석 코드 전송
  * @apiName attendanceCheckAdmin
@@ -145,11 +134,14 @@ router.get('/attendanceCheck', [(0, _role.perm)('attendance').can('att')], (0, _
  *          0
  *      }
  */
-
-router.get('/attendanceCheckAdmin', [(0, _role.perm)('attendance').can('att')], (0, _api.asyncRoute)(async function (req, res) {
-    if (startUser == req.user.username) res.json(ranNum);else res.json(0);
+router.get('/attendanceCheckAdmin', [role_1.perm('attendance').can('att')], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (startUser == req.user.username)
+            res.json(ranNum);
+        else
+            res.json(0);
+    });
 }));
-
 /**
  * @api {post} /attendance/attendanceCheckEnd/ 출석 종료
  * @apiName attendanceCheckEnd
@@ -163,12 +155,13 @@ router.get('/attendanceCheckAdmin', [(0, _role.perm)('attendance').can('att')], 
  *      HTTP/1.1 200 OK
  *
  */
-router.post('/attendanceCheckEnd', [(0, _role.perm)('attendance').can('att')], (0, _api.asyncRoute)(async function (req, res) {
-    startUser = '';
-    ranNum = -1;
-    res.end();
+router.post('/attendanceCheckEnd', [role_1.perm('attendance').can('att')], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        startUser = '';
+        ranNum = -1;
+        res.end();
+    });
 }));
-
 /**
  * @api {post} /attendance/startAttendance/ 출석 시작
  * @apiName startAttendance
@@ -185,53 +178,64 @@ router.post('/attendanceCheckEnd', [(0, _role.perm)('attendance').can('att')], (
  *      }
  *
  */
-router.post('/startAttendance', [(0, _role.perm)('attendance').can('update')], (0, _api.asyncRoute)(async function (req, res) {
-    var Date = moment().format('YYYYMMDD');
-    //get Userlist in User collection
-    const userList = await _User2.default.find({
-        attable: true
-    }).select('username');
-    //create db - AttendanceDay
-    var attendanceDay = new _attendanceDay2.default();
-    attendanceDay.day = Date;
-
-    const cnt = await _attendanceDay2.default.find().where('day').equals(Date).count();
-
-    if (cnt == 0) {
-        for (var k in userList) {
-            var cursor_Day = await _attendanceDay2.default.findOne().where('day').equals(Date);
-            var state = 'absence';
-            if (req.user.username == userList[k].username) state = 'attendance';
-            if (!cursor_Day) {
-                var attendanceDay = new _attendanceDay2.default();
-                attendanceDay.day = Date;
-                attendanceDay.addStatus(userList[k].username, state);
-            } else {
-                cursor_Day.addStatus(userList[k].username, state);
-            }
-            //create db - AttendanceUser
-            var cursor_User = await _attendanceUser2.default.findOne().where('name').equals(userList[k].username);
-            state = 'absence';
-            if (req.user.username == userList[k].username) state = 'attendance';
-            if (!cursor_User) {
-                var attendanceUser = new _attendanceUser2.default();
-                attendanceUser.name = userList[k].username;
-                attendanceUser.addStatus(Date, state);
-            } else {
-                cursor_User.addStatus(Date, state);
+router.post('/startAttendance', [role_1.perm('attendance').can('update')], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var Date = moment_1.default().format('YYYYMMDD');
+        //get Userlist in User collection
+        const userList = yield User_1.default.find({
+            attable: true,
+        }).select('username');
+        //create db - AttendanceDay
+        var attendanceDay = new attendanceDay_1.default();
+        attendanceDay.day = Date;
+        const cnt = yield attendanceDay_1.default.find()
+            .where('day')
+            .equals(Date)
+            .count();
+        if (cnt == 0) {
+            for (var k in userList) {
+                var cursor_Day = yield attendanceDay_1.default.findOne()
+                    .where('day')
+                    .equals(Date);
+                var state = 'absence';
+                if (req.user.username == userList[k].username)
+                    state = 'attendance';
+                if (!cursor_Day) {
+                    var attendanceDay = new attendanceDay_1.default();
+                    attendanceDay.day = Date;
+                    attendanceDay.addStatus(userList[k].username, state);
+                }
+                else {
+                    cursor_Day.addStatus(userList[k].username, state);
+                }
+                //create db - AttendanceUser
+                var cursor_User = yield attendanceUser_1.default.findOne()
+                    .where('name')
+                    .equals(userList[k].username);
+                state = 'absence';
+                if (req.user.username == userList[k].username)
+                    state = 'attendance';
+                if (!cursor_User) {
+                    var attendanceUser = new attendanceUser_1.default();
+                    attendanceUser.name = userList[k].username;
+                    attendanceUser.addStatus(Date, state);
+                }
+                else {
+                    cursor_User.addStatus(Date, state);
+                }
             }
         }
-    }
-    //Generate Attendance Code and return
-    try {
-        ranNum = await (0, _randomNumberCsprng2.default)(100, 999);
-        startUser = req.user.username;
-        res.json({ code: ranNum });
-    } catch (err) {
-        res.status(501).json();
-    }
+        //Generate Attendance Code and return
+        try {
+            ranNum = yield random_number_csprng_1.default(100, 999);
+            startUser = req.user.username;
+            res.json({ code: ranNum });
+        }
+        catch (err) {
+            res.status(501).json();
+        }
+    });
 }));
-
 /**
  * @api {get} /attendanceState/:day 일별 출석현황 반환
  * @apiDescription 특정 일자의 출석현황을 반환
@@ -271,13 +275,14 @@ router.post('/startAttendance', [(0, _role.perm)('attendance').can('update')], (
  * @apiErrorExample {json} Error-Response:
  *       HTTP/1.1 404 Not Found
  */
-router.get('/attendanceState/:day', [(0, _expressValidator.param)('day').isString(), (0, _role.perm)('attendance').can('update'), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    const cur = await _attendanceDay2.default.findOne({
-        day: req.params.day
-    }).select({ _id: 0, __v: 0, day: 0 });
-    res.json(cur);
+router.get('/attendanceState/:day', [express_validator_1.param('day').isString(), role_1.perm('attendance').can('update'), api_1.validateParams], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const cur = yield attendanceDay_1.default.findOne({
+            day: req.params.day,
+        }).select({ _id: 0, __v: 0, day: 0 });
+        res.json(cur);
+    });
 }));
-
 /**
  * @api {post} /attendancestateupdate/:day 출석 상태 업데이트
  * @apiDescription <code>day</code>날짜에 <code>name</code>이라는 아이디를 가진 사용자의 출석 상태를 <code>state</code>로 업데이트
@@ -299,21 +304,26 @@ router.get('/attendanceState/:day', [(0, _expressValidator.param)('day').isStrin
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
-router.post('/attendancestateupdate/:day', [(0, _role.perm)('attendance').can('update'), (0, _expressValidator.param)('day').isString(), (0, _expressValidator.body)('state').isString(), (0, _expressValidator.body)('name').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    var Day = req.params.day;
-
-    await _attendanceDay2.default.findOneAndUpdate({
-        day: Day,
-        'status.name': req.body.name
-    }, { 'status.$.state': req.body.state }, function (err, doc) {});
-
-    await _attendanceUser2.default.findOneAndUpdate({
-        name: req.body.name,
-        'status.date': Day
-    }, { 'status.$.state': req.body.state }, function (err, doc) {});
-    res.end();
+router.post('/attendancestateupdate/:day', [
+    role_1.perm('attendance').can('update'),
+    express_validator_1.param('day').isString(),
+    express_validator_1.body('state').isString(),
+    express_validator_1.body('name').isString(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var Day = req.params.day;
+        yield attendanceDay_1.default.findOneAndUpdate({
+            day: Day,
+            'status.name': req.body.name,
+        }, { 'status.$.state': req.body.state }, function (err, doc) { });
+        yield attendanceUser_1.default.findOneAndUpdate({
+            name: req.body.name,
+            'status.date': Day,
+        }, { 'status.$.state': req.body.state }, function (err, doc) { });
+        res.end();
+    });
 }));
-
 /**
  * @api {get} /attendance/attendanceUserList/ 사용자 리스트 반환
  * @apiDescription 전체 사용자 리스트를 반환
@@ -342,11 +352,12 @@ router.post('/attendancestateupdate/:day', [(0, _role.perm)('attendance').can('u
  *               ]
  *          }
  */
-router.get('/attendanceUserList', [(0, _role.perm)('attendance').can('update')], (0, _api.asyncRoute)(async function (req, res) {
-    const userList = await _User2.default.find().select('username');
-    res.json(userList);
+router.get('/attendanceUserList', [role_1.perm('attendance').can('update')], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const userList = yield User_1.default.find().select('username');
+        res.json(userList);
+    });
 }));
-
 /**
  * @api {get} /attendance/attendanceDayList/ 전체 일별 출결현황 반환
  * @apiDescription 전체 일별 출결현황 반환
@@ -412,11 +423,12 @@ router.get('/attendanceUserList', [(0, _role.perm)('attendance').can('update')],
  * ]
  *}
  */
-router.get('/attendanceDayList', [(0, _role.perm)('attendance').can('update')], (0, _api.asyncRoute)(async function (req, res) {
-    const attendnaceDayList = await _attendanceDay2.default.find();
-    res.json(attendnaceDayList);
+router.get('/attendanceDayList', [role_1.perm('attendance').can('update')], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const attendnaceDayList = yield attendanceDay_1.default.find();
+        res.json(attendnaceDayList);
+    });
 }));
-
 /**
  * @api {get} /attendance/attendanceUserListData/ 사용자별 출결현황 반환
  * @apiDescription 사용자별 출결현황 반환
@@ -465,11 +477,12 @@ router.get('/attendanceDayList', [(0, _role.perm)('attendance').can('update')], 
  *  },
  *]
  */
-router.get('/attendanceUserListData', [(0, _role.perm)('attendance').can('update')], (0, _api.asyncRoute)(async function (req, res) {
-    const attendnaceUser = await _attendanceUser2.default.find();
-    res.json(attendnaceUser);
+router.get('/attendanceUserListData', [role_1.perm('attendance').can('update')], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const attendnaceUser = yield attendanceUser_1.default.find();
+        res.json(attendnaceUser);
+    });
 }));
-
 /**
  * @api {get} /attendance/attendanceUserData/ 사용자 출결현황 반환
  * @apiDescription 자신의 출결현황 반환한다.
@@ -508,11 +521,14 @@ router.get('/attendanceUserListData', [(0, _role.perm)('attendance').can('update
  *  ]
  * }
  */
-router.get('/attendanceUserData', [(0, _role.perm)('attendance').canOwn('read')], (0, _api.asyncRoute)(async function (req, res) {
-    const attendnaceUser = await _attendanceUser2.default.find().where('name').equals(req.user.username);
-    res.json(attendnaceUser);
+router.get('/attendanceUserData', [role_1.perm('attendance').canOwn('read')], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const attendnaceUser = yield attendanceUser_1.default.find()
+            .where('name')
+            .equals(req.user.username);
+        res.json(attendnaceUser);
+    });
 }));
-
 /**
  * @api {post} /attendance/attendanceNUserData
  * @apiDescription <code>day</code> 날짜에 출석 정보가 없는 사용자 리스트 반환
@@ -544,20 +560,27 @@ router.get('/attendanceUserData', [(0, _role.perm)('attendance').canOwn('read')]
  * @apiErrorExample {json} Error-Response:
  *       HTTP/1.1 404 Not Found
  */
-router.post('/attendanceNUserData', [(0, _role.perm)('attendance').can('update'), (0, _expressValidator.body)('day').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    const result = [];
-    const Users = await _User2.default.find().select('username');
-    const attendanceDay = await _attendanceDay2.default.findOne().where('day').equals(req.body.day).select({ _id: 0, __v: 0, day: 0 });
-    if (attendanceDay != null) {
-        Users.forEach(element => {
-            if (attendanceDay.status.filter(function (e) {
-                return e.name === element.username;
-            }).length == 0) result.push(element.username);
-        });
-        res.json(result);
-    } else res.status(404).json();
+router.post('/attendanceNUserData', [role_1.perm('attendance').can('update'), express_validator_1.body('day').isString(), api_1.validateParams], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const result = [];
+        const Users = yield User_1.default.find().select('username');
+        const attendanceDay = yield attendanceDay_1.default.findOne()
+            .where('day')
+            .equals(req.body.day)
+            .select({ _id: 0, __v: 0, day: 0 });
+        if (attendanceDay != null) {
+            Users.forEach(element => {
+                if (attendanceDay.status.filter(function (e) {
+                    return e.name === element.username;
+                }).length == 0)
+                    result.push(element.username);
+            });
+            res.json(result);
+        }
+        else
+            res.status(404).json();
+    });
 }));
-
 /**
  * @api {get} /attendance/manage/user 출석 대상 조회
  * @apiDescription 출석 대상 사용자 리스트와 출석 대상이 아닌 사용자 리스트 반환
@@ -592,27 +615,34 @@ router.post('/attendanceNUserData', [(0, _role.perm)('attendance').can('update')
  *  "excludedUsers": []
  *}
  */
-router.get('/manage/user', [(0, _role.perm)('attendance').can('update'), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    const users = await _User2.default.find().where('attable').equals(true).sort('username').select('username info');
-
-    const excludedUsers = await _User2.default.find().where('attable').ne(true).sort('username').select('username info');
-
-    res.json({
-        attableUsers: users.map(user => {
-            return {
-                username: user.username,
-                realname: user.info.realname
-            };
-        }),
-        excludedUsers: excludedUsers.map(user => {
-            return {
-                username: user.username,
-                realname: user.info.realname
-            };
-        })
+router.get('/manage/user', [role_1.perm('attendance').can('update'), api_1.validateParams], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const users = yield User_1.default.find()
+            .where('attable')
+            .equals(true)
+            .sort('username')
+            .select('username info');
+        const excludedUsers = yield User_1.default.find()
+            .where('attable')
+            .ne(true)
+            .sort('username')
+            .select('username info');
+        res.json({
+            attableUsers: users.map(user => {
+                return {
+                    username: user.username,
+                    realname: user.info.realname,
+                };
+            }),
+            excludedUsers: excludedUsers.map(user => {
+                return {
+                    username: user.username,
+                    realname: user.info.realname,
+                };
+            }),
+        });
     });
 }));
-
 /**
  * @api {put} /attendance/manage/user 출석 대상 추가
  * @apiDescription 출석대상 사용자 추가
@@ -645,26 +675,26 @@ router.get('/manage/user', [(0, _role.perm)('attendance').can('update'), _api.va
  *      존재하지 않는 유저입니다.
  * }
  */
-router.put('/manage/user', [(0, _role.perm)('attendance').can('update'), (0, _expressValidator.body)('users').isArray(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
+router.put('/manage/user', [role_1.perm('attendance').can('update'), express_validator_1.body('users').isArray(), api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         for (let user of req.body.users) {
-            await (0, _api.checkUsername)(user);
+            yield api_1.checkUsername(user);
         }
-    } catch (error) {
+    }
+    catch (error) {
         const err = new Error('존재하지 않는 유저입니다.');
         err.status = 400;
         throw err;
     }
-
     for (let username of req.body.users) {
-        const user = await _User2.default.findOne().where('username').equals(username);
+        const user = yield User_1.default.findOne()
+            .where('username')
+            .equals(username);
         user.attable = true;
-        await user.save();
+        yield user.save();
     }
-
     res.end();
-}));
-
+})));
 /**
  * @api {delete} /attendance/manage/user/:username 출석 대상 제거
  * @apiDescription 출석 대상에서 <code>username</code> 라는 아이디를 가지는 사용자 제거
@@ -680,14 +710,18 @@ router.put('/manage/user', [(0, _role.perm)('attendance').can('update'), (0, _ex
  *      HTTP/1.1 200 OK
  *
  */
-router.delete('/manage/user/:username', [(0, _role.perm)('attendance').can('update'), (0, _expressValidator.param)('username').custom(_api.checkUsername), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    const user = await _User2.default.findOne().where('username').equals(req.params.username);
+router.delete('/manage/user/:username', [
+    role_1.perm('attendance').can('update'),
+    express_validator_1.param('username').custom(api_1.checkUsername),
+    api_1.validateParams,
+], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield User_1.default.findOne()
+        .where('username')
+        .equals(req.params.username);
     user.attable = false;
-    await user.save();
-
+    yield user.save();
     res.end();
-}));
-
+})));
 /**
  * @api {put} /attendance/addUsersRecords 출석 기록 추가
  * @apiDescription 출석 대상이 아니어서 기록이 없는 사용자의 출석기록을 <code>absence</code> 상태로 추가
@@ -721,34 +755,42 @@ router.delete('/manage/user/:username', [(0, _role.perm)('attendance').can('upda
  *      존재하지 않는 유저입니다.
  * }
  */
-router.put('/addUsersRecords', [(0, _role.perm)('attendance').can('update'), (0, _expressValidator.body)('users').isArray(), (0, _expressValidator.body)('day').isString(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
+router.put('/addUsersRecords', [
+    role_1.perm('attendance').can('update'),
+    express_validator_1.body('users').isArray(),
+    express_validator_1.body('day').isString(),
+    api_1.validateParams,
+], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         for (let user of req.body.users) {
-            await (0, _api.checkUsername)(user);
+            yield api_1.checkUsername(user);
         }
-    } catch (error) {
+    }
+    catch (error) {
         const err = new Error('존재하지 않는 유저입니다.');
         err.status = 400;
         throw err;
     }
-
     for (let user of req.body.users) {
-        const cursor_Day = await _attendanceDay2.default.findOne().where('day').equals(req.body.day);
-        if (cursor_Day) cursor_Day.addStatus(user, 'absence');
-
-        const cursor_User = await _attendanceUser2.default.findOne().where('name').equals(user);
-
+        const cursor_Day = yield attendanceDay_1.default.findOne()
+            .where('day')
+            .equals(req.body.day);
+        if (cursor_Day)
+            cursor_Day.addStatus(user, 'absence');
+        const cursor_User = yield attendanceUser_1.default.findOne()
+            .where('name')
+            .equals(user);
         if (!cursor_User) {
-            var attendanceUser = new _attendanceUser2.default();
+            var attendanceUser = new attendanceUser_1.default();
             attendanceUser.name = user;
             attendanceUser.addStatus(req.body.day, 'absence');
-        } else {
+        }
+        else {
             cursor_User.addStatus(req.body.day, 'absence');
         }
     }
     res.end();
-}));
-
+})));
 /**
  * @api {post} /attendance/attendanceUser 특정 사용자 출결정보 반환
  * @apiDescription <code>name</code>의 아이디를 가지는 사용자의 출결정보 반환
@@ -786,13 +828,14 @@ router.put('/addUsersRecords', [(0, _role.perm)('attendance').can('update'), (0,
  *}
  * }
  */
-router.post('/attendanceUser', [(0, _role.perm)('attendance').can('update'), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    const attendanceUser = await _attendanceUser2.default.findOne({
-        name: req.body.name
-    }).select({ _id: 0, __v: 0 });
-    res.json(attendanceUser);
+router.post('/attendanceUser', [role_1.perm('attendance').can('update'), api_1.validateParams], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const attendanceUser = yield attendanceUser_1.default.findOne({
+            name: req.body.name,
+        }).select({ _id: 0, __v: 0 });
+        res.json(attendanceUser);
+    });
 }));
-
 /**
  * @api {delete} /attendance/delete 출석기록 삭제
  * @apiDescription 특정유저의 특정일자의 출결기록 삭제
@@ -815,21 +858,27 @@ router.post('/attendanceUser', [(0, _role.perm)('attendance').can('update'), _ap
  *      HTTP/1.1 200 OK
  *
  */
-router.delete('/delete', [(0, _role.perm)('attendance').can('update'), (0, _expressValidator.query)('username').isString(), (0, _expressValidator.query)('date').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-
-    //AttendanceDays Collection 접근
-    await _attendanceDay2.default.findOneAndUpdate({
-        day: req.query.date
-    }, {
-        $pull: { status: { name: req.query.username } }
-    }, function (err, doc) {});
-    //AttendanceUsers Collection 접근
-    await _attendanceUser2.default.findOneAndUpdate({
-        name: req.query.username
-    }, {
-        $pull: { status: { date: req.query.date } }
-    }, function (err, doc) {});
-    res.end();
+router.delete('/delete', [
+    role_1.perm('attendance').can('update'),
+    express_validator_1.query('username').isString(),
+    express_validator_1.query('date').isString(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        //AttendanceDays Collection 접근
+        yield attendanceDay_1.default.findOneAndUpdate({
+            day: req.query.date,
+        }, {
+            $pull: { status: { name: req.query.username } },
+        }, function (err, doc) { });
+        //AttendanceUsers Collection 접근
+        yield attendanceUser_1.default.findOneAndUpdate({
+            name: req.query.username,
+        }, {
+            $pull: { status: { date: req.query.date } },
+        }, function (err, doc) { });
+        res.end();
+    });
 }));
 exports.default = router;
 //# sourceMappingURL=attendance.route.js.map

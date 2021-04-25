@@ -6,8 +6,8 @@ import AttendanceDay from '../../models/attendanceDay'
 import AttendanceUser from '../../models/attendanceUser'
 import { perm } from '../../utils/role'
 import { param, body, query } from 'express-validator'
+import moment from 'moment'
 const router = Router()
-var moment = require('moment')
 var ranNum = random(100, 999)
 var startUser = ''
 
@@ -931,28 +931,25 @@ router.delete(
         validateParams,
     ],
     asyncRoute(async function(req, res) {
-        
         //AttendanceDays Collection 접근
         await AttendanceDay.findOneAndUpdate(
             {
-                day:req.query.date
+                day: req.query.date,
             },
             {
-                $pull: { status: { name:req.query.username } },
+                $pull: { status: { name: req.query.username } },
             },
-            function(err, doc) {
-            }
+            function(err, doc) {}
         )
         //AttendanceUsers Collection 접근
         await AttendanceUser.findOneAndUpdate(
             {
-                name:req.query.username
+                name: req.query.username,
             },
             {
-                $pull: { status: { date:req.query.date } },
+                $pull: { status: { date: req.query.date } },
             },
-            function(err, doc) {
-            }
+            function(err, doc) {}
         )
         res.end()
     })

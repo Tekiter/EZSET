@@ -1,76 +1,71 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _express = require('express');
-
-var _api = require('../../utils/api');
-
-var _auth = require('../../utils/auth');
-
-var _role = require('../../utils/role');
-
-var _expressValidator = require('express-validator');
-
-var _config = require('../../utils/config');
-
-const router = (0, _express.Router)();
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const api_1 = require("../../utils/api");
+const auth_1 = require("../../utils/auth");
+const role_1 = require("../../utils/role");
+const role_2 = require("../../utils/role");
+const express_validator_1 = require("express-validator");
+const config_1 = require("../../utils/config");
+const router = express_1.Router();
 router.loginNotRequired = true;
-
 const configNames = ['groupName', 'usePreUser', 'theme'];
-
-const changeableConfigs = [{
-    key: 'groupName',
-    check: (0, _expressValidator.body)('groupName').isString()
-}, {
-    key: 'usePreUser',
-    check: (0, _expressValidator.body)('usePreUser').isBoolean().toBoolean()
-}, {
-    key: 'theme',
-    check: (0, _expressValidator.body)('theme').custom(value => {
-        if (!value) {
-            return false;
-        }
-        return true;
-    })
-}];
-
+const changeableConfigs = [
+    {
+        key: 'groupName',
+        check: express_validator_1.body('groupName').isString(),
+    },
+    {
+        key: 'usePreUser',
+        check: express_validator_1.body('usePreUser')
+            .isBoolean()
+            .toBoolean(),
+    },
+    {
+        key: 'theme',
+        check: express_validator_1.body('theme').custom(value => {
+            if (!value) {
+                return false;
+            }
+            return true;
+        }),
+    },
+];
 /**
  * @api {get} /config 서버 설정 가져오기
  * @apiDescription 서버의 기본 정보를 가져옴
  * @apiName ViewConfig
  * @apiGroup Config
  */
-router.get('/', (0, _api.asyncRoute)(async (req, res) => {
+router.get('/', api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const configs = {};
-
     for (let configName of configNames) {
-        configs[configName] = await (0, _config.getConfig)(configName);
+        configs[configName] = yield config_1.getConfig(configName);
     }
-
-    res.json(_extends({}, configs));
-}));
-
+    res.json(Object.assign({}, configs));
+})));
 /**
  * @api {get} /config/admin 서버 설정 가져오기 (어드민)
  * @apiDescription 서버의 모든 설정 정보를 가져옴
  * @apiName ViewAdminConfig
  * @apiGroup Config
  */
-router.get('/admin', [_auth.loginRequired, _role.getRoleMiddleware, (0, _role.perm)('serverConfig').can('change')], (0, _api.asyncRoute)(async (req, res) => {
+router.get('/admin', [auth_1.loginRequired, role_1.getRoleMiddleware, role_2.perm('serverConfig').can('change')], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const configs = {};
-
     for (let configName of configNames) {
-        configs[configName] = await (0, _config.getConfig)(configName);
+        configs[configName] = yield config_1.getConfig(configName);
     }
-
-    res.json(_extends({}, configs));
-}));
-
+    res.json(Object.assign({}, configs));
+})));
 /**
  * @api {patch} /config/admin 서버 설정 변경 (어드민)
  * @apiDescription 변경 가능한 서버의 설정 정보를 변경한다. body에 Object 로 설정값의 key: value 쌍을 넣으면 반영된다.
@@ -81,28 +76,34 @@ router.get('/admin', [_auth.loginRequired, _role.getRoleMiddleware, (0, _role.pe
  * {"groupName":"EZSET","usePreUser":false}
  *
  */
-router.patch('/admin', [_auth.loginRequired, _role.getRoleMiddleware, (0, _role.perm)('serverConfig').can('change'), changeableConfigs.map(config => config.check.optional()), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    for (let _ref of changeableConfigs) {
-        let { key } = _ref;
-
+router.patch('/admin', [
+    auth_1.loginRequired,
+    role_1.getRoleMiddleware,
+    role_2.perm('serverConfig').can('change'),
+    changeableConfigs.map(config => config.check.optional()),
+    api_1.validateParams,
+], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    for (let { key } of changeableConfigs) {
         if (req.body[key] != undefined) {
-            await (0, _config.setConfig)(key, req.body[key]);
+            yield config_1.setConfig(key, req.body[key]);
         }
     }
-
     res.status(200).end();
-}));
-
+})));
 /**
  * @api {get} /config/reset 서버 설정 초기화
  * @apiDescription 서버의 모든 설정 정보를 초기화
  * @apiName ResetConfig
  * @apiGroup Config
  */
-router.post('/reset', [_auth.loginRequired, _role.getRoleMiddleware, (0, _role.perm)('serverConfig').can('change'), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    await (0, _config.setDefaultConfigs)();
+router.post('/reset', [
+    auth_1.loginRequired,
+    role_1.getRoleMiddleware,
+    role_2.perm('serverConfig').can('change'),
+    api_1.validateParams,
+], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield config_1.setDefaultConfigs();
     res.end();
-}));
-
+})));
 exports.default = router;
 //# sourceMappingURL=config.route.js.map

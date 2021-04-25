@@ -1,30 +1,25 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _express = require('express');
-
-var _express2 = _interopRequireDefault(_express);
-
-var _api = require('../../utils/api');
-
-var _officialAbsenceReason = require('../../models/officialAbsenceReason');
-
-var _officialAbsenceReason2 = _interopRequireDefault(_officialAbsenceReason);
-
-var _role = require('../../utils/role');
-
-var _user = require('../../utils/user');
-
-var _expressValidator = require('express-validator');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const router = (0, _express2.default)();
-var moment = require('moment');
-
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const api_1 = require("../../utils/api");
+const officialAbsenceReason_1 = __importDefault(require("../../models/officialAbsenceReason"));
+const role_1 = require("../../utils/role");
+const user_1 = require("../../utils/user");
+const express_validator_1 = require("express-validator");
+const moment_1 = __importDefault(require("moment"));
+const router = express_1.default();
 /**
  * @api {post} /absencecheck/absenceBook/ 공결예약
  * @apiDescription 사용자가 결석예약 날짜들을 선택하면 프론트에서 list 형태로 back에 전달하고 db에 해당 정보를 날짜별로 각각 저장한다.
@@ -41,27 +36,34 @@ var moment = require('moment');
  *  "Reason": "가족여행"
  * }
  */
-router.post('/absenceBook', [(0, _role.perm)('absence').canOwn('create'), (0, _expressValidator.body)('dayList').isArray(), (0, _expressValidator.body)('Reason').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    var Name = req.user.username;
-    var Reason = req.body.Reason;
-    var dayList = req.body.dayList;
-    var approval = false;
-    try {
-        //백에서 list안의 원소를 각 날짜별로 결석 내용 저장 officialabsencereason
-        for (var k in dayList) {
-            var cursor = new _officialAbsenceReason2.default();
-            cursor.name = Name;
-            cursor.day = dayList[k];
-            cursor.reason = Reason;
-            cursor.approval = approval;
-            cursor.save();
+router.post('/absenceBook', [
+    role_1.perm('absence').canOwn('create'),
+    express_validator_1.body('dayList').isArray(),
+    express_validator_1.body('Reason').isString(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var Name = req.user.username;
+        var Reason = req.body.Reason;
+        var dayList = req.body.dayList;
+        var approval = false;
+        try {
+            //백에서 list안의 원소를 각 날짜별로 결석 내용 저장 officialabsencereason
+            for (var k in dayList) {
+                var cursor = new officialAbsenceReason_1.default();
+                cursor.name = Name;
+                cursor.day = dayList[k];
+                cursor.reason = Reason;
+                cursor.approval = approval;
+                cursor.save();
+            }
+            res.json(200);
         }
-        res.json(200);
-    } catch (err) {
-        res.status(501).json(err);
-    }
+        catch (err) {
+            res.status(501).json(err);
+        }
+    });
 }));
-
 //AttendanceManagMonthUser 페이지에서 사용
 /**
  * @api {get} /absencecheck/absenceUserData/ 공결 현황
@@ -93,15 +95,19 @@ router.post('/absenceBook', [(0, _role.perm)('absence').canOwn('create'), (0, _e
  * }
  * ]
  */
-router.get('/absenceUserData', [(0, _role.perm)('attendance').canOwn('read')], (0, _api.asyncRoute)(async function (req, res) {
-    try {
-        const officialAbsence = await _officialAbsenceReason2.default.find().where('name').equals(req.user.username);
-        res.json(officialAbsence);
-    } catch (err) {
-        res.status(501).json();
-    }
+router.get('/absenceUserData', [role_1.perm('attendance').canOwn('read')], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const officialAbsence = yield officialAbsenceReason_1.default.find()
+                .where('name')
+                .equals(req.user.username);
+            res.json(officialAbsence);
+        }
+        catch (err) {
+            res.status(501).json();
+        }
+    });
 }));
-
 //AttendanceManageDay 페이지에서 사용
 /**
  * @api {get} /absencecheck/absenceUsersData/:day 일별공결현황
@@ -130,15 +136,19 @@ router.get('/absenceUserData', [(0, _role.perm)('attendance').canOwn('read')], (
  * }
  * ]
  */
-router.get('/absenceUsersData/:day', [(0, _role.perm)('absence').canOwn('read'), (0, _expressValidator.param)('day').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    try {
-        const officialAbsence = await _officialAbsenceReason2.default.find().where('day').equals(req.params.day);
-        res.status(200).json(officialAbsence);
-    } catch (err) {
-        res.status(501).json();
-    }
+router.get('/absenceUsersData/:day', [role_1.perm('absence').canOwn('read'), express_validator_1.param('day').isString(), api_1.validateParams], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const officialAbsence = yield officialAbsenceReason_1.default.find()
+                .where('day')
+                .equals(req.params.day);
+            res.status(200).json(officialAbsence);
+        }
+        catch (err) {
+            res.status(501).json();
+        }
+    });
 }));
-
 //AttendanceManagMonthUser 페이지에서 사용
 /**
  * @api {delete} /absencecheck/deleteAbsenceUser/ 공결 신청 취소
@@ -156,19 +166,26 @@ router.get('/absenceUsersData/:day', [(0, _role.perm)('absence').canOwn('read'),
  * "day": "2020-03-11"
  * }
  */
-router.post('/deleteAbsenceUser', [(0, _role.perm)('absence').canOwn('delete'), (0, _expressValidator.body)('reason').isString(), (0, _expressValidator.body)('day').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    try {
-        await _officialAbsenceReason2.default.deleteOne({
-            name: req.user.username,
-            reason: req.body.reason,
-            day: req.body.day
-        });
-        res.status(200).json();
-    } catch (err) {
-        res.status(501).json();
-    }
+router.post('/deleteAbsenceUser', [
+    role_1.perm('absence').canOwn('delete'),
+    express_validator_1.body('reason').isString(),
+    express_validator_1.body('day').isString(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield officialAbsenceReason_1.default.deleteOne({
+                name: req.user.username,
+                reason: req.body.reason,
+                day: req.body.day,
+            });
+            res.status(200).json();
+        }
+        catch (err) {
+            res.status(501).json();
+        }
+    });
 }));
-
 //OfficialAbsenceAccept 페이지에서 사용
 /**
  * @api {get} /absencecheck/officialAbsenceList 공결신청 리스트
@@ -192,40 +209,40 @@ router.post('/deleteAbsenceUser', [(0, _role.perm)('absence').canOwn('delete'), 
  * ]
  * }
  */
-router.get('/officialAbsenceList', [(0, _role.perm)('absence').can('update'), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    try {
-        const cursor_No = await _officialAbsenceReason2.default.find({
-            day: { $gte: moment().format('YYYY-MM-DD') },
-            approval: false
-        }).sort({ name: 1 });
-        const cursor_Yes = await _officialAbsenceReason2.default.find({
-            day: { $gte: moment().format('YYYY-MM-DD') },
-            approval: true
-        }).sort({ name: 1 });
-
-        const convertAb = async curlist => {
-            const newlist = [];
-            for (let cur of curlist) {
-                newlist.push({
-                    name: cur.name,
-                    realname: await (0, _user.getRealname)(cur.name),
-                    day: cur.day,
-                    reason: cur.reason,
-                    approval: cur.approval
-                });
-            }
-            return newlist;
-        };
-
-        res.json({
-            noanswer: await convertAb(cursor_No),
-            yesanswer: await convertAb(cursor_Yes)
-        });
-    } catch (err) {
-        res.status(501).json();
-    }
+router.get('/officialAbsenceList', [role_1.perm('absence').can('update'), api_1.validateParams], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const cursor_No = yield officialAbsenceReason_1.default.find({
+                day: { $gte: moment_1.default().format('YYYY-MM-DD') },
+                approval: false,
+            }).sort({ name: 1 });
+            const cursor_Yes = yield officialAbsenceReason_1.default.find({
+                day: { $gte: moment_1.default().format('YYYY-MM-DD') },
+                approval: true,
+            }).sort({ name: 1 });
+            const convertAb = (curlist) => __awaiter(this, void 0, void 0, function* () {
+                const newlist = [];
+                for (let cur of curlist) {
+                    newlist.push({
+                        name: cur.name,
+                        realname: yield user_1.getRealname(cur.name),
+                        day: cur.day,
+                        reason: cur.reason,
+                        approval: cur.approval,
+                    });
+                }
+                return newlist;
+            });
+            res.json({
+                noanswer: yield convertAb(cursor_No),
+                yesanswer: yield convertAb(cursor_Yes),
+            });
+        }
+        catch (err) {
+            res.status(501).json();
+        }
+    });
 }));
-
 //body : name(String), day(String), approval(Boolean)
 //OfficialAbsenceAccept 페이지에서 사용
 /**
@@ -246,17 +263,25 @@ router.get('/officialAbsenceList', [(0, _role.perm)('absence').can('update'), _a
  *  "approval": true
  * }
  */
-router.post('/officialAbsenceAccept', [(0, _role.perm)('absence').can('update'), (0, _expressValidator.body)('name').isString(), (0, _expressValidator.body)('day').isString(), (0, _expressValidator.body)('approval').isBoolean(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    try {
-        const cursor = await _officialAbsenceReason2.default.findOneAndUpdate({
-            name: req.body.name,
-            day: req.body.day
-        }, { approval: req.body.approval }, function (err, doc) {});
-        res.json(cursor);
-    } catch (err) {
-        res.status(501).json();
-    }
+router.post('/officialAbsenceAccept', [
+    role_1.perm('absence').can('update'),
+    express_validator_1.body('name').isString(),
+    express_validator_1.body('day').isString(),
+    express_validator_1.body('approval').isBoolean(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const cursor = yield officialAbsenceReason_1.default.findOneAndUpdate({
+                name: req.body.name,
+                day: req.body.day,
+            }, { approval: req.body.approval }, function (err, doc) { });
+            res.json(cursor);
+        }
+        catch (err) {
+            res.status(501).json();
+        }
+    });
 }));
-
 exports.default = router;
 //# sourceMappingURL=absencecheck.route.js.map

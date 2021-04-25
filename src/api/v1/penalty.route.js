@@ -5,8 +5,8 @@ import PenaltyConfig from '../../models/Penalty/PenaltyConfig'
 import AttendanceUser from '../../models/attendanceUser'
 import { perm } from '../../utils/role'
 import { param, body, query } from 'express-validator'
+import moment from 'moment'
 const router = Router()
-var moment = require('moment')
 
 /**
  * @api {get} /penalty/read/:username 상벌점 조회
@@ -37,7 +37,8 @@ var moment = require('moment')
  *      }
  */
 router.get(
-    '/read/:username', [
+    '/read/:username',
+    [
         perm('penalty').can('read'),
         param('username').isString(),
         query('start_date').isString(),
@@ -140,43 +141,41 @@ router.get(
  *      }
  */
 router.get(
-    '/read', [
-        perm('penalty').can('read'),
-        validateParams,
-    ],
+    '/read',
+    [perm('penalty').can('read'), validateParams],
     asyncRoute(async function(req, res) {
         var result = []
         var attendanceUser = await AttendanceUser.find()
         var penaltyConfig = await PenaltyConfig.find()
         if (attendanceUser != null) {
-            attendanceUser.forEach(user=>{
-                user.status.forEach(element=>{
-                        if (element.state == 'late') {
-                            var Val = penaltyConfig.find((item, idx) => {
-                                return item.key === '지각'
-                            })
-                            result.push({
-                                type_id: Val._id,
-                                username: user.name,
-                                type: '지각',
-                                date: moment(element.date).format('YYYY-MM-DD'),
-                                description: '지각',
-                                point: Val.value,
-                            })
-                        }
-                        if (element.state == 'absence') {
-                            var val = penaltyConfig.find((item, idx) => {
-                                return item.key === '결석'
-                            })
-                            result.push({
-                                type_id: val._id,
-                                username: user.name,
-                                type: '결석',
-                                date: moment(element.date).format('YYYY-MM-DD'),
-                                description: '결석',
-                                point: val.value,
-                            })
-                        }
+            attendanceUser.forEach(user => {
+                user.status.forEach(element => {
+                    if (element.state == 'late') {
+                        var Val = penaltyConfig.find((item, idx) => {
+                            return item.key === '지각'
+                        })
+                        result.push({
+                            type_id: Val._id,
+                            username: user.name,
+                            type: '지각',
+                            date: moment(element.date).format('YYYY-MM-DD'),
+                            description: '지각',
+                            point: Val.value,
+                        })
+                    }
+                    if (element.state == 'absence') {
+                        var val = penaltyConfig.find((item, idx) => {
+                            return item.key === '결석'
+                        })
+                        result.push({
+                            type_id: val._id,
+                            username: user.name,
+                            type: '결석',
+                            date: moment(element.date).format('YYYY-MM-DD'),
+                            description: '결석',
+                            point: val.value,
+                        })
+                    }
                 })
             })
         }
@@ -226,7 +225,8 @@ router.get(
  *      HTTP/1.1 200 OK
  */
 router.post(
-    '/write', [
+    '/write',
+    [
         perm('penalty').can('update'),
         body('type_id').isString(),
         body('type').isString(),
@@ -236,7 +236,7 @@ router.post(
         validateParams,
     ],
     asyncRoute(async function(req, res) {
-        req.body.users.forEach(async(username)=>{
+        req.body.users.forEach(async username => {
             var penalty = new Penalty()
             penalty.type_id = req.body.type_id
             penalty.type = req.body.type
@@ -275,7 +275,8 @@ router.post(
  *      HTTP/1.1 200 OK
  */
 router.delete(
-    '/delete', [
+    '/delete',
+    [
         perm('penalty').can('update'),
         query('username').isString(),
         query('date').isString(),

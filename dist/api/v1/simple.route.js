@@ -1,33 +1,27 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _express = require('express');
-
-var _expressValidator = require('express-validator');
-
-var _Board = require('../../models/Board');
-
-var _Board2 = _interopRequireDefault(_Board);
-
-var _Post = require('../../models/Post');
-
-var _Post2 = _interopRequireDefault(_Post);
-
-var _api = require('../../utils/api');
-
-var _role = require('../../utils/role');
-
-var _file = require('../../utils/file');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const router = (0, _express.Router)();
-const crypto = require('crypto');
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const express_validator_1 = require("express-validator");
+const Board_1 = __importDefault(require("../../models/Board"));
+const Post_1 = __importDefault(require("../../models/Post"));
+const api_1 = require("../../utils/api");
+const role_1 = require("../../utils/role");
+const file_1 = require("../../utils/file");
+const crypto_1 = __importDefault(require("crypto"));
+const router = express_1.Router();
 const viewObj = new Object();
-
 /**
  * @api {post} /simple/boards/ 게시판 생성
  * @apiDescription 새로운 게시판을 생성한다
@@ -42,21 +36,24 @@ const viewObj = new Object();
  *
  * @apiError {Number} 500 게시판 생성 에러
  */
-router.post('/boards', [(0, _role.perm)('manageBoards').can('access'), (0, _expressValidator.body)('title').isString(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    let board = new _Board2.default();
+router.post('/boards', [
+    role_1.perm('manageBoards').can('access'),
+    express_validator_1.body('title').isString(),
+    api_1.validateParams,
+], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let board = new Board_1.default();
     board.title = req.body.title;
     board.isAnonymous = req.body.isAnonymous;
-
     try {
-        await board.save();
+        yield board.save();
         res.status(201).end();
-    } catch (error) {
+    }
+    catch (error) {
         const errr = new Error('database error');
         errr.status = 500;
         throw errr;
     }
-}));
-
+})));
 /**
  * @api {patch} /simple/posts/:post_id 게시글 수정
  * @apiDescription 게시글을 수정한다
@@ -86,9 +83,14 @@ router.post('/boards', [(0, _role.perm)('manageBoards').can('access'), (0, _expr
  *       }
  */
 //게시판 수정
-router.patch('/boards/:board_id', [(0, _role.perm)('manageBoards').can('access'), (0, _expressValidator.param)('board_id').isNumeric(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    const board = await _Board2.default.findOne().where('_id').equals(req.params.board_id);
-
+router.patch('/boards/:board_id', [
+    role_1.perm('manageBoards').can('access'),
+    express_validator_1.param('board_id').isNumeric(),
+    api_1.validateParams,
+], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const board = yield Board_1.default.findOne()
+        .where('_id')
+        .equals(req.params.board_id);
     if (!board) {
         const err = new Error('존재하지 않는 게시판입니다.');
         err.status = 404;
@@ -96,17 +98,17 @@ router.patch('/boards/:board_id', [(0, _role.perm)('manageBoards').can('access')
     }
     try {
         board.title = req.body.title;
-        await board.save();
+        yield board.save();
         res.status(200).json({
-            message: '수정 완료'
+            message: '수정 완료',
         });
-    } catch (error) {
+    }
+    catch (error) {
         const errr = new Error('database error');
         errr.status = 500;
         throw errr;
     }
-}));
-
+})));
 /**
  * @api {delete} /simple/boards/:board_id 게시판 삭제
  * @apiDescription 게시판을 삭제한다
@@ -132,40 +134,43 @@ router.patch('/boards/:board_id', [(0, _role.perm)('manageBoards').can('access')
  * @apiError {Number} 500 게시판 삭제 에러
  */
 //게시판 삭제
-router.delete('/boards/:board_id', [(0, _role.perm)('manageBoards').can('access'), (0, _expressValidator.param)('board_id').isNumeric(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    const board = await _Board2.default.findOne().where('_id').equals(req.params.board_id);
-
+router.delete('/boards/:board_id', [
+    role_1.perm('manageBoards').can('access'),
+    express_validator_1.param('board_id').isNumeric(),
+    api_1.validateParams,
+], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const board = yield Board_1.default.findOne()
+        .where('_id')
+        .equals(req.params.board_id);
     if (!board) {
         res.status(404).json({
-            message: '존재하지 않는 게시판입니다.'
+            message: '존재하지 않는 게시판입니다.',
         });
         return;
     }
-
     try {
-        const posts = await _Post2.default.find().where('board').equals(req.params.board_id);
-
+        const posts = yield Post_1.default.find()
+            .where('board')
+            .equals(req.params.board_id);
         for (let i = 0; i < posts.length; i++) {
-            await (0, _file.removeFileLink)(posts[i].files);
-            await (0, _file.deleteUnlinkedFile)(posts[i].files);
+            yield file_1.removeFileLink(posts[i].files);
+            yield file_1.deleteUnlinkedFile(posts[i].files);
         }
-
         for (let j = 0; j < posts.length; j++) {
-            await posts[j].remove();
+            yield posts[j].remove();
         }
-
-        await board.remove();
+        yield board.remove();
         // await Board.remove({ _id: req.params.board_id })
         res.status(200).json({
-            message: '게시판을 삭제했습니다'
+            message: '게시판을 삭제했습니다',
         });
-    } catch (error) {
+    }
+    catch (error) {
         const errr = new Error('database error');
         errr.status = 500;
         throw errr;
     }
-}));
-
+})));
 /**
  * @api {get} /simple/boards/ 게시판 목록
  * @apiDescription 게시판 목록을 불러온다
@@ -191,17 +196,16 @@ router.delete('/boards/:board_id', [(0, _role.perm)('manageBoards').can('access'
  *          message: '존재하지 않는 게시판입니다.',
  *        }
  */
-router.get('/boards', (0, _api.asyncRoute)(async (req, res) => {
-    const boards = await _Board2.default.find();
+router.get('/boards', api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const boards = yield Board_1.default.find();
     res.json(boards.map(board => {
         return {
             _id: board._id,
             title: board.title,
-            isAnonymous: board.isAnonymous
+            isAnonymous: board.isAnonymous,
         };
     }));
-}));
-
+})));
 /**
  * @api {post} /simple/boards/:board_id 게시글 생성
  * @apiDescription 게시글을 첨부파일과 같이 작성한다
@@ -248,59 +252,67 @@ router.get('/boards', (0, _api.asyncRoute)(async (req, res) => {
  *          string: 올바르지 않은 첨부파일입니다.
  *       }
  */
-router.post('/boards/:board_id', [(0, _expressValidator.param)('board_id').isNumeric(), (0, _expressValidator.body)('title').isString(), (0, _expressValidator.body)('content').isString(), (0, _expressValidator.body)('files').custom(_file.checkAttachableFileArray), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    if (!req.user.perm('board', req.params.board_id).can('write')) {
-        res.status(403).end();
-        return;
-    }
-    const boardId = parseInt(req.params.board_id);
-
-    try {
-        let board = await _Board2.default.findOne({ _id: boardId });
-        if (!board) {
-            res.status(404).json({ message: 'no board id ' + boardId });
+router.post('/boards/:board_id', [
+    express_validator_1.param('board_id').isNumeric(),
+    express_validator_1.body('title').isString(),
+    express_validator_1.body('content').isString(),
+    express_validator_1.body('files').custom(file_1.checkAttachableFileArray),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!req.user.perm('board', req.params.board_id).can('write')) {
+            res.status(403).end();
             return;
         }
-        if (!(0, _file.checkIsFileOwner)(req.body.files) || !(0, _file.checkUnlinkedFile)(req.body.files)) {
-            const err = new Error('올바르지 않은 첨부파일입니다.');
-            err.status = 400;
+        const boardId = parseInt(req.params.board_id);
+        try {
+            let board = yield Board_1.default.findOne({ _id: boardId });
+            if (!board) {
+                res.status(404).json({ message: 'no board id ' + boardId });
+                return;
+            }
+            if (!file_1.checkIsFileOwner(req.body.files) ||
+                !file_1.checkUnlinkedFile(req.body.files)) {
+                const err = new Error('올바르지 않은 첨부파일입니다.');
+                err.status = 400;
+                throw err;
+            }
+            let post;
+            if (board.isAnonymous == false) {
+                post = new Post_1.default({
+                    board: boardId,
+                    title: req.body.title,
+                    content: req.body.content,
+                    author: req.user.username,
+                    isAnonymous: false,
+                    created_date: Date.now(),
+                });
+            }
+            else {
+                post = new Post_1.default({
+                    board: boardId,
+                    title: req.body.title,
+                    content: req.body.content,
+                    author: crypto_1.default
+                        .createHash('sha512')
+                        .update(req.user.username)
+                        .digest('base64'),
+                    isAnonymous: true,
+                    created_date: Date.now(),
+                });
+            }
+            let newpost = yield post.save();
+            // DB 파일 객체에 역참조 등록
+            yield file_1.applyFileLink(req.body.files, 'boardPost', newpost.id);
+            newpost.files = req.body.files;
+            yield newpost.save();
+            res.status(201).json(newpost);
+        }
+        catch (err) {
             throw err;
         }
-        let post;
-        if (board.isAnonymous == false) {
-            post = new _Post2.default({
-                board: boardId,
-                title: req.body.title,
-                content: req.body.content,
-                author: req.user.username,
-                isAnonymous: false,
-                created_date: Date.now()
-            });
-        } else {
-            post = new _Post2.default({
-                board: boardId,
-                title: req.body.title,
-                content: req.body.content,
-                author: crypto.createHash('sha512').update(req.user.username).digest('base64'),
-                isAnonymous: true,
-                created_date: Date.now()
-            });
-        }
-
-        let newpost = await post.save();
-
-        // DB 파일 객체에 역참조 등록
-        await (0, _file.applyFileLink)(req.body.files, 'boardPost', newpost.id);
-        newpost.files = req.body.files;
-
-        await newpost.save();
-
-        res.status(201).json(newpost);
-    } catch (err) {
-        throw err;
-    }
+    });
 }));
-
 /**
  * @api {delete} /simple/posts/:post_id 게시글 삭제
  * @apiDescription 게시글을 삭제한다
@@ -346,44 +358,55 @@ router.post('/boards/:board_id', [(0, _expressValidator.param)('board_id').isNum
  *          string: database error
  *       }
  */
-router.delete('/posts/:post_id', [(0, _expressValidator.param)('post_id').isNumeric(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    // if (!req.user.perm('board', req.params.board_id).canOwn('delete')) {
-    //     res.status(403).end()
-    //     return
-    // }
-
-    try {
-        let post = await _Post2.default.findById(req.params.post_id);
-        if (post) {
-            if (post.isAnonymous == false) {
-                if (post.author != req.user.username && !req.user.perm('board', req.params.board_id).can('delete')) {
-                    res.status(403).end();
-                    return;
+router.delete('/posts/:post_id', [express_validator_1.param('post_id').isNumeric(), api_1.validateParams], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // if (!req.user.perm('board', req.params.board_id).canOwn('delete')) {
+        //     res.status(403).end()
+        //     return
+        // }
+        try {
+            let post = yield Post_1.default.findById(req.params.post_id);
+            if (post) {
+                if (post.isAnonymous == false) {
+                    if (post.author != req.user.username &&
+                        !req.user
+                            .perm('board', req.params.board_id)
+                            .can('delete')) {
+                        res.status(403).end();
+                        return;
+                    }
                 }
-            } else {
-                if (post.author != crypto.createHash('sha512').update(req.user.username).digest('base64') && !req.user.perm('board', req.params.board_id).can('delete')) {
-                    res.status(403).end();
-                    return;
+                else {
+                    if (post.author !=
+                        crypto_1.default
+                            .createHash('sha512')
+                            .update(req.user.username)
+                            .digest('base64') &&
+                        !req.user
+                            .perm('board', req.params.board_id)
+                            .can('delete')) {
+                        res.status(403).end();
+                        return;
+                    }
                 }
+                yield file_1.removeFileLink(post.files);
+                yield file_1.deleteUnlinkedFile(post.files);
+                yield post.delete();
+                res.status(200).json({ message: 'post deleted', target: post });
             }
-
-            await (0, _file.removeFileLink)(post.files);
-            await (0, _file.deleteUnlinkedFile)(post.files);
-
-            await post.delete();
-            res.status(200).json({ message: 'post deleted', target: post });
-        } else {
-            res.status(404).json({
-                message: 'no post id ' + req.params.post_id
-            });
+            else {
+                res.status(404).json({
+                    message: 'no post id ' + req.params.post_id,
+                });
+            }
         }
-    } catch (error) {
-        const errr = new Error('database error');
-        errr.status = 500;
-        throw errr;
-    }
+        catch (error) {
+            const errr = new Error('database error');
+            errr.status = 500;
+            throw errr;
+        }
+    });
 }));
-
 /**
  * @api {patch} /simple/posts/:post_id 게시글 수정
  * @apiDescription 게시글을 수정한다
@@ -425,72 +448,77 @@ router.delete('/posts/:post_id', [(0, _expressValidator.param)('post_id').isNume
  *          message: no board id 10,
  *       }
  */
-router.patch('/posts/:post_id', [(0, _expressValidator.param)('post_id').isNumeric(), (0, _expressValidator.body)('title').isString(), (0, _expressValidator.body)('content').isString(), (0, _expressValidator.body)('files').custom(_file.checkAttachableFileArray), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    // if (!req.user.perm('board', req.params.board_id).canOwn('update')) {
-    //     res.status(403).end()
-    //     return
-    // }
-    let post = await _Post2.default.findById(req.params.post_id);
-
-    if (post) {
-        if (post.isAnonymous == false) {
-            if (post.author != req.user.username) {
-                res.status(403).end();
-                return;
+router.patch('/posts/:post_id', [
+    express_validator_1.param('post_id').isNumeric(),
+    express_validator_1.body('title').isString(),
+    express_validator_1.body('content').isString(),
+    express_validator_1.body('files').custom(file_1.checkAttachableFileArray),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // if (!req.user.perm('board', req.params.board_id).canOwn('update')) {
+        //     res.status(403).end()
+        //     return
+        // }
+        let post = yield Post_1.default.findById(req.params.post_id);
+        if (post) {
+            if (post.isAnonymous == false) {
+                if (post.author != req.user.username) {
+                    res.status(403).end();
+                    return;
+                }
             }
-        } else {
-            if (post.author != crypto.createHash('sha512').update(req.user.username).digest('base64')) {
-                res.status(403).end();
-                return;
+            else {
+                if (post.author !=
+                    crypto_1.default
+                        .createHash('sha512')
+                        .update(req.user.username)
+                        .digest('base64')) {
+                    res.status(403).end();
+                    return;
+                }
             }
-        }
-
-        // 첨부할 파일들이 본인이 업로드한 파일들인지 체크
-        if (!(0, _file.checkIsFileOwner)(req.body.files)) {
-            const err = new Error('올바르지 않은 첨부파일입니다.');
-            err.status = 400;
-            throw err;
-        }
-        // 이미 첨부된 파일을 첨부하는지 검사
-        const links = await (0, _file.getFileLinks)(req.body.files);
-        for (let link of links) {
-            if (link.target !== 'boardPost' || link.ref !== post.id) {
+            // 첨부할 파일들이 본인이 업로드한 파일들인지 체크
+            if (!file_1.checkIsFileOwner(req.body.files)) {
                 const err = new Error('올바르지 않은 첨부파일입니다.');
                 err.status = 400;
                 throw err;
             }
+            // 이미 첨부된 파일을 첨부하는지 검사
+            const links = yield file_1.getFileLinks(req.body.files);
+            for (let link of links) {
+                if (link.target !== 'boardPost' || link.ref !== post.id) {
+                    const err = new Error('올바르지 않은 첨부파일입니다.');
+                    err.status = 400;
+                    throw err;
+                }
+            }
+            if (req.body.content) {
+                post.title = req.body.title;
+                post.content = req.body.content;
+            }
+            const newpost = yield post.save();
+            const prevFiles = newpost.files;
+            // 기존 파일들의 역참조 삭제
+            yield file_1.removeFileLink(prevFiles);
+            // 새로운 파일들의 역참조 등록
+            yield file_1.applyFileLink(req.body.files, 'boardPost', newpost.id);
+            newpost.files = req.body.files;
+            yield newpost.save();
+            // 기존에는 첨부되었지만, 수정시 제거된 파일들의 처리
+            yield file_1.deleteUnlinkedFile(prevFiles);
+            res.status(200).json({
+                message: '수정 완료',
+                target: post,
+            });
         }
-
-        if (req.body.content) {
-            post.title = req.body.title;
-            post.content = req.body.content;
+        else {
+            res.status(404).json({
+                message: 'no post id' + req.params.post_id,
+            });
         }
-        const newpost = await post.save();
-        const prevFiles = newpost.files;
-
-        // 기존 파일들의 역참조 삭제
-        await (0, _file.removeFileLink)(prevFiles);
-
-        // 새로운 파일들의 역참조 등록
-        await (0, _file.applyFileLink)(req.body.files, 'boardPost', newpost.id);
-        newpost.files = req.body.files;
-
-        await newpost.save();
-
-        // 기존에는 첨부되었지만, 수정시 제거된 파일들의 처리
-        await (0, _file.deleteUnlinkedFile)(prevFiles);
-
-        res.status(200).json({
-            message: '수정 완료',
-            target: post
-        });
-    } else {
-        res.status(404).json({
-            message: 'no post id' + req.params.post_id
-        });
-    }
+    });
 }));
-
 /**
  * @api {get} /simple/posts/:post_id 게시글 조회
  * @apiDescription 해당 아이디의 게시글을 불러온다
@@ -498,7 +526,7 @@ router.patch('/posts/:post_id', [(0, _expressValidator.param)('post_id').isNumer
  * @apiGroup Board
  *
  * @apiParam {Number} post_id 게시판 아이디
- * 
+ *
  * @apiSuccess {json} 200 게시글 조회
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200
@@ -515,67 +543,68 @@ router.patch('/posts/:post_id', [(0, _expressValidator.param)('post_id').isNumer
             comment: post.comments,
             files: await getFileInfoArray(post.files)
  *      }
- * 
+ *
  * @apiError {Number} 404 게시글 조회 실패 에러
  * @apiErrorExample Error-Response:
  *       HTTP/1.1 404
  *       {
  *          message: no post id post_id,
  *       }
- * 
+ *
  */
 //게시글 조회
-router.get('/posts/:post_id', [(0, _expressValidator.param)('post_id').isNumeric(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    const post = await _Post2.default.findOne().where('_id').equals(req.params.post_id);
-
-    if (!req.user.perm('board', post.board).can('read')) {
-        const err = new Error('권한이 없습니다.');
-        err.status = 403;
-        throw err;
-    }
-
-    if (post) {
-        //조회수 증가 viewObj 오브젝트 만들어서 post_id : [username] 형식으로 저장
-        if (!viewObj[req.params.post_id]) {
-            viewObj[req.params.post_id] = [];
+router.get('/posts/:post_id', [express_validator_1.param('post_id').isNumeric(), api_1.validateParams], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const post = yield Post_1.default.findOne()
+            .where('_id')
+            .equals(req.params.post_id);
+        if (!req.user.perm('board', post.board).can('read')) {
+            const err = new Error('권한이 없습니다.');
+            err.status = 403;
+            throw err;
         }
-        if (viewObj[req.params.post_id].indexOf(req.user.username) == -1) {
-            //username이 없다면 배열에 추가하고 조회수 증가
-            viewObj[req.params.post_id].push(req.user.username);
-            post.view++;
-            setTimeout(() => {
-                //10분이 지나면 배열에서 삭제해서 다시 조회수가 증가할 수 있게 만듦
-                viewObj[req.params.post_id].splice(viewObj[req.params.post_id].indexOf(req.user.username), 1);
-            }, 600000);
-            for (let i in viewObj) {
-                //username이 하나도 없으면 해당 오브젝트 삭제
-                if (i.length == 0) {
-                    delete viewObj.i;
+        if (post) {
+            //조회수 증가 viewObj 오브젝트 만들어서 post_id : [username] 형식으로 저장
+            if (!viewObj[req.params.post_id]) {
+                viewObj[req.params.post_id] = [];
+            }
+            if (viewObj[req.params.post_id].indexOf(req.user.username) == -1) {
+                //username이 없다면 배열에 추가하고 조회수 증가
+                viewObj[req.params.post_id].push(req.user.username);
+                post.view++;
+                setTimeout(() => {
+                    //10분이 지나면 배열에서 삭제해서 다시 조회수가 증가할 수 있게 만듦
+                    viewObj[req.params.post_id].splice(viewObj[req.params.post_id].indexOf(req.user.username), 1);
+                }, 600000);
+                for (let i in viewObj) {
+                    //username이 하나도 없으면 해당 오브젝트 삭제
+                    if (i.length == 0) {
+                        delete viewObj.i;
+                    }
                 }
             }
+            yield post.save();
+            res.status(200).json({
+                _id: parseInt(post.id),
+                title: post.title,
+                content: post.content,
+                author: post.author,
+                isAnonymous: post.isAnonymous,
+                created_date: post.created_date,
+                view: post.view,
+                like: post.likes_count,
+                isLike: post.likes_flag(req.user.username),
+                comment: post.comments,
+                files: yield file_1.getFileInfoArray(post.files),
+            });
         }
-
-        await post.save();
-        res.status(200).json({
-            _id: parseInt(post.id),
-            title: post.title,
-            content: post.content,
-            author: post.author,
-            isAnonymous: post.isAnonymous,
-            created_date: post.created_date,
-            view: post.view,
-            like: post.likes_count,
-            isLike: post.likes_flag(req.user.username),
-            comment: post.comments,
-            files: await (0, _file.getFileInfoArray)(post.files)
-        });
-    } else {
-        res.status(404).json({
-            message: 'no post id ' + req.params.post_id
-        });
-    }
+        else {
+            res.status(404).json({
+                message: 'no post id ' + req.params.post_id,
+            });
+        }
+    });
 }));
-
 /**
  * @api {get} /simple/posts/:post_id 게시글 목록 보기
  * @apiDescription 해당 게시판의 게시글 목록을 불러온다
@@ -589,53 +618,63 @@ router.get('/posts/:post_id', [(0, _expressValidator.param)('post_id').isNumeric
  *
  */
 //게시글 목록 보기
-router.get('/boards/:board_id', [(0, _expressValidator.param)('board_id').isNumeric(), (0, _expressValidator.query)('page').custom(_api.isPositive), (0, _expressValidator.query)('pagesize').custom(_api.isPositive), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    if (!req.user.perm('board', req.params.board_id).can('read')) {
-        const err = new Error('권한이 없습니다.');
-        err.status = 403;
-        throw err;
-    }
-
-    let boardId = parseInt(req.params.board_id);
-
-    try {
-        let board = await _Board2.default.findOne({ _id: boardId });
-        if (!board) {
-            res.status(404).json({ message: 'no board id ' + boardId });
-            return;
+router.get('/boards/:board_id', [
+    express_validator_1.param('board_id').isNumeric(),
+    express_validator_1.query('page').custom(api_1.isPositive),
+    express_validator_1.query('pagesize').custom(api_1.isPositive),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!req.user.perm('board', req.params.board_id).can('read')) {
+            const err = new Error('권한이 없습니다.');
+            err.status = 403;
+            throw err;
         }
-
-        const page = parseInt(req.query.page);
-        const pagesize = parseInt(req.query.pagesize || 8);
-
-        let postcount = await _Post2.default.find().count().where('board').equals(boardId);
-
-        let posts = await _Post2.default.find().where('board').equals(boardId).limit(pagesize).skip((page - 1) * pagesize).sort('-_id');
-        res.status(200).json({
-            board: board,
-            totalpage: postcount,
-            posts: posts.map(post => {
-                return {
-                    _id: parseInt(post.id),
-                    title: post.title,
-                    content: post.content,
-                    author: post.author,
-                    isAnonymous: post.isAnonymous,
-                    created_date: post.created_date,
-                    view: post.view,
-                    like: post.likes_count,
-                    comment_count: post.comments.length,
-                    comment: post.comments
-                };
-            })
-        });
-    } catch (error) {
-        const errr = new Error('database error');
-        errr.status = 500;
-        throw errr;
-    }
+        let boardId = parseInt(req.params.board_id);
+        try {
+            let board = yield Board_1.default.findOne({ _id: boardId });
+            if (!board) {
+                res.status(404).json({ message: 'no board id ' + boardId });
+                return;
+            }
+            const page = parseInt(req.query.page);
+            const pagesize = parseInt(req.query.pagesize || 8);
+            let postcount = yield Post_1.default.find()
+                .count()
+                .where('board')
+                .equals(boardId);
+            let posts = yield Post_1.default.find()
+                .where('board')
+                .equals(boardId)
+                .limit(pagesize)
+                .skip((page - 1) * pagesize)
+                .sort('-_id');
+            res.status(200).json({
+                board: board,
+                totalpage: postcount,
+                posts: posts.map(post => {
+                    return {
+                        _id: parseInt(post.id),
+                        title: post.title,
+                        content: post.content,
+                        author: post.author,
+                        isAnonymous: post.isAnonymous,
+                        created_date: post.created_date,
+                        view: post.view,
+                        like: post.likes_count,
+                        comment_count: post.comments.length,
+                        comment: post.comments,
+                    };
+                }),
+            });
+        }
+        catch (error) {
+            const errr = new Error('database error');
+            errr.status = 500;
+            throw errr;
+        }
+    });
 }));
-
 /**
  * @api {post} /posts/:post_id/comment 댓글 생성
  * @apiDescription 댓글을 작성한다
@@ -662,32 +701,36 @@ router.get('/boards/:board_id', [(0, _expressValidator.param)('board_id').isNume
  *       }
  */
 //댓글 작성
-router.post('/posts/:post_id/comment', [(0, _expressValidator.param)('post_id').isNumeric(), (0, _expressValidator.body)('content').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    let postId = parseInt(req.params.post_id);
-    let post = await _Post2.default.findOne({ _id: postId });
-
-    if (!req.user.perm('board', post.board).can('read')) {
-        const err = new Error('권한이 없습니다.');
-        err.status = 403;
-        throw err;
-    }
-    // if (req.body.content.length > 300) {
-    //     const err = new Error('댓글은 300자를 넘을 수 없습니다.')
-    //     err.status = 500
-    //     return
-    // }
-    if (!post) {
-        res.status(404).json({ message: 'no post id ' + postId });
-        return;
-    }
-    if (post.isAnonymous == true) {
-        await post.addComment(req.body.content, crypto.createHash('sha512').update(req.user.username).digest('base64'));
-    } else {
-        await post.addComment(req.body.content, req.user.username);
-    }
-    res.status(201).json({ message: '댓글 작성 완료' });
+router.post('/posts/:post_id/comment', [express_validator_1.param('post_id').isNumeric(), express_validator_1.body('content').isString(), api_1.validateParams], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let postId = parseInt(req.params.post_id);
+        let post = yield Post_1.default.findOne({ _id: postId });
+        if (!req.user.perm('board', post.board).can('read')) {
+            const err = new Error('권한이 없습니다.');
+            err.status = 403;
+            throw err;
+        }
+        // if (req.body.content.length > 300) {
+        //     const err = new Error('댓글은 300자를 넘을 수 없습니다.')
+        //     err.status = 500
+        //     return
+        // }
+        if (!post) {
+            res.status(404).json({ message: 'no post id ' + postId });
+            return;
+        }
+        if (post.isAnonymous == true) {
+            yield post.addComment(req.body.content, crypto_1.default
+                .createHash('sha512')
+                .update(req.user.username)
+                .digest('base64'));
+        }
+        else {
+            yield post.addComment(req.body.content, req.user.username);
+        }
+        res.status(201).json({ message: '댓글 작성 완료' });
+    });
 }));
-
 /**
  * @api {patch} /posts/:post_id/comment/:comment_id 댓글 수정
  * @apiDescription 댓글을 수정한다
@@ -714,40 +757,43 @@ router.post('/posts/:post_id/comment', [(0, _expressValidator.param)('post_id').
  *       }
  */
 //댓글 수정
-router.patch('/posts/:post_id/comment/:comment_id', [(0, _expressValidator.param)('post_id').isNumeric(), (0, _expressValidator.body)('content').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    let post = await _Post2.default.findOne().where('_id').equals(req.params.post_id);
-    if (!post) {
-        res.status(404).json({
-            message: 'no post id ' + req.params.comment_id
-        });
-        return;
-    }
-
-    if (!req.user.perm('board', post.board).can('read')) {
-        const err = new Error('권한이 없습니다.');
-        err.status = 403;
-        throw err;
-    }
-
-    let comment = post.getComment(req.params.comment_id);
-
-    if (post.isAnonymous == false) {
-        if (comment.writer != req.user.username) {
-            res.status(403).end();
+router.patch('/posts/:post_id/comment/:comment_id', [express_validator_1.param('post_id').isNumeric(), express_validator_1.body('content').isString(), api_1.validateParams], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let post = yield Post_1.default.findOne()
+            .where('_id')
+            .equals(req.params.post_id);
+        if (!post) {
+            res.status(404).json({
+                message: 'no post id ' + req.params.comment_id,
+            });
             return;
         }
-    } else {
-        if (comment.writer != crypto.createHash('sha512').update(req.user.username).digest('base64')) {
-            res.status(403).end();
-            return;
+        if (!req.user.perm('board', post.board).can('read')) {
+            const err = new Error('권한이 없습니다.');
+            err.status = 403;
+            throw err;
         }
-    }
-
-    await post.updateComment(req.body.content, req.params.comment_id);
-
-    res.status(201).json({ message: '댓글 수정 완료' });
+        let comment = post.getComment(req.params.comment_id);
+        if (post.isAnonymous == false) {
+            if (comment.writer != req.user.username) {
+                res.status(403).end();
+                return;
+            }
+        }
+        else {
+            if (comment.writer !=
+                crypto_1.default
+                    .createHash('sha512')
+                    .update(req.user.username)
+                    .digest('base64')) {
+                res.status(403).end();
+                return;
+            }
+        }
+        yield post.updateComment(req.body.content, req.params.comment_id);
+        res.status(201).json({ message: '댓글 수정 완료' });
+    });
 }));
-
 /**
  * @api {delete} /posts/:post_id/comment/:comment_id 댓글 삭제
  * @apiDescription 댓글을 삭제한다
@@ -774,48 +820,57 @@ router.patch('/posts/:post_id/comment/:comment_id', [(0, _expressValidator.param
  *       }
  */
 //댓글 삭제
-router.delete('/posts/:post_id/comment/:comment_id', [(0, _expressValidator.param)('post_id').isNumeric(), (0, _expressValidator.param)('comment_id').isNumeric(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    let post = await _Post2.default.findOne().where('_id').equals(req.params.post_id);
-
-    //게시글 유무
-    if (!post) {
-        res.status(404).json({
-            message: 'no post id ' + req.params.comment_id
-        });
-        return;
-    }
-    //댓글 본인확인
-    let comment = post.getComment(req.params.comment_id);
-
-    if (comment.writer == req.user.username) {
-        await post.removeComment(req.params.comment_id);
+router.delete('/posts/:post_id/comment/:comment_id', [
+    express_validator_1.param('post_id').isNumeric(),
+    express_validator_1.param('comment_id').isNumeric(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let post = yield Post_1.default.findOne()
+            .where('_id')
+            .equals(req.params.post_id);
+        //게시글 유무
+        if (!post) {
+            res.status(404).json({
+                message: 'no post id ' + req.params.comment_id,
+            });
+            return;
+        }
+        //댓글 본인확인
+        let comment = post.getComment(req.params.comment_id);
+        if (comment.writer == req.user.username) {
+            yield post.removeComment(req.params.comment_id);
+            res.status(200).json({ message: '삭제 성공' });
+        }
+        //게시판 권한
+        if (!req.user.perm('board', post.board).can('delete')) {
+            const err = new Error('권한이 없습니다.');
+            err.status = 403;
+            throw err;
+        }
+        if (post.isAnonymous == false) {
+            if (comment.writer != req.user.username &&
+                !req.user.perm('board', req.params.comment_id).can('delete')) {
+                res.status(403).end();
+                return;
+            }
+        }
+        else {
+            if (comment.writer !=
+                crypto_1.default
+                    .createHash('sha512')
+                    .update(req.user.username)
+                    .digest('base64') &&
+                !req.user.perm('board', req.params.comment_id).can('delete')) {
+                res.status(403).end();
+                return;
+            }
+        }
+        //다른 사람이 삭제할때 모든 권한 확인 후 삭제
+        yield post.removeComment(req.params.comment_id);
         res.status(200).json({ message: '삭제 성공' });
-    }
-
-    //게시판 권한
-    if (!req.user.perm('board', post.board).can('delete')) {
-        const err = new Error('권한이 없습니다.');
-        err.status = 403;
-        throw err;
-    }
-
-    if (post.isAnonymous == false) {
-        if (comment.writer != req.user.username && !req.user.perm('board', req.params.comment_id).can('delete')) {
-            res.status(403).end();
-            return;
-        }
-    } else {
-        if (comment.writer != crypto.createHash('sha512').update(req.user.username).digest('base64') && !req.user.perm('board', req.params.comment_id).can('delete')) {
-            res.status(403).end();
-            return;
-        }
-    }
-
-    //다른 사람이 삭제할때 모든 권한 확인 후 삭제
-    await post.removeComment(req.params.comment_id);
-    res.status(200).json({ message: '삭제 성공' });
+    });
 }));
-
 /**
  * @api {post} /posts/:post_id/like 추천 생성
  * @apiDescription 추천 활성화
@@ -841,25 +896,23 @@ router.delete('/posts/:post_id/comment/:comment_id', [(0, _expressValidator.para
  *       }
  */
 //좋아요 생성
-router.post('/posts/:post_id/like', [(0, _expressValidator.param)('post_id').isNumeric(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    let postId = parseInt(req.params.post_id);
-    let post = await _Post2.default.findOne({ _id: postId });
-
-    if (!post) {
-        res.status(404).json({ message: 'no post id ' + postId });
-        return;
-    }
-
-    if (!req.user.perm('board', post.board).can('read')) {
-        const err = new Error('권한이 없습니다.');
-        err.status = 403;
-        throw err;
-    }
-
-    await post.likes_create(req.user.username);
-    res.status(201).json({ message: '좋아요 생성 완료' });
+router.post('/posts/:post_id/like', [express_validator_1.param('post_id').isNumeric(), api_1.validateParams], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let postId = parseInt(req.params.post_id);
+        let post = yield Post_1.default.findOne({ _id: postId });
+        if (!post) {
+            res.status(404).json({ message: 'no post id ' + postId });
+            return;
+        }
+        if (!req.user.perm('board', post.board).can('read')) {
+            const err = new Error('권한이 없습니다.');
+            err.status = 403;
+            throw err;
+        }
+        yield post.likes_create(req.user.username);
+        res.status(201).json({ message: '좋아요 생성 완료' });
+    });
 }));
-
 /**
  * @api {delete} /posts/:post_id/like 추천 삭제
  * @apiDescription 추천 비활성화
@@ -885,23 +938,23 @@ router.post('/posts/:post_id/like', [(0, _expressValidator.param)('post_id').isN
  *       }
  */
 //좋아요 삭제
-router.delete('/posts/:post_id/like', [(0, _expressValidator.param)('post_id').isNumeric(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    let postId = parseInt(req.params.post_id);
-    let post = await _Post2.default.findOne({ _id: postId });
-    if (!post) {
-        res.status(404).json({ message: 'no post id ' + postId });
-        return;
-    }
-
-    if (!req.user.perm('board', post.board).can('read')) {
-        const err = new Error('권한이 없습니다.');
-        err.status = 403;
-        throw err;
-    }
-    await post.likes_delete(req.user.username);
-    res.status(201).json({ message: '좋아요 삭제 완료' });
+router.delete('/posts/:post_id/like', [express_validator_1.param('post_id').isNumeric(), api_1.validateParams], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let postId = parseInt(req.params.post_id);
+        let post = yield Post_1.default.findOne({ _id: postId });
+        if (!post) {
+            res.status(404).json({ message: 'no post id ' + postId });
+            return;
+        }
+        if (!req.user.perm('board', post.board).can('read')) {
+            const err = new Error('권한이 없습니다.');
+            err.status = 403;
+            throw err;
+        }
+        yield post.likes_delete(req.user.username);
+        res.status(201).json({ message: '좋아요 삭제 완료' });
+    });
 }));
-
 /**
  * @api {get} /searchpost 게시물 검색
  * @apiDescription 게시물을 제목, 내용, 제목 + 내용으로 검색할 수 있다
@@ -931,62 +984,75 @@ router.delete('/posts/:post_id/like', [(0, _expressValidator.param)('post_id').i
  *       }
  */
 //게시물 검색
-router.get('/searchpost', [(0, _expressValidator.query)('content'), (0, _expressValidator.query)('option'), (0, _expressValidator.query)('page').custom(_api.isPositive), (0, _expressValidator.query)('pagesize').custom(_api.isPositive), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    let options = [];
-    if (req.query.option == 'title') {
-        options = [{ title: new RegExp(req.query.content) }];
-    } else if (req.query.option == 'content') {
-        options = [{ content: new RegExp(req.query.content) }];
-    } else if (req.query.option == 'title+content') {
-        options = [{ title: new RegExp(req.query.content) }, { content: new RegExp(req.query.content) }];
-    } else {
-        const err = new Error('검색 옵션이 없습니다.');
-        err.status = 400;
-        throw err;
-    }
-
-    const board = (await _Board2.default.find()).filter(item => {
-        return req.user.perm('board', item.id + '').can('read');
-    }).map(item => item.id);
-
-    try {
-        const page = parseInt(req.query.page);
-        const pagesize = parseInt(req.query.pagesize || 8);
-
-        let postcount = await _Post2.default.find({
-            $or: options,
-            board: { $in: board }
-        }).count();
-
-        const posts = await _Post2.default.find({
-            $or: options,
-            board: { $in: board }
-        }).limit(pagesize).skip((page - 1) * pagesize);
-
-        res.status(200).json({
-            totalpage: postcount,
-            posts: posts.map(post => {
-                return {
-                    board: post.board,
-                    _id: parseInt(post.id),
-                    title: post.title,
-                    content: post.content,
-                    author: post.author,
-                    isAnonymous: post.isAnonymous,
-                    created_date: post.created_date,
-                    view: post.view,
-                    like: post.likes_count,
-                    comment_count: post.comments.length,
-                    comment: post.comments
-                };
+router.get('/searchpost', [
+    express_validator_1.query('content'),
+    express_validator_1.query('option'),
+    express_validator_1.query('page').custom(api_1.isPositive),
+    express_validator_1.query('pagesize').custom(api_1.isPositive),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let options = [];
+        if (req.query.option == 'title') {
+            options = [{ title: new RegExp(req.query.content) }];
+        }
+        else if (req.query.option == 'content') {
+            options = [{ content: new RegExp(req.query.content) }];
+        }
+        else if (req.query.option == 'title+content') {
+            options = [
+                { title: new RegExp(req.query.content) },
+                { content: new RegExp(req.query.content) },
+            ];
+        }
+        else {
+            const err = new Error('검색 옵션이 없습니다.');
+            err.status = 400;
+            throw err;
+        }
+        const board = (yield Board_1.default.find())
+            .filter(item => {
+            return req.user.perm('board', item.id + '').can('read');
+        })
+            .map(item => item.id);
+        try {
+            const page = parseInt(req.query.page);
+            const pagesize = parseInt(req.query.pagesize || 8);
+            let postcount = yield Post_1.default.find({
+                $or: options,
+                board: { $in: board },
+            }).count();
+            const posts = yield Post_1.default.find({
+                $or: options,
+                board: { $in: board },
             })
-        });
-    } catch (error) {
-        const errr = new Error('database error');
-        errr.status = 500;
-        throw errr;
-    }
+                .limit(pagesize)
+                .skip((page - 1) * pagesize);
+            res.status(200).json({
+                totalpage: postcount,
+                posts: posts.map(post => {
+                    return {
+                        board: post.board,
+                        _id: parseInt(post.id),
+                        title: post.title,
+                        content: post.content,
+                        author: post.author,
+                        isAnonymous: post.isAnonymous,
+                        created_date: post.created_date,
+                        view: post.view,
+                        like: post.likes_count,
+                        comment_count: post.comments.length,
+                        comment: post.comments,
+                    };
+                }),
+            });
+        }
+        catch (error) {
+            const errr = new Error('database error');
+            errr.status = 500;
+            throw errr;
+        }
+    });
 }));
-
 exports.default = router;
 //# sourceMappingURL=simple.route.js.map

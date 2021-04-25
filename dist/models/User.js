@@ -1,27 +1,14 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _mongoose = require('mongoose');
-
-var _mongoose2 = _interopRequireDefault(_mongoose);
-
-var _mongooseAutoIncrement = require('mongoose-auto-increment');
-
-var _mongooseAutoIncrement2 = _interopRequireDefault(_mongooseAutoIncrement);
-
-var _UserSchema = require('./schema/UserSchema');
-
-var _UserSchema2 = _interopRequireDefault(_UserSchema);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-_UserSchema2.default.plugin(_mongooseAutoIncrement2.default.plugin, {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const mongoose_auto_increment_1 = __importDefault(require("mongoose-auto-increment"));
+const UserSchema_1 = __importDefault(require("./schema/UserSchema"));
+UserSchema_1.default.plugin(mongoose_auto_increment_1.default.plugin, {
     model: 'User',
-    field: 'seq'
+    field: 'seq',
 });
-
-exports.default = _mongoose2.default.model('User', _UserSchema2.default);
+exports.default = mongoose_1.default.model('User', UserSchema_1.default);
 //# sourceMappingURL=User.js.map

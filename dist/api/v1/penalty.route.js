@@ -1,36 +1,26 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _express = require('express');
-
-var _express2 = _interopRequireDefault(_express);
-
-var _api = require('../../utils/api');
-
-var _Penalty = require('../../models/Penalty/Penalty');
-
-var _Penalty2 = _interopRequireDefault(_Penalty);
-
-var _PenaltyConfig = require('../../models/Penalty/PenaltyConfig');
-
-var _PenaltyConfig2 = _interopRequireDefault(_PenaltyConfig);
-
-var _attendanceUser = require('../../models/attendanceUser');
-
-var _attendanceUser2 = _interopRequireDefault(_attendanceUser);
-
-var _role = require('../../utils/role');
-
-var _expressValidator = require('express-validator');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const router = (0, _express2.default)();
-var moment = require('moment');
-
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const api_1 = require("../../utils/api");
+const Penalty_1 = __importDefault(require("../../models/Penalty/Penalty"));
+const PenaltyConfig_1 = __importDefault(require("../../models/Penalty/PenaltyConfig"));
+const attendanceUser_1 = __importDefault(require("../../models/attendanceUser"));
+const role_1 = require("../../utils/role");
+const express_validator_1 = require("express-validator");
+const moment_1 = __importDefault(require("moment"));
+const router = express_1.default();
 /**
  * @api {get} /penalty/read/:username 상벌점 조회
  * @apiDescription 사용자의 상벌점 조회
@@ -59,70 +49,75 @@ var moment = require('moment');
  *          }]
  *      }
  */
-router.get('/read/:username', [(0, _role.perm)('penalty').can('read'), (0, _expressValidator.param)('username').isString(), (0, _expressValidator.query)('start_date').isString(), (0, _expressValidator.query)('end_date').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    var result = [];
-    var attendanceUser = await _attendanceUser2.default.findOne({
-        name: req.params.username
-    }).select({ _id: 0, __v: 0, name: 0 });
-
-    var penaltyConfig = await _PenaltyConfig2.default.find();
-    if (attendanceUser != null) {
-        attendanceUser.status.forEach(element => {
-            if (moment(element.date) >= moment(req.query.start_date) && moment(element.date) <= moment(req.query.end_date)) {
-                if (element.state == 'late') {
-                    var Val = penaltyConfig.find((item, idx) => {
-                        return item.key === '지각';
-                    });
-                    result.push({
-                        type_id: Val._id,
-                        username: req.params.username,
-                        type: '지각',
-                        date: moment(element.date).format('YYYY-MM-DD'),
-                        description: '지각',
-                        point: Val.value
-                    });
+router.get('/read/:username', [
+    role_1.perm('penalty').can('read'),
+    express_validator_1.param('username').isString(),
+    express_validator_1.query('start_date').isString(),
+    express_validator_1.query('end_date').isString(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var result = [];
+        var attendanceUser = yield attendanceUser_1.default.findOne({
+            name: req.params.username,
+        }).select({ _id: 0, __v: 0, name: 0 });
+        var penaltyConfig = yield PenaltyConfig_1.default.find();
+        if (attendanceUser != null) {
+            attendanceUser.status.forEach(element => {
+                if (moment_1.default(element.date) >= moment_1.default(req.query.start_date) &&
+                    moment_1.default(element.date) <= moment_1.default(req.query.end_date)) {
+                    if (element.state == 'late') {
+                        var Val = penaltyConfig.find((item, idx) => {
+                            return item.key === '지각';
+                        });
+                        result.push({
+                            type_id: Val._id,
+                            username: req.params.username,
+                            type: '지각',
+                            date: moment_1.default(element.date).format('YYYY-MM-DD'),
+                            description: '지각',
+                            point: Val.value,
+                        });
+                    }
+                    if (element.state == 'absence') {
+                        var val = penaltyConfig.find((item, idx) => {
+                            return item.key === '결석';
+                        });
+                        result.push({
+                            type_id: val._id,
+                            username: req.params.username,
+                            type: '결석',
+                            date: moment_1.default(element.date).format('YYYY-MM-DD'),
+                            description: '결석',
+                            point: val.value,
+                        });
+                    }
                 }
-                if (element.state == 'absence') {
-                    var val = penaltyConfig.find((item, idx) => {
-                        return item.key === '결석';
-                    });
-                    result.push({
-                        type_id: val._id,
-                        username: req.params.username,
-                        type: '결석',
-                        date: moment(element.date).format('YYYY-MM-DD'),
-                        description: '결석',
-                        point: val.value
-                    });
-                }
-            }
-        });
-    }
-    var penalty = await _Penalty2.default.find({
-        username: req.params.username,
-        date: {
-            $gte: moment(req.query.start_date).format('YYYY-MM-DD'),
-            $lte: moment(req.query.end_date).format('YYYY-MM-DD')
+            });
         }
-    });
-
-    penalty.forEach(element => {
-        var val = penaltyConfig.find((item, idx) => {
-            return item.key === element.type;
-        });
-        result.push({
-            type_id: val._id,
+        var penalty = yield Penalty_1.default.find({
             username: req.params.username,
-            type: element.type,
-            date: moment(element.date).format('YYYY-MM-DD'),
-            description: element.description,
-            point: val.value
+            date: {
+                $gte: moment_1.default(req.query.start_date).format('YYYY-MM-DD'),
+                $lte: moment_1.default(req.query.end_date).format('YYYY-MM-DD'),
+            },
         });
+        penalty.forEach(element => {
+            var val = penaltyConfig.find((item, idx) => {
+                return item.key === element.type;
+            });
+            result.push({
+                type_id: val._id,
+                username: req.params.username,
+                type: element.type,
+                date: moment_1.default(element.date).format('YYYY-MM-DD'),
+                description: element.description,
+                point: val.value,
+            });
+        });
+        res.json(result);
     });
-
-    res.json(result);
 }));
-
 /**
  * @api {get} /penalty/read 상벌점 전체 조회
  * @apiDescription 전체 상벌점 조회
@@ -150,61 +145,60 @@ router.get('/read/:username', [(0, _role.perm)('penalty').can('read'), (0, _expr
  *          }]
  *      }
  */
-router.get('/read', [(0, _role.perm)('penalty').can('read'), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    var result = [];
-    var attendanceUser = await _attendanceUser2.default.find();
-    var penaltyConfig = await _PenaltyConfig2.default.find();
-    if (attendanceUser != null) {
-        attendanceUser.forEach(user => {
-            user.status.forEach(element => {
-                if (element.state == 'late') {
-                    var Val = penaltyConfig.find((item, idx) => {
-                        return item.key === '지각';
-                    });
-                    result.push({
-                        type_id: Val._id,
-                        username: user.name,
-                        type: '지각',
-                        date: moment(element.date).format('YYYY-MM-DD'),
-                        description: '지각',
-                        point: Val.value
-                    });
-                }
-                if (element.state == 'absence') {
-                    var val = penaltyConfig.find((item, idx) => {
-                        return item.key === '결석';
-                    });
-                    result.push({
-                        type_id: val._id,
-                        username: user.name,
-                        type: '결석',
-                        date: moment(element.date).format('YYYY-MM-DD'),
-                        description: '결석',
-                        point: val.value
-                    });
-                }
+router.get('/read', [role_1.perm('penalty').can('read'), api_1.validateParams], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var result = [];
+        var attendanceUser = yield attendanceUser_1.default.find();
+        var penaltyConfig = yield PenaltyConfig_1.default.find();
+        if (attendanceUser != null) {
+            attendanceUser.forEach(user => {
+                user.status.forEach(element => {
+                    if (element.state == 'late') {
+                        var Val = penaltyConfig.find((item, idx) => {
+                            return item.key === '지각';
+                        });
+                        result.push({
+                            type_id: Val._id,
+                            username: user.name,
+                            type: '지각',
+                            date: moment_1.default(element.date).format('YYYY-MM-DD'),
+                            description: '지각',
+                            point: Val.value,
+                        });
+                    }
+                    if (element.state == 'absence') {
+                        var val = penaltyConfig.find((item, idx) => {
+                            return item.key === '결석';
+                        });
+                        result.push({
+                            type_id: val._id,
+                            username: user.name,
+                            type: '결석',
+                            date: moment_1.default(element.date).format('YYYY-MM-DD'),
+                            description: '결석',
+                            point: val.value,
+                        });
+                    }
+                });
+            });
+        }
+        var penalty = yield Penalty_1.default.find();
+        penalty.forEach(element => {
+            var val = penaltyConfig.find((item, idx) => {
+                return item.key === element.type;
+            });
+            result.push({
+                type_id: val._id,
+                username: element.username,
+                type: element.type,
+                date: moment_1.default(element.date).format('YYYY-MM-DD'),
+                description: element.description,
+                point: val.value,
             });
         });
-    }
-    var penalty = await _Penalty2.default.find();
-
-    penalty.forEach(element => {
-        var val = penaltyConfig.find((item, idx) => {
-            return item.key === element.type;
-        });
-        result.push({
-            type_id: val._id,
-            username: element.username,
-            type: element.type,
-            date: moment(element.date).format('YYYY-MM-DD'),
-            description: element.description,
-            point: val.value
-        });
+        res.json(result);
     });
-
-    res.json(result);
 }));
-
 /**
  * @api {post} /penalty/write/ 상벌점 쓰기
  * @apiDescription 사용자의 상벌점 기록
@@ -230,19 +224,28 @@ router.get('/read', [(0, _role.perm)('penalty').can('read'), _api.validateParams
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
-router.post('/write', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.body)('type_id').isString(), (0, _expressValidator.body)('type').isString(), (0, _expressValidator.body)('date').isString(), (0, _expressValidator.body)('users').isArray(), (0, _expressValidator.body)('description').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    req.body.users.forEach(async username => {
-        var penalty = new _Penalty2.default();
-        penalty.type_id = req.body.type_id;
-        penalty.type = req.body.type;
-        penalty.username = username;
-        penalty.date = req.body.date;
-        penalty.description = req.body.description;
-        await penalty.save();
+router.post('/write', [
+    role_1.perm('penalty').can('update'),
+    express_validator_1.body('type_id').isString(),
+    express_validator_1.body('type').isString(),
+    express_validator_1.body('date').isString(),
+    express_validator_1.body('users').isArray(),
+    express_validator_1.body('description').isString(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        req.body.users.forEach((username) => __awaiter(this, void 0, void 0, function* () {
+            var penalty = new Penalty_1.default();
+            penalty.type_id = req.body.type_id;
+            penalty.type = req.body.type;
+            penalty.username = username;
+            penalty.date = req.body.date;
+            penalty.description = req.body.description;
+            yield penalty.save();
+        }));
+        res.end();
     });
-    res.end();
 }));
-
 /**
  * @api {delete} /penalty/delete 상벌점 삭제
  * @apiDescription 사용자의 상벌점 삭제
@@ -268,15 +271,23 @@ router.post('/write', [(0, _role.perm)('penalty').can('update'), (0, _expressVal
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
-router.delete('/delete', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.query)('username').isString(), (0, _expressValidator.query)('date').isString(), (0, _expressValidator.query)('type').isString(), (0, _expressValidator.query)('description').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    await _Penalty2.default.findOneAndDelete({
-        type: req.query.type,
-        username: req.query.username,
-        date: req.query.date,
-        description: req.query.description
+router.delete('/delete', [
+    role_1.perm('penalty').can('update'),
+    express_validator_1.query('username').isString(),
+    express_validator_1.query('date').isString(),
+    express_validator_1.query('type').isString(),
+    express_validator_1.query('description').isString(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield Penalty_1.default.findOneAndDelete({
+            type: req.query.type,
+            username: req.query.username,
+            date: req.query.date,
+            description: req.query.description,
+        });
+        res.end();
     });
-    res.end();
 }));
-
 exports.default = router;
 //# sourceMappingURL=penalty.route.js.map

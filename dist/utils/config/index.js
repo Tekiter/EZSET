@@ -1,59 +1,66 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.getConfig = getConfig;
-exports.setConfig = setConfig;
-exports.configAvailable = configAvailable;
-exports.setDefaultConfigs = setDefaultConfigs;
-
-var _Config = require('../../models/Config');
-
-var _Config2 = _interopRequireDefault(_Config);
-
-var _default = require('./default');
-
-var _default2 = _interopRequireDefault(_default);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.setDefaultConfigs = exports.configAvailable = exports.setConfig = exports.getConfig = void 0;
+const Config_1 = __importDefault(require("../../models/Config"));
+const default_1 = __importDefault(require("./default"));
 const cache = {};
-
-async function getConfig(key, defaultVal = undefined) {
-    if (cache[key]) {
-        return cache[key];
-    }
-    try {
-        const val = await _Config2.default.findOne().where('key').equals(key);
-        cache[key] = val.value;
-
-        return val ? val.value : defaultVal;
-    } catch (__) {
-        return defaultVal;
-    }
+function getConfig(key, defaultVal = undefined) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (cache[key]) {
+            return cache[key];
+        }
+        try {
+            const val = yield Config_1.default.findOne()
+                .where('key')
+                .equals(key);
+            cache[key] = val.value;
+            return val ? val.value : defaultVal;
+        }
+        catch (__) {
+            return defaultVal;
+        }
+    });
 }
-async function setConfig(key, value) {
-    let config = await _Config2.default.findOne().where('key').equals(key);
-
-    if (!config) {
-        config = new _Config2.default({ key });
-    }
-
-    config.value = value;
-
-    await config.save();
-
-    delete cache[key];
+exports.getConfig = getConfig;
+function setConfig(key, value) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let config = yield Config_1.default.findOne()
+            .where('key')
+            .equals(key);
+        if (!config) {
+            config = new Config_1.default({ key });
+        }
+        config.value = value;
+        yield config.save();
+        delete cache[key];
+    });
 }
-async function configAvailable() {
-    const count = await _Config2.default.estimatedDocumentCount();
-    return count !== 0;
+exports.setConfig = setConfig;
+function configAvailable() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const count = yield Config_1.default.estimatedDocumentCount();
+        return count !== 0;
+    });
 }
-
-async function setDefaultConfigs() {
-    for (let key of Object.keys(_default2.default)) {
-        await setConfig(key, _default2.default[key]);
-    }
+exports.configAvailable = configAvailable;
+function setDefaultConfigs() {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (let key of Object.keys(default_1.default)) {
+            yield setConfig(key, default_1.default[key]);
+        }
+    });
 }
+exports.setDefaultConfigs = setDefaultConfigs;
 //# sourceMappingURL=index.js.map

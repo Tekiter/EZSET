@@ -1,26 +1,18 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _mongoose = require('mongoose');
-
-var _mongoose2 = _interopRequireDefault(_mongoose);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
 // import autoIncrement from 'mongoose-auto-increment'
-
-const roleSchema = new _mongoose2.default.Schema({
+const roleSchema = new mongoose_1.default.Schema({
     tag: { type: String, trim: true, required: true, unique: true },
     name: { type: String, trim: true, required: true },
-    perm: { type: _mongoose2.default.Schema.Types.Mixed, default: {} }
+    perm: { type: mongoose_1.default.Schema.Types.Mixed, default: {} },
 });
-
 // roleSchema.plugin(autoIncrement.plugin, {
 //     model: 'role',
 //     startAt: 0,
 // })
-exports.default = _mongoose2.default.model('role', roleSchema);
+exports.default = mongoose_1.default.model('role', roleSchema);
 //# sourceMappingURL=Role.js.map

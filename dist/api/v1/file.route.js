@@ -1,21 +1,25 @@
-'use strict';
+"use strict";
+/*
+file.route.js
+파일 업로드와 다운로드를 관리하는 Route
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _express = require('express');
-
-var _file = require('../../utils/file');
-
-var _api = require('../../utils/api');
-
-var _expressValidator = require('express-validator');
-
-var _role = require('../../utils/role');
-
-const router = (0, _express.Router)();
-
+*/
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const file_1 = require("../../utils/file");
+const api_1 = require("../../utils/api");
+const express_validator_1 = require("express-validator");
+const role_1 = require("../../utils/role");
+const router = express_1.Router();
 /**
  * @api {get} /file/info/:file_id 업로드된 파일 정보
  * @apiDescription 업로드된 파일에 대한 기본 정보를 가져옴
@@ -37,24 +41,18 @@ const router = (0, _express.Router)();
  *        "timestamp": "2020-01-25T09:38:14.533Z"
  *      }
  */
-/*
-file.route.js
-파일 업로드와 다운로드를 관리하는 Route
-
-*/
-
-router.get('/info/:file_id', [(0, _expressValidator.param)('file_id').isMongoId(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    const fileinfo = await (0, _file.getFileInfo)(req.params.file_id);
+router.get('/info/:file_id', [express_validator_1.param('file_id').isMongoId(), api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const fileinfo = yield file_1.getFileInfo(req.params.file_id);
     if (fileinfo) {
         res.json(fileinfo);
-    } else {
+    }
+    else {
         // await deleteFile(req.params.file_id)
         const err = new Error('존재하지 않는 파일입니다.');
         err.status = 404;
         throw err;
     }
-}));
-
+})));
 /**
  * @api {post}} /file/upload 파일 업로드
  * @apiDescription 파일을 서버에 업로드한다.
@@ -70,16 +68,14 @@ router.get('/info/:file_id', [(0, _expressValidator.param)('file_id').isMongoId(
  *        "size":34850
  *      }
  */
-router.post('/upload', _file.upload.single('file'), (0, _api.asyncRoute)(async (req, res) => {
+router.post('/upload', file_1.upload.single('file'), api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // 업로드 이후 5분동안 첨부가 없으면, 파일을 자동 삭제한다.
-    (0, _file.setUploadExpireTimeout)(req.file.filename, 300000);
-
+    file_1.setUploadExpireTimeout(req.file.filename, 300000);
     res.json({
         id: req.file.filename,
-        size: req.file.size
+        size: req.file.size,
     });
-}));
-
+})));
 /**
  * @api {get} /file/download/:file_id 파일 다운로드
  * @apiDescription 업로드된 파일을 다운로드한다. 요청시 파일의 이진 데이터가 결과로 전송된다.
@@ -87,33 +83,34 @@ router.post('/upload', _file.upload.single('file'), (0, _api.asyncRoute)(async (
  * @apiGroup File
  * @apiParam {String} file_id 파일의 id
  */
-router.get('/download/:file_id', [(0, _expressValidator.param)('file_id').isMongoId(), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    const fileinfo = await (0, _file.getFileInfo)(req.params.file_id);
+router.get('/download/:file_id', [express_validator_1.param('file_id').isMongoId(), api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const fileinfo = yield file_1.getFileInfo(req.params.file_id);
     if (fileinfo) {
-        const fullpath = (0, _file.getFilePath)(req.params.file_id);
-        res.download(fullpath, fileinfo.filename, async err => {
+        const fullpath = file_1.getFilePath(req.params.file_id);
+        res.download(fullpath, fileinfo.filename, (err) => __awaiter(void 0, void 0, void 0, function* () {
             if (err) {
                 res.status(404).json({
-                    message: '삭제된 파일입니다.'
+                    message: '삭제된 파일입니다.',
                 });
-            } else {
-                await (0, _file.increaseFileHit)(req.params.file_id);
             }
-        });
-    } else {
+            else {
+                yield file_1.increaseFileHit(req.params.file_id);
+            }
+        }));
+    }
+    else {
         res.status(404).json({ message: '존재하지 않는 파일입니다.' });
     }
-}));
-
+})));
 /**
  * @api {get} /file/manage/cleanup 파일 폴더 정리
  * @apiDescription 사용되지 않지만, 디스크에 남아있는 파일을 삭제하여 용량을 확보한다.
  * @apiName CleanupFiles
  * @apiGroup File
  */
-router.post('/manage/cleanup', [(0, _role.perm)('manageServer').can('access'), _api.validateParams], (0, _api.asyncRoute)(async (req, res) => {
-    await (0, _file.cleanupUnlinkedFiles)();
+router.post('/manage/cleanup', [role_1.perm('manageServer').can('access'), api_1.validateParams], api_1.asyncRoute((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield file_1.cleanupUnlinkedFiles();
     res.status(200).end();
-}));
+})));
 exports.default = router;
 //# sourceMappingURL=file.route.js.map

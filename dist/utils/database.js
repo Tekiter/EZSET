@@ -1,39 +1,29 @@
-'use strict';
-
-var _mongoose = require('mongoose');
-
-var _mongoose2 = _interopRequireDefault(_mongoose);
-
-var _cachegoose = require('cachegoose');
-
-var _cachegoose2 = _interopRequireDefault(_cachegoose);
-
-var _mongooseAutoIncrement = require('mongoose-auto-increment');
-
-var _mongooseAutoIncrement2 = _interopRequireDefault(_mongooseAutoIncrement);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-_mongooseAutoIncrement2.default.initialize(_mongoose2.default.connection);
-(0, _cachegoose2.default)(_mongoose2.default);
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const cachegoose_1 = __importDefault(require("cachegoose"));
+const mongoose_auto_increment_1 = __importDefault(require("mongoose-auto-increment"));
+mongoose_auto_increment_1.default.initialize(mongoose_1.default.connection);
+cachegoose_1.default(mongoose_1.default);
 const database = {
     initialize(DATABASE_URI) {
         return new Promise(function (resolve, reject) {
-            _mongoose2.default.connect(DATABASE_URI, {
+            mongoose_1.default.connect(DATABASE_URI, {
                 useNewUrlParser: true,
-                useUnifiedTopology: true
+                useUnifiedTopology: true,
             }, function (err, db) {
                 if (err) {
                     reject(err);
-                } else {
+                }
+                else {
                     resolve();
                 }
             });
         });
-    }
+    },
 };
-
-module.exports.default = database;
-module.exports = database;
+exports.default = database;
 //# sourceMappingURL=database.js.map

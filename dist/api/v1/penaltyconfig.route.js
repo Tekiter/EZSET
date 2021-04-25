@@ -1,31 +1,24 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _express = require('express');
-
-var _express2 = _interopRequireDefault(_express);
-
-var _api = require('../../utils/api');
-
-var _PenaltyConfig = require('../../models/Penalty/PenaltyConfig');
-
-var _PenaltyConfig2 = _interopRequireDefault(_PenaltyConfig);
-
-var _role = require('../../utils/role');
-
-var _expressValidator = require('express-validator');
-
-var _Penalty = require('../../models/Penalty/Penalty');
-
-var _Penalty2 = _interopRequireDefault(_Penalty);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const router = (0, _express2.default)();
-
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const api_1 = require("../../utils/api");
+const PenaltyConfig_1 = __importDefault(require("../../models/Penalty/PenaltyConfig"));
+const role_1 = require("../../utils/role");
+const express_validator_1 = require("express-validator");
+const Penalty_1 = __importDefault(require("../../models/Penalty/Penalty"));
+const router = express_1.default();
 /**
  * @api {get} /penaltyconfig/read/ 상벌점 항목 조회
  * @apiDescription 사용자의 상벌점 항목 조회
@@ -48,11 +41,12 @@ const router = (0, _express2.default)();
  *          }]
  *      }
  */
-router.get('/read', [(0, _role.perm)('penalty').can('read')], (0, _api.asyncRoute)(async function (req, res) {
-    const cursor = await _PenaltyConfig2.default.find();
-    res.json(cursor);
+router.get('/read', [role_1.perm('penalty').can('read')], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const cursor = yield PenaltyConfig_1.default.find();
+        res.json(cursor);
+    });
 }));
-
 /**
  * @api {post} /penaltyconfig/write/ 상벌점 항목 생성
  * @apiDescription 상벌점 항목 생성
@@ -74,16 +68,26 @@ router.get('/read', [(0, _role.perm)('penalty').can('read')], (0, _api.asyncRout
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
-router.post('/write', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.body)('key').isString(), (0, _expressValidator.body)('value').isNumeric(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    const cnt = await _PenaltyConfig2.default.find().where('key').equals(req.body.key).count();
-    if (cnt > 0) return res.status(406).json();
-    var penaltyConfig = new _PenaltyConfig2.default();
-    penaltyConfig.key = req.body.key;
-    penaltyConfig.value = req.body.value;
-    penaltyConfig.save();
-    res.end();
+router.post('/write', [
+    role_1.perm('penalty').can('update'),
+    express_validator_1.body('key').isString(),
+    express_validator_1.body('value').isNumeric(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const cnt = yield PenaltyConfig_1.default.find()
+            .where('key')
+            .equals(req.body.key)
+            .count();
+        if (cnt > 0)
+            return res.status(406).json();
+        var penaltyConfig = new PenaltyConfig_1.default();
+        penaltyConfig.key = req.body.key;
+        penaltyConfig.value = req.body.value;
+        penaltyConfig.save();
+        res.end();
+    });
 }));
-
 /**
  * @api {post} /penaltyconfig/delete/ 상벌점 항목 삭제
  * @apiDescription 상벌점 항목 삭제
@@ -103,27 +107,32 @@ router.post('/write', [(0, _role.perm)('penalty').can('update'), (0, _expressVal
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
-
-router.delete('/:id', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.param)('id').isString(), (0, _expressValidator.query)('key').isString(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    if (req.query.key == '지각') {
-        const err = new Error('지각 항목은 삭제할 수 없습니다.');
-        err.status = 400;
-        throw err;
-    }
-    if (req.query.key == '결석') {
-        const err = new Error('결석 항목은 삭제할 수 없습니다.');
-        err.status = 400;
-        throw err;
-    }
-    await _Penalty2.default.deleteMany({
-        type_id: req.params.id
+router.delete('/:id', [
+    role_1.perm('penalty').can('update'),
+    express_validator_1.param('id').isString(),
+    express_validator_1.query('key').isString(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (req.query.key == '지각') {
+            const err = new Error('지각 항목은 삭제할 수 없습니다.');
+            err.status = 400;
+            throw err;
+        }
+        if (req.query.key == '결석') {
+            const err = new Error('결석 항목은 삭제할 수 없습니다.');
+            err.status = 400;
+            throw err;
+        }
+        yield Penalty_1.default.deleteMany({
+            type_id: req.params.id,
+        });
+        yield PenaltyConfig_1.default.findOneAndDelete({
+            _id: req.params.id,
+        });
+        res.end();
     });
-    await _PenaltyConfig2.default.findOneAndDelete({
-        _id: req.params.id
-    });
-    res.end();
 }));
-
 /**
  * @api {post} /penaltyconfig/update/ 상벌점 항목 수정
  * @apiDescription 상벌점 항목의 점수 수정
@@ -144,15 +153,22 @@ router.delete('/:id', [(0, _role.perm)('penalty').can('update'), (0, _expressVal
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  */
-router.post('/update', [(0, _role.perm)('penalty').can('update'), (0, _expressValidator.body)('_id').isString(), (0, _expressValidator.body)('key').isString(), (0, _expressValidator.body)('value').isNumeric(), _api.validateParams], (0, _api.asyncRoute)(async function (req, res) {
-    await _PenaltyConfig2.default.findOneAndUpdate({
-        _id: req.body._id
-    }, {
-        key: req.body.key,
-        value: req.body.value
+router.post('/update', [
+    role_1.perm('penalty').can('update'),
+    express_validator_1.body('_id').isString(),
+    express_validator_1.body('key').isString(),
+    express_validator_1.body('value').isNumeric(),
+    api_1.validateParams,
+], api_1.asyncRoute(function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield PenaltyConfig_1.default.findOneAndUpdate({
+            _id: req.body._id,
+        }, {
+            key: req.body.key,
+            value: req.body.value,
+        });
+        res.end();
     });
-
-    res.end();
 }));
 exports.default = router;
 //# sourceMappingURL=penaltyconfig.route.js.map
