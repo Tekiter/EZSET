@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const { validationResult } = require('express-validator')
+import { validationResult } from 'express-validator'
 import role from './role'
 import User from '../models/User'
 

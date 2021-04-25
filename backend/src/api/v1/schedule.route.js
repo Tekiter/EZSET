@@ -4,7 +4,7 @@ import Schedule from '../../models/Schedule'
 import { perm } from '../../utils/role'
 //import { param, body } from 'express-validator'
 import { body } from 'express-validator'
-var moment = require('moment')
+import moment from 'moment'
 const router = Router()
 
 /**
