@@ -1,52 +1,23 @@
 /* eslint-disable no-console */
-import express from 'express'
 import { validationResult } from 'express-validator'
 import role from './role'
 import User from '../models/User'
-import { RequestWithUser } from './auth'
-
-export type Request = express.Request | RequestWithUser
-export type Response = express.Response
-export type NextFunction = express.NextFunction
-
-interface RequestHandler {
-    (req: Request, res: Response, next?: NextFunction): void
-}
+import {
+    Middleware,
+    NextFunction,
+    Request,
+    RequestHandler,
+    Response,
+} from 'src/types'
 
 type AsyncRouteFunction = (
     fn: (
         ...args: Parameters<RequestHandler>
     ) => Promise<ReturnType<RequestHandler>>
-) => (...args: Parameters<RequestHandler>) => void
+) => (...args: Parameters<Middleware>) => void
 
 export const asyncRoute: AsyncRouteFunction = fn => (...args) =>
     fn(...args).catch(args[2])
-
-export function databaseError(res, error) {
-    const errfunc = err => {
-        // console.log(err)
-        res.status(500).json({ message: 'database error' })
-    }
-
-    if (error) {
-        errfunc(error)
-    } else {
-        return errfunc
-    }
-}
-
-export function unexpectedError(res, error) {
-    const errfunc = err => {
-        console.log(err)
-        res.status(500).json({ message: 'unexpected error' })
-    }
-
-    if (error) {
-        errfunc(error)
-    } else {
-        return errfunc
-    }
-}
 
 export function validateParams(
     req: Request,

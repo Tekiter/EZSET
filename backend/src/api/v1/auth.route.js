@@ -3,12 +3,7 @@ import { body } from 'express-validator'
 
 import { getConfig } from '../../utils/config'
 import * as auth from '../../utils/auth'
-import {
-    databaseError,
-    unexpectedError,
-    validateParams,
-    asyncRoute,
-} from '../../utils/api'
+import { validateParams, asyncRoute } from '../../utils/api'
 import User from '../../models/User'
 import PreUser from '../../models/PreUser'
 
@@ -168,24 +163,20 @@ router.route('/register').post(
 router.route('/register/doublecheck/username').post(
     [body('username').isString(), validateParams],
     asyncRoute(async (req, res) => {
-        try {
-            const exits = await User.count()
-                .where('username')
-                .equals(req.body.username)
-            const existsPreuser = await PreUser.count()
-                .where('username')
-                .equals(req.body.username)
+        const exits = await User.count()
+            .where('username')
+            .equals(req.body.username)
+        const existsPreuser = await PreUser.count()
+            .where('username')
+            .equals(req.body.username)
 
-            if (exits || existsPreuser) {
-                res.status(409).json({
-                    message: '이미 사용중인 아이디입니다.',
-                })
-                return
-            }
-            res.status(200).end()
-        } catch (error) {
-            unexpectedError(res, error)
+        if (exits || existsPreuser) {
+            res.status(409).json({
+                message: '이미 사용중인 아이디입니다.',
+            })
+            return
         }
+        res.status(200).end()
     })
 )
 
@@ -211,22 +202,18 @@ router.route('/register/doublecheck/username').post(
 router.route('/edittoken/issue').post(
     [body('username').isString(), body('password').isString(), validateParams],
     asyncRoute(async (req, res) => {
-        try {
-            const user = await User.findOne()
-                .where('username')
-                .equals(req.body.username)
+        const user = await User.findOne()
+            .where('username')
+            .equals(req.body.username)
 
-            if (user && user.checkPassword(req.body.password)) {
-                const editToken = await auth.createEditToken(req.body.username)
+        if (user && user.checkPassword(req.body.password)) {
+            const editToken = await auth.createEditToken(req.body.username)
 
-                res.status(200).json({
-                    editToken,
-                })
-            } else {
-                res.status(403).json({ message: '토큰 발급 실패' })
-            }
-        } catch (error) {
-            databaseError(res, error)
+            res.status(200).json({
+                editToken,
+            })
+        } else {
+            res.status(403).json({ message: '토큰 발급 실패' })
         }
     })
 )
