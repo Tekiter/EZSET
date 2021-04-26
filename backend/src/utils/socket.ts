@@ -1,15 +1,19 @@
+import express from 'express'
 import http from 'http'
 import sio from 'socket.io'
 
 //socket io to Attendance
 export const io = undefined
 
-export async function initSocket(app, SOCKET_PORT) {
+export async function initSocket(
+    app: express.Express,
+    SOCKET_PORT: string
+): Promise<void> {
     const server = http.createServer(app)
     const io = sio(server, { origins: '*:*' })
 
     //Attendance State
-    var curState = {
+    const curState = {
         flag: false,
         time: 180000,
     }
@@ -23,7 +27,7 @@ export async function initSocket(app, SOCKET_PORT) {
         socket.on('attendance', function(data) {
             curState.flag = data.flag
             if (!data.flag) curState.time = 18000
-            var msg = {
+            const msg = {
                 flag: data.flag,
                 time: curState.time,
             }
@@ -33,9 +37,9 @@ export async function initSocket(app, SOCKET_PORT) {
         })
         //setTimeout 3m when attendance start
 
-        socket.on('start', function(data) {
+        socket.on('start', function() {
             curState.time = 180000
-            var timerID = setInterval(function() {
+            const timerID = setInterval(function() {
                 if (curState.flag == false) {
                     clearInterval(timerID)
                     curState.time = 180000
@@ -44,7 +48,7 @@ export async function initSocket(app, SOCKET_PORT) {
                 if (curState.time == 0) {
                     clearInterval(timerID)
                     if (curState.flag == true) {
-                        var msg = {
+                        const msg = {
                             flag: false,
                         }
                         curState.flag = false
