@@ -1,11 +1,10 @@
 import { PenaltyService } from '../service/penalty.service'
 import { Response } from '../models/Response'
-
+// import apm from 'elastic-apm-node'
 export class PenaltyController {
     static createPenalty = async (req, res, next) => {
         try {
             const result = await PenaltyService.createPenalty(req.body)
-
             return res
                 .status(201)
                 .json(new Response(201, 'create Penalty success', result))
@@ -17,7 +16,6 @@ export class PenaltyController {
     static deletePenalty = async (req, res, next) => {
         try {
             const result = await PenaltyService.deletePenalty(req.params)
-
             return res
                 .status(200)
                 .json(new Response(200, 'delete Penalty success', result))
@@ -29,7 +27,6 @@ export class PenaltyController {
     static getPenaltys = async (req, res, next) => {
         try {
             const result = await PenaltyService.getPenaltys(req)
-
             return res
                 .status(200)
                 .json(new Response(200, 'get Penalty success', result))
@@ -41,7 +38,6 @@ export class PenaltyController {
     static getPenalty = async (req, res, next) => {
         try {
             const result = await PenaltyService.getPenalty(req)
-
             return res
                 .status(200)
                 .json(new Response(200, 'get Penalty success', result))

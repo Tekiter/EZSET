@@ -5,14 +5,9 @@ export class PenaltyService {
         const { users, type, description, date } = req
         try {
             let result = []
-            users.forEach(async username => {
+            users.forEach(username => {
                 result.push(
-                    await PenaltyDao.createPenalty(
-                        username,
-                        type,
-                        description,
-                        date
-                    )
+                    PenaltyDao.createPenalty(username, type, description, date)
                 )
             })
             return result
