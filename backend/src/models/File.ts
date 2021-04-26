@@ -1,5 +1,16 @@
 import mongoose from 'mongoose'
 
+export interface FileDocument extends mongoose.Document {
+    filename: string
+    size: number
+    uploader: string
+    mimetype: string
+    hit: number
+    timestamp: Date
+    link?: { target: string; ref: string }
+    increaseHit(): Promise<FileDocument>
+}
+
 const fileSchema = new mongoose.Schema({
     // 유저가 지정한 파일 이름
     filename: {
@@ -45,12 +56,12 @@ const fileSchema = new mongoose.Schema({
     },
 })
 
-fileSchema.methods.increaseHit = function() {
+fileSchema.methods.increaseHit = function(this: FileDocument) {
     this.hit += 1
     return this.save()
 }
 
-fileSchema.methods.hasLink = function() {
+fileSchema.methods.hasLink = function(this: FileDocument) {
     if (this.link) {
         if (this.link.target) {
             return true
@@ -59,4 +70,4 @@ fileSchema.methods.hasLink = function() {
     return false
 }
 
-export default mongoose.model('File', fileSchema)
+export default mongoose.model<FileDocument>('File', fileSchema)
