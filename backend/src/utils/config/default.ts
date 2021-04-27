@@ -1,3 +1,5 @@
+import { ConfigEntries } from './entries'
+
 export default {
     groupName: 'EZSET',
     usePreUser: true,
@@ -25,4 +27,4 @@ export default {
             },
         },
     },
-}
+} as Partial<ConfigEntries>

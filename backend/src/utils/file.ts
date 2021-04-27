@@ -1,5 +1,5 @@
 /*
-file.js
+file.ts
 파일 업로드와 다운로드를 관리하는 모듈
 
 */
@@ -7,7 +7,8 @@ file.js
 import fs from 'fs'
 import path from 'path'
 import multer from 'multer'
-import File from '../models/File'
+import File, { FileDocument } from '../models/File'
+import { FileInfo, FileXRef, Middleware } from 'src/types'
 
 // 파일이 저장될 디렉토리를 지정
 const uploadDir = process.env.FILE_UPLOAD_DIR || path.join(__dirname, 'upload')
@@ -31,7 +32,7 @@ const storage = multer.diskStorage({
         const fileobj = new File({
             filename: file.originalname,
         })
-        fileobj.save().then(res => {
+        fileobj.save().then(() => {
             cb(null, fileobj.id)
         })
     },
@@ -43,7 +44,7 @@ const rawUpload = multer({ storage })
 
 // 업로드된 파일의 정보를 db에 업데이트 하기위한 미들웨어
 export const upload = {
-    single(field) {
+    single(field: string): Middleware {
         return (req, res, next) => {
             const middle = rawUpload.single(field)
 
@@ -55,6 +56,9 @@ export const upload = {
                 }
 
                 File.findById(req.file.filename).then(file => {
+                    if (file === null) {
+                        throw new Error('File document not exists.')
+                    }
                     file.size = req.file.size
                     file.uploader = req.user.username
                     file.mimetype = req.file.mimetype
@@ -74,12 +78,22 @@ export const upload = {
     },
 }
 
+export async function getFileById(id: string): Promise<FileDocument> {
+    const file = await File.findById(id)
+    if (file === null) {
+        throw new Error('File record not found in db')
+    }
+    return file
+}
+
 /**
  * 파일 ID를 기준으로 파일의 정보를 가져온다.
  * @param {ObjectID} file_id
  */
-export async function getFileInfo(file_id) {
-    const file = await File.findById(file_id).cache()
+export async function getFileInfo(
+    file_id: string
+): Promise<FileInfo | undefined> {
+    const file = await File.findById(file_id) /*.cache()*/
 
     if (!file) {
         return undefined
@@ -94,10 +108,14 @@ export async function getFileInfo(file_id) {
     }
 }
 
-export async function getFileInfoArray(files) {
-    const output = []
-    for (let file of files) {
-        output.push(await getFileInfo(file))
+export async function getFileInfoArray(files: string[]): Promise<FileInfo[]> {
+    const output: FileInfo[] = []
+    for (const file of files) {
+        const fileinfo = await getFileInfo(file)
+        if (fileinfo === undefined) {
+            continue
+        }
+        output.push(fileinfo)
     }
     return output
 }
@@ -106,7 +124,7 @@ export async function getFileInfoArray(files) {
  * 파일의 ID를 기준으로 실제 파일 경로를 가져온다.
  * @param {ObjectID} file_id
  */
-export function getFilePath(file_id) {
+export function getFilePath(file_id: string): string {
     return path.join(uploadDir, file_id)
 }
 
@@ -114,15 +132,27 @@ export function getFilePath(file_id) {
  * 파일 다운로드 횟수를 1 증가시킨다.
  * @param {ObjectID} file_id
  */
-export async function increaseFileHit(file_id) {
-    const file = await File.findById(file_id).cache()
-    await file.increaseHit()
+export async function increaseFileHit(file_id: string): Promise<void> {
+    const file = await File.findById(file_id) /*.cache()*/
+    if (file) {
+        await file.increaseHit()
+    }
 }
 
-export function setUploadExpireTimeout(fileId, timeout) {
+function hasLink(
+    fileDocument: FileDocument
+): fileDocument is FileDocument & Pick<Required<FileDocument>, 'link'> {
+    if (fileDocument.link && fileDocument.link.target) {
+        return true
+    }
+    return false
+}
+
+export function setUploadExpireTimeout(fileId: string, timeout: number): void {
     setTimeout(async () => {
         const file = await File.findById(fileId)
-        if (!file.hasLink()) {
+
+        if (file && !hasLink(file)) {
             await deleteFile(fileId)
         }
     }, timeout)
@@ -132,7 +162,7 @@ export function setUploadExpireTimeout(fileId, timeout) {
  * 첨부가 가능한, 즉 역참조가 없는 파일인지 체크
  * @param {*} fileId 파일의 ID
  */
-export async function checkAttachableFile(fileId) {
+export async function checkAttachableFile(fileId: string): Promise<boolean> {
     // let file
     try {
         await File.findById(fileId + '')
@@ -151,12 +181,14 @@ export async function checkAttachableFile(fileId) {
  * 첨부가 가능한 파일 ID의 배열인지 체크
  * @param {*} files 파일 ID들이 들어있는 배열
  */
-export async function checkAttachableFileArray(files) {
+export async function checkAttachableFileArray(
+    files: string[]
+): Promise<boolean> {
     if (!Array.isArray(files)) {
         throw new Error('올바르지 않은 파일 ID 배열입니다.')
     }
 
-    for (let fileId of files) {
+    for (const fileId of files) {
         await checkAttachableFile(fileId)
     }
     return true
@@ -168,12 +200,21 @@ export async function checkAttachableFileArray(files) {
  * @param {*} target
  * @param {*} ref
  */
-export async function applyFileLink(files, target, ref) {
+export async function applyFileLink(
+    files: string[],
+    target: string,
+    ref: string
+): Promise<void> {
     if (!Array.isArray(files)) {
         files = [files]
     }
-    for (let fileId of files) {
+    for (const fileId of files) {
         const file = await File.findById(fileId)
+
+        if (!file) {
+            continue
+        }
+
         file.link = {
             target,
             ref,
@@ -187,15 +228,15 @@ export async function applyFileLink(files, target, ref) {
 
 /**
  * 파일 오브젝트에 역참조를 제거한다.
- * @param {*} files
  */
-export async function removeFileLink(files) {
+export async function removeFileLink(files: string[]): Promise<void> {
     if (!Array.isArray(files)) {
         files = [files]
     }
-    for (let fileId of files) {
-        const file = await File.findById(fileId)
-        file.link = {}
+    for (const fileId of files) {
+        const file = await getFileById(fileId)
+
+        file.link = undefined
 
         file.markModified('link')
 
@@ -207,20 +248,20 @@ export async function removeFileLink(files) {
  * 역참조가 없는 파일을 삭제한다.
  * @param {*} files
  */
-export async function deleteUnlinkedFile(files) {
+export async function deleteUnlinkedFile(files: string[]): Promise<void> {
     if (!Array.isArray(files)) {
         files = [files]
     }
-    for (let fileId of files) {
+    for (const fileId of files) {
         const file = await File.findById(fileId)
 
-        if (file && !file.hasLink()) {
+        if (file && !hasLink(file)) {
             await deleteFile(fileId)
         }
     }
 }
 
-export async function cleanupUnlinkedFiles() {
+export async function cleanupUnlinkedFiles(): Promise<void> {
     const allFiles = await File.find()
     await deleteUnlinkedFile(
         allFiles.map(file => {
@@ -233,9 +274,9 @@ export async function cleanupUnlinkedFiles() {
  * 해당 파일을 삭제한다.
  * @param {*} fileId
  */
-export async function deleteFile(fileId) {
+export async function deleteFile(fileId: string): Promise<void> {
     try {
-        const file = await File.findById(fileId)
+        const file = await getFileById(fileId)
         try {
             await fs.promises.unlink(path.join(uploadDir, file.id))
         } catch (error) {
@@ -251,12 +292,15 @@ export async function deleteFile(fileId) {
  * @param {*} files 파일 ID 또는 파일 ID의 배열
  * @param {*} username 판단할 유저
  */
-export async function checkIsFileOwner(files, username) {
+export async function checkIsFileOwner(
+    files: string[],
+    username: string
+): Promise<boolean> {
     if (!Array.isArray(files)) {
         files = [files]
     }
-    for (let fileId of files) {
-        const file = await File.findById(fileId)
+    for (const fileId of files) {
+        const file = await getFileById(fileId)
         if (file.uploader !== username) {
             return false
         }
@@ -268,27 +312,27 @@ export async function checkIsFileOwner(files, username) {
  * 파일들이 모두 역참조가 존재하지 않는지 확인한다.
  * @param {*} files
  */
-export async function checkUnlinkedFile(files) {
+export async function checkUnlinkedFile(files: string[]): Promise<boolean> {
     if (!Array.isArray(files)) {
         files = [files]
     }
-    for (let fileId of files) {
-        const file = await File.findById(fileId)
-        if (file.hasLink()) {
+    for (const fileId of files) {
+        const file = await getFileById(fileId)
+        if (hasLink(file)) {
             return false
         }
     }
     return true
 }
 
-export async function getFileLinks(files) {
+export async function getFileLinks(files: string[]): Promise<FileXRef[]> {
     if (!Array.isArray(files)) {
         files = [files]
     }
-    const res = []
-    for (let fileId of files) {
-        const file = await File.findById(fileId)
-        if (file.hasLink()) {
+    const res: FileXRef[] = []
+    for (const fileId of files) {
+        const file = await getFileById(fileId)
+        if (hasLink(file)) {
             res.push({
                 target: file.link.target,
                 ref: file.link.ref,

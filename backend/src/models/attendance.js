@@ -1,23 +1,23 @@
 import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
-const attendanceSchema  = new Schema({
+const attendanceSchema = new Schema({
     username: {
         type: String,
-        required : true
+        required: true,
     },
     realname: {
         type: String,
-        required : true
+        required: true,
     },
     date: {
         type: Date,
-        required : true
+        required: true,
     },
-    state:{
+    state: {
         type: String,
-        required : true
-    }
+        required: true,
+    },
 })
 
 module.exports = mongoose.model('attendance', attendanceSchema)

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { body } from 'express-validator'
-import auth from '../../utils/auth'
+import * as auth from '../../utils/auth'
 import { validateParams, asyncRoute } from '../../utils/api'
 import User from '../../models/User'
 

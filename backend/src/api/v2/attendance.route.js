@@ -1,5 +1,5 @@
-import express from 'express';
-var router = express.Router();
+import express from 'express'
+var router = express.Router()
 
 import { validateParams } from '../../utils/api'
 import { perm } from '../../utils/role'
@@ -9,14 +9,15 @@ import { AttendanceController } from '../../controller/attendance.controller'
 router.post(
     '/',
     [
-       perm('attendance').can('att'),
-       body('username').isString(),
-       body('realname').isString(),
-       body('state').isString(),
-       body('date').isString(),
-       validateParams,
+        perm('attendance').can('att'),
+        body('username').isString(),
+        body('realname').isString(),
+        body('state').isString(),
+        body('date').isString(),
+        validateParams,
     ],
-    AttendanceController.createAttendance);
+    AttendanceController.createAttendance
+)
 
 router.delete(
     '/',
@@ -26,7 +27,8 @@ router.delete(
         query('endDate').isString(),
         validateParams,
     ],
-    AttendanceController.deleteAttendances);
+    AttendanceController.deleteAttendances
+)
 
 router.delete(
     '/:username/:date',
@@ -36,16 +38,14 @@ router.delete(
         param('date').isString(),
         validateParams,
     ],
-    AttendanceController.deleteAttendance);
+    AttendanceController.deleteAttendance
+)
 
 router.get(
     '/:date',
-    [
-        perm('attendance').can('att'),
-        param('date').isString(),
-        validateParams,
-    ],
-    AttendanceController.getAttendanceByDate);
+    [perm('attendance').can('att'), param('date').isString(), validateParams],
+    AttendanceController.getAttendanceByDate
+)
 
 router.get(
     '/:username/date',
@@ -56,7 +56,8 @@ router.get(
         query('endDate').isString(),
         validateParams,
     ],
-    AttendanceController.getAttendanceByPeriod);
+    AttendanceController.getAttendanceByPeriod
+)
 
 router.patch(
     '/:username/:date',
@@ -67,6 +68,7 @@ router.patch(
         body('state').isString(),
         validateParams,
     ],
-    AttendanceController.updateAttendance);
+    AttendanceController.updateAttendance
+)
 
 export default router

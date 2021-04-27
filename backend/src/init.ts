@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
-import database from './utils/database'
+import * as database from './utils/database'
 import app from './app'
-import initialization from './utils/initialization'
+import { initialize } from './utils/initialization'
 import { initSocket } from './utils/socket'
 import elasticApmNode from 'elastic-apm-node'
 
@@ -49,7 +49,7 @@ export default async function initApp({
     DATABASE_URI,
     SOCKET_PORT,
     APM_SERVER_URL,
-}: initConfig) {
+}: initConfig): Promise<void> {
     console.log('Starting EZSET server...')
     try {
         //elastic apm
@@ -57,7 +57,7 @@ export default async function initApp({
 
         initDatabase(DATABASE_URI)
 
-        await initialization.initialize()
+        await initialize()
         await initSocket(app, SOCKET_PORT)
 
         app.listen(PORT, () => console.log(`Listening on port ${PORT}`))

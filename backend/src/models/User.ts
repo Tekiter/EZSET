@@ -1,5 +1,20 @@
 import mongoose from 'mongoose'
-import * as auth from '../../utils/auth'
+import autoIncerment from 'mongoose-auto-increment'
+import * as auth from '../utils/auth'
+
+export interface UserDocument extends mongoose.Document {
+    username: string
+    password_hash: string
+    info: any
+    roles: Array<string>
+    attable: boolean
+    timestamp: Date
+    seq: number
+}
+
+export interface UserModel extends mongoose.Model<UserDocument> {
+    checkPassword(password: string): boolean
+}
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -35,15 +50,20 @@ const userSchema = new mongoose.Schema({
 
 userSchema
     .virtual('password')
-    .get(function() {
+    .get(function(this: UserDocument) {
         return this.password_hash
     })
-    .set(function(value) {
+    .set(function(this: UserDocument, value: string) {
         this.password_hash = auth.hashPassword(value)
     })
 
-userSchema.methods.checkPassword = function(password) {
+userSchema.methods.checkPassword = function(password: string) {
     return auth.checkPassword(password, this.password_hash)
 }
 
-export default userSchema
+userSchema.plugin(autoIncerment.plugin, {
+    model: 'User',
+    field: 'seq',
+})
+
+export default mongoose.model<UserDocument, UserModel>('User', userSchema)
