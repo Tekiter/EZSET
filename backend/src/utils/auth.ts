@@ -2,7 +2,7 @@ import { Response, NextFunction } from 'express'
 import bcrypt from 'bcrypt-nodejs'
 import jwt from 'jsonwebtoken'
 import { getConfig } from './config'
-import { AccessInfo, StrictAccessInfo, Request } from 'src/types'
+import { AccessInfo, StrictAccessInfo, RequestWithAuth } from 'src/types'
 
 const JWT_SECRET: string = (({ JWT_SECRET }) => {
     if (JWT_SECRET === undefined) {
@@ -91,7 +91,7 @@ export function createEditToken(username: string): Promise<string> {
 }
 
 export async function loginRequired(
-    req: Request,
+    req: RequestWithAuth,
     res: Response,
     next: NextFunction
 ): Promise<void> {
@@ -113,7 +113,7 @@ export async function loginRequired(
 }
 
 export async function superAdminRequired(
-    req: Request,
+    req: RequestWithAuth,
     res: Response,
     next: NextFunction
 ): Promise<void> {

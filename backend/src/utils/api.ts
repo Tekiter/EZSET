@@ -1,12 +1,15 @@
 /* eslint-disable no-console */
+import express from 'express'
 import { validationResult } from 'express-validator'
 import role from './role'
 import User from '../models/User'
 import {
+    APIRouter,
     Middleware,
     NextFunction,
     Request,
     RequestHandler,
+    RequestWithAuth,
     Response,
 } from 'src/types'
 
@@ -16,23 +19,22 @@ type AsyncRouteFunction = (
     ) => Promise<ReturnType<RequestHandler>>
 ) => (...args: Parameters<Middleware>) => void
 
-export const asyncRoute: AsyncRouteFunction = fn => (...args) =>
-    fn(...args).catch(args[2])
+export const asyncRoute: AsyncRouteFunction = fn => (req, res, next) => {
+    return fn(req as RequestWithAuth, res).catch(next)
+}
 
 export function validateParams(
     req: Request,
     res: Response,
     next: NextFunction
-): boolean {
+): void {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() })
-        return false
     } else {
         if (next) {
             next()
         }
-        return true
     }
 }
 
@@ -87,4 +89,11 @@ export function isPositive(value: unknown): boolean {
         return intval >= 0
     }
     return false
+}
+
+export function createAPIRouter(): APIRouter {
+    const router = express.Router()
+    ;(router as APIRouter).loginNotRequired = false
+
+    return router as APIRouter
 }
