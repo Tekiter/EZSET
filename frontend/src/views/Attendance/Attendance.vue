@@ -31,7 +31,8 @@
             v-if="
                 flag &&
                     this.$perm('attendance').can('update') &&
-                    this.output_attendance_code != ''
+                    flag == true &&
+                    starter == this.$store.state.auth.user.username
             "
         >
             <v-toolbar flat color="primary">
@@ -50,12 +51,11 @@
                     <v-divider></v-divider>
                     출석 번호
                     <div class="display-3">
-                        {{ output_attendance_code }}
+                        {{ code }}
                     </div>
                 </div>
             </v-card-text>
         </v-card>
-
         <!-- 사용자들이 출석하는 카드 -->
         <v-card
             class="mx-auto"
@@ -63,7 +63,11 @@
             max-height="500"
             color="primary lighten-1"
             :dark="isDarkColor('primary')"
-            v-if="flag == true && code == 0 && output_attendance_code == ''"
+            v-if="
+                flag == true &&
+                    starter != this.$store.state.auth.user.username &&
+                    result == 0
+            "
         >
             <v-toolbar flat color="primary">
                 <v-icon>mdi-clipboard-check-outline</v-icon>
@@ -82,26 +86,30 @@
                 </v-col>
             </div>
             <div class="d-flex justify-center">
-                <v-btn text large @click="attendanceCheck()">출석하기</v-btn>
+                <v-btn
+                    text
+                    large
+                    @click="attendanceCheck(input_attendance_code)"
+                    >출석하기</v-btn
+                >
             </div>
         </v-card>
-
         <div>
             <v-alert
                 type="warning"
                 v-if="!this.$perm('attendance').can('update') && flag == false"
             >
-                출석중이 아닙니다.
+                출석 체크가 진행 중이지 않습니다.
             </v-alert>
             <v-alert
                 type="success"
                 v-if="
-                    this.output_attendance_code == '' &&
-                        flag == true &&
-                        code == 1
+                    flag == true &&
+                        result == 1 &&
+                        starter != this.$store.state.auth.user.username
                 "
             >
-                이미 출석하셨습니다!
+                출석하셨습니다!
             </v-alert>
         </div>
         <v-snackbar
@@ -118,38 +126,18 @@
 </template>
 <script>
 import moment from 'moment'
-import axios from 'axios'
+import socket from './../../utils/socket.io/socket.service'
+
 export default {
     name: 'attendance',
-    async created() {
-        await this.$socket.emit('join', {
-            roomName: 'attendance',
-        })
-        await this.$socket.on('attendance', data => {
-            this.flag = data.flag
-            this.remainTime = data.time
-        })
-
-        const attendanceCheckres = await axios.get('attendance/attendanceCheck')
-        this.code = parseInt(attendanceCheckres.data)
-
-        if (this.$perm('attendance').can('update')) {
-            const res = await axios.get('attendance/attendanceCheckAdmin')
-            if (res.data != 0) this.output_attendance_code = parseInt(res.data)
-            else this.output_attendance_code = 0
-        }
-
-        if (this.flag == true) this.tick()
-    },
-
     data() {
         return {
             input_attendance_code: '',
-            output_attendance_code: '',
             flag: false,
-            attendanceCard: true,
             code: 0,
+            starter: '',
             remainTime: 0,
+            result: 0,
             interval: '',
             snackbar: {
                 show: false,
@@ -158,51 +146,86 @@ export default {
             },
         }
     },
+    async created() {
+        await socket.emit('join', {
+            roomName: 'attendance',
+            user: this.$store.state.auth.user.username,
+        })
+        await socket.on('admin', data => {
+            this.code = data.code
+            this.tick()
+        })
+        await socket.on('init', data => {
+            this.flag = data.flag
+            this.remainTime = data.time
+            this.starter = data.starter
+            this.result = data.result
+        })
+        await socket.on('state', data => {
+            this.flag = data.flag
+            this.starter = data.starter
+
+            if (
+                this.starter != this.$store.state.auth.user.username &&
+                this.flag == true
+            ) {
+                this.attendanceCheck(-1)
+            }
+
+            if (data.flag == false) {
+                this.code = 0
+                this.result = 0
+                this.remainTime = 0
+                this.input_attendance_code = ''
+                clearInterval(this.interval)
+            }
+        })
+        await socket.on('result', data => {
+            if (data === 'fail')
+                this.openSnackbar('번호가 일치하지 않습니다', 'error')
+            else if (data === 'already') {
+                this.openSnackbar('이미 오늘 출석하셨습니다.', '#FFA000')
+                this.result = 1
+            } else if (data === 'prepare')
+                this.openSnackbar('출석코드를 입력해주세요.', 'success')
+            else {
+                this.openSnackbar('출석하셨습니다.', 'success')
+                this.result = 1
+                this.input_attendance_code = ''
+            }
+        })
+    },
+    mounted() {
+        if (this.flag == true) this.tick()
+    },
     methods: {
         async startAttendance() {
-            const res_code = await axios.post('attendance/startAttendance')
-            this.output_attendance_code = res_code.data.code
-            this.code = 1
-            this.$socket.emit('attendance', {
-                flag: true,
+            this.remainTime = 180000
+            this.code = Math.floor(Math.random() * (999 - 100 + 1)) + 100
+            socket.emit('start', {
+                code: this.code,
+                starter: this.$store.state.auth.user.username,
             })
-            this.$socket.emit('start', {
-                flag: true,
-            })
-            this.flag = true
             this.tick()
         },
         async endAttendance() {
-            this.$socket.emit('attendance', {
-                flag: false,
-            })
-            this.flag = false
+            socket.emit('stop')
             this.input_attendance_code = ''
-            await axios.post('attendance/attendanceCheckEnd')
             clearInterval(this.interval)
             this.$router.push(
                 `/AttendanceManageDay/${moment().format('YYYYMMDD')}`
             )
         },
-        async attendanceCheck() {
-            const res = await axios.post('attendance/attendanceWrite', {
-                code: this.input_attendance_code,
-                state: 'attendance',
+        async attendanceCheck(code) {
+            socket.emit('check', {
+                code,
+                user: this.$store.state.auth.user.username,
             })
-            if (res.data.result == 1) {
-                this.openSnackbar('출석하셨습니다!', 'success')
-                setTimeout(() => {
-                    this.$router.push('/AttendanceManageMonthUser')
-                }, 2000)
-            } else this.openSnackbar('번호가 일치하지 않습니다', 'error')
         },
         tick() {
             this.interval = setInterval(() => {
                 this.remainTime -= 1000
                 if (this.remainTime == 0) {
-                    this.$socket.emit('attendance', {
-                        flag: false,
-                    })
                     this.$router.push(
                         `/AttendanceManageDay/${moment().format('YYYYMMDD')}`
                     )
@@ -220,7 +243,6 @@ export default {
         timer() {
             var tmp = parseInt(this.remainTime / 1000 / 60) + ' : '
             if (parseInt((this.remainTime / 1000) % 60) == 0) return tmp + '00'
-            // else return tmp + ((this.remainTime / 1000) % 60)
             else {
                 if (parseInt((this.remainTime / 1000) % 60) < 10)
                     return tmp + '0' + ((this.remainTime / 1000) % 60)
