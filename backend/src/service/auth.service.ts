@@ -1,5 +1,5 @@
-import { UserDAO } from 'src/dao/user.dao'
-import { checkPassword, createAccessToken } from 'src/utils/auth'
+import { UserDAO } from '../dao/user.dao'
+import { checkPassword, createAccessToken } from '../utils/auth'
 
 interface AuthRequest {
     username: string

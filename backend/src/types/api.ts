@@ -3,6 +3,7 @@ import {
     Request as OriginalRequest,
     Response as OriginalResponse,
     NextFunction as OriginalNextFunction,
+    Query,
 } from 'express-serve-static-core'
 import { AccessInfo } from './auth'
 
@@ -20,7 +21,16 @@ export interface Middleware<Request extends OriginalRequest = RequestWithAuth> {
     (req: Request, res: Response, next: NextFunction): void | Promise<void>
 }
 
-export type RequestWithAuth = OriginalRequest & { user: AccessInfo }
+export interface ParamsDictionary {
+    [key: string]: string
+}
+export interface RequestWithAuth<
+    TBody = unknown,
+    TParams = ParamsDictionary,
+    TQuery = Query
+> extends OriginalRequest<TParams, unknown, TBody, TQuery> {
+    user: AccessInfo
+}
 
 export type RequestWithoutAuth = OriginalRequest
 

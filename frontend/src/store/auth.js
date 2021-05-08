@@ -23,7 +23,11 @@ export default {
     actions: {
         async login(context, { username, password }) {
             try {
-                const res = await axios.post('auth/login', {
+                // const res = await axios.post('auth/login', {
+                //     username,
+                //     password,
+                // })
+                const res = await axiosCommon.post('v2/auth/login', {
                     username,
                     password,
                 })
