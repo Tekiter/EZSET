@@ -1,10 +1,24 @@
-import axiosCommon from './axios.common.service'
+import axiosCommon from './../service/axios.common.service'
 
 export class AttendanceController {
+    static createAttendance = async (username, realname, state, date) => {
+        try {
+            const result = await axiosCommon.post('/v2/attendance', {
+                username,
+                realname,
+                state,
+                date,
+            })
+            return result.data
+        } catch (err) {
+            return err
+        }
+    }
+
     static getAttendanceByDate = async date => {
         try {
-            const result = await axiosCommon.get(`/v2/Attendance/${date}`)
-            return result.data.result
+            const result = await axiosCommon.get(`/v2/attendance/${date}`)
+            return result.data
         } catch (err) {
             return err
         }
@@ -17,7 +31,7 @@ export class AttendanceController {
     ) => {
         try {
             const result = await axiosCommon.get(
-                `/v2/Attendance/${username}/date`,
+                `/v2/attendance/${username}/date`,
                 {
                     params: {
                         startDate,
@@ -25,16 +39,47 @@ export class AttendanceController {
                     },
                 }
             )
-            return result.data.result
+            return result.data
         } catch (err) {
             return err
         }
     }
 
-    static deleteAttendance = async _id => {
+    static deleteAttendanceByUsernameAndDate = async (username, date) => {
         try {
-            const result = await axiosCommon.delete(`/v2/Attendance/${_id}`)
-            return result.data.result
+            const result = await axiosCommon.delete(
+                `/v2/attendance/${username}/${date}`
+            )
+            return result.data
+        } catch (err) {
+            return err
+        }
+    }
+    static deleteAttendanceByStartDateAndEndDate = async (
+        startDate,
+        endDate
+    ) => {
+        try {
+            const result = await axiosCommon.delete('/v2/attendance/', {
+                params: { startDate, endDate },
+            })
+            return result.data
+        } catch (err) {
+            return err
+        }
+    }
+
+    static updateAttendanceStateByUsernameAndDate = async (
+        username,
+        date,
+        state
+    ) => {
+        try {
+            const result = await axiosCommon.patch(
+                `/v2/attendance/${username}/${date}`,
+                { state }
+            )
+            return result.data
         } catch (err) {
             return err
         }

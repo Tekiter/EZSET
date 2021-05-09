@@ -58,17 +58,17 @@
                     <template>
                         <v-row class="mx-3">
                             <v-col
-                                v-for="item in statusData.status"
+                                v-for="item in attendance.info"
                                 :key="item.name"
                                 cols="12"
                             >
                                 <v-card flat>
                                     <div class="d-flex align-center mx-2">
                                         <span class="title font-weight-bold">
-                                            {{ findUserRealname(item.name) }}
+                                            {{ item.realname }}
                                         </span>
                                         <span class="subtitle-1 ml-2">
-                                            {{ item.name }}
+                                            {{ item.username }}
                                         </span>
                                         <v-spacer></v-spacer>
                                         <span
@@ -96,7 +96,8 @@
                                                 color="grey darken-1"
                                                 @click="
                                                     changeAttendanceState(
-                                                        item,
+                                                        item.username,
+                                                        item.date,
                                                         'attendance'
                                                     )
                                                 "
@@ -132,7 +133,8 @@
                                                 color="grey darken-1"
                                                 @click="
                                                     changeAttendanceState(
-                                                        item,
+                                                        item.username,
+                                                        item.date,
                                                         'late'
                                                     )
                                                 "
@@ -160,7 +162,8 @@
                                                 color="grey darken-1"
                                                 @click="
                                                     changeAttendanceState(
-                                                        item,
+                                                        item.username,
+                                                        item.date,
                                                         'absence'
                                                     )
                                                 "
@@ -197,7 +200,8 @@
                                                 color="grey darken-2"
                                                 @click="
                                                     changeAttendanceState(
-                                                        item,
+                                                        item.username,
+                                                        item.date,
                                                         'official_absence'
                                                     )
                                                 "
@@ -214,7 +218,10 @@
                         </v-row>
                     </template>
                     <div>
-                        <v-alert type="warning" v-if="statusData.length == 0">
+                        <v-alert
+                            type="warning"
+                            v-if="attendance.info.length == 0"
+                        >
                             출석정보가 없습니다.
                         </v-alert>
                     </div>
@@ -284,13 +291,12 @@
                                             v-if="item.approval == true"
                                             class="ma-3"
                                         >
-                                            <v-btn text icon color="success">
+                                            <v-btn icon color="success">
                                                 <v-icon>
                                                     mdi-checkbox-blank-circle-outline
                                                 </v-icon>
                                             </v-btn>
                                             <v-btn
-                                                text
                                                 icon
                                                 @click="
                                                     changeAbsenceState(item)
@@ -367,10 +373,10 @@
                             <v-row no-gutters>
                                 <v-col
                                     v-for="user in userAddDialog.users"
-                                    :key="user"
+                                    :key="user.username"
                                     v-show="
                                         searchMatches(
-                                            user,
+                                            user.realname,
                                             userAddDialog.search
                                         )
                                     "
@@ -380,9 +386,13 @@
                                     sm="6"
                                 >
                                     <v-checkbox
-                                        :label="`${user}`"
+                                        :label="
+                                            `${user.username}` +
+                                                ' ' +
+                                                `${user.realname}`
+                                        "
                                         v-model="userAddDialog.selections"
-                                        :value="user"
+                                        :value="user.username"
                                         hide-details
                                     >
                                     </v-checkbox>
@@ -435,6 +445,8 @@
 <script>
 import moment from 'moment'
 import axios from 'axios'
+import { AttendanceService } from '@/service/attendance.service'
+
 export default {
     async created() {
         if (!this.$perm('attendance').can('update')) {
@@ -447,7 +459,7 @@ export default {
     },
     data() {
         return {
-            total:{},
+            total: {},
             statusData: [],
             absenceDate: [],
             attLoad: false,
@@ -465,6 +477,9 @@ export default {
                 show: false,
                 text: '',
                 color: '',
+            },
+            attendance: {
+                info: [],
             },
             state: '',
             userName: '',
@@ -494,7 +509,7 @@ export default {
             }
             return ''
         },
-        async fetchTotal(){
+        async fetchTotal() {
             const cols = {
                 sum: 0,
                 attendance: 0,
@@ -502,8 +517,8 @@ export default {
                 absence: 0,
                 official_absence: 0,
             }
-            if (this.statusData.length != 0) {
-                await this.statusData.status.forEach(element => {
+            if (this.attendance.info.length != 0) {
+                await this.attendance.info.forEach(element => {
                     cols.sum += 1
                     if (element.state == 'attendance') cols.attendance += 1
                     else if (element.state == 'late') cols.late += 1
@@ -521,36 +536,32 @@ export default {
                 `absencecheck/absenceUsersData/${this.Mdate}`
             )
             this.absenceDate = res.data
-            this.absenLoad = true
 
             await this.updateAbsenceState()
-
-            try {
-                const res1 = await axios.get(
-                    `attendance/attendanceState/${this.date}`
-                )
-                this.state = res1.data.status
-                this.statusData = res1.data
-                this.attLoad = true
-            } catch (err) {
-                this.attLoad = true
-            }
-            const res2 = await axios.post('attendance/attendanceNUserData', {
-                day: this.date,
-            })
-            this.userAddDialog.users = res2.data
+            this.userAddDialog.users = await AttendanceService.getUsersWithoutAttendanceRecordByDate(
+                this.Mdate
+            )
+            this.attendance.info = await AttendanceService.getAttendanceByDate(
+                this.Mdate
+            )
+            this.absenLoad = true
+            this.attLoad = true
         },
         searchMatches(haystack, niddle) {
             return haystack.includes(niddle || '')
         },
         async applyUserAdd() {
-            await axios.put('attendance/addUsersRecords', {
-                users: this.userAddDialog.selections,
-                day: this.date,
+            this.userAddDialog.selections.forEach(username => {
+                AttendanceService.createAttendance(
+                    username,
+                    this.findUserRealname(username),
+                    this.Mdate,
+                    'attendance'
+                )
             })
             this.userAddDialog.show = false
             this.fetchAttUsers()
-            this.openSnackbar('추가했습니다!')
+            this.openSnackbar('추가했습니다!', 'success')
         },
         async cancelUserAdd() {
             this.userAddDialog.selections = []
@@ -559,31 +570,30 @@ export default {
         async updateAbsenceState() {
             for (let item of this.absenceDate) {
                 if (item.approval == true) {
-                    await axios.post(
-                        `attendance/attendancestateupdate/${this.date}`,
-                        {
-                            state: 'official_absence',
-                            name: item.name,
-                        }
+                    AttendanceService.updateAttendanceStateByUsernameAndDate(
+                        item.name,
+                        this.Mdate,
+                        'official_absence'
                     )
                 }
             }
         },
-        async changeAttendanceState(item, to) {
+        async changeAttendanceState(username, date, state) {
             try {
-                await axios.post(
-                    `attendance/attendancestateupdate/${this.date}`,
-                    {
-                        state: to,
-                        name: item.name,
-                    }
+                await AttendanceService.updateAttendanceStateByUsernameAndDate(
+                    username,
+                    this.Mdate,
+                    state
                 )
-                item.state = to
+                await this.fetchTotal()
+                await this.fetchAttUsers()
                 this.openSnackbar('변경되었습니다!', 'success')
             } catch (err) {
-                //console.log(err)
+                this.openSnackbar(
+                    '변경 실패 - 관리자에게 문의해주세요',
+                    'error'
+                )
             }
-            await this.fetchTotal()
         },
         async changeAbsenceState(item) {
             try {
@@ -595,26 +605,21 @@ export default {
                 item.approval = !item.approval
 
                 if (item.approval) {
-                    await axios.post(
-                        `attendance/attendancestateupdate/${this.date}`,
-                        {
-                            state: 'absence',
-                            name: item.name,
-                        }
+                    await AttendanceService.updateAttendanceStateByUsernameAndDate(
+                        item.name,
+                        this.Mdate,
+                        'absence'
                     )
                 } else {
-                    await axios.post(
-                        `attendance/attendancestateupdate/${this.date}`,
-                        {
-                            state: 'absence',
-                            name: item.name,
-                        }
+                    await AttendanceService.updateAttendanceStateByUsernameAndDate(
+                        item.name,
+                        this.Mdate,
+                        'absence'
                     )
                 }
                 this.fetchAttUsers()
                 this.openSnackbar('변경되었습니다!', 'success')
             } catch (err) {
-                //console.log(err)
                 this.openSnackbar('error', 'error')
             }
             await this.fetchTotal()
