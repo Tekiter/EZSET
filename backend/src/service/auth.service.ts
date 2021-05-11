@@ -1,3 +1,4 @@
+import { PreUserDAO } from '../dao/preUser.dao'
 import { UserDAO } from '../dao/user.dao'
 import { checkPassword, createAccessToken } from '../utils/auth'
 
@@ -6,8 +7,11 @@ interface AuthRequest {
     password: string
 }
 
+type AuthFailReason = 'STATE_PREUSER' | 'INVALID'
+
 interface AuthInfoFail {
     success: false
+    reason: AuthFailReason
 }
 
 interface AuthInfoSuccess {
@@ -24,7 +28,12 @@ export class AuthService {
             user === null ||
             !checkPassword(info.password, user.password_hash)
         ) {
-            return { success: false }
+            const preuser = await PreUserDAO.getPreUserByUsername(info.username)
+            if (preuser !== null) {
+                return { success: false, reason: 'STATE_PREUSER' }
+            }
+
+            return { success: false, reason: 'INVALID' }
         }
 
         const token = await createAccessToken({

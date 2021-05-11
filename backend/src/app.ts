@@ -77,6 +77,12 @@ function setupErrorHandler(app: express.Express) {
 
     // Error handler
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+        if (
+            !err.statusCode &&
+            (process.env.NODE_ENV + '').toLowerCase() !== 'production'
+        ) {
+            console.error(err)
+        }
         // eslint-disable-line no-unused-vars
         return res.status(err.statusCode || 500).json({
             statusCode: err.statusCode,
