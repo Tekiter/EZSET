@@ -20,3 +20,13 @@ export async function getRealname(username: string): Promise<string> {
         return ''
     }
 }
+
+export function isValidUsername(username: string): boolean {
+    const re = /^[a-z0-9]{6,12}$/
+    return re.test(username)
+}
+
+export function isValidPassword(password: string): boolean {
+    const re = /^(?=.*[A-Za-z]+)(?=.*[0-9]+)(?=.*[`~!@#$%^&*()\-_+=;:"'?.,<>[\]{}/\\|]*).{8,32}$/
+    return re.test(password)
+}

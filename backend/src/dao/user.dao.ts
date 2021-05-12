@@ -1,6 +1,6 @@
 import User, { UserDocument } from '../models/User'
 
-interface UserData {
+export interface UserData {
     username: string
     password_hash: string
     info: {
