@@ -6,10 +6,10 @@ export interface UserDocument extends mongoose.Document {
     username: string
     password_hash: string
     info: any
-    roles: Array<string>
-    attable: boolean
-    timestamp: Date
-    seq: number
+    roles?: Array<string>
+    attable?: boolean
+    timestamp?: Date
+    seq?: number
 }
 
 export interface UserModel extends mongoose.Model<UserDocument> {

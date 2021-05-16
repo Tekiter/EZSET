@@ -3,7 +3,17 @@ module.exports = {
     env: {
         node: true,
     },
-    extends: ['plugin:vue/essential', '@vue/prettier'],
+    parser: 'vue-eslint-parser',
+    parserOptions: {
+        parser: '@typescript-eslint/parser',
+    },
+    extends: [
+        'plugin:vue/essential',
+        'eslint:recommended',
+        '@vue/typescript',
+        '@vue/prettier',
+        '@vue/prettier/@typescript-eslint',
+    ],
     rules: {
         'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
         'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
@@ -15,9 +25,7 @@ module.exports = {
                 args: 'none',
             },
         ],
-    },
-    parserOptions: {
-        parser: 'babel-eslint',
+        'vue/valid-template-root': 0,
     },
     overrides: [
         {

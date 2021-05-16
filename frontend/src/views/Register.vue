@@ -117,6 +117,7 @@
 </template>
 <script>
 import axios from 'axios'
+import { AuthService } from '../service/auth.service'
 
 export default {
     data() {
@@ -166,12 +167,7 @@ export default {
             }
             this.isloading = true
             try {
-                await axios.post('auth/register', {
-                    username: this.form.username,
-                    password: this.form.password,
-                    realname: this.form.realname,
-                    email: this.form.email,
-                })
+                await AuthService.register(this.form)
                 this.$router.push({ path: '/' })
                 // // // eslint-disable-line no-console
             } catch (error) {

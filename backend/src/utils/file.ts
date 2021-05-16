@@ -8,7 +8,13 @@ import fs from 'fs'
 import path from 'path'
 import multer from 'multer'
 import File, { FileDocument } from '../models/File'
-import { FileInfo, FileXRef, Middleware } from 'src/types'
+import {
+    FileInfo,
+    FileXRef,
+    NextFunction,
+    Response,
+    RequestWithAuth,
+} from 'src/types'
 
 // 파일이 저장될 디렉토리를 지정
 const uploadDir = process.env.FILE_UPLOAD_DIR || path.join(__dirname, 'upload')
@@ -44,7 +50,9 @@ const rawUpload = multer({ storage })
 
 // 업로드된 파일의 정보를 db에 업데이트 하기위한 미들웨어
 export const upload = {
-    single(field: string): Middleware {
+    single(
+        field: string
+    ): (req: RequestWithAuth, res: Response, next: NextFunction) => void {
         return (req, res, next) => {
             const middle = rawUpload.single(field)
 
