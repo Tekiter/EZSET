@@ -2,14 +2,17 @@ import { Response, NextFunction } from 'express'
 import bcrypt from 'bcrypt-nodejs'
 import jwt from 'jsonwebtoken'
 import { getConfig } from './config'
-import { AccessInfo, StrictAccessInfo, RequestWithAuth } from 'src/types'
+import { AccessInfo, StrictAccessInfo, RequestWithAuth } from '../types'
 
-const JWT_SECRET: string = (({ JWT_SECRET }) => {
+function getJWTSecret(): string {
+    const JWT_SECRET = process.env.JWT_SECRET
+
     if (JWT_SECRET === undefined) {
-        throw new Error('Invalid JWT_SECRET')
+        throw new Error('JWT_SECRET is not set')
     }
+
     return JWT_SECRET + ''
-})(process.env)
+}
 
 function checkAccessInfo(raw: Partial<AccessInfo>): raw is AccessInfo {
     if (!('username' in raw)) {
@@ -39,7 +42,7 @@ export function createAccessToken({
                 username,
                 roles,
             },
-            JWT_SECRET,
+            getJWTSecret(),
             { expiresIn: 86400 },
             function(err, encoded) {
                 if (!err && encoded !== undefined) {
@@ -55,7 +58,7 @@ export function createAccessToken({
 //accessToken이 유효한지 확인
 export function checkToken(token: string): Promise<AccessInfo> {
     return new Promise(function(resolve, reject) {
-        jwt.verify(token, JWT_SECRET, function(err, decoded) {
+        jwt.verify(token, getJWTSecret(), function(err, decoded) {
             if (!err && decoded !== undefined) {
                 if (checkAccessInfo(decoded)) {
                     resolve(decoded)
@@ -77,7 +80,7 @@ export function createEditToken(username: string): Promise<string> {
                 username,
                 is_edit_token: true,
             } as StrictAccessInfo,
-            JWT_SECRET,
+            getJWTSecret(),
             { expiresIn: 300 },
             function(err, encoded) {
                 if (!err && encoded) {
