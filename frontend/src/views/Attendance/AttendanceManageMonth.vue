@@ -28,7 +28,7 @@
                         </template>
                         <v-date-picker
                             v-model="Sdate"
-                            @change=";(startDayPicker = false), fetchAll()"
+                            @change="changeDate()"
                             locale="ko"
                         ></v-date-picker>
                     </v-menu>
@@ -56,7 +56,7 @@
                         </template>
                         <v-date-picker
                             v-model="Edate"
-                            @change=";(endDayPicker = false), fetchAll()"
+                            @change="changeDate()"
                             locale="ko"
                         ></v-date-picker>
                     </v-menu>
@@ -66,7 +66,7 @@
 
         <!-- 출석 정보 카드 출력 -->
         <v-data-iterator
-            :items="infoAddedUsers"
+            :items="users"
             :search="toolbar.search"
             :loading="true"
             :items-per-page="itemsPerPage"
@@ -106,96 +106,13 @@
                         cols="12"
                         md="4"
                     >
-                        <v-card outlined>
-                            <div class="d-flex align-center mx-4 my-6">
-                                <span class="headline">
-                                    {{ user.realname }}
-                                </span>
-                                <span class="subtitle-1 ml-2">
-                                    {{ user.username }}
-                                </span>
-                                <v-spacer></v-spacer>
-                                <v-btn
-                                    v-if="$perm('attendance').can('update')"
-                                    @click="showAttendanceUserDialog(user)"
-                                    icon
-                                    small
-                                >
-                                    <v-icon>mdi-plus</v-icon>
-                                </v-btn>
-                            </div>
-                            <v-divider></v-divider>
-                            <v-card-text>
-                                <div class="d-flex">
-                                    <div class="d-flex flex-wrap flex-grow-1">
-                                        <v-tooltip bottom>
-                                            <template v-slot:activator="{ on }">
-                                                <v-icon
-                                                    color="success"
-                                                    v-on="on"
-                                                    >mdi-checkbox-blank-circle-outline</v-icon
-                                                >
-                                            </template>
-                                            <span>출석</span>
-                                        </v-tooltip>
-                                    </div>
-                                    <div
-                                        class="d-flex flex-wrap flex-grow-1 headline"
-                                    >
-                                        {{ user.v1 }}
-                                    </div>
-                                    <div class="d-flex flex-wrap flex-grow-1">
-                                        <v-tooltip bottom>
-                                            <template v-slot:activator="{ on }">
-                                                <v-icon
-                                                    color="warning"
-                                                    v-on="on"
-                                                    >mdi-triangle-outline</v-icon
-                                                >
-                                            </template>
-                                            <span>지각</span>
-                                        </v-tooltip>
-                                    </div>
-                                    <div
-                                        class="d-flex flex-wrap flex-grow-1 headline"
-                                    >
-                                        {{ user.v2 }}
-                                    </div>
-                                    <div class="d-flex flex-wrap flex-grow-1">
-                                        <v-tooltip bottom>
-                                            <template v-slot:activator="{ on }">
-                                                <v-icon color="error" v-on="on"
-                                                    >mdi-close</v-icon
-                                                >
-                                            </template>
-                                            <span>결석</span>
-                                        </v-tooltip>
-                                    </div>
-                                    <div
-                                        class="d-flex flex-wrap flex-grow-1 headline"
-                                    >
-                                        {{ user.v3 }}
-                                    </div>
-                                    <div class="d-flex flex-wrap flex-grow-1">
-                                        <v-tooltip bottom>
-                                            <template v-slot:activator="{ on }">
-                                                <v-icon
-                                                    color="success"
-                                                    v-on="on"
-                                                    >mdi-close-circle-outline</v-icon
-                                                >
-                                            </template>
-                                            <span>공결</span>
-                                        </v-tooltip>
-                                    </div>
-                                    <div
-                                        class="d-flex flex-wrap flex-grow-1 headline"
-                                    >
-                                        {{ user.v4 }}
-                                    </div>
-                                </div>
-                            </v-card-text>
-                        </v-card>
+                        <AttendanceManageMonthCard
+                            v-bind:username="user.username"
+                            :realname="user.realname"
+                            :Sdate="Sdate"
+                            :Edate="Edate"
+                            @fetch="fetchAll"
+                        ></AttendanceManageMonthCard>
                     </v-col>
                 </v-row>
             </template>
@@ -208,198 +125,6 @@
             </template>
         </v-data-iterator>
 
-        <!-- 유저 출결 정보 Dialog -->
-        <v-dialog
-            v-model="attendanceUserDialog.show"
-            persistent
-            max-width="350px"
-        >
-            <v-card>
-                <v-card-title>
-                    <span class="headline">{{
-                        attendanceUserDialog.user.realname
-                    }}</span>
-                    <v-card-subtitle>{{
-                        attendanceUserDialog.user.username
-                    }}</v-card-subtitle>
-                </v-card-title>
-                <v-card-text>
-                    <v-divider></v-divider>
-                    <v-skeleton-loader
-                        v-if="attendanceUserDialog.isLoading"
-                        class="mx-auto"
-                        max-width="300"
-                        type="list-item-two-line"
-                    ></v-skeleton-loader>
-                    <v-list v-if="attendanceUserDialog.isExist">
-                        <v-list-item
-                            v-for="recode in attendanceUserDialog.records"
-                            :key="recode.date"
-                        >
-                            <template>
-                                <v-list-item-content>
-                                    <v-list-item-title>
-                                        <div class="d-flex">
-                                            <div
-                                                class="d-flex flex-wrap flex-grow-1"
-                                            >
-                                                <v-btn
-                                                    @click="
-                                                        $router.push(
-                                                            `/AttendanceManageDay/${recode.date}`
-                                                        )
-                                                    "
-                                                    text
-                                                >
-                                                    {{
-                                                        changeDateFormat(
-                                                            recode.date
-                                                        )
-                                                    }}
-                                                </v-btn>
-                                            </div>
-                                            <v-spacer></v-spacer>
-                                            <div class="d-flex pl-3">
-                                                <v-tooltip bottom>
-                                                    <template
-                                                        v-slot:activator="{
-                                                            on,
-                                                        }"
-                                                    >
-                                                        <v-icon
-                                                            v-on="on"
-                                                            v-if="
-                                                                recode.state ==
-                                                                    'attendance'
-                                                            "
-                                                            color="success"
-                                                            >mdi-checkbox-blank-circle-outline</v-icon
-                                                        >
-                                                    </template>
-                                                    <span>출석</span>
-                                                </v-tooltip>
-                                                <v-tooltip bottom>
-                                                    <template
-                                                        v-slot:activator="{
-                                                            on,
-                                                        }"
-                                                    >
-                                                        <v-icon
-                                                            v-on="on"
-                                                            v-if="
-                                                                recode.state ==
-                                                                    'late'
-                                                            "
-                                                            color="warning"
-                                                            >mdi-triangle-outline</v-icon
-                                                        >
-                                                    </template>
-                                                    <span>지각</span>
-                                                </v-tooltip>
-                                                <v-tooltip bottom>
-                                                    <template
-                                                        v-slot:activator="{
-                                                            on,
-                                                        }"
-                                                    >
-                                                        <v-icon
-                                                            v-on="on"
-                                                            v-if="
-                                                                recode.state ==
-                                                                    'absence'
-                                                            "
-                                                            color="error"
-                                                            >mdi-close</v-icon
-                                                        >
-                                                    </template>
-                                                    <span>결석</span>
-                                                </v-tooltip>
-                                                <v-tooltip bottom>
-                                                    <template
-                                                        v-slot:activator="{
-                                                            on,
-                                                        }"
-                                                    >
-                                                        <v-icon
-                                                            v-on="on"
-                                                            v-if="
-                                                                recode.state ==
-                                                                    'official_absence'
-                                                            "
-                                                            color="success"
-                                                            >mdi-close-circle-outline</v-icon
-                                                        >
-                                                    </template>
-                                                    <span>공결</span>
-                                                </v-tooltip>
-                                            </div>
-                                            <div class="d-flex pl-3">
-                                                <v-tooltip bottom>
-                                                    <template
-                                                        v-slot:activator="{
-                                                            on,
-                                                        }"
-                                                    >
-                                                        <v-btn
-                                                            icon
-                                                            text
-                                                            @click="
-                                                                openDeleteItem(
-                                                                    recode
-                                                                )
-                                                            "
-                                                        >
-                                                            <v-icon v-on="on">
-                                                                mdi-trash-can-outline
-                                                            </v-icon>
-                                                        </v-btn>
-                                                    </template>
-                                                    <span>삭제</span>
-                                                </v-tooltip>
-                                            </div>
-                                        </div>
-                                    </v-list-item-title>
-                                </v-list-item-content>
-                            </template>
-                        </v-list-item>
-                        <v-divider></v-divider>
-                    </v-list>
-                </v-card-text>
-                <v-card-text v-if="!attendanceUserDialog.isExist">
-                    정보가 없습니다.
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn @click.native="closeattendanceUserDialog()" text
-                        >닫기</v-btn
-                    >
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-        <!--출석기록삭제-->
-        <v-dialog v-model="deleteDialog.show" persistent max-width="300px">
-            <v-card>
-                <v-card-title>
-                    <span class="headline">삭제</span
-                    ><v-card-subtitle>{{
-                        deleteDialog.info.username
-                    }}</v-card-subtitle>
-                </v-card-title>
-                <v-card-text>
-                    해당 항목을 삭제하시겠습니까?
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        @click="deleteItem(deleteDialog.info)"
-                        text
-                        color="error"
-                        >삭제</v-btn
-                    >
-                    <v-btn @click="deleteDialog.show = false" text>닫기</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
         <v-snackbar
             v-model="snackbar.show"
             :timeout="2000"
@@ -416,10 +141,12 @@
 import axios from 'axios'
 import moment from 'moment'
 import PaginationFooter from '../../components/misc/PaginationFooter.vue'
+import AttendanceManageMonthCard from '../../components/attendance/AttendanceManageMonthCard.vue'
 
 export default {
     components: {
         PaginationFooter,
+        AttendanceManageMonthCard,
     },
     data() {
         return {
@@ -466,6 +193,15 @@ export default {
             },
         }
     },
+    async created() {
+        if (!this.$perm('attendance').can('update')) {
+            this.$router.push({ name: 'error403' })
+            return
+        }
+
+        this.fetchAll()
+        console.log(this.users)
+    },
     computed: {
         isFetching() {
             return this.fetchingCount > 0
@@ -485,89 +221,21 @@ export default {
         async fetchAll() {
             this.infoAddedUsers = []
             this.fetchingCount += 1
-            const res = await axios.get('attendance/attendanceDayList')
-            this.attendanceDayData = res.data
-
             await this.fetchUsers()
-            await this.addInfoInUsers()
             this.fetchingCount -= 1
         },
         async fetchUsers() {
             this.fetchingCount += 1
             try {
-                const users = await axios.get('user')
-
-                this.totalCount = users.data.total
-                this.users = users.data.users
+                const result = await axios.get('/user')
+                this.users = result.data.users
             } finally {
                 this.fetchingCount -= 1
             }
         },
-        async addInfoInUsers() {
-            const res = this.users.map(user => {
-                return {
-                    username: user.username,
-                    realname: user.realname,
-                    v1: 0,
-                    v2: 0,
-                    v3: 0,
-                    v4: 0,
-                }
-            })
-            res.forEach(user => {
-                this.attendanceDayData
-                    .filter(val => {
-                        return (
-                            parseInt(val.day) >=
-                                parseInt(
-                                    moment(this.Sdate).format('YYYYMMDD')
-                                ) &&
-                            parseInt(val.day) <=
-                                parseInt(moment(this.Edate).format('YYYYMMDD'))
-                        )
-                    })
-                    .map(item => {
-                        item.status.forEach(st => {
-                            if (st.name == user.username) {
-                                if (st.state == 'attendance') user.v1 += 1
-                                else if (st.state == 'late') user.v2 += 1
-                                else if (st.state == 'absence') user.v3 += 1
-                                else if (st.state == 'official_absence')
-                                    user.v4 += 1
-                            }
-                        })
-                    })
-            })
-            this.infoAddedUsers = res
-        },
+
         searchMatches(haystack, niddle) {
             return haystack.includes(niddle)
-        },
-        async showAttendanceUserDialog(user) {
-            this.attendanceUserDialog.isLoading = true
-            this.attendanceUserDialog.show = true
-            this.attendanceUserDialog.user = user
-            const tmp = []
-            if (user.v1 == 0 && user.v2 == 0 && user.v3 == 0 && user.v4 == 0) {
-                this.attendanceUserDialog.isExist = false
-            } else {
-                const res = await axios.post('attendance/attendanceUser', {
-                    name: user.username,
-                })
-                for (let i in res.data.status) {
-                    if (
-                        parseInt(res.data.status[i].date) >=
-                            parseInt(moment(this.Sdate).format('YYYYMMDD')) &&
-                        parseInt(res.data.status[i].date) <=
-                            parseInt(moment(this.Edate).format('YYYYMMDD'))
-                    ) {
-                        tmp.push(res.data.status[i])
-                    }
-                }
-                this.attendanceUserDialog.isExist = true
-            }
-            this.attendanceUserDialog.records = tmp
-            this.attendanceUserDialog.isLoading = false
         },
         closeattendanceUserDialog() {
             this.attendanceUserDialog.isExist = true
@@ -578,38 +246,16 @@ export default {
         changeDateFormat(date) {
             return moment(date).format('YYYY년 MM월 DD일')
         },
-        async openDeleteItem(info) {
-            this.deleteDialog.show = true
-            this.deleteDialog.info = info
-            this.deleteDialog.username = this.attendanceUserDialog.user.username
-        },
-        async deleteItem(info) {
-            await axios.delete(`attendance/delete`, {
-                params: {
-                    username: this.attendanceUserDialog.user.username,
-                    date: info.date,
-                },
-            })
-            this.openSnackbar('삭제되었습니다', 'success')
-
-            this.deleteDialog.show = false
-            this.fetchingCount += 1
+        changeDate() {
+            this.startDayPicker = false
+            this.endDayPicker = false
             this.fetchAll()
-            this.attendanceUserDialog.show = false
-            this.fetchingCount -= 1
         },
         openSnackbar(text, color) {
             this.snackbar.text = text
             this.snackbar.color = color
             this.snackbar.show = true
         },
-    },
-    async created() {
-        if (!this.$perm('attendance').can('update')) {
-            this.$router.push({ name: 'error403' })
-            return
-        }
-        this.fetchAll()
     },
 }
 </script>
