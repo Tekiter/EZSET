@@ -34,6 +34,23 @@ export class AttendanceService {
         }
     }
 
+    static getAttendanceByUsernameAndDateBetweenStartDateAndEndDate = async (
+        username,
+        startDate,
+        endDate
+    ) => {
+        try {
+            const result = await AttendanceController.getAttendanceByUsernameAndDateBetweenStartDateAndEndDate(
+                username,
+                startDate,
+                endDate
+            )
+            return result.result
+        } catch (err) {
+            return err
+        }
+    }
+
     static getUsersWithoutAttendanceRecordByDate = async date => {
         try {
             const users = await axios.get('/user')
@@ -69,6 +86,18 @@ export class AttendanceService {
                 username,
                 date,
                 state
+            )
+            return result.result
+        } catch (err) {
+            return err
+        }
+    }
+
+    static deleteAttendanceByUsernameAndDate = async (username, date) => {
+        try {
+            const result = await AttendanceController.deleteAttendanceByUsernameAndDate(
+                username,
+                date
             )
             return result.result
         } catch (err) {

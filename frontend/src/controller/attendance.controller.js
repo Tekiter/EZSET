@@ -24,6 +24,26 @@ export class AttendanceController {
         }
     }
 
+    static getAttendanceByUsernameAndDateBetweenStartDateAndEndDate = async (
+        username,
+        startDate,
+        endDate
+    ) => {
+        try {
+            const result = await axiosCommon.get(
+                `/v2/attendance/${username}/date`,
+                {
+                    params: {
+                        startDate,
+                        endDate,
+                    },
+                }
+            )
+            return result.data
+        } catch (err) {
+            return err
+        }
+    }
     static getAttendanceByUsernameAndDate = async (
         username,
         startDate,
