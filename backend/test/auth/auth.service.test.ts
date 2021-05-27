@@ -15,10 +15,10 @@ describe('Create Auth Token', () => {
             username: 'admin',
             password: 'admin',
         })
-        expect(res.success == true)
+        expect(res.success).toBeTruthy()
         if (res.success) {
             const token = await checkToken(res.token)
-            expect(token.username === 'admin')
+            expect(token.username).toBe('admin')
         }
     })
 
@@ -27,9 +27,9 @@ describe('Create Auth Token', () => {
             username: 'admin',
             password: 'zzzz',
         })
-        expect(res.success == false)
+        expect(res.success).toBeFalsy()
 
         res = await AuthService.createAuthToken({ username: 'a', password: '' })
-        expect(res.success == false)
+        expect(res.success).toBeFalsy()
     })
 })
