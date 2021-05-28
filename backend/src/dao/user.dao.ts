@@ -20,6 +20,12 @@ export class UserDAO {
     }
 
     static async createUser(userData: UserData): Promise<UserDocument> {
-        return await User.create(userData)
+        // return await User.create(userData)
+        const user = new User(userData)
+        return await user.save()
+    }
+
+    static async deleteUser(username: string): Promise<void> {
+        await User.deleteOne({ username: username }).exec()
     }
 }
