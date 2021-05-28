@@ -1,4 +1,3 @@
-import { getConfig } from '../utils/config'
 import { PreUserDAO } from '../dao/preUser.dao'
 import { UserDAO } from '../dao/user.dao'
 import { hashPassword } from '../utils/auth'
@@ -22,11 +21,25 @@ export class UserService {
                 email: email,
             },
         }
-        if ((await getConfig('usePreUser', false)) == true) {
-            await PreUserDAO.createPreUser(form)
-        } else {
-            await UserDAO.createUser(form)
+        await UserDAO.createUser(form)
+    }
+
+    static async createPreUser(info: RegisterRequest): Promise<void> {
+        const { username, password, realname, email } = info
+
+        const form = {
+            username: username,
+            password_hash: hashPassword(password),
+            info: {
+                realname: realname,
+                email: email,
+            },
         }
+        await PreUserDAO.createPreUser(form)
+    }
+
+    static async deleteUser(username: string): Promise<void> {
+        await UserDAO.deleteUser(username)
     }
 
     static async isDuplicateUsername(username: string): Promise<boolean> {

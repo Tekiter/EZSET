@@ -1,6 +1,7 @@
 import { UserService } from '../service/user.service'
 import { isValidPassword, isValidUsername } from '../utils/user'
 import { asyncRoute } from '../utils/api'
+import { getConfig } from '../utils/config'
 
 interface RegisterData {
     username: string
@@ -54,12 +55,18 @@ export class UserController {
             })
         }
 
-        await UserService.createUser({
+        const obj = {
             username,
             password,
             realname,
             email,
-        })
+        }
+
+        if ((await getConfig('usePreUser')) === true) {
+            await UserService.createPreUser(obj)
+        } else {
+            await UserService.createUser(obj)
+        }
 
         res.status(201).json({
             message: 'success',

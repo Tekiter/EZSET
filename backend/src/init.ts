@@ -55,7 +55,7 @@ export default async function initApp({
         //elastic apm
         initElastic(APM_SERVER_URL)
 
-        initDatabase(DATABASE_URI)
+        await initDatabase(DATABASE_URI)
 
         await initialize()
         await initSocket(app, SOCKET_PORT)
